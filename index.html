@@ -1,62 +1,111 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Turbo Tiger — App</title>
-  <meta name="description" content="Turbo Tiger — cadastro, indicação e monitoramento de apostas. Baixe o APK para Android."/>
-  <link rel="icon" href="/favicon.ico"/>
-  <style>
-    /* estilo simples e responsivo, baseado em layout corporativo */
-    body { font-family: Arial,Helvetica,sans-serif; margin:0; color:#222; background:#f7f7f9; }
-    header{ background:#0b5ed7; color:#fff; padding:20px 16px;}
-    .container{ max-width:900px; margin:24px auto; padding:16px; background:#fff; border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.06);}
-    h1{ margin:0 0 8px; font-size:22px;}
-    p.lead{ color:#444; margin:8px 0 18px; line-height:1.45;}
-    .actions{ display:flex; gap:10px; flex-wrap:wrap; }
-    .btn{ display:inline-block; padding:12px 18px; border-radius:8px; text-decoration:none; font-weight:600; }
-    .btn-primary{ background:#0b5ed7; color:#fff; }
-    .btn-secondary{ background:#e9ecef; color:#111; }
-    footer{ margin-top:18px; font-size:13px; color:#666; }
-    .muted{ color:#666; font-size:13px; }
-    .note{ margin-top:12px; padding:12px; background:#fbfbfd; border-left:4px solid #0b5ed7; border-radius:6px;}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Turbo Tiger — Comunidade & App</title>
+<meta name="description" content="Comunidade Turbo — estratégia e app para acompanhar suas bets.">
+<style>
+  :root{ --accent:#f4b400; --accent-dark:#c88e00; --bg:#0b0b0b; --card:#ffffff; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial;color:#111;background:#fafafa;}
+  header{padding:28px 16px;background:linear-gradient(180deg,rgba(0,0,0,0.55),rgba(0,0,0,0.35)), url('assets/bg-1200.webp') center/cover no-repeat; color: white;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  .hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand img{width:72px;height:72px;object-fit:contain;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.35);}
+  h1{margin:0;font-size:26px;}
+  p.lead{margin:10px 0 14px;color:#eef3ff;max-width:720px;}
+  main{padding:20px 16px;display:block;margin-top:-40px;}
+  .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 12px 30px rgba(2,6,23,0.08);}
+  .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+  .btn{display:inline-block;padding:12px 16px;border-radius:10px;font-weight:700;text-decoration:none;cursor:pointer;}
+  .btn-primary{background:var(--accent);color:#111;}
+  .btn-ghost{background:transparent;border:2px solid #eee;color:#111;}
+  .info{color:#444;font-size:15px;margin-top:12px;}
+  footer{text-align:center;margin:18px 0;color:#777;font-size:14px;}
+  .indicator-banner{background:linear-gradient(90deg,var(--accent),var(--accent-dark));color:#111;padding:8px;border-radius:8px;font-weight:700;display:inline-block;}
+  @media(max-width:640px){ header{padding:18px;} .brand img{width:56px;height:56px;} h1{font-size:20px} .hero{gap:12px} }
+</style>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <h1>Turbo Tiger</h1>
-      <div class="muted">App de gestão de bets — versão de distribuição direta (Android APK).</div>
+<header>
+  <div class="wrap hero">
+    <div class="brand">
+      <img src="assets/logo-200.png" alt="Turbo Tiger">
+      <div>
+        <h1>Turbo Tiger</h1>
+        <div style="opacity:.95">App + Comunidade para melhorar suas estratégias em bets</div>
+      </div>
     </div>
-  </header>
-
-  <main class="container" role="main">
-    <h2>Baixe o APK</h2>
-    <p class="lead">Clique em “Baixar APK” para iniciar o download no seu dispositivo Android. Se você veio por um link de indicação, o sistema vai guardar o indicador e, após instalar o app, o app poderá recuperar esse indicador seguindo o fluxo de finalização.</p>
-
-    <div class="actions">
-      <!-- Link de download: substitua URL_FINAL_APK pela URL final do APK que você irá hospedar -->
-      <a id="downloadBtn" class="btn btn-primary" href="https://turbotiger.com.br/turbotiger.apk" rel="noopener">Baixar APK</a>
-      <a class="btn btn-secondary" href="/politicaetermos.html">Política de Privacidade & Termos</a>
+    <div style="margin-left:auto;">
+      <img src="assets/tiger-512.png" alt="Tiger" style="width:84px;height:84px;object-fit:cover;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.4)">
     </div>
+    <p class="lead">A Comunidade Turbo reúne estratégia, sinais e um app leve para organizar suas apostas. Baixe o app e entre na rede de indicações para multiplicar sua chance.</p>
+  </div>
+</header>
 
-    <div class="note">
-      <strong>Instruções rápidas (Android):</strong>
-      <ol>
-        <li>Permita downloads de fontes desconhecidas segundo as instruções do seu Android.</li>
-        <li>Instale o APK.</li>
-        <li>Abra o app e, se a tela de indicação aparecer, toque em “Finalizar indicação” (o app abrirá uma página que completa automaticamente a associação do indicador).</li>
+<main class="wrap">
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div style="flex:1">
+        <h2>Junte-se à Comunidade Turbo</h2>
+        <p class="info">Estratégias, alertas, e um app para registrar e acompanhar suas bets. Convide amigos com seu indicador e acompanhe quem você indicou.</p>
+        <div class="cta" id="ctaArea">
+          <a id="btnDownload" class="btn btn-primary" href="/app">Baixar o App</a>
+          <a class="btn btn-ghost" href="/politicaetermos.html">Política & Termos</a>
+        </div>
+        <div style="margin-top:12px;font-size:14px;color:#666" id="indicatorNote">Compartilhe seu link: <code id="shareLink">https://www.turbotiger.com.br/app</code></div>
+      </div>
+      <div style="width:260px;min-width:200px;">
+        <div style="background:linear-gradient(180deg,#fff,#fff);border-radius:10px;padding:12px;text-align:center;">
+          <strong style="display:block">Principais benefícios</strong>
+          <ul style="text-align:left;margin:10px 0 0;padding-left:18px;color:#333">
+            <li>Registro automático de bets</li>
+            <li>Relatórios e totais no app</li>
+            <li>Notificações e alarmes</li>
+            <li>Rede de indicações com seu código</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section style="margin-top:14px">
+    <div class="card">
+      <h3>Como funciona o indicador</h3>
+      <p class="info">Quando você compartilha seu link de indicação, o amigo acessa o link (ex: <code>https://www.turbotiger.com.br/app?indicador=seulogin</code>), nosso site grava o indicador e redireciona para o APK correto. Após instalar, ele clica em “Abrir Turbo Tiger” para que o app receba o indicador automaticamente.</p>
+      <ol class="info">
+        <li>Acesse seu link de indicação.</li>
+        <li>Baixe o APK (será escolhido 32/64 automaticamente).</li>
+        <li>Instale e clique em “Abrir Turbo Tiger” para completar a associação.</li>
       </ol>
     </div>
+  </section>
 
-    <section style="margin-top:18px;">
-      <h3>Indicador</h3>
-      <p class="muted">Se você recebeu um link de indicação, ele deverá ser similar a: <code>https://turbotiger.com.br/turbotiger.apk?indicador=SEULOGIN</code>. Ao clicar, nosso servidor guarda o indicador e exibe a landing com instruções. Depois que o usuário instala o app, o app pode recuperar o indicador com o fluxo de finalização (WebView / deep link).</p>
-    </section>
+  <footer>
+    <div class="wrap">
+      <small>© Turbo Tiger — Comunidade</small>
+    </div>
+  </footer>
+</main>
 
-    <footer>
-      <div class="muted">© Turbo Tiger</div>
-    </footer>
-  </main>
+<script>
+function getQueryParam(name) { const params = new URLSearchParams(window.location.search); return params.get(name); }
+const indicador = getQueryParam('indicador');
+const btn = document.getElementById('btnDownload');
+const share = document.getElementById('shareLink');
+if (indicador) {
+  btn.href = '/app?indicador=' + encodeURIComponent(indicador);
+  share.textContent = location.origin + '/app?indicador=' + encodeURIComponent(indicador);
+  const banner = document.createElement('div');
+  banner.className = 'indicator-banner';
+  banner.textContent = 'Você acessou via indicação: ' + indicador;
+  document.querySelector('.card').insertBefore(banner, document.querySelector('.card').firstChild);
+} else {
+  btn.href = '/app';
+  share.textContent = location.origin + '/app';
+}
+</script>
 </body>
 </html>
