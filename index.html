@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Turbo Tiger — App</title>
+  <meta name="description" content="Turbo Tiger — cadastro, indicação e monitoramento de apostas. Baixe o APK para Android."/>
+  <link rel="icon" href="/favicon.ico"/>
+  <style>
+    /* estilo simples e responsivo, baseado em layout corporativo */
+    body { font-family: Arial,Helvetica,sans-serif; margin:0; color:#222; background:#f7f7f9; }
+    header{ background:#0b5ed7; color:#fff; padding:20px 16px;}
+    .container{ max-width:900px; margin:24px auto; padding:16px; background:#fff; border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.06);}
+    h1{ margin:0 0 8px; font-size:22px;}
+    p.lead{ color:#444; margin:8px 0 18px; line-height:1.45;}
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .btn{ display:inline-block; padding:12px 18px; border-radius:8px; text-decoration:none; font-weight:600; }
+    .btn-primary{ background:#0b5ed7; color:#fff; }
+    .btn-secondary{ background:#e9ecef; color:#111; }
+    footer{ margin-top:18px; font-size:13px; color:#666; }
+    .muted{ color:#666; font-size:13px; }
+    .note{ margin-top:12px; padding:12px; background:#fbfbfd; border-left:4px solid #0b5ed7; border-radius:6px;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Turbo Tiger</h1>
+      <div class="muted">App de gestão de bets — versão de distribuição direta (Android APK).</div>
+    </div>
+  </header>
+
+  <main class="container" role="main">
+    <h2>Baixe o APK</h2>
+    <p class="lead">Clique em “Baixar APK” para iniciar o download no seu dispositivo Android. Se você veio por um link de indicação, o sistema vai guardar o indicador e, após instalar o app, o app poderá recuperar esse indicador seguindo o fluxo de finalização.</p>
+
+    <div class="actions">
+      <!-- Link de download: substitua URL_FINAL_APK pela URL final do APK que você irá hospedar -->
+      <a id="downloadBtn" class="btn btn-primary" href="https://turbotiger.com.br/turbotiger.apk" rel="noopener">Baixar APK</a>
+      <a class="btn btn-secondary" href="/politicaetermos.html">Política de Privacidade & Termos</a>
+    </div>
+
+    <div class="note">
+      <strong>Instruções rápidas (Android):</strong>
+      <ol>
+        <li>Permita downloads de fontes desconhecidas segundo as instruções do seu Android.</li>
+        <li>Instale o APK.</li>
+        <li>Abra o app e, se a tela de indicação aparecer, toque em “Finalizar indicação” (o app abrirá uma página que completa automaticamente a associação do indicador).</li>
+      </ol>
+    </div>
+
+    <section style="margin-top:18px;">
+      <h3>Indicador</h3>
+      <p class="muted">Se você recebeu um link de indicação, ele deverá ser similar a: <code>https://turbotiger.com.br/turbotiger.apk?indicador=SEULOGIN</code>. Ao clicar, nosso servidor guarda o indicador e exibe a landing com instruções. Depois que o usuário instala o app, o app pode recuperar o indicador com o fluxo de finalização (WebView / deep link).</p>
+    </section>
+
+    <footer>
+      <div class="muted">© Turbo Tiger</div>
+    </footer>
+  </main>
+</body>
+</html>
