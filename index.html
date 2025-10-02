@@ -9,9 +9,36 @@
   :root{ --accent:#f4b400; --accent-dark:#c88e00; --bg:#0b0b0b; --card:#ffffff; }
   *{box-sizing:border-box;}
   body{margin:0;font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial;color:#111;background:#fafafa;}
-  header{padding:28px 16px;background:linear-gradient(180deg,rgba(0,0,0,0.55),rgba(0,0,0,0.35)), url('assets/bg-1200.webp') center/cover no-repeat; color: white;}
-  .wrap{max-width:1000px;margin:0 auto;}
-  .hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
+  header {
+		  position: relative;
+		  padding: 28px 16px;
+		  background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0)), url('assets/bg-1200.webp') center/cover no-repeat;
+		  color: white;
+		  height: 220px;
+		  max-height: 220px;
+		  overflow: hidden;
+		}
+  .wrap{max-width:1000px;margin:0 auto;width: 100%;}
+  .hero {
+		  display: flex;
+		  flex-direction: column;
+		  gap: 18px;
+		  align-items: flex-start;
+		  position: relative;
+		  z-index: 1;
+		}
+  .wrap.hero {
+			  display: flex;
+			  flex-direction: column;
+			  gap: 18px;
+			  align-items: flex-start;
+			  position: relative;
+			  z-index: 1;
+			  padding-right: 220px;
+			  text-shadow:
+				0 4px 8px rgba(0,0,0,0.7),
+				0 2px 4px rgba(0,0,0,0.6);
+			}	
   .brand{display:flex;align-items:center;gap:12px;}
   .brand img{width:72px;height:72px;object-fit:contain;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.35);}
   h1{margin:0;font-size:26px;}
@@ -25,7 +52,17 @@
   .info{color:#444;font-size:15px;margin-top:12px;}
   footer{text-align:center;margin:18px 0;color:#777;font-size:14px;}
   .indicator-banner{background:linear-gradient(90deg,var(--accent),var(--accent-dark));color:#111;padding:8px;border-radius:8px;font-weight:700;display:inline-block;}
-  @media(max-width:640px){ header{padding:18px;} .brand img{width:56px;height:56px;} h1{font-size:20px} .hero{gap:12px} }
+  @media(max-width:640px){ header{padding:18px;} .brand img{width:56px;height:56px;} h1{font-size:20px} .hero{gap:12px} .wrap.hero {padding-right: 120px;} }
+  .header-tiger {
+				  position: absolute;
+				  right: 0;
+				  top: 0;
+				  max-height: 100%;
+				  width: auto;
+				  object-fit: contain;
+				  z-index: 0;
+				  aspect-ratio: 1;
+				}
 </style>
 </head>
 <body>
@@ -35,14 +72,14 @@
       <img src="assets/logo-200.png" alt="Turbo Tiger">
       <div>
         <h1>Turbo Tiger</h1>
-        <div style="opacity:.95">App + Comunidade para melhorar suas estratégias em bets</div>
+        <div style="opacity:.95">App + Comunidade para estratégias em bets</div>
       </div>
-    </div>
-    <div style="margin-left:auto;">
-      <img src="assets/tiger-512.png" alt="Tiger" style="width:84px;height:84px;object-fit:cover;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.4)">
     </div>
     <p class="lead">A Comunidade Turbo reúne estratégia, sinais e um app leve para organizar suas apostas. Baixe o app e entre na rede de indicações para multiplicar sua chance.</p>
   </div>
+  
+	<img src="assets/tiger-512.png" alt="Tiger" class="header-tiger">
+	
 </header>
 
 <main class="wrap">
