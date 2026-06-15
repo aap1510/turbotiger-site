@@ -1,90 +1,669 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Política de Privacidade e Termos — Turbo Tiger</title>
-  <style>
-    body{ font-family: Arial,Helvetica,sans-serif; margin:0; padding:16px; background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0)), url('assets/bg-1200.webp') center/cover no-repeat; color:#222;}
-    .container{ max-width:900px; margin:18px auto; background:#fff; padding:22px; border-radius:8px; box-shadow:0 8px 30px rgba(0,0,0,0.06);}
-    h1,h2,h3{ color:#0b5ed7; }
-    p,li{ line-height:1.5; color:#333; }
-    ul{ margin-left:18px;}
-    .small{ font-size:13px; color:#666;}
-  </style>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="description" content="Política de Privacidade e Termos de Uso do Turbo Tiger."/>
+    <title>Política de Privacidade e Termos de Uso — Turbo Tiger</title>
+    <style>
+        :root {
+            --azul: #0b5ed7;
+            --texto: #222;
+            --muted: #666;
+            --borda: #e9ecef;
+            --alerta-bg: #fff8e1;
+            --alerta-borda: #f1c40f;
+            --info-bg: #eef6ff;
+            --info-borda: #7ab7ff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 16px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.48)), url('assets/bg-1200.webp') center/cover no-repeat fixed;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 24px auto;
+            background: #fff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.24);
+            color: var(--texto);
+        }
+
+        h1, h2, h3 {
+            color: var(--azul);
+            margin-top: 28px;
+            line-height: 1.25;
+        }
+
+        h1 {
+            border-bottom: 2px solid var(--borda);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        p, li {
+            line-height: 1.62;
+            color: #333;
+        }
+
+        ul { margin-left: 18px; padding-left: 10px; }
+        li { margin-bottom: 8px; }
+
+        a {
+            color: var(--azul);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        a:hover, a:focus { text-decoration: underline; }
+
+        .small {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .nav-links {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 28px;
+            color: #333;
+        }
+
+        .box {
+            border-left: 4px solid var(--info-borda);
+            background: var(--info-bg);
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin: 18px 0;
+        }
+
+        .warning {
+            border-left: 4px solid var(--alerta-borda);
+            background: var(--alerta-bg);
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin: 18px 0;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: var(--borda);
+            margin: 36px 0;
+        }
+
+        footer {
+            color: #eee;
+            text-align: center;
+            margin: 28px 0 8px;
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 8px; }
+            .container {
+                margin: 12px auto;
+                padding: 20px;
+                border-radius: 10px;
+            }
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #000;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+                margin: 0;
+                border-radius: 0;
+            }
+
+            footer { color: #000; }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Política de Privacidade</h1>
-    <p class="small">Atualizado em: <!-- coloque data --> 01/10/2025</p>
 
-    <p>Esta Política de Privacidade descreve como a Turbo Tiger coleta, usa, armazena e compartilha dados pessoais dos usuários do aplicativo e do site. Ao utilizar nossos serviços, você concorda com as práticas descritas nesta política.</p>
+<div class="container">
 
-    <h2>1. Controlador</h2>
-    <p>O controlador dos dados é <strong>Turbo Tiger</strong>. Para questões relativas à privacidade, entre em contato pelo e-mail: <em>comunidade@turbotiger.com.br</em>.</p>
+    <div class="nav-links">
+        <strong>Acesso rápido:</strong>
+        <a href="#privacidade">Política de Privacidade</a> |
+        <a href="#termos">Termos de Uso</a> |
+        <a href="#contato">Contato</a>
+    </div>
 
-    <h2>2. Dados coletados</h2>
-    <p>Podemos coletar os seguintes dados pessoais:</p>
-    <ul>
-      <li>Nome, e-mail, telefone;</li>
-      <li>Dados de cadastro (login, identificador indicador);</li>
-      <li>Dados técnicos do dispositivo (modelo, versão Android, ID gerado pelo app);</li>
-      <li>Dados de utilização (ações no app, preferências) para melhorar o serviço;</li>
-    </ul>
+    <section id="privacidade">
+        <h1>Política de Privacidade</h1>
+        <p class="small">Última atualização: 14/06/2026</p>
 
-    <h2>3. Finalidade do tratamento</h2>
-    <p>Os dados são usados para:</p>
-    <ul>
-      <li>Registrar e identificar usuários;</li>
-      <li>Associar indicador quando aplicável;</li>
-      <li>Prestar suporte e melhorar o aplicativo;</li>
-      <li>Cumprir obrigações legais e de segurança.</li>
-    </ul>
+        <p>
+            Esta Política de Privacidade explica como o <strong>Turbo Tiger</strong> coleta, utiliza,
+            armazena, compartilha e protege dados pessoais relacionados ao uso do aplicativo, do site
+            e dos serviços vinculados à plataforma.
+        </p>
 
-    <h2>4. Base legal</h2>
-    <p>O tratamento é realizado com base na execução do contrato (uso do app), no consentimento do titular quando necessário e em interesses legítimos para prevenção de fraude e melhorias do serviço.</p>
+        <div class="box">
+            <p>
+                O Turbo Tiger é uma ferramenta de controle, organização, gerenciamento, estatísticas,
+                alertas, histórico e apoio à tomada de decisão do usuário. O Turbo Tiger não é casa de
+                apostas, não realiza apostas, não intermedeia apostas, não recebe valores apostados e
+                não garante ganhos financeiros.
+            </p>
+        </div>
 
-    <h2>5. Compartilhamento de dados</h2>
-    <p>Não comercializamos dados pessoais. Podemos compartilhar informações com provedores de infraestrutura (AWS/Render/GitHub/Netlify) e serviços terceirizados estritamente necessários para a operação do app.</p>
+        <h2>1. Controlador e contato</h2>
+        <p>
+            O controlador dos dados pessoais é <strong>Turbo Tiger</strong>. Para assuntos relacionados
+            à privacidade, proteção de dados pessoais, segurança, exclusão de conta ou exercício de
+            direitos previstos na Lei Geral de Proteção de Dados, entre em contato por:
+        </p>
+        <p><strong>E-mail:</strong> <a href="mailto:comunidade@turbotiger.com.br">comunidade@turbotiger.com.br</a></p>
 
-    <h2>6. Segurança</h2>
-    <p>Adotamos medidas técnicas e administrativas para proteger dados contra acesso não autorizado, alteração, divulgação ou destruição. Nenhuma transmissão pela Internet é 100% segura; no entanto, aplicamos boas práticas (HTTPS, variáveis de ambiente, tokens).</p>
+        <h2>2. Dados que podemos coletar</h2>
+        <p>Podemos coletar os seguintes dados, conforme a funcionalidade utilizada:</p>
+        <ul>
+            <li>Nome, sobrenome, e-mail, telefone/WhatsApp, codinome de usuário, senha protegida e dados de autenticação.</li>
+            <li>CPF, data de nascimento, idade e dados necessários para confirmação de identidade, maioridade, segurança e prevenção de fraude.</li>
+            <li>Dados de indicação, indicador, código de indicação, origem do cadastro e informações relacionadas ao programa de indicação, quando aplicável.</li>
+            <li>Dados técnicos do dispositivo, como modelo, fabricante, sistema operacional, versão do app, identificador gerado pelo aplicativo, identificadores de instalação, tokens de push e informações de segurança.</li>
+            <li>Dados de abertura e uso do aplicativo, como quantidade de aberturas, último acesso, telas acessadas, status da sessão, preferências, configurações, idioma, registros de erro e eventos de funcionamento.</li>
+            <li>Dados de localização, país, estado, cidade, coordenadas ou informações aproximadas quando necessários para funcionamento, segurança, verificação regional, maioridade, prevenção de uso indevido ou cumprimento de regras legais e internas.</li>
+            <li>Dados cadastrados voluntariamente pelo usuário sobre bancas, saldos, históricos, entradas, resultados, estatísticas, plataformas de terceiros, jogos, operações, alertas, metas, limites e demais informações usadas para gerenciamento pessoal.</li>
+            <li>Dados capturados ou registrados durante funcionalidades de histórico, acompanhamento, navegação ou sessão de jogo, quando ativadas ou utilizadas pelo usuário.</li>
+            <li>Dados de notificações, alarmes, lembretes, mensagens operacionais, status de entrega, permissões concedidas e tokens usados para comunicação com o dispositivo.</li>
+            <li>Dados de assinatura, plano, período de teste, licença, status de acesso, pagamentos, renovações, cancelamentos e informações necessárias para liberar funcionalidades.</li>
+            <li>Registros de acesso, logs técnicos, endereço IP, data e hora, identificadores de sessão, ações relevantes, auditoria, prevenção de fraude, suporte e segurança.</li>
+            <li>Informações trocadas com suporte, atendimento, mensagens enviadas pelo usuário, anexos ou evidências encaminhadas voluntariamente.</li>
+        </ul>
 
-    <h2>7. Retenção</h2>
-    <p>Conservamos dados pelo tempo necessário às finalidades informadas, ou conforme exigido por lei. Dados de indicação (indicador + token) expiram automaticamente em 30 dias por padrão.</p>
+        <p>
+            Não solicitamos dados bancários completos para apostas. Quando houver pagamento de assinatura
+            por loja oficial ou provedor de pagamento, os dados de pagamento são processados pela respectiva
+            plataforma ou intermediador, conforme suas próprias políticas.
+        </p>
 
-    <h2>8. Direitos do titular</h2>
-    <p>Você pode solicitar acesso, retificação, anonimização, portabilidade ou eliminação dos dados pessoais, além de retirar o consentimento quando aplicável. Envie pedido para <em>comunidade@turbotiger.com.br</em>.</p>
+        <h2>3. Dados de usuários não cadastrados</h2>
+        <p>
+            Quando o usuário instala e abre o aplicativo, mesmo antes de criar uma conta, poderemos registrar
+            dados técnicos mínimos do dispositivo, identificador de instalação, versão do app, quantidade de
+            aberturas, data de abertura e token de notificação, caso o usuário conceda permissão.
+        </p>
+        <p>
+            Esses dados são utilizados para funcionamento, segurança, métricas de instalação, prevenção de fraude
+            e envio de comunicações operacionais ou informativas, sempre respeitando as permissões do dispositivo.
+            O usuário pode desativar notificações nas configurações do aparelho.
+        </p>
 
-    <hr style="margin:22px 0;"/>
+        <h2>4. Dados locais no dispositivo</h2>
+        <p>
+            O aplicativo poderá armazenar dados localmente no dispositivo, como preferências, sessões, configurações,
+            cache, histórico temporário, dados de navegação, arquivos de configuração, informações em armazenamento
+            local e dados necessários para retomar o uso do app.
+        </p>
+        <p>
+            A limpeza de dados do aplicativo pelo sistema operacional poderá apagar essas informações locais e exigir
+            nova configuração, novo login ou recarregamento de dados.
+        </p>
 
-    <h1>Termos de Uso</h1>
-    <p class="small">Última atualização: 01/10/2025</p>
+        <h2>5. Finalidades do tratamento</h2>
+        <p>Usamos os dados para:</p>
+        <ul>
+            <li>Criar, autenticar, proteger e manter a conta do usuário.</li>
+            <li>Confirmar identidade, maioridade e elegibilidade de uso.</li>
+            <li>Permitir o funcionamento de cadastro, login, recuperação de senha, verificação por e-mail ou WhatsApp e confirmação de dados.</li>
+            <li>Operar funcionalidades de controle, gerenciamento, histórico, estatísticas, metas, alertas, bancas e acompanhamento de desempenho.</li>
+            <li>Permitir navegação, acompanhamento e proteção de sessão quando o usuário utiliza plataformas de terceiros dentro do app.</li>
+            <li>Gerar relatórios, gráficos, análises, tendências, classificações, previsões, alertas e insights por regras internas ou inteligência artificial.</li>
+            <li>Enviar notificações, mensagens operacionais, avisos de segurança, lembretes, novidades, comunicações de conta e informações relevantes.</li>
+            <li>Controlar planos, licenças, períodos de teste, assinaturas, status de acesso e funcionalidades pagas ou gratuitas.</li>
+            <li>Prevenir fraudes, uso indevido, múltiplas contas artificiais, acessos suspeitos, compartilhamento irregular de conta e violações dos Termos de Uso.</li>
+            <li>Prestar suporte, corrigir erros, melhorar desempenho, monitorar falhas e aprimorar a experiência do usuário.</li>
+            <li>Cumprir obrigações legais, regulatórias, fiscais, contratuais, judiciais, administrativas e de segurança.</li>
+        </ul>
 
-    <h2>1. Aceitação</h2>
-    <p>Ao usar o site e/ou aplicativo Turbo Tiger, você concorda com estes Termos. Se não concordar, não utilize nossos serviços.</p>
+        <h2>6. Base legal</h2>
+        <p>Tratamos dados pessoais com fundamento nas seguintes bases legais previstas na LGPD:</p>
+        <ul>
+            <li>Execução de contrato ou procedimentos preliminares relacionados ao uso do aplicativo.</li>
+            <li>Cumprimento de obrigação legal ou regulatória.</li>
+            <li>Consentimento do titular, quando exigido, especialmente para permissões específicas do dispositivo.</li>
+            <li>Legítimo interesse para segurança, prevenção de fraude, melhoria do serviço, suporte, comunicação operacional e proteção da plataforma.</li>
+            <li>Exercício regular de direitos em processos judiciais, administrativos ou arbitrais.</li>
+        </ul>
 
-    <h2>2. Requisitos</h2>
-    <p>Você deve ter capacidade legal para contratar. É proibido usar o aplicativo para fins ilegais, fraudulentos ou que violem direitos de terceiros.</p>
+        <h2>7. CPF, maioridade e verificação</h2>
+        <p>
+            O CPF e dados relacionados poderão ser solicitados para confirmar a identidade do usuário, validar a
+            maioridade, evitar cadastros fraudulentos, proteger a plataforma, cumprir obrigações legais e garantir
+            que o aplicativo seja utilizado por pessoas aptas ao uso.
+        </p>
+        <p>
+            O aplicativo é destinado exclusivamente a usuários maiores de 18 anos. Contas identificadas como
+            pertencentes a menores de idade poderão ser bloqueadas, suspensas ou excluídas.
+        </p>
 
-    <h2>3. Licença de uso</h2>
-    <p>Concedemos a você uma licença limitada, não exclusiva e intransferível para usar o app conforme estes termos.</p>
+        <h2>8. Localização</h2>
+        <p>
+            A localização poderá ser solicitada para validar região de uso, preencher dados de localidade, melhorar
+            a experiência, aplicar regras de segurança e cumprir requisitos legais ou operacionais. O usuário poderá
+            negar ou revogar a permissão nas configurações do dispositivo, ciente de que algumas funcionalidades
+            poderão ficar limitadas.
+        </p>
 
-    <h2>4. Responsabilidades</h2>
-    <p>Você é responsável pela veracidade dos dados cadastrados. Não nos responsabilizamos por danos decorrentes de mau uso, comportamento fraudulento ou precariedade da conexão do usuário.</p>
+        <h2>9. Notificações e comunicações</h2>
+        <p>
+            O aplicativo poderá solicitar permissão para enviar notificações. As notificações podem incluir avisos
+            operacionais, alertas configurados pelo usuário, mensagens de segurança, lembretes, informações de conta,
+            novidades, campanhas, comunicações para usuários cadastrados e comunicações para dispositivos que abriram
+            o app mas ainda não concluíram cadastro.
+        </p>
+        <p>
+            O usuário pode desativar notificações a qualquer momento nas configurações do dispositivo.
+        </p>
 
-    <h2>5. Propriedade intelectual</h2>
-    <p>O conteúdo do app e do site é protegido por leis de direito autoral. É proibida reprodução sem autorização.</p>
+        <h2>10. Permissões do dispositivo</h2>
+        <p>Conforme a funcionalidade usada, o aplicativo poderá solicitar ou utilizar permissões como:</p>
+        <ul>
+            <li>Internet e estado da rede, para conexão com servidores, banco de dados, autenticação e serviços externos.</li>
+            <li>Notificações, para alertas, lembretes e comunicações do app.</li>
+            <li>Localização, para validação regional, preenchimento de localidade e segurança.</li>
+            <li>Telefone ou informações do dispositivo, quando permitido pelo sistema, para segurança, validação, suporte ou preenchimento de dados técnicos.</li>
+            <li>Câmera e microfone, apenas se funcionalidades de suporte, leitura, envio de evidências, mídia ou recursos semelhantes forem disponibilizadas e acionadas pelo usuário.</li>
+            <li>Biometria ou impressão digital, quando disponível, para facilitar login seguro.</li>
+            <li>Serviço em primeiro plano, bloqueio de suspensão e otimização de bateria, quando necessário para manter captura, histórico, sessão ativa ou navegação em andamento.</li>
+        </ul>
 
-    <h2>6. Alterações</h2>
-    <p>Podemos alterar estes Termos e a Política de Privacidade a qualquer tempo; publicaremos a data de atualização. O uso continuado implica aceitação das mudanças.</p>
+        <h2>11. Sessões de jogo, captura e funcionamento em segundo plano</h2>
+        <p>
+            Quando o usuário estiver em uma sessão de jogo, navegação interna, acompanhamento ou captura de histórico,
+            o aplicativo poderá manter processos ativos em primeiro plano ou segundo plano para evitar perda de dados,
+            interrupção de captura, fechamento inesperado ou necessidade de recarregar informações.
+        </p>
+        <p>
+            Nesses casos, o Android poderá exibir uma notificação fixa informando que o Turbo Tiger está ativo. Essa
+            funcionalidade pode consumir mais bateria, mas tem a finalidade de preservar a experiência e a continuidade
+            da sessão do usuário.
+        </p>
+        <p>
+            Em dispositivos Android compatíveis, o app poderá ser classificado tecnicamente como aplicativo de jogo
+            para permitir recursos do sistema operacional voltados à proteção contra toques acidentais nos botões
+            Home, Recentes ou Voltar durante sessões de uso. Essa classificação técnica não transforma o Turbo Tiger
+            em jogo, casa de apostas ou plataforma de apostas.
+        </p>
 
-    <h2>7. Lei aplicável</h2>
-    <p>Estes Termos são regidos pela legislação brasileira. Fica eleito o foro da cidade do seu domicílio (ou outro acordado) para resolução de conflitos.</p>
+        <h2>12. Navegação em plataformas de terceiros</h2>
+        <p>
+            O aplicativo poderá permitir que o usuário acesse, organize ou acompanhe plataformas de terceiros. Essas
+            plataformas possuem seus próprios termos, políticas, regras, cookies, autenticação, saldos, pagamentos e
+            responsabilidades.
+        </p>
+        <p>
+            O Turbo Tiger não controla, administra, audita ou garante o funcionamento de plataformas de terceiros.
+            Dados inseridos diretamente em sites ou serviços de terceiros são tratados por esses terceiros, conforme
+            suas próprias políticas.
+        </p>
 
-    <footer style="margin-top:18px;text-align:center" class="small">
-      © Turbo Tiger
-    </footer>
-  </div>
+        <h2>13. Inteligência artificial e análises automatizadas</h2>
+        <p>
+            O Turbo Tiger poderá utilizar inteligência artificial, algoritmos estatísticos, automações e provedores
+            externos para gerar mensagens, análises, previsões, tendências, alertas, classificações e insights a partir
+            dos dados cadastrados ou autorizados pelo usuário.
+        </p>
+        <p>
+            As respostas de inteligência artificial são auxiliares e informativas. Elas não constituem consultoria
+            financeira, recomendação de investimento, promessa de lucro, garantia de acerto, garantia de resultado ou
+            orientação profissional definitiva.
+        </p>
+        <p>
+            O usuário não deve inserir dados sensíveis, senhas, credenciais de terceiros ou informações desnecessárias
+            em campos livres de mensagem, suporte ou inteligência artificial.
+        </p>
+
+        <h2>14. Publicidade, métricas e análise</h2>
+        <p>
+            O aplicativo poderá exibir anúncios, campanhas, mensagens promocionais ou conteúdos patrocinados. Quando
+            houver publicidade ou ferramentas de análise, parceiros tecnológicos poderão tratar identificadores,
+            dados técnicos e informações de uso conforme suas próprias políticas e as permissões concedidas pelo usuário.
+        </p>
+        <p>
+            Quando exigido, o usuário poderá receber opções de consentimento, personalização ou recusa de publicidade
+            personalizada.
+        </p>
+
+        <h2>15. Compartilhamento de dados</h2>
+        <p>Não vendemos dados pessoais. Podemos compartilhar dados com:</p>
+        <ul>
+            <li>Provedores de hospedagem, banco de dados, autenticação, armazenamento e infraestrutura.</li>
+            <li>Serviços de envio de e-mail, WhatsApp, notificações push, SMS ou comunicação operacional.</li>
+            <li>Provedores de inteligência artificial, análise, logs, monitoramento, segurança e suporte.</li>
+            <li>Lojas de aplicativos, sistemas de assinatura, gateways de pagamento e intermediadores financeiros, quando aplicável.</li>
+            <li>Prestadores técnicos necessários à operação, manutenção, segurança e evolução do aplicativo.</li>
+            <li>Autoridades públicas, órgãos reguladores, Poder Judiciário ou terceiros quando necessário por lei, ordem judicial ou exercício regular de direitos.</li>
+        </ul>
+
+        <h2>16. Transferência internacional</h2>
+        <p>
+            Alguns fornecedores, servidores, APIs, serviços de nuvem, inteligência artificial, autenticação, notificações
+            ou suporte podem estar localizados fora do Brasil. Nesses casos, poderemos realizar transferência internacional
+            de dados observando a legislação aplicável e adotando medidas razoáveis de segurança e proteção.
+        </p>
+
+        <h2>17. Segurança</h2>
+        <p>
+            Adotamos medidas técnicas e administrativas para proteger dados pessoais contra acesso não autorizado,
+            perda, alteração, divulgação indevida, destruição ou uso abusivo. Entre essas medidas podem estar HTTPS,
+            autenticação, regras de acesso, tokens, monitoramento, logs, segregação de permissões, criptografia quando
+            aplicável e controles de segurança.
+        </p>
+        <p>
+            Nenhum sistema é 100% seguro. O usuário também deve proteger sua conta, manter senha segura, não compartilhar
+            credenciais e usar dispositivos confiáveis.
+        </p>
+
+        <h2>18. Retenção e exclusão</h2>
+        <p>
+            Mantemos dados pelo tempo necessário para cumprir as finalidades desta Política, operar o serviço, proteger
+            a plataforma, cumprir obrigações legais, resolver disputas, prevenir fraudes e exercer direitos.
+        </p>
+        <p>
+            Após solicitação de exclusão da conta, dados pessoais passíveis de eliminação serão apagados ou anonimizados,
+            salvo quando a retenção for necessária para cumprimento de obrigação legal, regulatória, fiscal, contábil,
+            contratual, prevenção de fraude, segurança ou exercício regular de direitos.
+        </p>
+
+        <h2>19. Direitos do titular</h2>
+        <p>Nos termos da LGPD, o usuário poderá solicitar:</p>
+        <ul>
+            <li>Confirmação da existência de tratamento.</li>
+            <li>Acesso aos dados pessoais.</li>
+            <li>Correção de dados incompletos, inexatos ou desatualizados.</li>
+            <li>Anonimização, bloqueio ou eliminação de dados desnecessários, excessivos ou tratados em desconformidade.</li>
+            <li>Portabilidade, quando aplicável e regulamentado.</li>
+            <li>Informações sobre compartilhamento de dados.</li>
+            <li>Revogação do consentimento, quando o tratamento depender de consentimento.</li>
+            <li>Revisão de decisões automatizadas, quando aplicável.</li>
+            <li>Exclusão da conta e dos dados pessoais passíveis de eliminação.</li>
+        </ul>
+        <p>
+            Solicitações devem ser enviadas para
+            <a href="mailto:comunidade@turbotiger.com.br">comunidade@turbotiger.com.br</a>.
+            Poderemos solicitar informações adicionais para confirmar a identidade do solicitante.
+        </p>
+
+        <h2>20. Crianças e adolescentes</h2>
+        <p>
+            O Turbo Tiger não é destinado a menores de 18 anos. Não coletamos intencionalmente dados de menores.
+            Caso identifiquemos uso por menor de idade, a conta poderá ser bloqueada ou excluída.
+        </p>
+
+        <h2>21. Alterações desta Política</h2>
+        <p>
+            Esta Política poderá ser atualizada para refletir mudanças legais, técnicas, operacionais ou comerciais.
+            A versão vigente será publicada nesta página, com indicação da data de atualização.
+        </p>
+    </section>
+
+    <hr/>
+
+    <section id="termos">
+        <h1>Termos de Uso</h1>
+        <p class="small">Última atualização: 14/06/2026</p>
+
+        <h2>1. Aceitação</h2>
+        <p>
+            Ao acessar ou usar o Turbo Tiger, o usuário declara que leu, entendeu e concorda com estes Termos de Uso
+            e com a Política de Privacidade. Se não concordar, não utilize o aplicativo, o site ou os serviços.
+        </p>
+
+        <h2>2. Natureza do serviço</h2>
+        <p>
+            O Turbo Tiger é uma ferramenta de controle, gerenciamento, organização, estatísticas, histórico, alertas,
+            suporte à tomada de decisão e acompanhamento pessoal.
+        </p>
+        <p>
+            O Turbo Tiger não é casa de apostas, cassino, plataforma de apostas, intermediador financeiro, operador
+            de jogos, agente de apostas, consultor financeiro ou garantidor de resultados.
+        </p>
+        <p>
+            O usuário é exclusivamente responsável por decisões tomadas em plataformas de terceiros, incluindo jogos,
+            apostas, depósitos, saques, saldos, limites, riscos, perdas ou ganhos.
+        </p>
+
+        <h2>3. Idade mínima e capacidade legal</h2>
+        <p>
+            O uso do Turbo Tiger é permitido apenas para pessoas maiores de 18 anos e legalmente capazes. Ao criar
+            conta ou utilizar o serviço, o usuário declara cumprir esse requisito.
+        </p>
+        <p>
+            Contas identificadas como pertencentes a menores de idade, pessoas incapazes ou usuários que violem regras
+            legais poderão ser suspensas, bloqueadas ou excluídas.
+        </p>
+
+        <h2>4. Cadastro, conta e segurança</h2>
+        <p>
+            O usuário deve fornecer informações verdadeiras, completas e atualizadas. O usuário é responsável por
+            proteger suas credenciais, dispositivos, e-mails, códigos de verificação e demais meios de acesso.
+        </p>
+        <p>
+            É proibido compartilhar conta, vender acesso, criar múltiplas contas artificiais, burlar limitações,
+            usar dados de terceiros sem autorização ou tentar manipular regras do sistema.
+        </p>
+
+        <h2>5. Licença de uso</h2>
+        <p>
+            A Turbo Tiger concede ao usuário uma licença limitada, pessoal, não exclusiva, revogável, intransferível
+            e não sublicenciável para usar o aplicativo conforme estes Termos.
+        </p>
+        <p>É proibido:</p>
+        <ul>
+            <li>Copiar, modificar, vender, sublicenciar, distribuir ou explorar comercialmente o aplicativo sem autorização.</li>
+            <li>Realizar engenharia reversa, descompilar, inspecionar indevidamente ou tentar acessar código-fonte, banco de dados, APIs ou rotinas internas.</li>
+            <li>Automatizar acessos, raspar dados, burlar autenticação, explorar falhas ou comprometer a segurança.</li>
+            <li>Usar o app para fraude, spam, abuso, práticas ilegais ou violação de direitos de terceiros.</li>
+        </ul>
+
+        <h2>6. Uso responsável</h2>
+        <p>
+            O usuário reconhece que jogos, apostas ou atividades semelhantes em plataformas de terceiros podem envolver
+            riscos financeiros, emocionais e legais. O Turbo Tiger não incentiva jogo excessivo, irresponsável ou compulsivo.
+        </p>
+        <p>
+            O usuário deve respeitar seus limites financeiros, a legislação aplicável, as regras das plataformas de
+            terceiros e buscar ajuda especializada caso identifique comportamento compulsivo.
+        </p>
+
+        <div class="warning">
+            <p>
+                O Turbo Tiger não garante lucro, acerto, rentabilidade, recuperação de perdas, previsões corretas,
+                desempenho futuro ou resultado financeiro positivo.
+            </p>
+        </div>
+
+        <h2>7. Inteligência artificial, estatísticas e previsões</h2>
+        <p>
+            As funcionalidades de inteligência artificial, estatísticas, previsões, alertas, tendências e insights são
+            ferramentas auxiliares e informativas. Elas podem conter erros, limitações, atrasos ou interpretações
+            imprecisas.
+        </p>
+        <p>
+            Nenhuma informação fornecida pelo Turbo Tiger deve ser interpretada como recomendação financeira,
+            consultoria profissional, garantia de resultado, promessa de ganho ou instrução para apostar.
+        </p>
+
+        <h2>8. Plataformas de terceiros</h2>
+        <p>
+            O aplicativo poderá permitir navegação, organização, acesso ou acompanhamento de plataformas de terceiros.
+            Essas plataformas são independentes e possuem seus próprios termos, políticas, regras, riscos, sistemas,
+            pagamentos, saldos, bloqueios e suporte.
+        </p>
+        <p>
+            A Turbo Tiger não se responsabiliza por indisponibilidade, bloqueio, erro, saldo, saque, depósito, regra,
+            resultado, cotação, pagamento, alteração de política ou qualquer ato praticado por plataformas de terceiros.
+        </p>
+
+        <h2>9. Sessões, histórico e funcionamento em segundo plano</h2>
+        <p>
+            Para preservar sessões, capturas, históricos ou navegação em andamento, o Turbo Tiger poderá manter serviço
+            ativo em primeiro plano ou segundo plano, exibir notificação fixa no Android e usar recursos do sistema para
+            reduzir fechamento acidental durante o uso.
+        </p>
+        <p>
+            Em alguns dispositivos, o app poderá ser identificado tecnicamente como aplicativo de jogo para que o sistema
+            operacional ofereça proteção contra toques acidentais em botões de navegação durante sessões de uso. Essa
+            configuração tem finalidade de segurança da experiência e não altera a natureza do Turbo Tiger como ferramenta
+            de gerenciamento.
+        </p>
+
+        <h2>10. Programa de indicação</h2>
+        <p>
+            Quando disponível, o programa de indicação poderá conceder benefícios, créditos, vantagens ou comissões,
+            conforme regras específicas divulgadas pela plataforma.
+        </p>
+        <p>
+            É proibido usar spam, falsas promessas, fraude, múltiplas contas, cadastros artificiais, dados de terceiros,
+            manipulação de links, automações indevidas ou qualquer prática abusiva.
+        </p>
+        <p>
+            A Turbo Tiger poderá revisar, suspender, cancelar ou estornar benefícios quando houver suspeita de fraude,
+            uso indevido ou descumprimento das regras.
+        </p>
+
+        <h2>11. Planos, assinaturas e pagamentos</h2>
+        <p>
+            O Turbo Tiger poderá oferecer versões gratuitas, planos trial, alpha, beta, assinaturas mensais, trimestrais,
+            semestrais, anuais ou outras modalidades de acesso.
+        </p>
+        <p>
+            Preços, funcionalidades, períodos de teste, renovação automática, cancelamento e condições comerciais serão
+            informados no momento da contratação.
+        </p>
+        <p>
+            Quando a contratação ocorrer pela Google Play Store ou Apple App Store, cobrança, cancelamento, renovação,
+            reembolso e contestação seguem as regras da respectiva loja. Quando a contratação ocorrer por meio direto
+            permitido, serão observadas as regras informadas no momento da contratação e a legislação aplicável.
+        </p>
+        <p>
+            A falta de pagamento, cancelamento, expiração do plano ou violação destes Termos poderá limitar ou bloquear
+            funcionalidades.
+        </p>
+
+        <h2>12. Suporte</h2>
+        <p>
+            O suporte poderá ser prestado por canais oficiais, incluindo e-mail, atendimento no aplicativo, mensagens,
+            WhatsApp ou outros meios disponibilizados pela Turbo Tiger.
+        </p>
+        <p>
+            O usuário não deve enviar senhas, códigos de autenticação, credenciais de plataformas de terceiros ou dados
+            desnecessários ao suporte.
+        </p>
+
+        <h2>13. Propriedade intelectual</h2>
+        <p>
+            Marca, nome, logotipo, telas, textos, imagens, layout, códigos, fluxos, banco de dados, documentação, lógica,
+            algoritmos, relatórios, análises, design, elementos visuais e demais materiais do Turbo Tiger pertencem à
+            Turbo Tiger ou a seus licenciantes.
+        </p>
+        <p>
+            É proibida reprodução, cópia, distribuição, modificação, venda, cessão, exploração ou uso não autorizado
+            de qualquer elemento da plataforma.
+        </p>
+
+        <h2>14. Condutas proibidas</h2>
+        <p>O usuário não poderá:</p>
+        <ul>
+            <li>Usar o app para violar lei, regulamento, direito de terceiros ou regras de plataformas externas.</li>
+            <li>Inserir dados falsos, de terceiros ou obtidos sem autorização.</li>
+            <li>Fraudar cadastros, indicações, pagamentos, estatísticas ou funcionalidades.</li>
+            <li>Tentar invadir, sobrecarregar, automatizar, clonar, copiar ou explorar falhas do sistema.</li>
+            <li>Usar o app para assédio, ameaça, conteúdo ilícito, spam ou práticas abusivas.</li>
+            <li>Compartilhar acesso, vender conta, alugar licença ou permitir uso por terceiros não autorizados.</li>
+        </ul>
+
+        <h2>15. Suspensão e encerramento</h2>
+        <p>
+            Poderemos suspender, limitar ou encerrar contas em caso de violação destes Termos, suspeita de fraude,
+            risco de segurança, ordem legal, uso indevido, comportamento abusivo, compartilhamento irregular de conta
+            ou tentativa de prejudicar a plataforma.
+        </p>
+
+        <h2>16. Disponibilidade e alterações do serviço</h2>
+        <p>
+            Buscamos manter o aplicativo disponível e funcional, mas não garantimos operação contínua, livre de erros,
+            interrupções, atrasos, falhas de terceiros, indisponibilidade de internet ou problemas externos.
+        </p>
+        <p>
+            Funcionalidades poderão ser alteradas, suspensas, removidas, aprimoradas ou substituídas a qualquer momento,
+            respeitados os direitos do consumidor e obrigações aplicáveis.
+        </p>
+
+        <h2>17. Limitação de responsabilidade</h2>
+        <p>
+            Na máxima extensão permitida por lei, a Turbo Tiger não será responsável por perdas financeiras, decisões
+            tomadas pelo usuário, resultados em plataformas de terceiros, falhas externas, indisponibilidade de internet,
+            erros de dados inseridos pelo usuário, uso indevido, descumprimento de regras por terceiros ou expectativas
+            de resultado.
+        </p>
+        <p>
+            Nada nestes Termos exclui direitos que não possam ser afastados pela legislação aplicável.
+        </p>
+
+        <h2>18. Privacidade</h2>
+        <p>
+            O tratamento de dados pessoais segue a Política de Privacidade disponível nesta mesma página. Ao usar o
+            Turbo Tiger, o usuário concorda com o tratamento de dados necessário ao funcionamento da plataforma.
+        </p>
+
+        <h2>19. Alterações dos Termos</h2>
+        <p>
+            Estes Termos poderão ser atualizados a qualquer momento para refletir mudanças legais, técnicas, operacionais
+            ou comerciais. A versão vigente será publicada nesta página.
+        </p>
+        <p>
+            O uso contínuo do aplicativo após a publicação de alterações representa aceitação da versão atualizada.
+        </p>
+
+        <h2>20. Lei aplicável e foro</h2>
+        <p>
+            Estes Termos são regidos pelas leis da República Federativa do Brasil, incluindo a Lei Geral de Proteção de
+            Dados, o Código Civil e o Código de Defesa do Consumidor, quando aplicáveis.
+        </p>
+        <p>
+            Eventuais controvérsias serão dirimidas no foro do domicílio do consumidor, conforme garantido pela legislação
+            aplicável.
+        </p>
+    </section>
+
+    <hr/>
+
+    <section id="contato">
+        <h1>Contato</h1>
+        <p>
+            Para privacidade, suporte, exclusão de conta, dúvidas sobre estes Termos ou exercício de direitos LGPD:
+        </p>
+        <p><strong>E-mail:</strong> <a href="mailto:comunidade@turbotiger.com.br">comunidade@turbotiger.com.br</a></p>
+        <p class="small">
+            Esta página deve ser mantida disponível no site, no aplicativo e nas páginas oficiais das lojas sempre que exigido.
+        </p>
+    </section>
+
+</div>
+
+<footer>
+    <p class="small">© 2026 Turbo Tiger. Todos os direitos reservados.</p>
+</footer>
+
 </body>
 </html>
