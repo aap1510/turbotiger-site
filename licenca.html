@@ -53,6 +53,15 @@
   .pay-tab.active{border-color:#111;background:#111;color:#fff}
   .pay-box{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff}
   .pay-title{font-weight:800;margin-bottom:5px}
+  .payer-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:10px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field.full{grid-column:1/-1}
+  .field label{font-size:13px;font-weight:800;color:#252525}
+  .field input{width:100%;border:1px solid var(--line);border-radius:10px;padding:13px 12px;font-size:15px;background:#fff;color:var(--text);outline:none}
+  .field input:focus{border-color:var(--accent-dark);box-shadow:0 0 0 3px rgba(244,180,0,.18)}
+  .field input:disabled,.field input[readonly]{background:#f4f4f4;color:#555;cursor:not-allowed}
+  .field-note{font-size:12px;color:var(--muted);line-height:1.4}
+  .field-note.error{color:var(--danger);font-weight:700}
   .summary-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:10px 0;font-size:14px}
   .summary-row strong{font-size:15px;text-align:right}
   .summary-total{display:flex;justify-content:space-between;align-items:flex-end;margin:14px 0;gap:12px}
@@ -104,6 +113,23 @@
         <div>
           <strong>30 dias gr&aacute;tis para testar</strong>
           <div class="muted">O teste gr&aacute;tis termina em <span id="trialDate"></span>. Depois disso, o acesso segue exatamente o plano escolhido abaixo.</div>
+        </div>
+      </div>
+
+      <h2>Dados para pagamento</h2>
+      <div class="payer-grid">
+        <div class="field">
+          <label for="payerDoc">CPF/CNPJ</label>
+          <input id="payerDoc" type="text" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="Digite somente numeros">
+        </div>
+        <div class="field">
+          <label for="payerName" id="payerNameLabel">Nome completo</label>
+          <input id="payerName" type="text" autocomplete="name" placeholder="Nome completo">
+        </div>
+        <div class="field full">
+          <label for="payerEmail">E-mail do cadastro</label>
+          <input id="payerEmail" type="email" readonly disabled placeholder="Carregando e-mail do app">
+          <div class="field-note" id="payerStatus">O pagamento sera vinculado ao usuario aberto pelo app e as informacoes serao enviadas para este e-mail.</div>
         </div>
       </div>
 
@@ -208,9 +234,17 @@ let selectedPay = 'cartao';
 let checkoutOk = false;
 let existingPaymentUrl = '';
 let trialDate = brDatePlus(30);
+let checkoutEmail = '';
+let baseButtonEnabled = false;
+let baseButtonText = 'Validando acesso...';
 
 const statusBox = document.getElementById('checkoutStatus');
 const checkoutBtn = document.getElementById('checkoutBtn');
+const payerDocInput = document.getElementById('payerDoc');
+const payerNameInput = document.getElementById('payerName');
+const payerNameLabel = document.getElementById('payerNameLabel');
+const payerEmailInput = document.getElementById('payerEmail');
+const payerStatus = document.getElementById('payerStatus');
 
 function brDatePlus(days){
   const d = new Date();
@@ -258,8 +292,135 @@ function setStatus(message, kind){
 }
 
 function setButton(enabled, text){
-  checkoutBtn.disabled = !enabled;
-  checkoutBtn.textContent = text;
+  baseButtonEnabled = enabled;
+  baseButtonText = text;
+  refreshCheckoutButton();
+}
+
+function digitsOnly(value){
+  return String(value || '').replace(/\D/g, '');
+}
+
+function maskCpfCnpj(digits){
+  const value = digitsOnly(digits).slice(0, 14);
+  if (value.length <= 11) {
+    return value
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  }
+  return value
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/\.(\d{3})(\d)/, '.$1/$2')
+    .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+}
+
+function isRepeatedDigits(value){
+  return /^(\d)\1+$/.test(value);
+}
+
+function isValidCpf(cpf){
+  cpf = digitsOnly(cpf);
+  if (cpf.length !== 11 || isRepeatedDigits(cpf)) return false;
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += Number(cpf[i]) * (10 - i);
+  let digit = 11 - (sum % 11);
+  if (digit >= 10) digit = 0;
+  if (digit !== Number(cpf[9])) return false;
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += Number(cpf[i]) * (11 - i);
+  digit = 11 - (sum % 11);
+  if (digit >= 10) digit = 0;
+  return digit === Number(cpf[10]);
+}
+
+function isValidCnpj(cnpj){
+  cnpj = digitsOnly(cnpj);
+  if (cnpj.length !== 14 || isRepeatedDigits(cnpj)) return false;
+  const weights1 = [5,4,3,2,9,8,7,6,5,4,3,2];
+  const weights2 = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+  let sum = 0;
+  for (let i = 0; i < 12; i++) sum += Number(cnpj[i]) * weights1[i];
+  let digit = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+  if (digit !== Number(cnpj[12])) return false;
+  sum = 0;
+  for (let i = 0; i < 13; i++) sum += Number(cnpj[i]) * weights2[i];
+  digit = sum % 11 < 2 ? 0 : 11 - (sum % 11);
+  return digit === Number(cnpj[13]);
+}
+
+function updatePayerDocumentUi(){
+  const digits = digitsOnly(payerDocInput.value).slice(0, 14);
+  payerDocInput.value = maskCpfCnpj(digits);
+  const isCnpj = digits.length > 11;
+  payerNameLabel.textContent = isCnpj ? 'Razao social' : 'Nome completo';
+  payerNameInput.placeholder = isCnpj ? 'Razao social' : 'Nome completo';
+  payerNameInput.autocomplete = isCnpj ? 'organization' : 'name';
+}
+
+function validatePayer(showMessage){
+  updatePayerDocumentUi();
+  const documentDigits = digitsOnly(payerDocInput.value).slice(0, 14);
+  const name = payerNameInput.value.trim().replace(/\s+/g, ' ');
+  const isCnpj = documentDigits.length > 11;
+  let ok = true;
+  let message = 'O pagamento sera vinculado ao usuario aberto pelo app e as informacoes serao enviadas para este e-mail.';
+  let buttonText = baseButtonText;
+
+  if (!checkoutEmail) {
+    ok = false;
+    message = 'Abra esta pagina pelo app para carregar o e-mail do cadastro.';
+    buttonText = 'Carregando e-mail do cadastro';
+  } else if (documentDigits.length !== 11 && documentDigits.length !== 14) {
+    ok = false;
+    message = 'Informe um CPF ou CNPJ valido para o pagador.';
+    buttonText = 'Informe CPF/CNPJ';
+  } else if (documentDigits.length === 11 && !isValidCpf(documentDigits)) {
+    ok = false;
+    message = 'CPF invalido. Confira os numeros digitados.';
+    buttonText = 'CPF invalido';
+  } else if (documentDigits.length === 14 && !isValidCnpj(documentDigits)) {
+    ok = false;
+    message = 'CNPJ invalido. Confira os numeros digitados.';
+    buttonText = 'CNPJ invalido';
+  } else if (name.length < 3) {
+    ok = false;
+    message = isCnpj ? 'Informe a razao social do pagador.' : 'Informe o nome completo do pagador.';
+    buttonText = isCnpj ? 'Informe a razao social' : 'Informe o nome completo';
+  }
+
+  if (showMessage || !ok) {
+    payerStatus.textContent = message;
+    payerStatus.className = 'field-note' + (ok ? '' : ' error');
+  } else {
+    payerStatus.textContent = message;
+    payerStatus.className = 'field-note';
+  }
+
+  return { ok, documento: documentDigits, nome: name, tipo: isCnpj ? 'cnpj' : 'cpf', buttonText };
+}
+
+function refreshCheckoutButton(){
+  if (!baseButtonEnabled) {
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = baseButtonText;
+    return;
+  }
+
+  const validation = validatePayer(false);
+  checkoutBtn.disabled = !validation.ok;
+  checkoutBtn.textContent = validation.ok ? baseButtonText : validation.buttonText;
+}
+
+function resetExistingPaymentAfterPayerChange(){
+  updatePayerDocumentUi();
+  existingPaymentUrl = '';
+  if (checkoutOk) {
+    setButton(true, 'Ir para pagamento seguro');
+  } else {
+    refreshCheckoutButton();
+  }
 }
 
 function rpc(name, body){
@@ -318,8 +479,11 @@ function formatDate(value){
 function applyCheckout(data){
   checkoutOk = true;
   existingPaymentUrl = data.gateway_payment_url || '';
+  checkoutEmail = String(data.email_usuario || data.email_cobranca || '').trim();
+  payerEmailInput.value = checkoutEmail;
   setButton(true, existingPaymentUrl ? 'Continuar pagamento seguro' : 'Ir para pagamento seguro');
   setStatus('Checkout seguro validado pelo app. Escolha o plano e a forma de pagamento.', 'ok');
+  validatePayer(false);
 
   if (data.gateway_status === 'pago') {
     setStatus('Pagamento confirmado. Sua assinatura sera liberada automaticamente no app.', 'ok');
@@ -369,6 +533,12 @@ checkoutBtn.addEventListener('click', async function(){
     return;
   }
 
+  const payer = validatePayer(true);
+  if (!payer.ok) {
+    refreshCheckoutButton();
+    return;
+  }
+
   if (existingPaymentUrl) {
     window.location.href = existingPaymentUrl;
     return;
@@ -379,7 +549,10 @@ checkoutBtn.addEventListener('click', async function(){
   const data = await gatewayCheckout({
     checkout_ref: checkoutRef,
     plano: selectedPlan,
-    forma_pagamento: selectedPay
+    forma_pagamento: selectedPay,
+    pagador_documento: payer.documento,
+    pagador_nome: payer.nome,
+    email_cobranca: checkoutEmail
   });
 
   if (!data.ok || !data.payment_url) {
@@ -396,6 +569,14 @@ checkoutBtn.addEventListener('click', async function(){
 
 document.getElementById('trialDate').textContent = trialDate;
 document.getElementById('sumDate').textContent = trialDate;
+payerDocInput.addEventListener('input', resetExistingPaymentAfterPayerChange);
+payerNameInput.addEventListener('input', resetExistingPaymentAfterPayerChange);
+payerDocInput.addEventListener('paste', function(event){
+  event.preventDefault();
+  const text = (event.clipboardData || window.clipboardData).getData('text');
+  payerDocInput.value = maskCpfCnpj(digitsOnly(text).slice(0, 14));
+  resetExistingPaymentAfterPayerChange();
+});
 
 document.querySelectorAll('.plan').forEach(function(card){
   card.addEventListener('click', function(){
