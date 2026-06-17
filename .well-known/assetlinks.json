@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.turbo.tiger",
+      "sha256_cert_fingerprints": [
+        "A5:20:4E:CD:A6:AD:8D:0A:3C:08:94:C9:F5:06:E0:13:38:89:39:41:30:8E:4E:55:A8:E0:F8:F4:44:33:4C:41",
+        "F5:FB:93:15:3D:39:32:A3:3F:7E:36:85:95:23:57:09:53:A7:5A:C2:45:A8:F8:28:E8:A8:2B:C3:B6:14:ED:69"
+      ]
+    }
+  }
+]

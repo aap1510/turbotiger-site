@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Assinar Turbo Tiger</title>
+<meta name="description" content="Assine o Turbo Tiger Beta com 30 dias grátis. Planos mensal, trimestral, semestral e anual.">
+<style>
+  :root{
+    --bg:#0b0b0b;
+    --panel:#ffffff;
+    --muted:#5f6368;
+    --line:#e7e7e7;
+    --text:#151515;
+    --accent:#f4b400;
+    --accent-dark:#c98f00;
+    --success:#17803d;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:#f7f7f7}
+  .top{background:linear-gradient(180deg,rgba(0,0,0,.72),rgba(0,0,0,.42)),url('assets/bg-1200.webp') center/cover no-repeat;color:#fff;padding:28px 18px 54px}
+  .wrap{max-width:1120px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{width:52px;height:52px;border-radius:10px;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+  .brand strong{display:block;font-size:20px}
+  .brand span{font-size:13px;color:#f4f4f4}
+  .hero{margin-top:28px;max-width:820px}
+  h1{font-size:38px;line-height:1.08;margin:0 0 12px}
+  .lead{font-size:17px;line-height:1.5;color:#f1f1f1;margin:0}
+  .checkout{max-width:1120px;margin:-34px auto 34px;padding:0 18px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start}
+  .section,.summary{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgba(15,15,15,.08)}
+  .section{padding:18px}
+  .summary{padding:18px;position:sticky;top:16px}
+  h2{font-size:20px;margin:0 0 12px}
+  h3{font-size:17px;margin:0}
+  .muted{color:var(--muted);font-size:14px;line-height:1.45}
+  .trial{display:flex;gap:12px;align-items:flex-start;background:#fff8dc;border:1px solid #f3d36b;border-radius:10px;padding:12px;margin-bottom:16px}
+  .trial strong{display:block;margin-bottom:3px}
+  .plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .plan{border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;position:relative;background:#fff;min-height:176px}
+  .plan input{position:absolute;opacity:0;pointer-events:none}
+  .plan.selected{border-color:var(--accent-dark);box-shadow:0 0 0 3px rgba(244,180,0,.18)}
+  .plan.best{border-width:2px}
+  .tag{display:inline-block;background:#111;color:#fff;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700;margin-bottom:10px}
+  .tag.gold{background:linear-gradient(90deg,var(--accent),var(--accent-dark));color:#111}
+  .price{font-size:26px;font-weight:800;margin:8px 0 2px}
+  .price small{font-size:14px;color:var(--muted);font-weight:600}
+  .total{font-size:14px;color:var(--muted);margin-bottom:10px}
+  .save{font-size:13px;color:var(--success);font-weight:700}
+  .pay-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .pay-tab{border:1px solid var(--line);background:#fff;border-radius:10px;padding:12px;font-weight:800;cursor:pointer;text-align:center}
+  .pay-tab.active{border-color:#111;background:#111;color:#fff}
+  .pay-box{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff}
+  label{font-size:13px;font-weight:700;display:block;margin:10px 0 5px}
+  input{width:100%;border:1px solid var(--line);border-radius:9px;padding:12px;font-size:15px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .summary-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:10px 0;font-size:14px}
+  .summary-row strong{font-size:15px}
+  .summary-total{display:flex;justify-content:space-between;align-items:flex-end;margin:14px 0}
+  .summary-total strong{font-size:26px}
+  .cta{width:100%;border:0;border-radius:10px;background:var(--accent);color:#111;font-weight:900;padding:14px 16px;font-size:16px;cursor:pointer}
+  .cta:hover{background:#e7aa00}
+  .fine{font-size:12px;color:var(--muted);line-height:1.45;margin-top:12px}
+  .benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+  .benefit{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px}
+  .benefit strong{display:block;margin-bottom:4px}
+  .back{display:inline-block;margin-top:18px;color:#fff;text-decoration:none;font-weight:700}
+  @media(max-width:860px){
+    .checkout{grid-template-columns:1fr}
+    .summary{position:static}
+    h1{font-size:30px}
+  }
+  @media(max-width:620px){
+    .plans,.benefits,.grid2{grid-template-columns:1fr}
+    .pay-tabs{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <img src="assets/logo-200.png" alt="Turbo Tiger">
+      <div>
+        <strong>Turbo Tiger</strong>
+        <span>Beta com 30 dias grátis</span>
+      </div>
+    </div>
+    <div class="hero">
+      <h1>Escolha seu plano e comece com 30 dias grátis.</h1>
+      <p class="lead">O plano anual entrega o menor valor mensal do Turbo Tiger: R$ 19,90/mês, com 50% de desconto sobre o preço oficial mensal.</p>
+      <a class="back" href="/">Voltar para o site</a>
+    </div>
+  </div>
+</header>
+
+<main class="checkout">
+  <div>
+    <section class="section">
+      <div class="trial">
+        <div>
+          <strong>30 dias grátis para testar</strong>
+          <div class="muted">O teste grátis termina em <span id="trialDate"></span>. Depois disso, o pagamento segue exatamente a forma escolhida abaixo.</div>
+        </div>
+      </div>
+
+      <h2>Planos</h2>
+      <div class="plans" id="plans">
+        <label class="plan" data-plan="mensal">
+          <input type="radio" name="plan" value="mensal">
+          <span class="tag">Lançamento</span>
+          <h3>Mensal</h3>
+          <div class="price">R$ 29,90 <small>/mês</small></div>
+          <div class="total">Promoção até 31/10/2026. Depois: R$ 39,90/mês</div>
+          <div class="save">25% abaixo do mensal oficial</div>
+        </label>
+
+        <label class="plan" data-plan="trimestral">
+          <input type="radio" name="plan" value="trimestral">
+          <span class="tag">Mais flexível</span>
+          <h3>Trimestral</h3>
+          <div class="price">R$ 26,90 <small>/mês</small></div>
+          <div class="total">Total: R$ 80,70</div>
+          <div class="save">32,6% de desconto</div>
+        </label>
+
+        <label class="plan" data-plan="semestral">
+          <input type="radio" name="plan" value="semestral">
+          <span class="tag">Retenção</span>
+          <h3>Semestral</h3>
+          <div class="price">R$ 22,90 <small>/mês</small></div>
+          <div class="total">Total: R$ 137,40</div>
+          <div class="save">42,6% de desconto</div>
+        </label>
+
+        <label class="plan best selected" data-plan="anual">
+          <input type="radio" name="plan" value="anual" checked>
+          <span class="tag gold">Melhor escolha</span>
+          <h3>Anual</h3>
+          <div class="price">R$ 19,90 <small>/mês</small></div>
+          <div class="total">Total: R$ 238,80</div>
+          <div class="save">50% de desconto e menor custo mensal</div>
+        </label>
+      </div>
+    </section>
+
+    <section class="section" style="margin-top:18px">
+      <h2>Pagamento</h2>
+      <div class="pay-tabs">
+        <button class="pay-tab active" type="button" data-pay="cartao">Cartão de crédito</button>
+        <button class="pay-tab" type="button" data-pay="pix">Pix programado</button>
+      </div>
+
+      <div class="pay-box" id="cardBox">
+        <div class="muted">Cadastre o cartão agora. Depois dos 30 dias grátis, o plano escolhido é cobrado conforme o período contratado.</div>
+        <label>Número do cartão</label>
+        <input placeholder="0000 0000 0000 0000" inputmode="numeric">
+        <div class="grid2">
+          <div>
+            <label>Validade</label>
+            <input placeholder="MM/AA" inputmode="numeric">
+          </div>
+          <div>
+            <label>CVV</label>
+            <input placeholder="123" inputmode="numeric">
+          </div>
+        </div>
+        <label>Nome impresso no cartão</label>
+        <input placeholder="Nome completo">
+      </div>
+
+      <div class="pay-box" id="pixBox" style="display:none">
+        <div class="muted">O Pix programado agenda cobranças mensais automáticas após os 30 dias grátis, pelo período do plano escolhido.</div>
+        <label>Nome completo</label>
+        <input placeholder="Nome completo">
+        <label>CPF</label>
+        <input placeholder="000.000.000-00" inputmode="numeric">
+        <label>E-mail</label>
+        <input placeholder="seuemail@exemplo.com" inputmode="email">
+      </div>
+    </section>
+
+    <div class="benefits">
+      <div class="benefit"><strong>Entrada sem risco</strong><span class="muted">30 dias para ativar, testar e decidir com calma.</span></div>
+      <div class="benefit"><strong>Menor valor no anual</strong><span class="muted">R$ 19,90/mês preserva o melhor desconto.</span></div>
+      <div class="benefit"><strong>Mensal promocional</strong><span class="muted">Valor de lançamento do mensal válido até 31/10/2026.</span></div>
+    </div>
+  </div>
+
+  <aside class="summary">
+    <h2>Resumo</h2>
+    <div class="summary-row"><span>Plano</span><strong id="sumPlan">Anual</strong></div>
+    <div class="summary-row" id="sumPromoRow" style="display:none"><span>Promoção</span><strong id="sumPromo">Até 31/10/2026</strong></div>
+    <div class="summary-row"><span>Trial</span><strong>30 dias grátis</strong></div>
+    <div class="summary-row"><span id="sumDateLabel">Início após teste</span><strong id="sumDate"></strong></div>
+    <div class="summary-row"><span>Forma</span><strong id="sumPay">Cartão</strong></div>
+    <div class="summary-row"><span id="sumPeriodLabel">Uso liberado</span><strong id="sumPeriod">12 meses</strong></div>
+    <div class="summary-total">
+      <span id="sumAmountLabel">Valor do período</span>
+      <strong id="sumTotal">R$ 238,80</strong>
+    </div>
+    <button class="cta" type="button" id="checkoutBtn">Começar 30 dias grátis</button>
+    <p class="fine" id="sumFine">No cartão, depois dos 30 dias grátis, você paga R$ 238,80 uma única vez e fica com 12 meses de uso liberados. O Turbo Tiger Beta requer aparelho Android 64-bit.</p>
+  </aside>
+</main>
+
+<script>
+const plans = {
+  mensal: { name:'Mensal', months:1, total:'R$ 29,90', monthly:'R$ 29,90', officialMonthly:'R$ 39,90', promoUntil:'31/10/2026', note:'R$ 29,90/mês na promoção' },
+  trimestral: { name:'Trimestral', months:3, total:'R$ 80,70', monthly:'R$ 26,90', note:'R$ 26,90/mês' },
+  semestral: { name:'Semestral', months:6, total:'R$ 137,40', monthly:'R$ 22,90', note:'R$ 22,90/mês' },
+  anual: { name:'Anual', months:12, total:'R$ 238,80', monthly:'R$ 19,90', note:'R$ 19,90/mês' }
+};
+let selectedPlan = 'anual';
+let selectedPay = 'cartao';
+
+function brDatePlus(days){
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+}
+
+function updateSummary(){
+  const plan = plans[selectedPlan];
+  const pluralMes = plan.months === 1 ? 'mês' : 'meses';
+  const pluralCobranca = plan.months === 1 ? 'cobrança mensal' : 'cobranças mensais';
+  const promoRow = document.getElementById('sumPromoRow');
+  document.getElementById('sumPlan').textContent = plan.name;
+  document.getElementById('sumPay').textContent = selectedPay === 'cartao' ? 'Cartão' : 'Pix programado';
+  promoRow.style.display = plan.promoUntil ? 'flex' : 'none';
+  document.getElementById('sumPromo').textContent = plan.promoUntil ? 'Até ' + plan.promoUntil : '';
+
+  if (selectedPay === 'cartao') {
+    document.getElementById('sumDateLabel').textContent = 'Início após teste';
+    document.getElementById('sumDate').textContent = trialDate;
+    document.getElementById('sumPeriodLabel').textContent = 'Uso liberado';
+    document.getElementById('sumPeriod').textContent = plan.months + ' ' + pluralMes;
+    document.getElementById('sumAmountLabel').textContent = plan.months === 1 ? 'Valor mensal' : 'Valor do período';
+    document.getElementById('sumTotal').textContent = plan.months === 1 ? plan.monthly + ' / mês' : plan.total;
+    document.getElementById('sumFine').textContent = plan.months === 1
+      ? 'No cartão, depois dos 30 dias grátis, a assinatura mensal começa em ' + trialDate + ' por ' + plan.monthly + '/mês. Promoção de lançamento válida até ' + plan.promoUntil + '; depois o mensal oficial será ' + plan.officialMonthly + '/mês. O Turbo Tiger Beta requer aparelho Android 64-bit.'
+      : 'No cartão, depois dos 30 dias grátis, você paga ' + plan.total + ' uma única vez e fica com ' + plan.months + ' meses de uso liberados. O Turbo Tiger Beta requer aparelho Android 64-bit.';
+    return;
+  }
+
+  document.getElementById('sumDateLabel').textContent = 'Início programado';
+  document.getElementById('sumDate').textContent = trialDate;
+  document.getElementById('sumPeriodLabel').textContent = 'Programação';
+  document.getElementById('sumPeriod').textContent = plan.months + ' ' + pluralCobranca;
+  document.getElementById('sumAmountLabel').textContent = 'Cobrança mensal';
+  document.getElementById('sumTotal').textContent = plan.monthly + ' / mês';
+  document.getElementById('sumFine').textContent = 'No Pix programado, a cobrança automática começa em ' + trialDate + ' no valor de ' + plan.monthly + ' por mês, durante ' + plan.months + ' ' + pluralMes + '.' +
+    (plan.promoUntil ? ' Promoção de lançamento válida até ' + plan.promoUntil + '; depois o mensal oficial será ' + plan.officialMonthly + '/mês.' : '') +
+    ' O Turbo Tiger Beta requer aparelho Android 64-bit.';
+}
+
+let trialDate = brDatePlus(30);
+document.getElementById('trialDate').textContent = trialDate;
+document.getElementById('sumDate').textContent = trialDate;
+
+document.querySelectorAll('.plan').forEach(function(card){
+  card.addEventListener('click', function(){
+    selectedPlan = card.dataset.plan;
+    document.querySelectorAll('.plan').forEach(function(item){ item.classList.remove('selected'); });
+    card.classList.add('selected');
+    card.querySelector('input').checked = true;
+    updateSummary();
+  });
+});
+
+document.querySelectorAll('.pay-tab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    selectedPay = tab.dataset.pay;
+    document.querySelectorAll('.pay-tab').forEach(function(item){ item.classList.remove('active'); });
+    tab.classList.add('active');
+    document.getElementById('cardBox').style.display = selectedPay === 'cartao' ? 'block' : 'none';
+    document.getElementById('pixBox').style.display = selectedPay === 'pix' ? 'block' : 'none';
+    updateSummary();
+  });
+});
+
+document.getElementById('checkoutBtn').addEventListener('click', function(){
+  const plan = plans[selectedPlan];
+  const msg = selectedPay === 'cartao'
+    ? 'Plano ' + plan.name + ' selecionado. O cartão cobrará ' + (plan.months === 1 ? plan.monthly + '/mês' : plan.total + ' pelo período de ' + plan.months + ' meses') + ' após o teste grátis.'
+    : 'Plano ' + plan.name + ' selecionado. O Pix programado cobrará ' + plan.monthly + ' por mês durante ' + plan.months + ' meses, após o teste grátis.';
+  alert(msg);
+});
+
+updateSummary();
+</script>
+<script>
+(function(){
+  const SUPABASE_URL = 'https://jzqgudmvquokizvgehow.supabase.co/rest/v1';
+  const SUPABASE_KEY = 'sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU';
+  const checkoutRef = (new URLSearchParams(location.search).get('checkout') || '').trim();
+  const summary = document.querySelector('.summary');
+  const oldBtn = document.getElementById('checkoutBtn');
+  const btn = oldBtn.cloneNode(true);
+  let checkoutOk = false;
+
+  oldBtn.parentNode.replaceChild(btn, oldBtn);
+
+  const status = document.createElement('div');
+  status.id = 'checkoutStatus';
+  status.style.border = '1px solid #e7e7e7';
+  status.style.borderRadius = '10px';
+  status.style.padding = '12px';
+  status.style.margin = '12px 0';
+  status.style.fontSize = '13px';
+  status.style.lineHeight = '1.4';
+  status.style.background = '#fff';
+  status.style.color = '#5f6368';
+  summary.insertBefore(status, btn);
+
+  function setStatus(message, kind){
+    status.textContent = message;
+    if (kind === 'ok') {
+      status.style.borderColor = '#a9dfbf';
+      status.style.background = '#f0fff5';
+      status.style.color = '#176b35';
+    } else if (kind === 'error') {
+      status.style.borderColor = '#f0b8b8';
+      status.style.background = '#fff5f5';
+      status.style.color = '#9b1c1c';
+    } else {
+      status.style.borderColor = '#e7e7e7';
+      status.style.background = '#fff';
+      status.style.color = '#5f6368';
+    }
+  }
+
+  function setButton(enabled, text){
+    btn.disabled = !enabled;
+    btn.textContent = text;
+    btn.style.opacity = enabled ? '1' : '.55';
+    btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
+  }
+
+  function rpc(name, body){
+    return fetch(SUPABASE_URL + '/rpc/' + name, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(body)
+    }).then(async function(response){
+      const text = await response.text();
+      let data = {};
+      try { data = text ? JSON.parse(text) : {}; } catch(e) { data = { ok:false, mensagem:text }; }
+      if (!response.ok) {
+        data.ok = false;
+        data.mensagem = data.message || data.msg || data.mensagem || 'erro_supabase';
+      }
+      return data;
+    });
+  }
+
+  function formatDate(value){
+    if (!value) return '';
+    const parts = String(value).split('-');
+    if (parts.length === 3) {
+      return parts[2] + '/' + parts[1] + '/' + parts[0];
+    }
+    return value;
+  }
+
+  function applyCheckout(data){
+    checkoutOk = true;
+    setButton(true, 'Come\u00e7ar 30 dias gr\u00e1tis');
+    setStatus('Checkout seguro validado pelo app. Escolha o plano e a forma de pagamento.', 'ok');
+
+    if (data.trial_fim) {
+      trialDate = formatDate(data.trial_fim);
+      document.getElementById('trialDate').textContent = trialDate;
+      document.getElementById('sumDate').textContent = trialDate;
+      updateSummary();
+    }
+
+    if (data.plano && plans[data.plano]) {
+      const card = document.querySelector('.plan[data-plan="' + data.plano + '"]');
+      if (card) card.click();
+    }
+
+    if (data.forma_pagamento) {
+      const pay = data.forma_pagamento === 'pix_programado' ? 'pix' : data.forma_pagamento;
+      const tab = document.querySelector('.pay-tab[data-pay="' + pay + '"]');
+      if (tab) tab.click();
+    }
+  }
+
+  async function validateCheckout(){
+    setButton(false, 'Validando acesso...');
+
+    if (!checkoutRef) {
+      setStatus('Para assinar, abra esta p\u00e1gina pelo bot\u00e3o Assine agora dentro do app Turbo Tiger.', 'error');
+      setButton(false, 'Abra pelo app para assinar');
+      return;
+    }
+
+    const data = await rpc('assinatura_checkout_resolver_rpc', { p_checkout_ref: checkoutRef });
+    if (!data.ok) {
+      setStatus('Este link de assinatura expirou ou n\u00e3o \u00e9 v\u00e1lido. Abra novamente pelo app Turbo Tiger.', 'error');
+      setButton(false, 'Abra pelo app para assinar');
+      return;
+    }
+
+    applyCheckout(data);
+  }
+
+  btn.addEventListener('click', async function(){
+    if (!checkoutOk) {
+      setStatus('Abra a assinatura pelo app Turbo Tiger para vincular o pagamento ao seu usu\u00e1rio.', 'error');
+      return;
+    }
+
+    setButton(false, 'Preparando pagamento...');
+    const data = await rpc('assinatura_checkout_selecionar_rpc', {
+      p_checkout_ref: checkoutRef,
+      p_plano: selectedPlan,
+      p_forma_pagamento: selectedPay
+    });
+
+    if (!data.ok) {
+      setStatus('N\u00e3o foi poss\u00edvel registrar este checkout. Abra novamente pelo app.', 'error');
+      setButton(true, 'Come\u00e7ar 30 dias gr\u00e1tis');
+      return;
+    }
+
+    const gatewayNome = data.gateway_nome || data.gateway || 'gateway ativo';
+    setStatus('Plano registrado com seguran\u00e7a. O pagamento ficou reservado para ' + gatewayNome + ' usando a refer\u00eancia ' + data.external_reference + '.', 'ok');
+    setButton(false, 'Gateway em breve');
+  });
+
+  validateCheckout();
+})();
+</script>
+</body>
+</html>

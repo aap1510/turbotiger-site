@@ -26,14 +26,15 @@
 <body>
 <div class="wrap">
   <div class="card">
-    <h2>Preparando o download</h2>
-    <p class="muted" id="status">Detectando seu dispositivo e preparando o download...</p>
+    <h2>Download Turbo Tiger 64-bit</h2>
+    <p class="muted" id="status">Preparando o download do Turbo Tiger Beta para Android 64-bit...</p>
 
     <div style="margin-top:14px;">
-      <a id="manualLink" class="btn btn-primary" href="#">Baixar (se não baixar automaticamente)</a>
+      <a id="manualLink" class="btn btn-primary" href="#">Baixar Turbo Tiger 64-bit</a>
       <a id="openApp" class="btn btn-ghost" style="margin-left:8px" href="#">Abrir Turbo Tiger</a>
     </div>
 
+    <p class="small" style="margin-top:12px"><strong>Compatibilidade:</strong> o Turbo Tiger Beta requer aparelho Android 64-bit. Se o site identificar aparelho 32-bit, o download será bloqueado porque o APK não é compatível.</p>
     <p class="small" style="margin-top:12px">Se você instalou o app, clique em <strong>Abrir Turbo Tiger</strong> para que o app receba seu código de indicação automaticamente.</p>
     <p class="small" id="debug" style="margin-top:12px;color:#444"></p>
   </div>
@@ -43,50 +44,82 @@
 </footer>
 
 <script>
-// === CONFIG - altere estes valores para seus URLs reais ANTES de publicar ===
-// Se você hospedar os APKs na pasta /downloads/ do GitHub Pages, mantenha caminhos relativos.
-// Ou cole o link do GitHub Releases / S3 / Render. 
-const APK32 = '/downloads/TurboTiger-32.apk'; // substitua pela URL real do APK 32-bit
-const APK64 = '/downloads/TurboTiger-64.apk'; // substitua pela URL real do APK 64-bit
-const LOG_ENDPOINT = '/download'; // substitua pelo seu endpoint de registro (ex: https://turbotiger-download.onrender.com/download)
-// ============================================================================
+const APK = '/downloads/TurboTiger.apk';
 
 function getQueryParam(name){ const p=new URLSearchParams(location.search); return p.get(name); }
 function isAndroid(){ return /android/i.test(navigator.userAgent); }
-function detect64(){ const ua = navigator.userAgent.toLowerCase(); if(ua.includes('arm64')||ua.includes('aarch64')||ua.includes('x86_64')||ua.includes('amd64')) return true; return false; }
+function setDownloadEnabled(enabled, text){
+  manualLink.textContent = text;
+  if (enabled) {
+    manualLink.href = APK;
+    manualLink.style.opacity = '1';
+    manualLink.style.pointerEvents = 'auto';
+  } else {
+    manualLink.href = '#';
+    manualLink.style.opacity = '.65';
+    manualLink.style.pointerEvents = 'none';
+  }
+}
+async function detectAndroidArch(){
+  if (!isAndroid()) return 'not-android';
 
-const indicator = getQueryParam('indicador') || localStorage.getItem('turbo_indicator') || '';
-if (indicator) localStorage.setItem('turbo_indicator', indicator);
+  try {
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+      const hints = await navigator.userAgentData.getHighEntropyValues(['architecture', 'bitness', 'platform']);
+      const arch = String(hints.architecture || '').toLowerCase();
+      const bitness = String(hints.bitness || '').toLowerCase();
+      const platform = String(hints.platform || '').toLowerCase();
+
+      if (platform && platform !== 'android') return 'not-android';
+      if (bitness === '64' || arch.includes('arm64') || arch.includes('aarch64') || arch.includes('x86_64')) return '64';
+      if (bitness === '32' || arch === 'arm' || arch === 'x86') return '32';
+    }
+  } catch(e) {}
+
+  const ua = navigator.userAgent.toLowerCase();
+  if (ua.includes('arm64') || ua.includes('aarch64') || ua.includes('x86_64') || ua.includes('amd64')) return '64';
+  if (ua.includes('armv7') || ua.includes('armeabi-v7a') || ua.includes('i686')) return '32';
+  return 'unknown';
+}
+
+const inviteRef = getQueryParam('ref') || localStorage.getItem('turbo_invite_ref') || '';
+if (inviteRef) localStorage.setItem('turbo_invite_ref', inviteRef);
 
 const status = document.getElementById('status');
 const manualLink = document.getElementById('manualLink');
 const openApp = document.getElementById('openApp');
 const debug = document.getElementById('debug');
 
-debug.textContent = 'Indicador: ' + indicator + ' | UA: ' + navigator.userAgent;
+debug.textContent = inviteRef ? 'Convite recebido.' : 'Abra esta página pelo link de convite.';
 
-// Registra indicador no servidor (non-blocking). Ajuste LOG_ENDPOINT para seu serviço.
-if (indicator && LOG_ENDPOINT) {
-  try {
-    fetch(LOG_ENDPOINT + '?indicador=' + encodeURIComponent(indicator), { method:'GET', mode:'no-cors' })
-      .catch(()=>{/* sem-ação em caso de erro */});
-  } catch(e){}
-}
+detectAndroidArch().then(function(arch){
+  if (arch === 'not-android') {
+    setDownloadEnabled(true, 'Baixar Turbo Tiger 64-bit');
+    status.textContent = 'Este download é destinado a aparelhos Android 64-bit. Se estiver no Android, clique em Baixar Turbo Tiger 64-bit.';
+    return;
+  }
 
-if (!isAndroid()) {
-  status.textContent = 'Este download é destinado a dispositivos Android. Se estiver no Android, aguarde o redirecionamento ou clique em Baixar.';
-  manualLink.href = APK32;
-} else {
-  const is64 = detect64();
-  const target = is64 ? APK64 : APK32;
-  status.textContent = 'Detectado ' + (is64 ? '64-bit' : '32-bit') + ' — redirecionando para o download...';
-  manualLink.href = target + (indicator ? ('?indicador=' + encodeURIComponent(indicator)) : '');
-  // redireciona automaticamente após pequeno atraso para permitir registro
-  setTimeout(()=>{ window.location.href = manualLink.href; }, 1200);
-}
+  if (arch === '32') {
+    setDownloadEnabled(false, 'Aparelho 32-bit incompatível');
+    status.textContent = 'Este aparelho aparenta ser Android 32-bit. O Turbo Tiger Beta requer Android 64-bit e este APK não será compatível.';
+    return;
+  }
+
+  if (arch === '64') {
+    setDownloadEnabled(true, 'Baixar Turbo Tiger 64-bit');
+    status.textContent = 'Android 64-bit identificado. Redirecionando para o download...';
+    setTimeout(()=>{ window.location.href = manualLink.href; }, 1200);
+    return;
+  }
+
+  setDownloadEnabled(true, 'Baixar Turbo Tiger 64-bit');
+  status.textContent = 'Não foi possível confirmar automaticamente se este aparelho é 64-bit. O Turbo Tiger Beta requer Android 64-bit; aparelhos 32-bit não são compatíveis.';
+});
 
 // deep link para abrir o app após instalação
-openApp.href = 'turbotiger://install?indicador=' + encodeURIComponent(indicator || '');
+openApp.href = inviteRef
+  ? 'turbotiger://invite?ref=' + encodeURIComponent(inviteRef)
+  : 'https://www.turbotiger.com.br/app';
 openApp.addEventListener('click', function(){ setTimeout(()=>{ status.textContent = 'Se o app não abrir, verifique se foi instalado e clique novamente.'; }, 600); });
 </script>
 
