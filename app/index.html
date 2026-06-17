@@ -3,125 +3,25 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Download Turbo Tiger</title>
+<meta http-equiv="refresh" content="0; url=/convite/">
+<title>Turbo Tiger</title>
 <style>
-  body{font-family:Arial,Helvetica,sans-serif;margin:0;color:#111;min-height: 90vh;background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0)), url('../assets/bg-1200.webp') center/cover no-repeat;}
-  .wrap{max-width:720px;margin:48px auto;padding:18px;position: relative;}
-  
-  .card {
-  position: relative;
-  background: #fff;
-  padding: 18px;
-  border-radius: 12px;
-  /* sombra mais forte e mais visível */
-  box-shadow: 0 15px 50px rgba(0,0,0,0.45);
-}
-  .btn{display:inline-block;padding:12px 16px;border-radius:10px;text-decoration:none;font-weight:700;cursor:pointer}
-  .btn-primary{background:#f4b400;color:#111;}
-  .btn-ghost{background:transparent;border:1px solid #ddd;color:#111}
-  .muted{color:#666;font-size:14px}
-  .small{font-size:13px;color:#666}
+  body{font-family:Arial,Helvetica,sans-serif;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#fafafa;color:#111}
+  .box{max-width:420px;padding:18px;text-align:center}
+  a{color:#111;font-weight:700}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <h2>Download Turbo Tiger 64-bit</h2>
-    <p class="muted" id="status">Preparando o download do Turbo Tiger Beta para Android 64-bit...</p>
-
-    <div style="margin-top:14px;">
-      <a id="manualLink" class="btn btn-primary" href="#">Baixar Turbo Tiger 64-bit</a>
-      <a id="openApp" class="btn btn-ghost" style="margin-left:8px" href="#">Abrir Turbo Tiger</a>
-    </div>
-
-    <p class="small" style="margin-top:12px"><strong>Compatibilidade:</strong> o Turbo Tiger Beta requer aparelho Android 64-bit. Se o site identificar aparelho 32-bit, o download será bloqueado porque o APK não é compatível.</p>
-    <p class="small" style="margin-top:12px">Se você instalou o app, clique em <strong>Abrir Turbo Tiger</strong> para que o app receba seu código de indicação automaticamente.</p>
-    <p class="small" id="debug" style="margin-top:12px;color:#444"></p>
-  </div>
+<div class="box">
+  <p>Redirecionando para o convite Turbo Tiger...</p>
+  <p><a id="go" href="/convite/">Abrir convite</a></p>
 </div>
-<footer style="margin-top:18px;text-align:center;color:#fff;" class="small">
-      © Turbo Tiger
-</footer>
-
 <script>
-const APK = '/downloads/TurboTiger.apk';
-
-function getQueryParam(name){ const p=new URLSearchParams(location.search); return p.get(name); }
-function isAndroid(){ return /android/i.test(navigator.userAgent); }
-function setDownloadEnabled(enabled, text){
-  manualLink.textContent = text;
-  if (enabled) {
-    manualLink.href = APK;
-    manualLink.style.opacity = '1';
-    manualLink.style.pointerEvents = 'auto';
-  } else {
-    manualLink.href = '#';
-    manualLink.style.opacity = '.65';
-    manualLink.style.pointerEvents = 'none';
-  }
-}
-async function detectAndroidArch(){
-  if (!isAndroid()) return 'not-android';
-
-  try {
-    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
-      const hints = await navigator.userAgentData.getHighEntropyValues(['architecture', 'bitness', 'platform']);
-      const arch = String(hints.architecture || '').toLowerCase();
-      const bitness = String(hints.bitness || '').toLowerCase();
-      const platform = String(hints.platform || '').toLowerCase();
-
-      if (platform && platform !== 'android') return 'not-android';
-      if (bitness === '64' || arch.includes('arm64') || arch.includes('aarch64') || arch.includes('x86_64')) return '64';
-      if (bitness === '32' || arch === 'arm' || arch === 'x86') return '32';
-    }
-  } catch(e) {}
-
-  const ua = navigator.userAgent.toLowerCase();
-  if (ua.includes('arm64') || ua.includes('aarch64') || ua.includes('x86_64') || ua.includes('amd64')) return '64';
-  if (ua.includes('armv7') || ua.includes('armeabi-v7a') || ua.includes('i686')) return '32';
-  return 'unknown';
-}
-
-const inviteRef = getQueryParam('ref') || localStorage.getItem('turbo_invite_ref') || '';
-if (inviteRef) localStorage.setItem('turbo_invite_ref', inviteRef);
-
-const status = document.getElementById('status');
-const manualLink = document.getElementById('manualLink');
-const openApp = document.getElementById('openApp');
-const debug = document.getElementById('debug');
-
-debug.textContent = inviteRef ? 'Convite recebido.' : 'Abra esta página pelo link de convite.';
-
-detectAndroidArch().then(function(arch){
-  if (arch === 'not-android') {
-    setDownloadEnabled(true, 'Baixar Turbo Tiger 64-bit');
-    status.textContent = 'Este download é destinado a aparelhos Android 64-bit. Se estiver no Android, clique em Baixar Turbo Tiger 64-bit.';
-    return;
-  }
-
-  if (arch === '32') {
-    setDownloadEnabled(false, 'Aparelho 32-bit incompatível');
-    status.textContent = 'Este aparelho aparenta ser Android 32-bit. O Turbo Tiger Beta requer Android 64-bit e este APK não será compatível.';
-    return;
-  }
-
-  if (arch === '64') {
-    setDownloadEnabled(true, 'Baixar Turbo Tiger 64-bit');
-    status.textContent = 'Android 64-bit identificado. Redirecionando para o download...';
-    setTimeout(()=>{ window.location.href = manualLink.href; }, 1200);
-    return;
-  }
-
-  setDownloadEnabled(true, 'Baixar Turbo Tiger 64-bit');
-  status.textContent = 'Não foi possível confirmar automaticamente se este aparelho é 64-bit. O Turbo Tiger Beta requer Android 64-bit; aparelhos 32-bit não são compatíveis.';
-});
-
-// deep link para abrir o app após instalação
-openApp.href = inviteRef
-  ? 'turbotiger://invite?ref=' + encodeURIComponent(inviteRef)
-  : 'https://www.turbotiger.com.br/app';
-openApp.addEventListener('click', function(){ setTimeout(()=>{ status.textContent = 'Se o app não abrir, verifique se foi instalado e clique novamente.'; }, 600); });
+const params = new URLSearchParams(location.search);
+const ref = params.get("ref");
+const target = ref ? "/convite/?ref=" + encodeURIComponent(ref) : "/convite/";
+document.getElementById("go").href = target;
+location.replace(target);
 </script>
-
 </body>
 </html>
