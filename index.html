@@ -3,65 +3,54 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Turbo Tiger — App & Comunidade</title>
-<meta name="description" content="Comunidade Turbo — estratégia e app para acompanhar suas bets.">
+<title>Turbo Tiger - App & Comunidade</title>
+<meta name="description" content="Comunidade Turbo Tiger, estrategia e app para acompanhar suas bets.">
 <style>
-  :root{ --accent:#f4b400; --accent-dark:#c88e00; --bg:#0b0b0b; --card:#ffffff; }
-  *{box-sizing:border-box;}
-  body{margin:0;font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial;color:#111;background:#fafafa;}
-  header {
-		  position: relative;
-		  padding: 28px 16px;
-		  background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0)), url('assets/bg-1200.webp') center/cover no-repeat;
-		  color: white;
-		  height: 220px;
-		  max-height: 220px;
-		  overflow: hidden;
-		}
-  .wrap{max-width:1000px;margin:0 auto;width: 100%;}
-  .hero {
-		  display: flex;
-		  flex-direction: column;
-		  gap: 18px;
-		  align-items: flex-start;
-		  position: relative;
-		  z-index: 1;
-		}
-  .wrap.hero {
-			  display: flex;
-			  flex-direction: column;
-			  gap: 18px;
-			  align-items: flex-start;
-			  position: relative;
-			  z-index: 1;
-			  padding-right: 220px;
-			  text-shadow:
-				0 2px 4px rgba(0,0,0,0.6);
-			}	
-  .brand{display:flex;align-items:center;gap:12px;}
-  .brand img{width:72px;height:72px;object-fit:contain;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.35);}
-  h1{margin:0;font-size:26px;}
-  p.lead{margin:10px 0 14px;color:#eef3ff;max-width:720px;}
-  main{padding:20px 16px;display:block;margin-top:-40px;}
-  .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 12px 30px rgba(2,6,23,0.08);}
-  .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
-  .btn{display:inline-block;padding:12px 16px;border-radius:10px;font-weight:700;text-decoration:none;cursor:pointer;}
-  .btn-primary{background:var(--accent);color:#111;}
-  .btn-ghost{background:transparent;border:2px solid #eee;color:#111;}
-  .info{color:#444;font-size:15px;margin-top:12px;}
-  footer{text-align:center;margin:18px 0;color:#777;font-size:14px;}
-  .indicator-banner{background:linear-gradient(90deg,var(--accent),var(--accent-dark));color:#111;padding:8px;border-radius:8px;font-weight:700;display:inline-block;}
-  @media(max-width:640px){ header{padding:18px;} .brand img{width:56px;height:56px;} h1{font-size:20px} .hero{gap:12px} .wrap.hero {padding-right: 120px;} }
-  .header-tiger {
-				  position: absolute;
-				  right: 0;
-				  top: 0;
-				  max-height: 100%;
-				  width: auto;
-				  object-fit: contain;
-				  z-index: 0;
-				  aspect-ratio: 1;
-				}
+  :root{
+    --accent:#f4b400;
+    --accent-dark:#c88e00;
+    --ink:#111;
+    --muted:#454545;
+    --card:#fff;
+    --line:#e8e8e8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fafafa}
+  header{position:relative;height:220px;max-height:220px;overflow:hidden;padding:28px 16px;color:#fff;background:linear-gradient(180deg,rgba(0,0,0,.58),rgba(0,0,0,.08)),url("assets/bg-1200.webp") center/cover no-repeat}
+  .wrap{max-width:1000px;margin:0 auto;width:100%}
+  .hero{display:flex;flex-direction:column;gap:18px;align-items:flex-start;position:relative;z-index:1;padding-right:220px;text-shadow:0 2px 4px rgba(0,0,0,.6)}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{width:72px;height:72px;object-fit:contain;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .brand span{opacity:.95;line-height:1.25}
+  h1,h2,h3,p{margin-top:0}
+  h1{margin:0;font-size:26px}
+  h2{font-size:26px;line-height:1.1;margin-bottom:10px}
+  h3{font-size:18px;margin-bottom:8px}
+  .lead{margin:0;color:#eef3ff;max-width:720px;font-size:19px;line-height:1.35}
+  .header-tiger{position:absolute;right:0;top:0;max-height:100%;width:auto;object-fit:contain;z-index:0;aspect-ratio:1}
+  main{padding:20px 16px;margin-top:-40px}
+  .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 12px 30px rgba(2,6,23,.08)}
+  .split{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .copy{flex:1;min-width:260px}
+  .panel{width:260px;min-width:200px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+  .panel ul{text-align:left;margin:10px 0 0;padding-left:18px;color:#333}
+  .panel li{margin:6px 0}
+  .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:12px 16px;border-radius:10px;font-weight:700;text-decoration:none;cursor:pointer;border:0}
+  .btn-primary{background:var(--accent);color:#111}
+  .btn-primary:active{background:var(--accent-dark)}
+  .btn-ghost{background:transparent;border:2px solid #eee;color:#111}
+  .info{color:var(--muted);font-size:15px;line-height:1.5;margin-bottom:10px}
+  .fine{color:#676767;font-size:13px;line-height:1.45;margin-top:10px}
+  footer{text-align:center;margin:18px 0;color:#777;font-size:14px}
+  @media(max-width:640px){
+    header{padding:18px}
+    .brand img{width:56px;height:56px}
+    h1{font-size:20px}
+    h2{font-size:23px}
+    .hero{gap:12px;padding-right:120px}
+    .panel{width:100%}
+  }
 </style>
 </head>
 <body>
@@ -69,78 +58,70 @@
   <div class="wrap hero">
     <div class="brand">
       <img src="assets/logo-200.png" alt="Turbo Tiger">
-      <div>
-        <div style="opacity:.95">App & Comunidade<br>para bets</div>
-      </div>
+      <span>App & Comunidade<br>para bets</span>
     </div>
     <p class="lead">Com IA Tiger pra<br>turbinar suas apostas.</p>
   </div>
-  
-	<img src="assets/tiger-512.png" alt="Tiger" class="header-tiger">
-	
+  <img src="assets/tiger-512.png" alt="Tiger" class="header-tiger">
 </header>
 
 <main class="wrap">
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-      <div style="flex:1">
-        <h2>Junte-se à<br>Turbo Tiger</h2>
-        <p class="info">Estatísticas, estratégias e gerenciamento de bancas.<br>Convide amigos com seu login, acompanhe quem você indicou e ganhe muitos benefícios.</p>
+  <section class="card">
+    <div class="split">
+      <div class="copy">
+        <h2>Junte-se &agrave;<br>Turbo Tiger</h2>
+        <p class="info">Estat&iacute;sticas, estrat&eacute;gias e gerenciamento de bancas. Convide amigos com seu login, acompanhe quem voc&ecirc; indicou e ganhe benef&iacute;cios.</p>
+        <p class="info"><strong>Compatibilidade:</strong> o Turbo Tiger Beta requer aparelho Android 64-bit. Aparelhos 32-bit n&atilde;o s&atilde;o compat&iacute;veis.</p>
         <div class="cta" id="ctaArea">
-          <a id="btnDownload" class="btn btn-primary" href="/app">Compartilhe</a>
-		  <a class="btn btn-ghost" href="/licenca.html">Assine agora</a>
-          <a class="btn btn-ghost" href="/politicaetermos.html">Política & Termos</a>
+          <a id="btnShare" class="btn btn-primary" href="turbotiger://convite?acao=gerar_convite" onclick="return turboTigerShareInvite(event)">Compartilhar</a>
+          <a class="btn btn-ghost" href="/politicaetermos.html">Pol&iacute;tica & Termos</a>
         </div>
+        <p class="fine">O convite deve ser enviado por um usu&aacute;rio logado no app Turbo Tiger. A p&aacute;gina de download &eacute; aberta somente pelo link seguro do convite.</p>
       </div>
-      <div style="width:260px;min-width:200px;">
-        <div style="background:linear-gradient(180deg,#fff,#fff);border-radius:10px;padding:12px;text-align:center;">
-          <strong style="display:block">Principais benefícios</strong>
-          <ul style="text-align:left;margin:10px 0 0;padding-left:18px;color:#333">
-            <li>Registro automático de bets</li>
-            <li>Relatórios e totais no app</li>
-            <li>Notificações e alertas</li>
-            <li>Indicações com benefícios</li>
-          </ul>
-        </div>
+      <div class="panel">
+        <strong>Principais benef&iacute;cios</strong>
+        <ul>
+          <li>Registro autom&aacute;tico de bets</li>
+          <li>Relat&oacute;rios e totais no app</li>
+          <li>Notifica&ccedil;&otilde;es e alertas</li>
+          <li>Indica&ccedil;&otilde;es com benef&iacute;cios</li>
+        </ul>
       </div>
-    </div>
-  </div>
-
-  <section style="margin-top:14px">
-    <div class="card">
-      <h3>Como funciona a indicação</h3>
-      <p class="info">Quando você compartilha, seu amigo acessa o link, nosso site grava seu login como indicador e redireciona para o APP. Após instalar, ele clica em “Abrir Turbo Tiger” para que o app receba o indicador automaticamente.</p>
-      <ol class="info">
-        <li>Acesse o link indicado</li>
-        <li>Baixe o APP</li>
-        <li>Torne-se membro 🐯</li>
-      </ol>
     </div>
   </section>
 
+  <section class="card" style="margin-top:14px">
+    <h3>Como funciona a indica&ccedil;&atilde;o</h3>
+    <p class="info">No app, toque em <strong>Compartilhar</strong>. O Android abre a tela nativa de compartilhamento para copiar o link ou enviar direto pelo WhatsApp, Messenger, Instagram e outros apps dispon&iacute;veis.</p>
+    <ol class="info">
+      <li>O amigo recebe seu link seguro de convite.</li>
+      <li>Se ainda n&atilde;o tiver o Turbo Tiger, o link abre a p&aacute;gina de download.</li>
+      <li>Depois de instalar, ao tocar no mesmo link, o Android abre o Turbo Tiger diretamente com seu convite.</li>
+    </ol>
+  </section>
+
   <footer>
-    <div class="wrap">
-      <small>© Turbo Tiger</small>
-    </div>
+    <small>&copy; Turbo Tiger</small>
   </footer>
 </main>
-
 <script>
-function getQueryParam(name) { const params = new URLSearchParams(window.location.search); return params.get(name); }
-const indicador = getQueryParam('indicador');
-const btn = document.getElementById('btnDownload');
-const share = document.getElementById('shareLink');
-if (indicador) {
-  btn.href = '/app?indicador=' + encodeURIComponent(indicador);
-  share.textContent = location.origin + '/app?indicador=' + encodeURIComponent(indicador);
-  const banner = document.createElement('div');
-  banner.className = 'indicator-banner';
-  banner.textContent = 'Você acessou via indicação: ' + indicador;
-  document.querySelector('.card').insertBefore(banner, document.querySelector('.card').firstChild);
-} else {
-  btn.href = '/app';
-  share.textContent = location.origin + '/app';
+function turboTigerShareInvite(event) {
+  try {
+    if (window.TurboTigerHistoricoBridge && typeof window.TurboTigerHistoricoBridge.post === "function") {
+      if (event && typeof event.preventDefault === "function") {
+        event.preventDefault();
+      }
+      window.TurboTigerHistoricoBridge.post("TURBO_SHARE_INVITE");
+      return false;
+    }
+  } catch(e) {}
+  return true;
 }
+
+const shareButton = document.getElementById("btnShare");
+shareButton.addEventListener("click", function(event){
+  return turboTigerShareInvite(event);
+});
 </script>
 </body>
 </html>
