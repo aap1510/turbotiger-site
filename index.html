@@ -73,7 +73,7 @@
         <p class="info">Estat&iacute;sticas, estrat&eacute;gias e gerenciamento de bancas. Convide amigos com seu login, acompanhe quem voc&ecirc; indicou e ganhe benef&iacute;cios.</p>
         <p class="info"><strong>Compatibilidade:</strong> o Turbo Tiger Beta requer aparelho Android 64-bit. Aparelhos 32-bit n&atilde;o s&atilde;o compat&iacute;veis.</p>
         <div class="cta" id="ctaArea">
-          <a id="btnShare" class="btn btn-primary" href="turbotiger://convite?acao=gerar_convite">Compartilhar</a>
+          <a id="btnShare" class="btn btn-primary" href="turbotiger://convite?acao=gerar_convite" onclick="return turboTigerShareInvite(event)">Compartilhar</a>
           <a class="btn btn-ghost" href="/politicaetermos.html">Pol&iacute;tica & Termos</a>
         </div>
         <p class="fine">O convite deve ser enviado por um usu&aacute;rio logado no app Turbo Tiger. A p&aacute;gina de download &eacute; aberta somente pelo link seguro do convite.</p>
@@ -104,5 +104,24 @@
     <small>&copy; Turbo Tiger</small>
   </footer>
 </main>
+<script>
+function turboTigerShareInvite(event) {
+  try {
+    if (window.TurboTigerHistoricoBridge && typeof window.TurboTigerHistoricoBridge.post === "function") {
+      if (event && typeof event.preventDefault === "function") {
+        event.preventDefault();
+      }
+      window.TurboTigerHistoricoBridge.post("TURBO_SHARE_INVITE");
+      return false;
+    }
+  } catch(e) {}
+  return true;
+}
+
+const shareButton = document.getElementById("btnShare");
+shareButton.addEventListener("click", function(event){
+  return turboTigerShareInvite(event);
+});
+</script>
 </body>
 </html>
