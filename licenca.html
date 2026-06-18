@@ -178,7 +178,19 @@
           <input id="payerEmail" type="email" readonly disabled placeholder="Carregando e-mail do app">
           <div class="field-note">O pagamento fica vinculado ao usu&aacute;rio do app, e os avisos seguem para este e-mail.</div>
         </div>
+        <div class="field full">
+          <label for="registrationCpf">CPF do cadastro</label>
+          <input id="registrationCpf" type="text" readonly disabled placeholder="Carregando CPF do app">
+        </div>
       </div>
+
+      <label class="option-line" for="samePayer">
+        <input id="samePayer" type="checkbox" disabled>
+        <div>
+          <strong>Pagador ser&aacute; o mesmo do cadastro?</strong>
+          <div class="muted">Ao marcar, o CPF do cadastro ser&aacute; usado nos dados do pagador.</div>
+        </div>
+      </label>
 
       <div class="pay-box" id="cardBox">
         <div class="pay-title">Cart&atilde;o de cr&eacute;dito</div>
@@ -203,6 +215,10 @@
           <div class="field">
             <label for="cardDoc">CPF/CNPJ do titular</label>
             <input id="cardDoc" type="text" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="Somente n&uacute;meros">
+          </div>
+          <div class="field">
+            <label for="cardHolderName" id="cardHolderNameLabel">Nome do titular confirmado</label>
+            <input id="cardHolderName" type="text" readonly placeholder="Preenchido automaticamente pelo CPF">
           </div>
           <div class="field">
             <label for="cardPhone">Telefone do titular</label>
@@ -316,6 +332,7 @@ let selectedPlan = 'anual';
 let selectedPay = 'cartao';
 let checkoutOk = false;
 let checkoutEmail = '';
+let checkoutCpf = '';
 let baseButtonEnabled = false;
 let baseButtonText = 'Validando acesso...';
 let pollTimer = null;
@@ -324,6 +341,13 @@ let payerCpfLookupDoc = '';
 let payerCpfLookupName = '';
 let payerCpfLookupLoading = false;
 let payerCpfLookupError = '';
+let cardCpfLookupSeq = 0;
+let cardCpfLookupDoc = '';
+let cardCpfLookupName = '';
+let cardCpfLookupLoading = false;
+let cardCpfLookupError = '';
+let paymentRoutes = { cartao:true, pix_avulso:true, pix_programado:true };
+let paymentConfirmedHandled = false;
 
 const statusBox = document.getElementById('checkoutStatus');
 const checkoutBtn = document.getElementById('checkoutBtn');
@@ -331,8 +355,13 @@ const payerDocInput = document.getElementById('payerDoc');
 const payerNameInput = document.getElementById('payerName');
 const payerNameLabel = document.getElementById('payerNameLabel');
 const payerEmailInput = document.getElementById('payerEmail');
+const registrationCpfInput = document.getElementById('registrationCpf');
+const samePayerInput = document.getElementById('samePayer');
 const payerStatus = document.getElementById('payerStatus');
 const cardStatus = document.getElementById('cardStatus');
+const cardDocInput = document.getElementById('cardDoc');
+const cardHolderNameInput = document.getElementById('cardHolderName');
+const cardHolderNameLabel = document.getElementById('cardHolderNameLabel');
 const pixProgramadoInput = document.getElementById('pixProgramado');
 const pixProgramadoBox = document.getElementById('pixProgramadoBox');
 const pixMonthsBox = document.getElementById('pixMonthsBox');
@@ -468,6 +497,74 @@ function syncPlansFromDatabase(rows){
   return true;
 }
 
+function syncPaymentRoutesFromDatabase(rows){
+  if (!Array.isArray(rows)) return false;
+
+  const routes = { cartao:false, pix_avulso:false, pix_programado:false };
+  rows.forEach(function(row){
+    const forma = String(row && row.forma_pagamento || '').trim();
+    if (Object.prototype.hasOwnProperty.call(routes, forma)) {
+      routes[forma] = true;
+    }
+  });
+
+  paymentRoutes = routes;
+  applyPaymentRouteVisibility();
+  return true;
+}
+
+function canPaymentRoute(forma){
+  return !!paymentRoutes[forma];
+}
+
+function returnToAppAfterPayment(){
+  const target = '/?app=1&pagamento=confirmado&checkout=' + encodeURIComponent(checkoutRef);
+  setTimeout(function(){
+    try {
+      window.location.replace(target);
+    } catch(e) {
+      window.location.href = target;
+    }
+  }, 1600);
+}
+
+function handlePaymentConfirmed(message, buttonText){
+  if (paymentConfirmedHandled) return;
+  paymentConfirmedHandled = true;
+  stopPaymentPolling();
+  setStatus(message || 'Pagamento confirmado. Sua assinatura foi liberada no app.', 'ok');
+  setButton(false, buttonText || 'Pagamento confirmado');
+  returnToAppAfterPayment();
+}
+
+function pixAvailableForSelectedPlan(){
+  return canPaymentRoute('pix_avulso') || (selectedPlan === 'mensal' && canPaymentRoute('pix_programado'));
+}
+
+function ensureSelectedPaymentAllowed(){
+  if (selectedPay === 'cartao' && !canPaymentRoute('cartao')) {
+    selectedPay = pixAvailableForSelectedPlan() ? 'pix' : 'cartao';
+  } else if (selectedPay === 'pix' && !pixAvailableForSelectedPlan()) {
+    selectedPay = canPaymentRoute('cartao') ? 'cartao' : 'pix';
+  }
+}
+
+function applyPaymentRouteVisibility(){
+  ensureSelectedPaymentAllowed();
+
+  const cardTab = document.querySelector('.pay-tab[data-pay="cartao"]');
+  const pixTab = document.querySelector('.pay-tab[data-pay="pix"]');
+  if (cardTab) cardTab.style.display = canPaymentRoute('cartao') ? '' : 'none';
+  if (pixTab) pixTab.style.display = (canPaymentRoute('pix_avulso') || canPaymentRoute('pix_programado')) ? '' : 'none';
+
+  document.querySelectorAll('.pay-tab').forEach(function(item){
+    item.classList.toggle('active', item.dataset.pay === selectedPay);
+  });
+  document.getElementById('cardBox').style.display = selectedPay === 'cartao' ? 'block' : 'none';
+  document.getElementById('pixBox').style.display = selectedPay === 'pix' ? 'block' : 'none';
+  updatePixProgramadoVisibility();
+}
+
 function planSaveText(plan){
   if (!plan.discount) return plan.monthly + '/m\u00eas';
   const percent = formatPercent(plan.discount);
@@ -570,6 +667,39 @@ function isValidCpfCnpj(value){
   return (digits.length === 11 && isValidCpf(digits)) || (digits.length === 14 && isValidCnpj(digits));
 }
 
+function isValidCardNumber(value){
+  const digits = digitsOnly(value);
+  if (digits.length < 13 || digits.length > 19 || isRepeatedDigits(digits)) return false;
+  let sum = 0;
+  let doubleDigit = false;
+  for (let i = digits.length - 1; i >= 0; i--) {
+    let digit = Number(digits[i]);
+    if (doubleDigit) {
+      digit *= 2;
+      if (digit > 9) digit -= 9;
+    }
+    sum += digit;
+    doubleDigit = !doubleDigit;
+  }
+  return sum % 10 === 0;
+}
+
+function normalizedNameTokens(value){
+  const ignored = { DA:true, DAS:true, DE:true, DO:true, DOS:true, E:true };
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .split(/[^A-Z0-9]+/)
+    .filter(function(token){ return token.length > 1 && !ignored[token]; });
+}
+
+function cardNameMatchesHolder(cardName, holderName){
+  const cardTokens = normalizedNameTokens(cardName);
+  const holderTokens = normalizedNameTokens(holderName);
+  return cardTokens.some(function(token){ return holderTokens.indexOf(token) >= 0; });
+}
+
 function updatePayerDocumentUi(){
   const digits = digitsOnly(payerDocInput.value).slice(0, 14);
   payerDocInput.value = maskCpfCnpj(digits);
@@ -635,13 +765,97 @@ async function consultarCpfPagadorSeNecessario(){
   }
 }
 
+function updateCardDocumentUi(){
+  const digits = digitsOnly(cardDocInput.value).slice(0, 14);
+  cardDocInput.value = maskCpfCnpj(digits);
+  const isCnpj = digits.length > 11;
+  cardHolderNameLabel.textContent = isCnpj ? 'Razão social do titular' : 'Nome do titular confirmado';
+  cardHolderNameInput.placeholder = isCnpj ? 'Razão social' : 'Preenchido automaticamente pelo CPF';
+  cardHolderNameInput.autocomplete = isCnpj ? 'organization' : 'name';
+  cardHolderNameInput.readOnly = !isCnpj;
+
+  if (isCnpj) {
+    if (cardCpfLookupName && cardHolderNameInput.value === cardCpfLookupName) {
+      cardHolderNameInput.value = '';
+    }
+    cardCpfLookupLoading = false;
+    cardCpfLookupError = '';
+    cardCpfLookupDoc = '';
+    cardCpfLookupName = '';
+    return;
+  }
+
+  if (digits !== cardCpfLookupDoc) {
+    if (cardCpfLookupLoading) cardCpfLookupSeq += 1;
+    cardCpfLookupLoading = false;
+    cardHolderNameInput.value = '';
+    cardCpfLookupName = '';
+    cardCpfLookupError = '';
+  }
+}
+
+async function consultarCpfTitularCartaoSeNecessario(){
+  const cpf = digitsOnly(cardDocInput.value).slice(0, 11);
+  if (cpf.length !== 11 || !isValidCpf(cpf) || cpf === cardCpfLookupDoc || cardCpfLookupLoading) return;
+
+  const seq = ++cardCpfLookupSeq;
+  cardCpfLookupLoading = true;
+  cardCpfLookupError = '';
+  cardCpfLookupDoc = cpf;
+  cardHolderNameInput.value = '';
+  cardStatus.textContent = 'Consultando dados do CPF do titular...';
+  cardStatus.className = 'field-note';
+  refreshCheckoutButton();
+
+  try {
+    const data = await rpc('consultar_cpf_serpro_rpc', { p_cpf: cpf });
+    if (seq !== cardCpfLookupSeq) return;
+    const nome = String(data && data.nome || '').trim().replace(/\s+/g, ' ');
+    if (!nome) throw new Error(data && (data.mensagem || data.message) || 'CPF sem nome retornado.');
+    cardCpfLookupName = nome;
+    cardCpfLookupError = '';
+    cardHolderNameInput.value = nome;
+    cardStatus.textContent = 'Nome do titular confirmado pelo CPF.';
+    cardStatus.className = 'field-note';
+  } catch(e) {
+    if (seq !== cardCpfLookupSeq) return;
+    cardCpfLookupDoc = '';
+    cardCpfLookupName = '';
+    cardCpfLookupError = 'Não foi possível consultar o CPF do titular agora. Tente novamente.';
+    cardStatus.textContent = cardCpfLookupError;
+    cardStatus.className = 'field-note error';
+  } finally {
+    if (seq === cardCpfLookupSeq) {
+      cardCpfLookupLoading = false;
+      resetPaymentState();
+    }
+  }
+}
+
+function applySamePayer(){
+  const useRegistrationCpf = samePayerInput.checked && isValidCpf(checkoutCpf);
+  payerDocInput.disabled = useRegistrationCpf;
+  cardDocInput.disabled = useRegistrationCpf;
+
+  if (useRegistrationCpf) {
+    payerDocInput.value = maskCpfCnpj(checkoutCpf);
+    cardDocInput.value = maskCpfCnpj(checkoutCpf);
+  }
+
+  updatePayerDocumentUi();
+  updateCardDocumentUi();
+  consultarCpfPagadorSeNecessario();
+  consultarCpfTitularCartaoSeNecessario();
+  resetPaymentState();
+}
+
 function pixProgrammedMonths(){
   return Math.min(12, Math.max(2, Number(pixMonthsInput.value) || 2));
 }
 
 function currentPaymentMethod(){
   if (selectedPay === 'cartao') return 'cartao';
-  return selectedPlan === 'mensal' && pixProgramadoInput.checked ? 'pix_programado' : 'pix_avulso';
+  return selectedPlan === 'mensal' && pixProgramadoInput.checked && canPaymentRoute('pix_programado') ? 'pix_programado' : 'pix_avulso';
 }
 
 function validatePix(showMessage){
@@ -697,7 +911,9 @@ function validateCard(showMessage){
   const cardName = document.getElementById('cardName').value.trim().replace(/\s+/g, ' ');
   const expiry = digitsOnly(document.getElementById('cardExpiry').value);
   const cvv = digitsOnly(document.getElementById('cardCvv').value);
-  const holderDoc = digitsOnly(document.getElementById('cardDoc').value).slice(0, 14);
+  const holderDoc = digitsOnly(cardDocInput.value).slice(0, 14);
+  const holderName = cardHolderNameInput.value.trim().replace(/\s+/g, ' ');
+  const holderIsCnpj = holderDoc.length === 14;
   const phone = digitsOnly(document.getElementById('cardPhone').value).slice(0, 13);
   const postalCode = digitsOnly(document.getElementById('cardCep').value).slice(0, 8);
   const addressNumber = document.getElementById('cardAddressNumber').value.trim();
@@ -711,7 +927,7 @@ function validateCard(showMessage){
     ok = false;
     message = 'Carregando e-mail do cadastro.';
     buttonText = 'Carregando e-mail';
-  } else if (cardNumber.length < 13 || cardNumber.length > 19) {
+  } else if (!isValidCardNumber(cardNumber)) {
     ok = false;
     message = 'Informe um n\u00famero de cart\u00e3o v\u00e1lido.';
     buttonText = 'Informe o cart\u00e3o';
@@ -731,6 +947,26 @@ function validateCard(showMessage){
     ok = false;
     message = 'Informe CPF ou CNPJ v\u00e1lido do titular do cart\u00e3o.';
     buttonText = 'Informe CPF/CNPJ';
+  } else if (!holderIsCnpj && cardCpfLookupLoading) {
+    ok = false;
+    message = 'Consultando dados do CPF do titular...';
+    buttonText = 'Consultando CPF';
+  } else if (!holderIsCnpj && cardCpfLookupError) {
+    ok = false;
+    message = cardCpfLookupError;
+    buttonText = 'Consulte o CPF';
+  } else if (!holderIsCnpj && (cardCpfLookupDoc !== holderDoc || cardCpfLookupName === '')) {
+    ok = false;
+    message = 'Aguarde a confirma\u00e7\u00e3o do nome pelo CPF do titular.';
+    buttonText = 'Aguardando CPF';
+  } else if (holderName.length < 3) {
+    ok = false;
+    message = holderIsCnpj ? 'Informe a raz\u00e3o social do titular.' : 'Aguarde o nome confirmado pelo CPF.';
+    buttonText = holderIsCnpj ? 'Informe a raz\u00e3o social' : 'Aguardando CPF';
+  } else if (!holderIsCnpj && !cardNameMatchesHolder(cardName, holderName)) {
+    ok = false;
+    message = 'Verifique o nome impresso no cart\u00e3o: ele deve coincidir com pelo menos um nome do titular do CPF.';
+    buttonText = 'Confira o nome do cart\u00e3o';
   } else if (phone.length < 10) {
     ok = false;
     message = 'Informe o telefone do titular com DDD.';
@@ -754,11 +990,18 @@ function validateCard(showMessage){
     ok,
     buttonText,
     card: { number: cardNumber, holderName: cardName, expiryMonth: month, expiryYear: year, ccv: cvv },
-    holder: { name: cardName, email: checkoutEmail, cpfCnpj: holderDoc, phone, postalCode, addressNumber }
+    holder: { name: holderName, email: checkoutEmail, cpfCnpj: holderDoc, phone, postalCode, addressNumber }
   };
 }
 
 function validatePayment(showMessage){
+  ensureSelectedPaymentAllowed();
+  if (selectedPay === 'cartao' && !canPaymentRoute('cartao')) {
+    return { ok:false, buttonText:'Cart\u00e3o indispon\u00edvel' };
+  }
+  if (selectedPay === 'pix' && !pixAvailableForSelectedPlan()) {
+    return { ok:false, buttonText:'Pix indispon\u00edvel' };
+  }
   return selectedPay === 'cartao' ? validateCard(showMessage) : validatePix(showMessage);
 }
 
@@ -831,15 +1074,19 @@ function gatewayCheckout(body){
 function applyCheckout(data){
   checkoutOk = true;
   syncPlansFromDatabase(data.planos);
+  syncPaymentRoutesFromDatabase(data.gateways);
   checkoutEmail = String(data.email_usuario || data.email_cobranca || '').trim();
+  checkoutCpf = digitsOnly(data.cpf_cadastro).slice(0, 11);
   payerEmailInput.value = checkoutEmail;
+  registrationCpfInput.value = checkoutCpf ? maskCpfCnpj(checkoutCpf) : 'CPF n\u00e3o encontrado no cadastro';
+  samePayerInput.disabled = !isValidCpf(checkoutCpf);
+  if (samePayerInput.disabled) samePayerInput.checked = false;
   setButton(true, selectedPay === 'cartao' ? 'Pagar agora' : 'Gerar Pix');
   setStatus('Assinatura vinculada ao seu usu\u00e1rio. Escolha o plano e a forma de pagamento.', 'ok');
 
   if (data.gateway_status === 'pago' || data.status === 'pago') {
-    stopPaymentPolling();
-    setStatus('Pagamento confirmado. Sua assinatura foi liberada no app.', 'ok');
-    setButton(false, 'Pagamento confirmado');
+    handlePaymentConfirmed('Pagamento confirmado. Sua assinatura foi liberada no app.', 'Pagamento confirmado');
+    return;
   }
 
   if (data.plano && plans[data.plano]) {
@@ -944,9 +1191,7 @@ checkoutBtn.addEventListener('click', async function(){
   }
 
   if (data.status === 'approved' || data.gateway_status === 'pago') {
-    stopPaymentPolling();
-    setStatus('Pagamento aprovado. Sua assinatura foi liberada no app.', 'ok');
-    setButton(false, 'Pagamento aprovado');
+    handlePaymentConfirmed('Pagamento aprovado. Sua assinatura foi liberada no app.', 'Pagamento aprovado');
     return;
   }
 
@@ -964,9 +1209,7 @@ function startPaymentPolling(){
   pollTimer = setInterval(async function(){
     const data = await rpc('assinatura_checkout_resolver_rpc', { p_checkout_ref: checkoutRef });
     if (data && data.ok && (data.gateway_status === 'pago' || data.status === 'pago')) {
-      stopPaymentPolling();
-      setStatus('Pagamento confirmado. Sua assinatura foi liberada no app.', 'ok');
-      setButton(false, 'Pagamento confirmado');
+      handlePaymentConfirmed('Pagamento confirmado. Sua assinatura foi liberada no app.', 'Pagamento confirmado');
     }
   }, 8000);
 }
@@ -980,11 +1223,14 @@ function stopPaymentPolling(){
 
 function updatePixProgramadoVisibility(){
   const monthly = selectedPlan === 'mensal';
-  pixProgramadoBox.style.display = monthly ? 'flex' : 'none';
-  if (!monthly) {
+  const pixProgramadoAvailable = monthly && canPaymentRoute('pix_programado');
+  pixProgramadoBox.style.display = pixProgramadoAvailable ? 'flex' : 'none';
+  if (!pixProgramadoAvailable) {
     pixProgramadoInput.checked = false;
+  } else if (selectedPay === 'pix' && !canPaymentRoute('pix_avulso')) {
+    pixProgramadoInput.checked = true;
   }
-  pixMonthsBox.style.display = monthly && pixProgramadoInput.checked ? 'grid' : 'none';
+  pixMonthsBox.style.display = pixProgramadoAvailable && pixProgramadoInput.checked ? 'grid' : 'none';
 }
 
 function selectPlan(planKey, resetState){
@@ -997,6 +1243,7 @@ function selectPlan(planKey, resetState){
     if (input) input.checked = selected;
   });
   updatePixProgramadoVisibility();
+  applyPaymentRouteVisibility();
   if (resetState) {
     resetPaymentState();
   } else {
@@ -1015,13 +1262,15 @@ function bindPlanCards(){
 document.getElementById('cardNumber').addEventListener('input', function(){ this.value = maskCard(this.value); resetPaymentState(); });
 document.getElementById('cardExpiry').addEventListener('input', function(){ this.value = maskExpiry(this.value); resetPaymentState(); });
 document.getElementById('cardCvv').addEventListener('input', function(){ this.value = digitsOnly(this.value).slice(0, 4); resetPaymentState(); });
-document.getElementById('cardDoc').addEventListener('input', function(){ this.value = maskCpfCnpj(this.value); resetPaymentState(); });
+cardDocInput.addEventListener('input', function(){ updateCardDocumentUi(); consultarCpfTitularCartaoSeNecessario(); resetPaymentState(); });
 document.getElementById('cardPhone').addEventListener('input', function(){ this.value = maskPhone(this.value); resetPaymentState(); });
 document.getElementById('cardCep').addEventListener('input', function(){ this.value = maskCep(this.value); resetPaymentState(); });
 document.getElementById('cardName').addEventListener('input', resetPaymentState);
+cardHolderNameInput.addEventListener('input', resetPaymentState);
 document.getElementById('cardAddressNumber').addEventListener('input', resetPaymentState);
 payerDocInput.addEventListener('input', function(){ updatePayerDocumentUi(); consultarCpfPagadorSeNecessario(); resetPaymentState(); });
 payerNameInput.addEventListener('input', resetPaymentState);
+samePayerInput.addEventListener('change', applySamePayer);
 pixProgramadoInput.addEventListener('change', function(){ updatePixProgramadoVisibility(); resetPaymentState(); });
 pixMonthsInput.addEventListener('change', resetPaymentState);
 document.getElementById('copyPixBtn').addEventListener('click', async function(){
@@ -1038,11 +1287,7 @@ document.getElementById('copyPixBtn').addEventListener('click', async function()
 document.querySelectorAll('.pay-tab').forEach(function(tab){
   tab.addEventListener('click', function(){
     selectedPay = tab.dataset.pay;
-    document.querySelectorAll('.pay-tab').forEach(function(item){ item.classList.remove('active'); });
-    tab.classList.add('active');
-    document.getElementById('cardBox').style.display = selectedPay === 'cartao' ? 'block' : 'none';
-    document.getElementById('pixBox').style.display = selectedPay === 'pix' ? 'block' : 'none';
-    updatePixProgramadoVisibility();
+    applyPaymentRouteVisibility();
     resetPaymentState();
   });
 });
