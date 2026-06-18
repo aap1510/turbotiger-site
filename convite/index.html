@@ -103,6 +103,31 @@ function setDownloadEnabled(enabled, label){
   }
 }
 
+function tryOpenInstalledApp(inviteRef){
+  const appUrl = "turbotiger://convite?ref=" + encodeURIComponent(inviteRef);
+  let appOpened = false;
+
+  function markAppOpened(){
+    appOpened = true;
+  }
+
+  document.addEventListener("visibilitychange", function onVisibilityChange(){
+    if (document.hidden) {
+      markAppOpened();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    }
+  });
+  window.addEventListener("pagehide", markAppOpened, { once: true });
+
+  window.location.href = appUrl;
+
+  return new Promise(function(resolve){
+    setTimeout(function(){
+      resolve(appOpened || document.hidden);
+    }, 1200);
+  });
+}
+
 async function detectAndroidArch(){
   if (!isAndroid()) return "not-android";
 
@@ -135,8 +160,13 @@ async function init(){
   }
 
   localStorage.setItem("turbo_invite_ref", inviteRef);
-  fallbackLink.href = "turbotiger://invite?ref=" + encodeURIComponent(inviteRef);
+  fallbackLink.href = "turbotiger://convite?ref=" + encodeURIComponent(inviteRef);
   fallbackOpen.style.display = "block";
+
+  if (isAndroid()) {
+    setStatus("Tentando abrir o convite no app Turbo Tiger.", "");
+    if (await tryOpenInstalledApp(inviteRef)) return;
+  }
 
   const arch = await detectAndroidArch();
 
