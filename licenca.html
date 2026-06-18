@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Assinar Turbo Tiger</title>
-<meta name="description" content="Assine o Turbo Tiger Beta. Planos mensal, trimestral, semestral e anual.">
+<title>Turbo Tiger - Assinatura</title>
+<meta name="description" content="Assine o Turbo Tiger Premium. Planos mensal, trimestral, semestral e anual.">
 <style>
   :root{
     --bg:#0b0b0b;
@@ -104,7 +104,7 @@
       <img src="assets/logo-200.png" alt="Turbo Tiger">
       <div>
         <strong>Turbo Tiger</strong>
-        <span>Assinatura Beta</span>
+        <span>Assinatura Premium</span>
       </div>
     </div>
     <div class="hero">
@@ -263,15 +263,6 @@
             <div class="field-note" id="payerStatus">Informe os dados do pagador para gerar o Pix.</div>
           </div>
         </div>
-        <div class="pix-result" id="pixResult">
-          <div class="pay-title">Pix gerado</div>
-          <div class="muted" id="pixResultText">Pague o QR Code para liberar o acesso no app.</div>
-          <img id="pixQrImage" alt="QR Code Pix" />
-          <div class="copy-row">
-            <input id="pixCopyCode" readonly>
-            <button type="button" id="copyPixBtn">Copiar</button>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -295,6 +286,15 @@
     <div class="status" id="checkoutStatus">Validando acesso seguro pelo app...</div>
     <button class="cta" type="button" id="checkoutBtn" disabled>Validando acesso...</button>
     <p class="fine" id="sumFine">No cart&atilde;o, voc&ecirc; paga R$ 238,80 agora e fica com 12 meses de uso liberados. O Turbo Tiger Beta requer aparelho Android 64-bit.</p>
+    <div class="pix-result" id="pixResult">
+      <div class="pay-title">Pix gerado</div>
+      <div class="muted" id="pixResultText">Pague o QR Code para liberar o acesso no app.</div>
+      <img id="pixQrImage" alt="QR Code Pix" />
+      <div class="copy-row">
+        <input id="pixCopyCode" readonly>
+        <button type="button" id="copyPixBtn">Copiar</button>
+      </div>
+    </div>
   </aside>
 </main>
 
@@ -319,6 +319,11 @@ let checkoutEmail = '';
 let baseButtonEnabled = false;
 let baseButtonText = 'Validando acesso...';
 let pollTimer = null;
+let payerCpfLookupSeq = 0;
+let payerCpfLookupDoc = '';
+let payerCpfLookupName = '';
+let payerCpfLookupLoading = false;
+let payerCpfLookupError = '';
 
 const statusBox = document.getElementById('checkoutStatus');
 const checkoutBtn = document.getElementById('checkoutBtn');
@@ -570,8 +575,64 @@ function updatePayerDocumentUi(){
   payerDocInput.value = maskCpfCnpj(digits);
   const isCnpj = digits.length > 11;
   payerNameLabel.textContent = isCnpj ? 'Raz\u00e3o social' : 'Nome completo';
-  payerNameInput.placeholder = isCnpj ? 'Raz\u00e3o social' : 'Nome completo';
+  payerNameInput.placeholder = isCnpj ? 'Raz\u00e3o social' : 'Preenchido automaticamente pelo CPF';
   payerNameInput.autocomplete = isCnpj ? 'organization' : 'name';
+  payerNameInput.readOnly = !isCnpj;
+
+  if (isCnpj) {
+    if (payerCpfLookupName && payerNameInput.value === payerCpfLookupName) {
+      payerNameInput.value = '';
+    }
+    payerCpfLookupLoading = false;
+    payerCpfLookupError = '';
+    payerCpfLookupDoc = '';
+    payerCpfLookupName = '';
+    return;
+  }
+
+  if (digits !== payerCpfLookupDoc) {
+    payerNameInput.value = '';
+    payerCpfLookupName = '';
+    payerCpfLookupError = '';
+  }
+}
+
+async function consultarCpfPagadorSeNecessario(){
+  const cpf = digitsOnly(payerDocInput.value).slice(0, 11);
+  if (cpf.length !== 11 || !isValidCpf(cpf) || cpf === payerCpfLookupDoc || payerCpfLookupLoading) return;
+
+  const seq = ++payerCpfLookupSeq;
+  payerCpfLookupLoading = true;
+  payerCpfLookupError = '';
+  payerCpfLookupDoc = cpf;
+  payerNameInput.value = '';
+  payerStatus.textContent = 'Consultando dados do CPF...';
+  payerStatus.className = 'field-note';
+  refreshCheckoutButton();
+
+  try {
+    const data = await rpc('consultar_cpf_serpro_rpc', { p_cpf: cpf });
+    if (seq !== payerCpfLookupSeq) return;
+    const nome = String(data && data.nome || '').trim().replace(/\s+/g, ' ');
+    if (!nome) throw new Error(data && (data.mensagem || data.message) || 'CPF sem nome retornado.');
+    payerCpfLookupName = nome;
+    payerCpfLookupError = '';
+    payerNameInput.value = nome;
+    payerStatus.textContent = 'Nome confirmado pelo CPF.';
+    payerStatus.className = 'field-note';
+  } catch(e) {
+    if (seq !== payerCpfLookupSeq) return;
+    payerCpfLookupDoc = '';
+    payerCpfLookupName = '';
+    payerCpfLookupError = 'N\u00e3o foi poss\u00edvel consultar o CPF agora. Tente novamente.';
+    payerStatus.textContent = payerCpfLookupError;
+    payerStatus.className = 'field-note error';
+  } finally {
+    if (seq === payerCpfLookupSeq) {
+      payerCpfLookupLoading = false;
+      resetPaymentState();
+    }
+  }
 }
 
 function pixProgrammedMonths(){
@@ -603,6 +664,18 @@ function validatePix(showMessage){
     ok = false;
     message = documentDigits.length === 14 ? 'CNPJ inv\u00e1lido. Confira os n\u00fameros digitados.' : 'CPF inv\u00e1lido. Confira os n\u00fameros digitados.';
     buttonText = documentDigits.length === 14 ? 'CNPJ inv\u00e1lido' : 'CPF inv\u00e1lido';
+  } else if (!isCnpj && payerCpfLookupLoading) {
+    ok = false;
+    message = 'Consultando dados do CPF...';
+    buttonText = 'Consultando CPF';
+  } else if (!isCnpj && payerCpfLookupError) {
+    ok = false;
+    message = payerCpfLookupError;
+    buttonText = 'Consulte o CPF';
+  } else if (!isCnpj && (payerCpfLookupDoc !== documentDigits || payerCpfLookupName === '')) {
+    ok = false;
+    message = 'Aguarde a confirma\u00e7\u00e3o do nome pelo CPF.';
+    buttonText = 'Aguardando CPF';
   } else if (name.length < 3) {
     ok = false;
     message = isCnpj ? 'Informe a raz\u00e3o social do pagador.' : 'Informe o nome completo do pagador.';
@@ -947,7 +1020,7 @@ document.getElementById('cardPhone').addEventListener('input', function(){ this.
 document.getElementById('cardCep').addEventListener('input', function(){ this.value = maskCep(this.value); resetPaymentState(); });
 document.getElementById('cardName').addEventListener('input', resetPaymentState);
 document.getElementById('cardAddressNumber').addEventListener('input', resetPaymentState);
-payerDocInput.addEventListener('input', function(){ updatePayerDocumentUi(); resetPaymentState(); });
+payerDocInput.addEventListener('input', function(){ updatePayerDocumentUi(); consultarCpfPagadorSeNecessario(); resetPaymentState(); });
 payerNameInput.addEventListener('input', resetPaymentState);
 pixProgramadoInput.addEventListener('change', function(){ updatePixProgramadoVisibility(); resetPaymentState(); });
 pixMonthsInput.addEventListener('change', resetPaymentState);
