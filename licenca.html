@@ -336,6 +336,7 @@ let checkoutCpf = '';
 let baseButtonEnabled = false;
 let baseButtonText = 'Validando acesso...';
 let pollTimer = null;
+let pixExpirationTimer = null;
 let payerCpfLookupSeq = 0;
 let payerCpfLookupDoc = '';
 let payerCpfLookupName = '';
@@ -441,6 +442,18 @@ function formatDateBR(value){
   const text = String(value || '').slice(0, 10);
   const match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   return match ? match[3] + '/' + match[2] + '/' + match[1] : text;
+}
+
+function formatDateTimeBR(value){
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value || '');
+  return date.toLocaleString('pt-BR', {
+    day:'2-digit',
+    month:'2-digit',
+    year:'numeric',
+    hour:'2-digit',
+    minute:'2-digit'
+  });
 }
 
 function formatPercent(value){
@@ -1018,6 +1031,7 @@ function refreshCheckoutButton(){
 }
 
 function resetPaymentState(){
+  stopPixExpirationTimer();
   pixResult.style.display = 'none';
   if (checkoutOk) {
     setButton(true, selectedPay === 'cartao' ? 'Pagar agora' : 'Gerar Pix');
