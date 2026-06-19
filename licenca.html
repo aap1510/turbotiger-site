@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
@@ -201,7 +201,7 @@
             <input id="cardNumber" type="text" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000">
           </div>
           <div class="field full">
-            <label for="cardName">Nome impresso no cart&atilde;o</label>
+            <label for="cardName">Titular do cart&atilde;o</label>
             <input id="cardName" type="text" autocomplete="cc-name" maxlength="80" placeholder="Nome do titular">
           </div>
           <div class="field">
@@ -217,8 +217,8 @@
             <input id="cardDoc" type="text" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="Somente n&uacute;meros">
           </div>
           <div class="field">
-            <label for="cardHolderName" id="cardHolderNameLabel">Nome do titular confirmado</label>
-            <input id="cardHolderName" type="text" readonly placeholder="Preenchido automaticamente pelo CPF">
+            <label for="cardHolderName" id="cardHolderNameLabel">Titular do cart&atilde;o</label>
+            <input id="cardHolderName" type="text" readonly disabled placeholder="Preenchido automaticamente pelo CPF">
           </div>
           <div class="field">
             <label for="cardPhone">Telefone do titular</label>
@@ -273,7 +273,7 @@
           </div>
           <div class="field">
             <label for="payerName" id="payerNameLabel">Nome completo</label>
-            <input id="payerName" type="text" autocomplete="name" placeholder="Nome completo">
+            <input id="payerName" type="text" autocomplete="name" readonly disabled placeholder="Preenchido automaticamente pelo CPF">
           </div>
           <div class="field full">
             <div class="field-note" id="payerStatus">Informe os dados do pagador para gerar o Pix.</div>
@@ -698,20 +698,30 @@ function isValidCardNumber(value){
   return sum % 10 === 0;
 }
 
-function normalizedNameTokens(value){
-  const ignored = { DA:true, DAS:true, DE:true, DO:true, DOS:true, E:true };
-  return String(value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toUpperCase()
-    .split(/[^A-Z0-9]+/)
-    .filter(function(token){ return token.length > 1 && !ignored[token]; });
+function setFieldLocked(input, locked){
+  input.disabled = locked;
+  input.readOnly = locked;
+  if (locked) {
+    input.setAttribute('tabindex', '-1');
+  } else {
+    input.removeAttribute('tabindex');
+  }
 }
 
-function cardNameMatchesHolder(cardName, holderName){
-  const cardTokens = normalizedNameTokens(cardName);
-  const holderTokens = normalizedNameTokens(holderName);
-  return cardTokens.some(function(token){ return holderTokens.indexOf(token) >= 0; });
+function resetPayerCpfLookup(){
+  if (payerCpfLookupLoading) payerCpfLookupSeq += 1;
+  payerCpfLookupLoading = false;
+  payerCpfLookupDoc = '';
+  payerCpfLookupName = '';
+  payerCpfLookupError = '';
+}
+
+function resetCardCpfLookup(){
+  if (cardCpfLookupLoading) cardCpfLookupSeq += 1;
+  cardCpfLookupLoading = false;
+  cardCpfLookupDoc = '';
+  cardCpfLookupName = '';
+  cardCpfLookupError = '';
 }
 
 function updatePayerDocumentUi(){
@@ -719,27 +729,21 @@ function updatePayerDocumentUi(){
   payerDocInput.value = maskCpfCnpj(digits);
   const isCnpj = digits.length > 11;
   payerNameLabel.textContent = isCnpj ? 'Raz\u00e3o social' : 'Nome completo';
-  payerNameInput.placeholder = isCnpj ? 'Raz\u00e3o social' : 'Digite o nome completo ou aguarde a consulta do CPF';
+  payerNameInput.placeholder = isCnpj ? 'Raz\u00e3o social' : 'Preenchido automaticamente pelo CPF';
   payerNameInput.autocomplete = isCnpj ? 'organization' : 'name';
-  payerNameInput.readOnly = false;
+  setFieldLocked(payerNameInput, !isCnpj);
 
   if (isCnpj) {
     if (payerCpfLookupName && payerNameInput.value === payerCpfLookupName) {
       payerNameInput.value = '';
     }
-    payerCpfLookupLoading = false;
-    payerCpfLookupError = '';
-    payerCpfLookupDoc = '';
-    payerCpfLookupName = '';
+    resetPayerCpfLookup();
     return;
   }
 
   if (digits !== payerCpfLookupDoc) {
-    if (payerCpfLookupLoading) payerCpfLookupSeq += 1;
-    payerCpfLookupLoading = false;
     if (payerNameInput.value === payerCpfLookupName) payerNameInput.value = '';
-    payerCpfLookupName = '';
-    payerCpfLookupError = '';
+    resetPayerCpfLookup();
   }
 }
 
@@ -774,12 +778,12 @@ async function consultarCpfPagadorSeNecessario(){
     payerCpfLookupName = nome;
     payerCpfLookupError = '';
     payerNameInput.value = nome;
-    payerStatus.textContent = 'Nome confirmado pelo CPF.';
+    payerStatus.textContent = 'Nome preenchido pelo CPF.';
     payerStatus.className = 'field-note';
   } catch(e) {
     if (seq !== payerCpfLookupSeq) return;
     payerCpfLookupName = '';
-    payerCpfLookupError = 'Não foi possível confirmar o CPF agora. Se o CPF estiver correto, informe o nome completo e gere o Pix.';
+    payerCpfLookupError = 'Não foi possível confirmar o CPF agora. Confira o CPF ou tente novamente em instantes.';
     payerStatus.textContent = payerCpfLookupError;
     payerStatus.className = 'field-note error';
   } finally {
@@ -794,28 +798,22 @@ function updateCardDocumentUi(){
   const digits = digitsOnly(cardDocInput.value).slice(0, 14);
   cardDocInput.value = maskCpfCnpj(digits);
   const isCnpj = digits.length > 11;
-  cardHolderNameLabel.textContent = isCnpj ? 'Razão social do titular' : 'Nome do titular confirmado';
+  cardHolderNameLabel.textContent = isCnpj ? 'Razão social do titular' : 'Titular do cartão';
   cardHolderNameInput.placeholder = isCnpj ? 'Razão social' : 'Preenchido automaticamente pelo CPF';
   cardHolderNameInput.autocomplete = isCnpj ? 'organization' : 'name';
-  cardHolderNameInput.readOnly = !isCnpj;
+  setFieldLocked(cardHolderNameInput, !isCnpj);
 
   if (isCnpj) {
     if (cardCpfLookupName && cardHolderNameInput.value === cardCpfLookupName) {
       cardHolderNameInput.value = '';
     }
-    cardCpfLookupLoading = false;
-    cardCpfLookupError = '';
-    cardCpfLookupDoc = '';
-    cardCpfLookupName = '';
+    resetCardCpfLookup();
     return;
   }
 
   if (digits !== cardCpfLookupDoc) {
-    if (cardCpfLookupLoading) cardCpfLookupSeq += 1;
-    cardCpfLookupLoading = false;
     cardHolderNameInput.value = '';
-    cardCpfLookupName = '';
-    cardCpfLookupError = '';
+    resetCardCpfLookup();
   }
 }
 
@@ -840,7 +838,7 @@ async function consultarCpfTitularCartaoSeNecessario(){
     cardCpfLookupName = nome;
     cardCpfLookupError = '';
     cardHolderNameInput.value = nome;
-    cardStatus.textContent = 'Nome do titular confirmado pelo CPF.';
+    cardStatus.textContent = 'Titular do cartão preenchido pelo CPF.';
     cardStatus.className = 'field-note';
   } catch(e) {
     if (seq !== cardCpfLookupSeq) return;
@@ -865,6 +863,13 @@ function applySamePayer(){
   if (useRegistrationCpf) {
     payerDocInput.value = maskCpfCnpj(checkoutCpf);
     cardDocInput.value = maskCpfCnpj(checkoutCpf);
+  } else {
+    payerDocInput.value = '';
+    payerNameInput.value = '';
+    cardDocInput.value = '';
+    cardHolderNameInput.value = '';
+    resetPayerCpfLookup();
+    resetCardCpfLookup();
   }
 
   updatePayerDocumentUi();
@@ -946,7 +951,7 @@ function validateCard(showMessage){
     buttonText = 'Informe o cart\u00e3o';
   } else if (cardName.length < 3) {
     ok = false;
-    message = 'Informe o nome impresso no cart\u00e3o.';
+    message = 'Informe o titular do cart\u00e3o.';
     buttonText = 'Informe o nome';
   } else if (expiry.length !== 4 || Number(month) < 1 || Number(month) > 12) {
     ok = false;
@@ -970,16 +975,12 @@ function validateCard(showMessage){
     buttonText = 'Consulte o CPF';
   } else if (!holderIsCnpj && (cardCpfLookupDoc !== holderDoc || cardCpfLookupName === '')) {
     ok = false;
-    message = 'Aguarde a confirma\u00e7\u00e3o do nome pelo CPF do titular.';
+    message = 'Aguarde o preenchimento do titular pelo CPF.';
     buttonText = 'Aguardando CPF';
   } else if (holderName.length < 3) {
     ok = false;
-    message = holderIsCnpj ? 'Informe a raz\u00e3o social do titular.' : 'Aguarde o nome confirmado pelo CPF.';
+    message = holderIsCnpj ? 'Informe a raz\u00e3o social do titular.' : 'Aguarde o titular do cartão pelo CPF.';
     buttonText = holderIsCnpj ? 'Informe a raz\u00e3o social' : 'Aguardando CPF';
-  } else if (!holderIsCnpj && !cardNameMatchesHolder(cardName, holderName)) {
-    ok = false;
-    message = 'Verifique o nome impresso no cart\u00e3o: ele deve coincidir com pelo menos um nome do titular do CPF.';
-    buttonText = 'Confira o nome do cart\u00e3o';
   } else if (phone.length < 10) {
     ok = false;
     message = 'Informe o telefone do titular com DDD.';
