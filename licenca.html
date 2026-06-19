@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Assinar Turbo Tiger</title>
-<meta name="description" content="Assine o Turbo Tiger Beta com 30 dias gratis. Planos mensal, trimestral, semestral e anual.">
+<title>Turbo Tiger - Assinatura</title>
+<meta name="description" content="Assine o Turbo Tiger Premium. Planos mensal, trimestral, semestral e anual.">
 <style>
   :root{
     --bg:#0b0b0b;
@@ -35,8 +35,8 @@
   h2{font-size:20px;margin:0 0 12px}
   h3{font-size:17px;margin:0}
   .muted{color:var(--muted);font-size:14px;line-height:1.45}
-  .trial{display:flex;gap:12px;align-items:flex-start;background:#fff8dc;border:1px solid #f3d36b;border-radius:10px;padding:12px;margin-bottom:16px}
-  .trial strong{display:block;margin-bottom:3px}
+  .notice{display:flex;gap:12px;align-items:flex-start;background:#fff8dc;border:1px solid #f3d36b;border-radius:10px;padding:12px;margin-bottom:16px}
+  .notice strong{display:block;margin-bottom:3px}
   .plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .plan{border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;position:relative;background:#fff;min-height:176px}
   .plan input{position:absolute;opacity:0;pointer-events:none}
@@ -53,15 +53,23 @@
   .pay-tab.active{border-color:#111;background:#111;color:#fff}
   .pay-box{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff}
   .pay-title{font-weight:800;margin-bottom:5px}
-  .payer-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:10px}
+  .payer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:10px}
   .field{display:flex;flex-direction:column;gap:6px}
   .field.full{grid-column:1/-1}
   .field label{font-size:13px;font-weight:800;color:#252525}
-  .field input{width:100%;border:1px solid var(--line);border-radius:10px;padding:13px 12px;font-size:15px;background:#fff;color:var(--text);outline:none}
-  .field input:focus{border-color:var(--accent-dark);box-shadow:0 0 0 3px rgba(244,180,0,.18)}
+  .field input,.field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:13px 12px;font-size:15px;background:#fff;color:var(--text);outline:none}
+  .field input:focus,.field select:focus{border-color:var(--accent-dark);box-shadow:0 0 0 3px rgba(244,180,0,.18)}
   .field input:disabled,.field input[readonly]{background:#f4f4f4;color:#555;cursor:not-allowed}
   .field-note{font-size:12px;color:var(--muted);line-height:1.4}
   .field-note.error{color:var(--danger);font-weight:700}
+  .option-line{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;margin:12px 0;background:#fafafa}
+  .option-line input{width:18px;height:18px;margin-top:2px;accent-color:var(--accent-dark)}
+  .option-line strong{display:block;margin-bottom:2px}
+  .pix-result{display:none;border:1px solid #d8e7ff;background:#f6f9ff;border-radius:12px;padding:14px;margin-top:12px}
+  .pix-result img{display:block;width:190px;height:190px;max-width:100%;margin:10px auto;border-radius:10px;background:#fff}
+  .copy-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:10px}
+  .copy-row input{font-size:12px}
+  .copy-row button{border:0;border-radius:10px;background:#111;color:#fff;font-weight:800;padding:0 12px;cursor:pointer}
   .summary-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:10px 0;font-size:14px}
   .summary-row strong{font-size:15px;text-align:right}
   .summary-total{display:flex;justify-content:space-between;align-items:flex-end;margin:14px 0;gap:12px}
@@ -83,8 +91,9 @@
     h1{font-size:30px}
   }
   @media(max-width:620px){
-    .plans,.benefits{grid-template-columns:1fr}
-    .pay-tabs{grid-template-columns:1fr}
+    .plans,.benefits,.payer-grid{grid-template-columns:1fr}
+    .pay-tabs,.copy-row{grid-template-columns:1fr}
+    .copy-row button{padding:12px}
   }
 </style>
 </head>
@@ -95,12 +104,12 @@
       <img src="assets/logo-200.png" alt="Turbo Tiger">
       <div>
         <strong>Turbo Tiger</strong>
-        <span>Beta com 30 dias gr&aacute;tis</span>
+        <span>Assinatura Premium</span>
       </div>
     </div>
     <div class="hero">
-      <h1>Escolha seu plano e comece com 30 dias gr&aacute;tis.</h1>
-      <p class="lead">O plano anual entrega o menor valor mensal do Turbo Tiger: R$ 19,90/m&ecirc;s, com 50% de desconto sobre o pre&ccedil;o oficial mensal.</p>
+      <h1>Escolha seu plano para continuar usando o Turbo Tiger.</h1>
+      <p class="lead">O plano anual continua sendo a melhor escolha: R$ 19,90/m&ecirc;s, com 50% de desconto sobre o pre&ccedil;o oficial mensal.</p>
       <a class="back" href="/">Voltar para o site</a>
     </div>
   </div>
@@ -109,27 +118,10 @@
 <main class="checkout">
   <div>
     <section class="section">
-      <div class="trial">
+      <div class="notice">
         <div>
-          <strong>30 dias gr&aacute;tis para testar</strong>
-          <div class="muted">O teste gr&aacute;tis termina em <span id="trialDate"></span>. Depois disso, o acesso segue exatamente o plano escolhido abaixo.</div>
-        </div>
-      </div>
-
-      <h2>Dados para pagamento</h2>
-      <div class="payer-grid">
-        <div class="field">
-          <label for="payerDoc">CPF/CNPJ</label>
-          <input id="payerDoc" type="text" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="Digite somente numeros">
-        </div>
-        <div class="field">
-          <label for="payerName" id="payerNameLabel">Nome completo</label>
-          <input id="payerName" type="text" autocomplete="name" placeholder="Nome completo">
-        </div>
-        <div class="field full">
-          <label for="payerEmail">E-mail do cadastro</label>
-          <input id="payerEmail" type="email" readonly disabled placeholder="Carregando e-mail do app">
-          <div class="field-note" id="payerStatus">O pagamento sera vinculado ao usuario aberto pelo app e as informacoes serao enviadas para este e-mail.</div>
+          <strong>Pagamento imediato e acesso liberado</strong>
+          <div class="muted">Esta p&aacute;gina &eacute; aberta pelo app quando o per&iacute;odo gratuito terminou ou quando a assinatura precisa ser renovada.</div>
         </div>
       </div>
 
@@ -177,22 +169,121 @@
       <h2>Pagamento</h2>
       <div class="pay-tabs">
         <button class="pay-tab active" type="button" data-pay="cartao">Cart&atilde;o de cr&eacute;dito</button>
-        <button class="pay-tab" type="button" data-pay="pix_programado">Pix programado</button>
+        <button class="pay-tab" type="button" data-pay="pix">Pix</button>
       </div>
 
+      <div class="payer-grid">
+        <div class="field full">
+          <label for="payerEmail">E-mail do cadastro</label>
+          <input id="payerEmail" type="email" readonly disabled placeholder="Carregando e-mail do app">
+          <div class="field-note">O pagamento fica vinculado ao usu&aacute;rio do app, e os avisos seguem para este e-mail.</div>
+        </div>
+        <div class="field full">
+          <label for="registrationCpf">CPF do cadastro</label>
+          <input id="registrationCpf" type="text" readonly disabled placeholder="Carregando CPF do app">
+        </div>
+      </div>
+
+      <label class="option-line" for="samePayer">
+        <input id="samePayer" type="checkbox" disabled>
+        <div>
+          <strong>Pagador ser&aacute; o mesmo do cadastro?</strong>
+          <div class="muted">Ao marcar, o CPF do cadastro ser&aacute; usado nos dados do pagador.</div>
+        </div>
+      </label>
+
       <div class="pay-box" id="cardBox">
-        <div class="pay-title">Cart&atilde;o no ambiente seguro do Asaas</div>
-        <div class="muted">Voc&ecirc; ser&aacute; redirecionado para o checkout seguro. No cart&atilde;o, o plano escolhido &eacute; pago agora e o per&iacute;odo de uso come&ccedil;a ap&oacute;s os 30 dias gr&aacute;tis.</div>
+        <div class="pay-title">Cart&atilde;o de cr&eacute;dito</div>
+        <div class="muted">O pagamento &eacute; processado agora pela Asaas, sem salvar dados do cart&atilde;o no Turbo Tiger.</div>
+        <div class="payer-grid" style="margin-top:12px">
+          <div class="field full">
+            <label for="cardNumber">N&uacute;mero do cart&atilde;o</label>
+            <input id="cardNumber" type="text" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000">
+          </div>
+          <div class="field full">
+            <label for="cardName">Nome impresso no cart&atilde;o</label>
+            <input id="cardName" type="text" autocomplete="cc-name" maxlength="80" placeholder="Nome do titular">
+          </div>
+          <div class="field">
+            <label for="cardExpiry">Validade</label>
+            <input id="cardExpiry" type="text" inputmode="numeric" autocomplete="cc-exp" maxlength="5" placeholder="MM/AA">
+          </div>
+          <div class="field">
+            <label for="cardCvv">CVV</label>
+            <input id="cardCvv" type="text" inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="000">
+          </div>
+          <div class="field">
+            <label for="cardDoc">CPF/CNPJ do titular</label>
+            <input id="cardDoc" type="text" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="Somente n&uacute;meros">
+          </div>
+          <div class="field">
+            <label for="cardHolderName" id="cardHolderNameLabel">Nome do titular confirmado</label>
+            <input id="cardHolderName" type="text" readonly placeholder="Preenchido automaticamente pelo CPF">
+          </div>
+          <div class="field">
+            <label for="cardPhone">Telefone do titular</label>
+            <input id="cardPhone" type="text" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="DDD + n&uacute;mero">
+          </div>
+          <div class="field">
+            <label for="cardCep">CEP do titular</label>
+            <input id="cardCep" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000">
+          </div>
+          <div class="field">
+            <label for="cardAddressNumber">N&uacute;mero do endere&ccedil;o</label>
+            <input id="cardAddressNumber" type="text" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="N&uacute;mero">
+          </div>
+          <div class="field full">
+            <div class="field-note" id="cardStatus">Informe os dados do cart&atilde;o e do titular para processar o pagamento.</div>
+          </div>
+        </div>
       </div>
 
       <div class="pay-box" id="pixBox" style="display:none">
-        <div class="pay-title">Pix programado no ambiente seguro do Asaas</div>
-        <div class="muted">O Pix programado agenda cobran&ccedil;as mensais autom&aacute;ticas ap&oacute;s os 30 dias gr&aacute;tis, pelo per&iacute;odo do plano escolhido.</div>
+        <div class="pay-title">Pix</div>
+        <div class="muted">No Pix, o pagamento &eacute; feito agora. Nos planos trimestral, semestral e anual, o Pix &eacute; sempre &agrave; vista.</div>
+        <div class="option-line" id="pixProgramadoBox">
+          <input id="pixProgramado" type="checkbox">
+          <div>
+            <strong>Programar mensalidades futuras</strong>
+            <div class="muted">Dispon&iacute;vel somente no plano mensal. Voc&ecirc; paga o primeiro Pix agora e deixa os pr&oacute;ximos meses agendados pela Asaas.</div>
+          </div>
+        </div>
+        <div class="payer-grid" id="pixMonthsBox" style="display:none">
+          <div class="field full">
+            <label for="pixMonths">Quantidade total de meses</label>
+            <select id="pixMonths">
+              <option value="2">2 meses: 1 agora + 1 programado</option>
+              <option value="3">3 meses: 1 agora + 2 programados</option>
+              <option value="4">4 meses: 1 agora + 3 programados</option>
+              <option value="5">5 meses: 1 agora + 4 programados</option>
+              <option value="6" selected>6 meses: 1 agora + 5 programados</option>
+              <option value="7">7 meses: 1 agora + 6 programados</option>
+              <option value="8">8 meses: 1 agora + 7 programados</option>
+              <option value="9">9 meses: 1 agora + 8 programados</option>
+              <option value="10">10 meses: 1 agora + 9 programados</option>
+              <option value="11">11 meses: 1 agora + 10 programados</option>
+              <option value="12">12 meses: 1 agora + 11 programados</option>
+            </select>
+          </div>
+        </div>
+        <div class="payer-grid" id="pixPayerFields">
+          <div class="field">
+            <label for="payerDoc">CPF/CNPJ</label>
+            <input id="payerDoc" type="text" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="Digite somente n&uacute;meros">
+          </div>
+          <div class="field">
+            <label for="payerName" id="payerNameLabel">Nome completo</label>
+            <input id="payerName" type="text" autocomplete="name" placeholder="Nome completo">
+          </div>
+          <div class="field full">
+            <div class="field-note" id="payerStatus">Informe os dados do pagador para gerar o Pix.</div>
+          </div>
+        </div>
       </div>
     </section>
 
     <div class="benefits">
-      <div class="benefit"><strong>Entrada sem risco</strong><span class="muted">30 dias para ativar, testar e decidir com calma.</span></div>
+      <div class="benefit"><strong>Acesso imediato</strong><span class="muted">A libera&ccedil;&atilde;o ocorre assim que o pagamento for confirmado.</span></div>
       <div class="benefit"><strong>Menor valor no anual</strong><span class="muted">R$ 19,90/m&ecirc;s preserva o melhor desconto.</span></div>
       <div class="benefit"><strong>Mensal promocional</strong><span class="muted">Valor de lan&ccedil;amento do mensal v&aacute;lido at&eacute; 31/10/2026.</span></div>
     </div>
@@ -202,27 +293,35 @@
     <h2>Resumo</h2>
     <div class="summary-row"><span>Plano</span><strong id="sumPlan">Anual</strong></div>
     <div class="summary-row" id="sumPromoRow" style="display:none"><span>Promo&ccedil;&atilde;o</span><strong id="sumPromo">At&eacute; 31/10/2026</strong></div>
-    <div class="summary-row"><span>Trial</span><strong>30 dias gr&aacute;tis</strong></div>
-    <div class="summary-row"><span id="sumDateLabel">In&iacute;cio ap&oacute;s teste</span><strong id="sumDate"></strong></div>
     <div class="summary-row"><span>Forma</span><strong id="sumPay">Cart&atilde;o</strong></div>
     <div class="summary-row"><span id="sumPeriodLabel">Uso liberado</span><strong id="sumPeriod">12 meses</strong></div>
     <div class="summary-total">
-      <span id="sumAmountLabel">Valor do per&iacute;odo</span>
+      <span id="sumAmountLabel">Valor a pagar agora</span>
       <strong id="sumTotal">R$ 238,80</strong>
     </div>
     <div class="status" id="checkoutStatus">Validando acesso seguro pelo app...</div>
     <button class="cta" type="button" id="checkoutBtn" disabled>Validando acesso...</button>
-    <p class="fine" id="sumFine">No cart&atilde;o, voc&ecirc; paga R$ 238,80 agora em ambiente seguro e fica com 12 meses de uso liberados ap&oacute;s os 30 dias gr&aacute;tis. O Turbo Tiger Beta requer aparelho Android 64-bit.</p>
+    <p class="fine" id="sumFine">No cart&atilde;o, voc&ecirc; paga R$ 238,80 agora e fica com 12 meses de uso liberados. O Turbo Tiger Beta requer aparelho Android 64-bit.</p>
+    <div class="pix-result" id="pixResult">
+      <div class="pay-title">Pix gerado</div>
+      <div class="muted" id="pixResultText">Pague o QR Code para liberar o acesso no app.</div>
+      <img id="pixQrImage" alt="QR Code Pix" />
+      <div class="copy-row">
+        <input id="pixCopyCode" readonly>
+        <button type="button" id="copyPixBtn">Copiar</button>
+      </div>
+    </div>
   </aside>
 </main>
 
 <script>
-const plans = {
-  mensal: { name:'Mensal', months:1, total:'R$ 29,90', monthly:'R$ 29,90', officialMonthly:'R$ 39,90', promoUntil:'31/10/2026', note:'R$ 29,90/m\u00eas na promo\u00e7\u00e3o' },
-  trimestral: { name:'Trimestral', months:3, total:'R$ 80,70', monthly:'R$ 26,90', note:'R$ 26,90/m\u00eas' },
-  semestral: { name:'Semestral', months:6, total:'R$ 137,40', monthly:'R$ 22,90', note:'R$ 22,90/m\u00eas' },
-  anual: { name:'Anual', months:12, total:'R$ 238,80', monthly:'R$ 19,90', note:'R$ 19,90/m\u00eas' }
+const fallbackPlans = {
+  mensal: { key:'mensal', name:'Mensal', months:1, total:'R$ 29,90', monthly:'R$ 29,90', totalCents:2990, monthlyCents:2990, officialMonthly:'R$ 39,90', promoUntil:'31/10/2026', discount:25, tag:'Lan\u00e7amento', order:10 },
+  trimestral: { key:'trimestral', name:'Trimestral', months:3, total:'R$ 80,70', monthly:'R$ 26,90', totalCents:8070, monthlyCents:2690, discount:32.6, tag:'Mais flex\u00edvel', order:20 },
+  semestral: { key:'semestral', name:'Semestral', months:6, total:'R$ 137,40', monthly:'R$ 22,90', totalCents:13740, monthlyCents:2290, discount:42.6, tag:'Reten\u00e7\u00e3o', order:30 },
+  anual: { key:'anual', name:'Anual', months:12, total:'R$ 238,80', monthly:'R$ 19,90', totalCents:23880, monthlyCents:1990, discount:50, tag:'Melhor escolha', order:40 }
 };
+const plans = Object.assign({}, fallbackPlans);
 
 const SUPABASE_REST_URL = 'https://jzqgudmvquokizvgehow.supabase.co/rest/v1';
 const SUPABASE_FUNCTION_URL = 'https://jzqgudmvquokizvgehow.supabase.co/functions/v1/asaas-gateway/checkout';
@@ -232,11 +331,24 @@ const checkoutRef = (new URLSearchParams(location.search).get('checkout') || '')
 let selectedPlan = 'anual';
 let selectedPay = 'cartao';
 let checkoutOk = false;
-let existingPaymentUrl = '';
-let trialDate = brDatePlus(30);
 let checkoutEmail = '';
+let checkoutCpf = '';
 let baseButtonEnabled = false;
 let baseButtonText = 'Validando acesso...';
+let pollTimer = null;
+let pixExpirationTimer = null;
+let payerCpfLookupSeq = 0;
+let payerCpfLookupDoc = '';
+let payerCpfLookupName = '';
+let payerCpfLookupLoading = false;
+let payerCpfLookupError = '';
+let cardCpfLookupSeq = 0;
+let cardCpfLookupDoc = '';
+let cardCpfLookupName = '';
+let cardCpfLookupLoading = false;
+let cardCpfLookupError = '';
+let paymentRoutes = { cartao:true, pix_avulso:true, pix_programado:true };
+let paymentConfirmedHandled = false;
 
 const statusBox = document.getElementById('checkoutStatus');
 const checkoutBtn = document.getElementById('checkoutBtn');
@@ -244,45 +356,60 @@ const payerDocInput = document.getElementById('payerDoc');
 const payerNameInput = document.getElementById('payerName');
 const payerNameLabel = document.getElementById('payerNameLabel');
 const payerEmailInput = document.getElementById('payerEmail');
+const registrationCpfInput = document.getElementById('registrationCpf');
+const samePayerInput = document.getElementById('samePayer');
 const payerStatus = document.getElementById('payerStatus');
-
-function brDatePlus(days){
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
-}
+const cardStatus = document.getElementById('cardStatus');
+const cardDocInput = document.getElementById('cardDoc');
+const cardHolderNameInput = document.getElementById('cardHolderName');
+const cardHolderNameLabel = document.getElementById('cardHolderNameLabel');
+const pixProgramadoInput = document.getElementById('pixProgramado');
+const pixProgramadoBox = document.getElementById('pixProgramadoBox');
+const pixMonthsBox = document.getElementById('pixMonthsBox');
+const pixMonthsInput = document.getElementById('pixMonths');
+const pixResult = document.getElementById('pixResult');
+const pixQrImage = document.getElementById('pixQrImage');
+const pixCopyCode = document.getElementById('pixCopyCode');
 
 function updateSummary(){
+  if (!plans[selectedPlan]) {
+    const keys = availablePlanKeys();
+    selectedPlan = keys.length ? keys[0] : selectedPlan;
+  }
   const plan = plans[selectedPlan];
+  if (!plan) return;
   const pluralMes = plan.months === 1 ? 'm\u00eas' : 'meses';
-  const pluralCobranca = plan.months === 1 ? 'cobran\u00e7a mensal' : 'cobran\u00e7as mensais';
   const promoRow = document.getElementById('sumPromoRow');
+  const payMethod = currentPaymentMethod();
   document.getElementById('sumPlan').textContent = plan.name;
-  document.getElementById('sumPay').textContent = selectedPay === 'cartao' ? 'Cart\u00e3o' : 'Pix programado';
+  document.getElementById('sumPay').textContent = payMethod === 'cartao' ? 'Cart\u00e3o' : (payMethod === 'pix_programado' ? 'Pix mensal programado' : 'Pix \u00e0 vista');
   promoRow.style.display = plan.promoUntil ? 'flex' : 'none';
   document.getElementById('sumPromo').textContent = plan.promoUntil ? 'At\u00e9 ' + plan.promoUntil : '';
 
-  if (selectedPay === 'cartao') {
-    document.getElementById('sumDateLabel').textContent = 'In\u00edcio ap\u00f3s teste';
-    document.getElementById('sumDate').textContent = trialDate;
-    document.getElementById('sumPeriodLabel').textContent = 'Uso liberado';
-    document.getElementById('sumPeriod').textContent = plan.months + ' ' + pluralMes;
-    document.getElementById('sumAmountLabel').textContent = plan.months === 1 ? 'Valor mensal' : 'Valor do per\u00edodo';
-    document.getElementById('sumTotal').textContent = plan.months === 1 ? plan.monthly : plan.total;
-    document.getElementById('sumFine').textContent = plan.months === 1
-      ? 'No cart\u00e3o, voc\u00ea paga ' + plan.monthly + ' agora em ambiente seguro e deixa 1 m\u00eas de uso liberado para come\u00e7ar ap\u00f3s os 30 dias gr\u00e1tis. Promo\u00e7\u00e3o de lan\u00e7amento v\u00e1lida at\u00e9 ' + plan.promoUntil + '; depois o mensal oficial ser\u00e1 ' + plan.officialMonthly + '/m\u00eas. O Turbo Tiger Beta requer aparelho Android 64-bit.'
-      : 'No cart\u00e3o, voc\u00ea paga ' + plan.total + ' agora em ambiente seguro e fica com ' + plan.months + ' meses de uso liberados ap\u00f3s os 30 dias gr\u00e1tis. O Turbo Tiger Beta requer aparelho Android 64-bit.';
+  if (payMethod === 'pix_programado') {
+    const months = pixProgrammedMonths();
+    const nextCount = Math.max(0, months - 1);
+    const promoText = plan.promoUntil
+      ? ' Promo\u00e7\u00e3o de lan\u00e7amento v\u00e1lida at\u00e9 ' + plan.promoUntil + (plan.officialMonthly ? '; depois o mensal oficial ser\u00e1 ' + plan.officialMonthly + '/m\u00eas.' : '.')
+      : '';
+    document.getElementById('sumPeriodLabel').textContent = 'Programa\u00e7\u00e3o';
+    document.getElementById('sumPeriod').textContent = months + ' meses';
+    document.getElementById('sumAmountLabel').textContent = 'Pix de hoje';
+    document.getElementById('sumTotal').textContent = plan.monthly;
+    document.getElementById('sumFine').textContent = 'No Pix programado mensal, voc\u00ea paga ' + plan.monthly + ' agora e a Asaas gera as pr\u00f3ximas ' + nextCount + ' cobran\u00e7as mensais no mesmo valor.' + promoText + ' O Turbo Tiger Beta requer aparelho Android 64-bit.';
     return;
   }
 
-  document.getElementById('sumDateLabel').textContent = 'In\u00edcio programado';
-  document.getElementById('sumDate').textContent = trialDate;
-  document.getElementById('sumPeriodLabel').textContent = 'Programa\u00e7\u00e3o';
-  document.getElementById('sumPeriod').textContent = plan.months + ' ' + pluralCobranca;
-  document.getElementById('sumAmountLabel').textContent = 'Cobran\u00e7a mensal';
-  document.getElementById('sumTotal').textContent = plan.monthly + ' / m\u00eas';
-  document.getElementById('sumFine').textContent = 'No Pix programado, a cobran\u00e7a autom\u00e1tica come\u00e7a em ' + trialDate + ' no valor de ' + plan.monthly + ' por m\u00eas, durante ' + plan.months + ' ' + pluralMes + '.' +
-    (plan.promoUntil ? ' Promo\u00e7\u00e3o de lan\u00e7amento v\u00e1lida at\u00e9 ' + plan.promoUntil + '; depois o mensal oficial ser\u00e1 ' + plan.officialMonthly + '/m\u00eas.' : '') +
+  document.getElementById('sumPeriodLabel').textContent = 'Uso liberado';
+  document.getElementById('sumPeriod').textContent = plan.months + ' ' + pluralMes;
+  document.getElementById('sumAmountLabel').textContent = 'Valor a pagar agora';
+  document.getElementById('sumTotal').textContent = plan.total;
+  const liberadoTexto = plan.months === 1 ? '1 m\u00eas de uso liberado' : plan.months + ' ' + pluralMes + ' de uso liberados';
+  const promoText = plan.promoUntil
+    ? ' Promo\u00e7\u00e3o de lan\u00e7amento v\u00e1lida at\u00e9 ' + plan.promoUntil + (plan.officialMonthly ? '; depois o mensal oficial ser\u00e1 ' + plan.officialMonthly + '/m\u00eas.' : '.')
+    : '';
+  document.getElementById('sumFine').textContent = (payMethod === 'cartao' ? 'No cart\u00e3o' : 'No Pix') + ', voc\u00ea paga ' + plan.total + ' agora e fica com ' + liberadoTexto + '.' +
+    promoText +
     ' O Turbo Tiger Beta requer aparelho Android 64-bit.';
 }
 
@@ -301,6 +428,187 @@ function digitsOnly(value){
   return String(value || '').replace(/\D/g, '');
 }
 
+function moneyFromCents(cents){
+  return 'R$ ' + (Math.max(0, Number(cents) || 0) / 100).toFixed(2).replace('.', ',');
+}
+
+function escapeHtml(value){
+  return String(value || '').replace(/[&<>"']/g, function(char){
+    return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[char];
+  });
+}
+
+function formatDateBR(value){
+  const text = String(value || '').slice(0, 10);
+  const match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return match ? match[3] + '/' + match[2] + '/' + match[1] : text;
+}
+
+function formatDateTimeBR(value){
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value || '');
+  return date.toLocaleString('pt-BR', {
+    day:'2-digit',
+    month:'2-digit',
+    year:'numeric',
+    hour:'2-digit',
+    minute:'2-digit'
+  });
+}
+
+function formatPercent(value){
+  const number = Number(value) || 0;
+  return number.toLocaleString('pt-BR', { minimumFractionDigits: number % 1 ? 1 : 0, maximumFractionDigits: 1 });
+}
+
+function availablePlanKeys(){
+  return Object.keys(plans).sort(function(a, b){
+    return (plans[a].order || 0) - (plans[b].order || 0);
+  });
+}
+
+function normalizePlanFromDatabase(row){
+  const key = String(row && row.plano || '').trim();
+  const months = Math.max(1, Number(row && row.meses) || 0);
+  const monthlyCents = Math.max(1, Number(row && row.valor_mensal_centavos) || 0);
+  const totalCents = Math.max(1, Number(row && row.valor_total_centavos) || 0);
+  if (!key || !months || !monthlyCents || !totalCents) return null;
+
+  const promoUntil = row.promocao_fim ? formatDateBR(row.promocao_fim) : '';
+  const officialMonthly = row.valor_oficial_mensal_centavos ? moneyFromCents(row.valor_oficial_mensal_centavos) : '';
+  const discount = Number(row.desconto_percentual) || 0;
+
+  return {
+    key,
+    name: String(row.nome || key).trim(),
+    months,
+    total: moneyFromCents(totalCents),
+    monthly: moneyFromCents(monthlyCents),
+    totalCents,
+    monthlyCents,
+    officialMonthly,
+    promoUntil,
+    discount,
+    tag: String(row.destaque || '').trim(),
+    order: Number(row.ordem) || 0
+  };
+}
+
+function syncPlansFromDatabase(rows){
+  if (!Array.isArray(rows) || rows.length === 0) return false;
+  const normalized = rows.map(normalizePlanFromDatabase).filter(Boolean);
+  if (normalized.length === 0) return false;
+
+  Object.keys(plans).forEach(function(key){ delete plans[key]; });
+  normalized.forEach(function(plan){ plans[plan.key] = plan; });
+
+  if (!plans[selectedPlan]) {
+    selectedPlan = plans.anual ? 'anual' : normalized[normalized.length - 1].key;
+  }
+
+  renderPlanCards();
+  return true;
+}
+
+function syncPaymentRoutesFromDatabase(rows){
+  if (!Array.isArray(rows)) return false;
+
+  const routes = { cartao:false, pix_avulso:false, pix_programado:false };
+  rows.forEach(function(row){
+    const forma = String(row && row.forma_pagamento || '').trim();
+    if (Object.prototype.hasOwnProperty.call(routes, forma)) {
+      routes[forma] = true;
+    }
+  });
+
+  paymentRoutes = routes;
+  applyPaymentRouteVisibility();
+  return true;
+}
+
+function canPaymentRoute(forma){
+  return !!paymentRoutes[forma];
+}
+
+function returnToAppAfterPayment(){
+  const target = '/?app=1&pagamento=confirmado&checkout=' + encodeURIComponent(checkoutRef);
+  setTimeout(function(){
+    try {
+      window.location.replace(target);
+    } catch(e) {
+      window.location.href = target;
+    }
+  }, 1600);
+}
+
+function handlePaymentConfirmed(message, buttonText){
+  if (paymentConfirmedHandled) return;
+  paymentConfirmedHandled = true;
+  stopPaymentPolling();
+  stopPixExpirationTimer();
+  setStatus(message || 'Pagamento confirmado. Sua assinatura foi liberada no app.', 'ok');
+  setButton(false, buttonText || 'Pagamento confirmado');
+  returnToAppAfterPayment();
+}
+
+function pixAvailableForSelectedPlan(){
+  return canPaymentRoute('pix_avulso') || (selectedPlan === 'mensal' && canPaymentRoute('pix_programado'));
+}
+
+function ensureSelectedPaymentAllowed(){
+  if (selectedPay === 'cartao' && !canPaymentRoute('cartao')) {
+    selectedPay = pixAvailableForSelectedPlan() ? 'pix' : 'cartao';
+  } else if (selectedPay === 'pix' && !pixAvailableForSelectedPlan()) {
+    selectedPay = canPaymentRoute('cartao') ? 'cartao' : 'pix';
+  }
+}
+
+function applyPaymentRouteVisibility(){
+  ensureSelectedPaymentAllowed();
+
+  const cardTab = document.querySelector('.pay-tab[data-pay="cartao"]');
+  const pixTab = document.querySelector('.pay-tab[data-pay="pix"]');
+  if (cardTab) cardTab.style.display = canPaymentRoute('cartao') ? '' : 'none';
+  if (pixTab) pixTab.style.display = (canPaymentRoute('pix_avulso') || canPaymentRoute('pix_programado')) ? '' : 'none';
+
+  document.querySelectorAll('.pay-tab').forEach(function(item){
+    item.classList.toggle('active', item.dataset.pay === selectedPay);
+  });
+  document.getElementById('cardBox').style.display = selectedPay === 'cartao' ? 'block' : 'none';
+  document.getElementById('pixBox').style.display = selectedPay === 'pix' ? 'block' : 'none';
+  updatePixProgramadoVisibility();
+}
+
+function planSaveText(plan){
+  if (!plan.discount) return plan.monthly + '/m\u00eas';
+  const percent = formatPercent(plan.discount);
+  return plan.key === 'mensal' ? percent + '% abaixo do mensal oficial' : percent + '% de desconto';
+}
+
+function renderPlanCards(){
+  const container = document.getElementById('plans');
+  container.innerHTML = availablePlanKeys().map(function(key){
+    const plan = plans[key];
+    const selected = key === selectedPlan;
+    const best = key === 'anual' || /melhor/i.test(plan.tag || '');
+    const tag = plan.tag || (key === 'mensal' ? 'Lan\u00e7amento' : plan.name);
+    const totalText = plan.promoUntil
+      ? 'Promo\u00e7\u00e3o at\u00e9 ' + plan.promoUntil + (plan.officialMonthly ? '. Depois: ' + plan.officialMonthly + '/m\u00eas' : '')
+      : 'Total: ' + plan.total;
+
+    return '<label class="plan' + (best ? ' best' : '') + (selected ? ' selected' : '') + '" data-plan="' + escapeHtml(key) + '">' +
+      '<input type="radio" name="plan" value="' + escapeHtml(key) + '"' + (selected ? ' checked' : '') + '>' +
+      '<span class="tag' + (best ? ' gold' : '') + '">' + escapeHtml(tag) + '</span>' +
+      '<h3>' + escapeHtml(plan.name) + '</h3>' +
+      '<div class="price">' + escapeHtml(plan.monthly) + ' <small>/m\u00eas</small></div>' +
+      '<div class="total">' + escapeHtml(totalText) + '</div>' +
+      '<div class="save">' + escapeHtml(planSaveText(plan)) + '</div>' +
+    '</label>';
+  }).join('');
+  bindPlanCards();
+  selectPlan(selectedPlan, false);
+}
+
 function maskCpfCnpj(digits){
   const value = digitsOnly(digits).slice(0, 14);
   if (value.length <= 11) {
@@ -314,6 +622,24 @@ function maskCpfCnpj(digits){
     .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
     .replace(/\.(\d{3})(\d)/, '.$1/$2')
     .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+}
+
+function maskCard(value){
+  return digitsOnly(value).slice(0, 19).replace(/(.{4})/g, '$1 ').trim();
+}
+
+function maskExpiry(value){
+  const digits = digitsOnly(value).slice(0, 4);
+  return digits.length > 2 ? digits.slice(0, 2) + '/' + digits.slice(2) : digits;
+}
+
+function maskCep(value){
+  const digits = digitsOnly(value).slice(0, 8);
+  return digits.length > 5 ? digits.slice(0, 5) + '-' + digits.slice(5) : digits;
+}
+
+function maskPhone(value){
+  return digitsOnly(value).slice(0, 13);
 }
 
 function isRepeatedDigits(value){
@@ -350,55 +676,346 @@ function isValidCnpj(cnpj){
   return digit === Number(cnpj[13]);
 }
 
+function isValidCpfCnpj(value){
+  const digits = digitsOnly(value);
+  return (digits.length === 11 && isValidCpf(digits)) || (digits.length === 14 && isValidCnpj(digits));
+}
+
+function isValidCardNumber(value){
+  const digits = digitsOnly(value);
+  if (digits.length < 13 || digits.length > 19 || isRepeatedDigits(digits)) return false;
+  let sum = 0;
+  let doubleDigit = false;
+  for (let i = digits.length - 1; i >= 0; i--) {
+    let digit = Number(digits[i]);
+    if (doubleDigit) {
+      digit *= 2;
+      if (digit > 9) digit -= 9;
+    }
+    sum += digit;
+    doubleDigit = !doubleDigit;
+  }
+  return sum % 10 === 0;
+}
+
+function normalizedNameTokens(value){
+  const ignored = { DA:true, DAS:true, DE:true, DO:true, DOS:true, E:true };
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .split(/[^A-Z0-9]+/)
+    .filter(function(token){ return token.length > 1 && !ignored[token]; });
+}
+
+function cardNameMatchesHolder(cardName, holderName){
+  const cardTokens = normalizedNameTokens(cardName);
+  const holderTokens = normalizedNameTokens(holderName);
+  return cardTokens.some(function(token){ return holderTokens.indexOf(token) >= 0; });
+}
+
 function updatePayerDocumentUi(){
   const digits = digitsOnly(payerDocInput.value).slice(0, 14);
   payerDocInput.value = maskCpfCnpj(digits);
   const isCnpj = digits.length > 11;
-  payerNameLabel.textContent = isCnpj ? 'Razao social' : 'Nome completo';
-  payerNameInput.placeholder = isCnpj ? 'Razao social' : 'Nome completo';
+  payerNameLabel.textContent = isCnpj ? 'Raz\u00e3o social' : 'Nome completo';
+  payerNameInput.placeholder = isCnpj ? 'Raz\u00e3o social' : 'Digite o nome completo ou aguarde a consulta do CPF';
   payerNameInput.autocomplete = isCnpj ? 'organization' : 'name';
+  payerNameInput.readOnly = false;
+
+  if (isCnpj) {
+    if (payerCpfLookupName && payerNameInput.value === payerCpfLookupName) {
+      payerNameInput.value = '';
+    }
+    payerCpfLookupLoading = false;
+    payerCpfLookupError = '';
+    payerCpfLookupDoc = '';
+    payerCpfLookupName = '';
+    return;
+  }
+
+  if (digits !== payerCpfLookupDoc) {
+    if (payerCpfLookupLoading) payerCpfLookupSeq += 1;
+    payerCpfLookupLoading = false;
+    if (payerNameInput.value === payerCpfLookupName) payerNameInput.value = '';
+    payerCpfLookupName = '';
+    payerCpfLookupError = '';
+  }
 }
 
-function validatePayer(showMessage){
+function withTimeout(promise, milliseconds, message){
+  let timer = null;
+  const timeout = new Promise(function(_, reject){
+    timer = setTimeout(function(){ reject(new Error(message || 'timeout')); }, milliseconds);
+  });
+  return Promise.race([promise, timeout]).finally(function(){
+    if (timer) clearTimeout(timer);
+  });
+}
+
+async function consultarCpfPagadorSeNecessario(){
+  const cpf = digitsOnly(payerDocInput.value).slice(0, 11);
+  if (cpf.length !== 11 || !isValidCpf(cpf) || cpf === payerCpfLookupDoc || payerCpfLookupLoading) return;
+
+  const seq = ++payerCpfLookupSeq;
+  payerCpfLookupLoading = true;
+  payerCpfLookupError = '';
+  payerCpfLookupDoc = cpf;
+  payerNameInput.value = '';
+  payerStatus.textContent = 'Consultando dados do CPF...';
+  payerStatus.className = 'field-note';
+  refreshCheckoutButton();
+
+  try {
+    const data = await withTimeout(rpc('consultar_cpf_serpro_rpc', { p_cpf: cpf }), 8000, 'consulta_cpf_timeout');
+    if (seq !== payerCpfLookupSeq) return;
+    const nome = String(data && data.nome || '').trim().replace(/\s+/g, ' ');
+    if (!nome) throw new Error(data && (data.mensagem || data.message) || 'CPF sem nome retornado.');
+    payerCpfLookupName = nome;
+    payerCpfLookupError = '';
+    payerNameInput.value = nome;
+    payerStatus.textContent = 'Nome confirmado pelo CPF.';
+    payerStatus.className = 'field-note';
+  } catch(e) {
+    if (seq !== payerCpfLookupSeq) return;
+    payerCpfLookupName = '';
+    payerCpfLookupError = 'Não foi possível confirmar o CPF agora. Se o CPF estiver correto, informe o nome completo e gere o Pix.';
+    payerStatus.textContent = payerCpfLookupError;
+    payerStatus.className = 'field-note error';
+  } finally {
+    if (seq === payerCpfLookupSeq) {
+      payerCpfLookupLoading = false;
+      resetPaymentState();
+    }
+  }
+}
+
+function updateCardDocumentUi(){
+  const digits = digitsOnly(cardDocInput.value).slice(0, 14);
+  cardDocInput.value = maskCpfCnpj(digits);
+  const isCnpj = digits.length > 11;
+  cardHolderNameLabel.textContent = isCnpj ? 'Razão social do titular' : 'Nome do titular confirmado';
+  cardHolderNameInput.placeholder = isCnpj ? 'Razão social' : 'Preenchido automaticamente pelo CPF';
+  cardHolderNameInput.autocomplete = isCnpj ? 'organization' : 'name';
+  cardHolderNameInput.readOnly = !isCnpj;
+
+  if (isCnpj) {
+    if (cardCpfLookupName && cardHolderNameInput.value === cardCpfLookupName) {
+      cardHolderNameInput.value = '';
+    }
+    cardCpfLookupLoading = false;
+    cardCpfLookupError = '';
+    cardCpfLookupDoc = '';
+    cardCpfLookupName = '';
+    return;
+  }
+
+  if (digits !== cardCpfLookupDoc) {
+    if (cardCpfLookupLoading) cardCpfLookupSeq += 1;
+    cardCpfLookupLoading = false;
+    cardHolderNameInput.value = '';
+    cardCpfLookupName = '';
+    cardCpfLookupError = '';
+  }
+}
+
+async function consultarCpfTitularCartaoSeNecessario(){
+  const cpf = digitsOnly(cardDocInput.value).slice(0, 11);
+  if (cpf.length !== 11 || !isValidCpf(cpf) || cpf === cardCpfLookupDoc || cardCpfLookupLoading) return;
+
+  const seq = ++cardCpfLookupSeq;
+  cardCpfLookupLoading = true;
+  cardCpfLookupError = '';
+  cardCpfLookupDoc = cpf;
+  cardHolderNameInput.value = '';
+  cardStatus.textContent = 'Consultando dados do CPF do titular...';
+  cardStatus.className = 'field-note';
+  refreshCheckoutButton();
+
+  try {
+    const data = await rpc('consultar_cpf_serpro_rpc', { p_cpf: cpf });
+    if (seq !== cardCpfLookupSeq) return;
+    const nome = String(data && data.nome || '').trim().replace(/\s+/g, ' ');
+    if (!nome) throw new Error(data && (data.mensagem || data.message) || 'CPF sem nome retornado.');
+    cardCpfLookupName = nome;
+    cardCpfLookupError = '';
+    cardHolderNameInput.value = nome;
+    cardStatus.textContent = 'Nome do titular confirmado pelo CPF.';
+    cardStatus.className = 'field-note';
+  } catch(e) {
+    if (seq !== cardCpfLookupSeq) return;
+    cardCpfLookupDoc = '';
+    cardCpfLookupName = '';
+    cardCpfLookupError = 'Não foi possível consultar o CPF do titular agora. Tente novamente.';
+    cardStatus.textContent = cardCpfLookupError;
+    cardStatus.className = 'field-note error';
+  } finally {
+    if (seq === cardCpfLookupSeq) {
+      cardCpfLookupLoading = false;
+      resetPaymentState();
+    }
+  }
+}
+
+function applySamePayer(){
+  const useRegistrationCpf = samePayerInput.checked && isValidCpf(checkoutCpf);
+  payerDocInput.disabled = useRegistrationCpf;
+  cardDocInput.disabled = useRegistrationCpf;
+
+  if (useRegistrationCpf) {
+    payerDocInput.value = maskCpfCnpj(checkoutCpf);
+    cardDocInput.value = maskCpfCnpj(checkoutCpf);
+  }
+
+  updatePayerDocumentUi();
+  updateCardDocumentUi();
+  consultarCpfPagadorSeNecessario();
+  consultarCpfTitularCartaoSeNecessario();
+  resetPaymentState();
+}
+
+function pixProgrammedMonths(){
+  return Math.min(12, Math.max(2, Number(pixMonthsInput.value) || 2));
+}
+
+function currentPaymentMethod(){
+  if (selectedPay === 'cartao') return 'cartao';
+  return selectedPlan === 'mensal' && pixProgramadoInput.checked && canPaymentRoute('pix_programado') ? 'pix_programado' : 'pix_avulso';
+}
+
+function validatePix(showMessage){
   updatePayerDocumentUi();
   const documentDigits = digitsOnly(payerDocInput.value).slice(0, 14);
   const name = payerNameInput.value.trim().replace(/\s+/g, ' ');
   const isCnpj = documentDigits.length > 11;
   let ok = true;
-  let message = 'O pagamento sera vinculado ao usuario aberto pelo app e as informacoes serao enviadas para este e-mail.';
-  let buttonText = baseButtonText;
+  let message = 'Informe os dados do pagador para gerar o Pix.';
+  let buttonText = 'Informe CPF/CNPJ';
 
   if (!checkoutEmail) {
     ok = false;
-    message = 'Abra esta pagina pelo app para carregar o e-mail do cadastro.';
-    buttonText = 'Carregando e-mail do cadastro';
+    message = 'Carregando e-mail do cadastro.';
+    buttonText = 'Carregando e-mail';
   } else if (documentDigits.length !== 11 && documentDigits.length !== 14) {
     ok = false;
-    message = 'Informe um CPF ou CNPJ valido para o pagador.';
-    buttonText = 'Informe CPF/CNPJ';
-  } else if (documentDigits.length === 11 && !isValidCpf(documentDigits)) {
+    message = 'Informe um CPF ou CNPJ v\u00e1lido para o pagador.';
+  } else if (!isValidCpfCnpj(documentDigits)) {
     ok = false;
-    message = 'CPF invalido. Confira os numeros digitados.';
-    buttonText = 'CPF invalido';
-  } else if (documentDigits.length === 14 && !isValidCnpj(documentDigits)) {
-    ok = false;
-    message = 'CNPJ invalido. Confira os numeros digitados.';
-    buttonText = 'CNPJ invalido';
+    message = documentDigits.length === 14 ? 'CNPJ inv\u00e1lido. Confira os n\u00fameros digitados.' : 'CPF inv\u00e1lido. Confira os n\u00fameros digitados.';
+    buttonText = documentDigits.length === 14 ? 'CNPJ inv\u00e1lido' : 'CPF inv\u00e1lido';
   } else if (name.length < 3) {
     ok = false;
-    message = isCnpj ? 'Informe a razao social do pagador.' : 'Informe o nome completo do pagador.';
-    buttonText = isCnpj ? 'Informe a razao social' : 'Informe o nome completo';
+    message = isCnpj ? 'Informe a raz\u00e3o social do pagador.' : 'Informe o nome completo do pagador.';
+    buttonText = isCnpj ? 'Informe a raz\u00e3o social' : 'Informe o nome completo';
+  } else {
+    buttonText = baseButtonText;
   }
 
   if (showMessage || !ok) {
     payerStatus.textContent = message;
     payerStatus.className = 'field-note' + (ok ? '' : ' error');
-  } else {
-    payerStatus.textContent = message;
-    payerStatus.className = 'field-note';
   }
 
   return { ok, documento: documentDigits, nome: name, tipo: isCnpj ? 'cnpj' : 'cpf', buttonText };
+}
+
+function validateCard(showMessage){
+  const cardNumber = digitsOnly(document.getElementById('cardNumber').value);
+  const cardName = document.getElementById('cardName').value.trim().replace(/\s+/g, ' ');
+  const expiry = digitsOnly(document.getElementById('cardExpiry').value);
+  const cvv = digitsOnly(document.getElementById('cardCvv').value);
+  const holderDoc = digitsOnly(cardDocInput.value).slice(0, 14);
+  const holderName = cardHolderNameInput.value.trim().replace(/\s+/g, ' ');
+  const holderIsCnpj = holderDoc.length === 14;
+  const phone = digitsOnly(document.getElementById('cardPhone').value).slice(0, 13);
+  const postalCode = digitsOnly(document.getElementById('cardCep').value).slice(0, 8);
+  const addressNumber = document.getElementById('cardAddressNumber').value.trim();
+  const month = expiry.slice(0, 2);
+  const year = expiry.slice(2);
+  let ok = true;
+  let message = 'Informe os dados do cart\u00e3o e do titular para processar o pagamento.';
+  let buttonText = baseButtonText;
+
+  if (!checkoutEmail) {
+    ok = false;
+    message = 'Carregando e-mail do cadastro.';
+    buttonText = 'Carregando e-mail';
+  } else if (!isValidCardNumber(cardNumber)) {
+    ok = false;
+    message = 'Informe um n\u00famero de cart\u00e3o v\u00e1lido.';
+    buttonText = 'Informe o cart\u00e3o';
+  } else if (cardName.length < 3) {
+    ok = false;
+    message = 'Informe o nome impresso no cart\u00e3o.';
+    buttonText = 'Informe o nome';
+  } else if (expiry.length !== 4 || Number(month) < 1 || Number(month) > 12) {
+    ok = false;
+    message = 'Informe a validade no formato MM/AA.';
+    buttonText = 'Informe a validade';
+  } else if (cvv.length < 3 || cvv.length > 4) {
+    ok = false;
+    message = 'Informe o CVV do cart\u00e3o.';
+    buttonText = 'Informe o CVV';
+  } else if (!isValidCpfCnpj(holderDoc)) {
+    ok = false;
+    message = 'Informe CPF ou CNPJ v\u00e1lido do titular do cart\u00e3o.';
+    buttonText = 'Informe CPF/CNPJ';
+  } else if (!holderIsCnpj && cardCpfLookupLoading) {
+    ok = false;
+    message = 'Consultando dados do CPF do titular...';
+    buttonText = 'Consultando CPF';
+  } else if (!holderIsCnpj && cardCpfLookupError) {
+    ok = false;
+    message = cardCpfLookupError;
+    buttonText = 'Consulte o CPF';
+  } else if (!holderIsCnpj && (cardCpfLookupDoc !== holderDoc || cardCpfLookupName === '')) {
+    ok = false;
+    message = 'Aguarde a confirma\u00e7\u00e3o do nome pelo CPF do titular.';
+    buttonText = 'Aguardando CPF';
+  } else if (holderName.length < 3) {
+    ok = false;
+    message = holderIsCnpj ? 'Informe a raz\u00e3o social do titular.' : 'Aguarde o nome confirmado pelo CPF.';
+    buttonText = holderIsCnpj ? 'Informe a raz\u00e3o social' : 'Aguardando CPF';
+  } else if (!holderIsCnpj && !cardNameMatchesHolder(cardName, holderName)) {
+    ok = false;
+    message = 'Verifique o nome impresso no cart\u00e3o: ele deve coincidir com pelo menos um nome do titular do CPF.';
+    buttonText = 'Confira o nome do cart\u00e3o';
+  } else if (phone.length < 10) {
+    ok = false;
+    message = 'Informe o telefone do titular com DDD.';
+    buttonText = 'Informe o telefone';
+  } else if (postalCode.length !== 8) {
+    ok = false;
+    message = 'Informe o CEP do titular.';
+    buttonText = 'Informe o CEP';
+  } else if (addressNumber.length < 1) {
+    ok = false;
+    message = 'Informe o n\u00famero do endere\u00e7o do titular.';
+    buttonText = 'Informe o n\u00famero';
+  }
+
+  if (showMessage || !ok) {
+    cardStatus.textContent = message;
+    cardStatus.className = 'field-note' + (ok ? '' : ' error');
+  }
+
+  return {
+    ok,
+    buttonText,
+    card: { number: cardNumber, holderName: cardName, expiryMonth: month, expiryYear: year, ccv: cvv },
+    holder: { name: holderName, email: checkoutEmail, cpfCnpj: holderDoc, phone, postalCode, addressNumber }
+  };
+}
+
+function validatePayment(showMessage){
+  ensureSelectedPaymentAllowed();
+  if (selectedPay === 'cartao' && !canPaymentRoute('cartao')) {
+    return { ok:false, buttonText:'Cart\u00e3o indispon\u00edvel' };
+  }
+  if (selectedPay === 'pix' && !pixAvailableForSelectedPlan()) {
+    return { ok:false, buttonText:'Pix indispon\u00edvel' };
+  }
+  return selectedPay === 'cartao' ? validateCard(showMessage) : validatePix(showMessage);
 }
 
 function refreshCheckoutButton(){
@@ -408,19 +1025,20 @@ function refreshCheckoutButton(){
     return;
   }
 
-  const validation = validatePayer(false);
+  const validation = validatePayment(false);
   checkoutBtn.disabled = !validation.ok;
   checkoutBtn.textContent = validation.ok ? baseButtonText : validation.buttonText;
 }
 
-function resetExistingPaymentAfterPayerChange(){
-  updatePayerDocumentUi();
-  existingPaymentUrl = '';
+function resetPaymentState(){
+  stopPixExpirationTimer();
+  pixResult.style.display = 'none';
   if (checkoutOk) {
-    setButton(true, 'Ir para pagamento seguro');
+    setButton(true, selectedPay === 'cartao' ? 'Pagar agora' : 'Gerar Pix');
   } else {
     refreshCheckoutButton();
   }
+  updateSummary();
 }
 
 function rpc(name, body){
@@ -467,34 +1085,22 @@ function gatewayCheckout(body){
   });
 }
 
-function formatDate(value){
-  if (!value) return '';
-  const parts = String(value).split('-');
-  if (parts.length === 3) {
-    return parts[2] + '/' + parts[1] + '/' + parts[0];
-  }
-  return value;
-}
-
 function applyCheckout(data){
   checkoutOk = true;
-  existingPaymentUrl = data.gateway_payment_url || '';
+  syncPlansFromDatabase(data.planos);
+  syncPaymentRoutesFromDatabase(data.gateways);
   checkoutEmail = String(data.email_usuario || data.email_cobranca || '').trim();
+  checkoutCpf = digitsOnly(data.cpf_cadastro).slice(0, 11);
   payerEmailInput.value = checkoutEmail;
-  setButton(true, existingPaymentUrl ? 'Continuar pagamento seguro' : 'Ir para pagamento seguro');
-  setStatus('Checkout seguro validado pelo app. Escolha o plano e a forma de pagamento.', 'ok');
-  validatePayer(false);
+  registrationCpfInput.value = checkoutCpf ? maskCpfCnpj(checkoutCpf) : 'CPF n\u00e3o encontrado no cadastro';
+  samePayerInput.disabled = !isValidCpf(checkoutCpf);
+  if (samePayerInput.disabled) samePayerInput.checked = false;
+  setButton(true, selectedPay === 'cartao' ? 'Pagar agora' : 'Gerar Pix');
+  setStatus('Assinatura vinculada ao seu usu\u00e1rio. Escolha o plano e a forma de pagamento.', 'ok');
 
-  if (data.gateway_status === 'pago') {
-    setStatus('Pagamento confirmado. Sua assinatura sera liberada automaticamente no app.', 'ok');
-    setButton(false, 'Pagamento confirmado');
-  }
-
-  if (data.trial_fim) {
-    trialDate = formatDate(data.trial_fim);
-    document.getElementById('trialDate').textContent = trialDate;
-    document.getElementById('sumDate').textContent = trialDate;
-    updateSummary();
+  if (data.gateway_status === 'pago' || data.status === 'pago') {
+    handlePaymentConfirmed('Pagamento confirmado. Sua assinatura foi liberada no app.', 'Pagamento confirmado');
+    return;
   }
 
   if (data.plano && plans[data.plano]) {
@@ -503,23 +1109,31 @@ function applyCheckout(data){
   }
 
   if (data.forma_pagamento) {
-    const tab = document.querySelector('.pay-tab[data-pay="' + data.forma_pagamento + '"]');
+    const normalizedPay = data.forma_pagamento === 'cartao' ? 'cartao' : 'pix';
+    const tab = document.querySelector('.pay-tab[data-pay="' + normalizedPay + '"]');
     if (tab) tab.click();
+    pixProgramadoInput.checked = data.forma_pagamento === 'pix_programado';
+    if (data.pix_meses_programados && data.pix_meses_programados >= 2) {
+      pixMonthsInput.value = String(Math.min(12, Math.max(2, Number(data.pix_meses_programados))));
+    }
   }
+
+  updatePixProgramadoVisibility();
+  refreshCheckoutButton();
 }
 
 async function validateCheckout(){
   setButton(false, 'Validando acesso...');
 
   if (!checkoutRef) {
-    setStatus('Para assinar, abra esta pagina pelo botao Assine agora dentro do app Turbo Tiger.', 'error');
+    setStatus('Para assinar, abra esta p\u00e1gina pelo bot\u00e3o Assine agora dentro do app Turbo Tiger.', 'error');
     setButton(false, 'Abra pelo app para assinar');
     return;
   }
 
   const data = await rpc('assinatura_checkout_resolver_rpc', { p_checkout_ref: checkoutRef });
   if (!data.ok) {
-    setStatus('Este link de assinatura expirou ou nao e valido. Abra novamente pelo app Turbo Tiger.', 'error');
+    setStatus('Este link de assinatura expirou ou n\u00e3o \u00e9 v\u00e1lido. Abra novamente pelo app Turbo Tiger.', 'error');
     setButton(false, 'Abra pelo app para assinar');
     return;
   }
@@ -527,82 +1141,194 @@ async function validateCheckout(){
   applyCheckout(data);
 }
 
+function renderPixResult(data){
+  stopPixExpirationTimer();
+  const qr = data.pix_qr_code || {};
+  const encodedImage = String(qr.encodedImage || qr.encoded_image || '');
+  const payload = String(qr.payload || '');
+  const expirationDate = String(qr.expirationDate || qr.expiration_date || '');
+  const expirationTime = expirationDate ? new Date(expirationDate).getTime() : 0;
+  if (encodedImage) {
+    pixQrImage.src = encodedImage.indexOf('data:') === 0 ? encodedImage : 'data:image/png;base64,' + encodedImage;
+  }
+  pixCopyCode.value = payload;
+  document.getElementById('pixResultText').textContent = expirationDate
+    ? 'Pague este Pix para liberar o acesso. QR Code válido até ' + formatDateTimeBR(expirationDate) + '.'
+    : 'Pague este Pix para liberar o acesso no app.';
+  pixResult.style.display = 'block';
+  setStatus('Pix gerado. Assim que o pagamento for confirmado, a assinatura ser\u00e1 liberada no app.', 'ok');
+  setButton(false, 'Aguardando pagamento Pix');
+  if (expirationTime > Date.now()) {
+    pixExpirationTimer = setTimeout(function(){
+      stopPaymentPolling();
+      pixResult.style.display = 'none';
+      pixCopyCode.value = '';
+      setStatus('Este Pix venceu. Gere um novo QR Code para pagar.', 'error');
+      setButton(true, 'Gerar novo Pix');
+    }, Math.max(1000, expirationTime - Date.now()));
+  }
+  startPaymentPolling();
+}
+
 checkoutBtn.addEventListener('click', async function(){
   if (!checkoutOk) {
-    setStatus('Abra a assinatura pelo app Turbo Tiger para vincular o pagamento ao seu usuario.', 'error');
+    setStatus('Abra a assinatura pelo app Turbo Tiger para vincular o pagamento ao seu usu\u00e1rio.', 'error');
     return;
   }
 
-  const payer = validatePayer(true);
-  if (!payer.ok) {
+  const validation = validatePayment(true);
+  if (!validation.ok) {
     refreshCheckoutButton();
     return;
   }
 
-  if (existingPaymentUrl) {
-    window.location.href = existingPaymentUrl;
-    return;
-  }
-
-  setButton(false, 'Preparando pagamento...');
-  setStatus('Criando checkout seguro no Asaas...', '');
-  const data = await gatewayCheckout({
+  const formaPagamento = currentPaymentMethod();
+  const checkoutPayload = {
     checkout_ref: checkoutRef,
     plano: selectedPlan,
-    forma_pagamento: selectedPay,
-    pagador_documento: payer.documento,
-    pagador_nome: payer.nome,
+    forma_pagamento: formaPagamento,
     email_cobranca: checkoutEmail
-  });
+  };
 
-  if (!data.ok || !data.payment_url) {
-    setStatus('Nao foi possivel criar o checkout no gateway. Tente novamente ou abra a assinatura pelo app.', 'error');
-    setButton(true, 'Tentar novamente');
+  if (formaPagamento === 'pix_programado') {
+    checkoutPayload.pix_meses_programados = pixProgrammedMonths();
+  }
+
+  if (selectedPay === 'cartao') {
+    checkoutPayload.cartao = validation.card;
+    checkoutPayload.titular_cartao = validation.holder;
+  } else {
+    checkoutPayload.pagador_documento = validation.documento;
+    checkoutPayload.pagador_nome = validation.nome;
+  }
+
+  setButton(false, selectedPay === 'cartao' ? 'Processando cart\u00e3o...' : 'Gerando Pix...');
+  setStatus(selectedPay === 'cartao' ? 'Processando pagamento com seguran\u00e7a...' : 'Criando cobran\u00e7a Pix...', '');
+  const data = await gatewayCheckout(checkoutPayload);
+
+  if (!data.ok) {
+    const detalheErro = String(data.mensagem || data.message || data.error || '').trim();
+    const message = data.error === 'cartao_recusado'
+      ? 'Cart\u00e3o recusado. Confira os dados ou tente outro cart\u00e3o.'
+      : (detalheErro
+        ? 'N\u00e3o foi poss\u00edvel processar o pagamento: ' + detalheErro
+        : 'N\u00e3o foi poss\u00edvel processar o pagamento. Tente novamente.');
+    setStatus(message, 'error');
+    setButton(true, selectedPay === 'cartao' ? 'Tentar novamente' : 'Gerar Pix novamente');
     return;
   }
 
-  existingPaymentUrl = data.payment_url;
-  setStatus('Checkout criado com seguranca. Redirecionando para o Asaas...', 'ok');
-  setButton(false, 'Abrindo Asaas...');
-  window.location.href = data.payment_url;
+  if (data.status === 'approved' || data.gateway_status === 'pago') {
+    handlePaymentConfirmed('Pagamento aprovado. Sua assinatura foi liberada no app.', 'Pagamento aprovado');
+    return;
+  }
+
+  if (data.pix_qr_code) {
+    renderPixResult(data);
+    return;
+  }
+
+  setStatus('Pagamento criado. Aguarde a confirma\u00e7\u00e3o do gateway.', 'ok');
+  setButton(false, 'Aguardando confirma\u00e7\u00e3o');
 });
 
-document.getElementById('trialDate').textContent = trialDate;
-document.getElementById('sumDate').textContent = trialDate;
-payerDocInput.addEventListener('input', resetExistingPaymentAfterPayerChange);
-payerNameInput.addEventListener('input', resetExistingPaymentAfterPayerChange);
-payerDocInput.addEventListener('paste', function(event){
-  event.preventDefault();
-  const text = (event.clipboardData || window.clipboardData).getData('text');
-  payerDocInput.value = maskCpfCnpj(digitsOnly(text).slice(0, 14));
-  resetExistingPaymentAfterPayerChange();
-});
+function startPaymentPolling(){
+  stopPaymentPolling();
+  pollTimer = setInterval(async function(){
+    const data = await rpc('assinatura_checkout_resolver_rpc', { p_checkout_ref: checkoutRef });
+    if (data && data.ok && (data.gateway_status === 'pago' || data.status === 'pago')) {
+      handlePaymentConfirmed('Pagamento confirmado. Sua assinatura foi liberada no app.', 'Pagamento confirmado');
+    }
+  }, 8000);
+}
 
-document.querySelectorAll('.plan').forEach(function(card){
-  card.addEventListener('click', function(){
-    selectedPlan = card.dataset.plan;
-    existingPaymentUrl = '';
-    document.querySelectorAll('.plan').forEach(function(item){ item.classList.remove('selected'); });
-    card.classList.add('selected');
-    card.querySelector('input').checked = true;
-    if (checkoutOk) setButton(true, 'Ir para pagamento seguro');
-    updateSummary();
+function stopPaymentPolling(){
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
+}
+
+function stopPixExpirationTimer(){
+  if (pixExpirationTimer) {
+    clearTimeout(pixExpirationTimer);
+    pixExpirationTimer = null;
+  }
+}
+
+function updatePixProgramadoVisibility(){
+  const monthly = selectedPlan === 'mensal';
+  const pixProgramadoAvailable = monthly && canPaymentRoute('pix_programado');
+  pixProgramadoBox.style.display = pixProgramadoAvailable ? 'flex' : 'none';
+  if (!pixProgramadoAvailable) {
+    pixProgramadoInput.checked = false;
+  } else if (selectedPay === 'pix' && !canPaymentRoute('pix_avulso')) {
+    pixProgramadoInput.checked = true;
+  }
+  pixMonthsBox.style.display = pixProgramadoAvailable && pixProgramadoInput.checked ? 'grid' : 'none';
+}
+
+function selectPlan(planKey, resetState){
+  if (!plans[planKey]) return;
+  selectedPlan = planKey;
+  document.querySelectorAll('.plan').forEach(function(item){
+    const selected = item.dataset.plan === planKey;
+    item.classList.toggle('selected', selected);
+    const input = item.querySelector('input');
+    if (input) input.checked = selected;
   });
+  updatePixProgramadoVisibility();
+  applyPaymentRouteVisibility();
+  if (resetState) {
+    resetPaymentState();
+  } else {
+    updateSummary();
+  }
+}
+
+function bindPlanCards(){
+  document.querySelectorAll('.plan').forEach(function(card){
+    card.addEventListener('click', function(){
+      selectPlan(card.dataset.plan, true);
+    });
+  });
+}
+
+document.getElementById('cardNumber').addEventListener('input', function(){ this.value = maskCard(this.value); resetPaymentState(); });
+document.getElementById('cardExpiry').addEventListener('input', function(){ this.value = maskExpiry(this.value); resetPaymentState(); });
+document.getElementById('cardCvv').addEventListener('input', function(){ this.value = digitsOnly(this.value).slice(0, 4); resetPaymentState(); });
+cardDocInput.addEventListener('input', function(){ updateCardDocumentUi(); consultarCpfTitularCartaoSeNecessario(); resetPaymentState(); });
+document.getElementById('cardPhone').addEventListener('input', function(){ this.value = maskPhone(this.value); resetPaymentState(); });
+document.getElementById('cardCep').addEventListener('input', function(){ this.value = maskCep(this.value); resetPaymentState(); });
+document.getElementById('cardName').addEventListener('input', resetPaymentState);
+cardHolderNameInput.addEventListener('input', resetPaymentState);
+document.getElementById('cardAddressNumber').addEventListener('input', resetPaymentState);
+payerDocInput.addEventListener('input', function(){ updatePayerDocumentUi(); consultarCpfPagadorSeNecessario(); resetPaymentState(); });
+payerNameInput.addEventListener('input', resetPaymentState);
+samePayerInput.addEventListener('change', applySamePayer);
+pixProgramadoInput.addEventListener('change', function(){ updatePixProgramadoVisibility(); resetPaymentState(); });
+pixMonthsInput.addEventListener('change', resetPaymentState);
+document.getElementById('copyPixBtn').addEventListener('click', async function(){
+  try {
+    await navigator.clipboard.writeText(pixCopyCode.value);
+    this.textContent = 'Copiado';
+    setTimeout(() => { this.textContent = 'Copiar'; }, 1800);
+  } catch(e) {
+    pixCopyCode.select();
+    document.execCommand('copy');
+  }
 });
 
 document.querySelectorAll('.pay-tab').forEach(function(tab){
   tab.addEventListener('click', function(){
     selectedPay = tab.dataset.pay;
-    existingPaymentUrl = '';
-    document.querySelectorAll('.pay-tab').forEach(function(item){ item.classList.remove('active'); });
-    tab.classList.add('active');
-    document.getElementById('cardBox').style.display = selectedPay === 'cartao' ? 'block' : 'none';
-    document.getElementById('pixBox').style.display = selectedPay === 'pix_programado' ? 'block' : 'none';
-    if (checkoutOk) setButton(true, 'Ir para pagamento seguro');
-    updateSummary();
+    applyPaymentRouteVisibility();
+    resetPaymentState();
   });
 });
 
+renderPlanCards();
+updatePixProgramadoVisibility();
 updateSummary();
 validateCheckout();
 </script>
