@@ -545,10 +545,7 @@ function handlePaymentConfirmed(message, buttonText){
   if (paymentConfirmedHandled) return;
   paymentConfirmedHandled = true;
   stopPaymentPolling();
-<<<<<<< HEAD
   stopPixExpirationTimer();
-=======
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
   setStatus(message || 'Pagamento confirmado. Sua assinatura foi liberada no app.', 'ok');
   setButton(false, buttonText || 'Pagamento confirmado');
   returnToAppAfterPayment();
@@ -722,15 +719,9 @@ function updatePayerDocumentUi(){
   payerDocInput.value = maskCpfCnpj(digits);
   const isCnpj = digits.length > 11;
   payerNameLabel.textContent = isCnpj ? 'Raz\u00e3o social' : 'Nome completo';
-<<<<<<< HEAD
   payerNameInput.placeholder = isCnpj ? 'Raz\u00e3o social' : 'Digite o nome completo ou aguarde a consulta do CPF';
   payerNameInput.autocomplete = isCnpj ? 'organization' : 'name';
   payerNameInput.readOnly = false;
-=======
-  payerNameInput.placeholder = isCnpj ? 'Raz\u00e3o social' : 'Preenchido automaticamente pelo CPF';
-  payerNameInput.autocomplete = isCnpj ? 'organization' : 'name';
-  payerNameInput.readOnly = !isCnpj;
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
 
   if (isCnpj) {
     if (payerCpfLookupName && payerNameInput.value === payerCpfLookupName) {
@@ -744,19 +735,14 @@ function updatePayerDocumentUi(){
   }
 
   if (digits !== payerCpfLookupDoc) {
-<<<<<<< HEAD
     if (payerCpfLookupLoading) payerCpfLookupSeq += 1;
     payerCpfLookupLoading = false;
     if (payerNameInput.value === payerCpfLookupName) payerNameInput.value = '';
-=======
-    payerNameInput.value = '';
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
     payerCpfLookupName = '';
     payerCpfLookupError = '';
   }
 }
 
-<<<<<<< HEAD
 function withTimeout(promise, milliseconds, message){
   let timer = null;
   const timeout = new Promise(function(_, reject){
@@ -767,8 +753,6 @@ function withTimeout(promise, milliseconds, message){
   });
 }
 
-=======
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
 async function consultarCpfPagadorSeNecessario(){
   const cpf = digitsOnly(payerDocInput.value).slice(0, 11);
   if (cpf.length !== 11 || !isValidCpf(cpf) || cpf === payerCpfLookupDoc || payerCpfLookupLoading) return;
@@ -783,11 +767,7 @@ async function consultarCpfPagadorSeNecessario(){
   refreshCheckoutButton();
 
   try {
-<<<<<<< HEAD
     const data = await withTimeout(rpc('consultar_cpf_serpro_rpc', { p_cpf: cpf }), 8000, 'consulta_cpf_timeout');
-=======
-    const data = await rpc('consultar_cpf_serpro_rpc', { p_cpf: cpf });
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
     if (seq !== payerCpfLookupSeq) return;
     const nome = String(data && data.nome || '').trim().replace(/\s+/g, ' ');
     if (!nome) throw new Error(data && (data.mensagem || data.message) || 'CPF sem nome retornado.');
@@ -798,14 +778,8 @@ async function consultarCpfPagadorSeNecessario(){
     payerStatus.className = 'field-note';
   } catch(e) {
     if (seq !== payerCpfLookupSeq) return;
-<<<<<<< HEAD
     payerCpfLookupName = '';
     payerCpfLookupError = 'Não foi possível confirmar o CPF agora. Se o CPF estiver correto, informe o nome completo e gere o Pix.';
-=======
-    payerCpfLookupDoc = '';
-    payerCpfLookupName = '';
-    payerCpfLookupError = 'N\u00e3o foi poss\u00edvel consultar o CPF agora. Tente novamente.';
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
     payerStatus.textContent = payerCpfLookupError;
     payerStatus.className = 'field-note error';
   } finally {
@@ -929,21 +903,6 @@ function validatePix(showMessage){
     ok = false;
     message = documentDigits.length === 14 ? 'CNPJ inv\u00e1lido. Confira os n\u00fameros digitados.' : 'CPF inv\u00e1lido. Confira os n\u00fameros digitados.';
     buttonText = documentDigits.length === 14 ? 'CNPJ inv\u00e1lido' : 'CPF inv\u00e1lido';
-<<<<<<< HEAD
-=======
-  } else if (!isCnpj && payerCpfLookupLoading) {
-    ok = false;
-    message = 'Consultando dados do CPF...';
-    buttonText = 'Consultando CPF';
-  } else if (!isCnpj && payerCpfLookupError) {
-    ok = false;
-    message = payerCpfLookupError;
-    buttonText = 'Consulte o CPF';
-  } else if (!isCnpj && (payerCpfLookupDoc !== documentDigits || payerCpfLookupName === '')) {
-    ok = false;
-    message = 'Aguarde a confirma\u00e7\u00e3o do nome pelo CPF.';
-    buttonText = 'Aguardando CPF';
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
   } else if (name.length < 3) {
     ok = false;
     message = isCnpj ? 'Informe a raz\u00e3o social do pagador.' : 'Informe o nome completo do pagador.';
@@ -1183,33 +1142,22 @@ async function validateCheckout(){
 }
 
 function renderPixResult(data){
-<<<<<<< HEAD
   stopPixExpirationTimer();
-=======
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
   const qr = data.pix_qr_code || {};
   const encodedImage = String(qr.encodedImage || qr.encoded_image || '');
   const payload = String(qr.payload || '');
   const expirationDate = String(qr.expirationDate || qr.expiration_date || '');
-<<<<<<< HEAD
   const expirationTime = expirationDate ? new Date(expirationDate).getTime() : 0;
-=======
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
   if (encodedImage) {
     pixQrImage.src = encodedImage.indexOf('data:') === 0 ? encodedImage : 'data:image/png;base64,' + encodedImage;
   }
   pixCopyCode.value = payload;
   document.getElementById('pixResultText').textContent = expirationDate
-<<<<<<< HEAD
     ? 'Pague este Pix para liberar o acesso. QR Code válido até ' + formatDateTimeBR(expirationDate) + '.'
-=======
-    ? 'Pague este Pix para liberar o acesso. Vencimento do QR Code: ' + expirationDate + '.'
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
     : 'Pague este Pix para liberar o acesso no app.';
   pixResult.style.display = 'block';
   setStatus('Pix gerado. Assim que o pagamento for confirmado, a assinatura ser\u00e1 liberada no app.', 'ok');
   setButton(false, 'Aguardando pagamento Pix');
-<<<<<<< HEAD
   if (expirationTime > Date.now()) {
     pixExpirationTimer = setTimeout(function(){
       stopPaymentPolling();
@@ -1219,8 +1167,6 @@ function renderPixResult(data){
       setButton(true, 'Gerar novo Pix');
     }, Math.max(1000, expirationTime - Date.now()));
   }
-=======
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
   startPaymentPolling();
 }
 
@@ -1258,21 +1204,26 @@ checkoutBtn.addEventListener('click', async function(){
 
   setButton(false, selectedPay === 'cartao' ? 'Processando cart\u00e3o...' : 'Gerando Pix...');
   setStatus(selectedPay === 'cartao' ? 'Processando pagamento com seguran\u00e7a...' : 'Criando cobran\u00e7a Pix...', '');
-  const data = await gatewayCheckout(checkoutPayload);
+  let data;
+  try {
+    data = await gatewayCheckout(checkoutPayload);
+  } catch(e) {
+    const detalheErro = String(e && e.message || '').trim();
+    setStatus(detalheErro
+      ? 'Não foi possível conectar ao gateway de pagamento: ' + detalheErro
+      : 'Não foi possível conectar ao gateway de pagamento. Verifique sua internet e tente novamente.',
+      'error');
+    setButton(true, selectedPay === 'cartao' ? 'Tentar novamente' : 'Gerar Pix novamente');
+    return;
+  }
 
   if (!data.ok) {
-<<<<<<< HEAD
     const detalheErro = String(data.mensagem || data.message || data.error || '').trim();
     const message = data.error === 'cartao_recusado'
       ? 'Cart\u00e3o recusado. Confira os dados ou tente outro cart\u00e3o.'
       : (detalheErro
         ? 'N\u00e3o foi poss\u00edvel processar o pagamento: ' + detalheErro
         : 'N\u00e3o foi poss\u00edvel processar o pagamento. Tente novamente.');
-=======
-    const message = data.error === 'cartao_recusado'
-      ? 'Cart\u00e3o recusado. Confira os dados ou tente outro cart\u00e3o.'
-      : 'N\u00e3o foi poss\u00edvel processar o pagamento. Tente novamente.';
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
     setStatus(message, 'error');
     setButton(true, selectedPay === 'cartao' ? 'Tentar novamente' : 'Gerar Pix novamente');
     return;
@@ -1309,7 +1260,6 @@ function stopPaymentPolling(){
   }
 }
 
-<<<<<<< HEAD
 function stopPixExpirationTimer(){
   if (pixExpirationTimer) {
     clearTimeout(pixExpirationTimer);
@@ -1317,8 +1267,6 @@ function stopPixExpirationTimer(){
   }
 }
 
-=======
->>>>>>> 702c97ed208dfaa63ccc7621b75400740e81a1c4
 function updatePixProgramadoVisibility(){
   const monthly = selectedPlan === 'mensal';
   const pixProgramadoAvailable = monthly && canPaymentRoute('pix_programado');
