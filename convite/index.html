@@ -67,16 +67,18 @@
 </div>
 
 <script>
-const APK = "/downloads/TurboTiger.apk";
 const REF_RE = /^[A-Za-z0-9_-]{16,80}$/;
 const SUPABASE_REST_URL = "https://jzqgudmvquokizvgehow.supabase.co/rest/v1";
 const SUPABASE_KEY = "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU";
+const SUPABASE_DOWNLOAD_URL = "https://jzqgudmvquokizvgehow.supabase.co/functions/v1/convite-download";
 
 const intro = document.getElementById("intro");
 const statusBox = document.getElementById("status");
 const manualLink = document.getElementById("manualLink");
 const fallbackOpen = document.getElementById("fallbackOpen");
 const fallbackLink = document.getElementById("fallbackLink");
+let activeInviteRef = "";
+let downloadInProgress = false;
 
 function getInviteRef(){
   const params = new URLSearchParams(location.search);
@@ -88,6 +90,17 @@ function isAndroid(){
   return /android/i.test(navigator.userAgent || "");
 }
 
+function isIOS(){
+  const ua = navigator.userAgent || "";
+  return /iphone|ipad|ipod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
+function getDownloadOs(){
+  if (isAndroid()) return "android";
+  if (isIOS()) return "ios";
+  return "android";
+}
+
 function setStatus(message, type){
   statusBox.textContent = message;
   statusBox.className = "status" + (type ? " " + type : "");
@@ -97,7 +110,7 @@ function setDownloadEnabled(enabled, label){
   manualLink.textContent = label;
   manualLink.setAttribute("aria-disabled", enabled ? "false" : "true");
   if (enabled) {
-    manualLink.href = APK;
+    manualLink.href = "#";
     manualLink.classList.remove("btn-disabled");
   } else {
     manualLink.href = "#";
@@ -133,6 +146,49 @@ async function validateInvite(inviteRef){
   } catch(e) {
     return { ok:false, mensagem:"falha_conexao" };
   }
+}
+
+async function requestDownloadUrl(inviteRef){
+  try {
+    const os = getDownloadOs();
+    const response = await fetch(SUPABASE_DOWNLOAD_URL + "?ref=" + encodeURIComponent(inviteRef) + "&os=" + encodeURIComponent(os), {
+      method: "GET",
+      headers: { Accept: "application/json" }
+    });
+    const text = await response.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch(e) { data = { ok:false, error:text }; }
+    if (!response.ok) {
+      data.ok = false;
+      data.error = data.error || "falha_link_download";
+    }
+    return data;
+  } catch(e) {
+    return { ok:false, error:"falha_conexao_download" };
+  }
+}
+
+async function startSecureDownload(){
+  if (!activeInviteRef || downloadInProgress) return;
+
+  downloadInProgress = true;
+  setDownloadEnabled(false, "Preparando download...");
+  setStatus("Gerando link seguro de download.", "");
+
+  const download = await requestDownloadUrl(activeInviteRef);
+  if (!download || !download.ok || !download.url) {
+    downloadInProgress = false;
+    setDownloadEnabled(true, "Tentar baixar novamente");
+    setStatus("Nao foi possivel gerar o link seguro. Verifique se o convite ainda esta valido.", "error");
+    return;
+  }
+
+  setStatus("Link seguro gerado. Iniciando download.", "ok");
+  window.location.href = download.url;
+  setTimeout(function(){
+    downloadInProgress = false;
+    setDownloadEnabled(true, "Baixar Turbo Tiger 64-bit");
+  }, 2500);
 }
 
 function tryOpenInstalledApp(inviteRef){
@@ -191,6 +247,7 @@ async function init(){
     return;
   }
 
+  activeInviteRef = inviteRef;
   setDownloadEnabled(false, "Validando convite...");
   setStatus("Validando convite seguro.", "");
   const invite = await validateInvite(inviteRef);
@@ -223,7 +280,7 @@ async function init(){
     intro.textContent = "Convite recebido. Download liberado para Android 64-bit.";
     setDownloadEnabled(true, "Baixar Turbo Tiger 64-bit");
     setStatus("Android 64-bit identificado. O download vai iniciar automaticamente.", "ok");
-    setTimeout(function(){ window.location.href = manualLink.href; }, 1000);
+    setTimeout(startSecureDownload, 1000);
     return;
   }
 
@@ -238,6 +295,12 @@ async function init(){
   setDownloadEnabled(true, "Baixar Turbo Tiger 64-bit");
   setStatus("Nao foi possivel confirmar automaticamente se este Android e 64-bit. O Turbo Tiger Beta nao e compativel com aparelhos 32-bit.", "");
 }
+
+manualLink.addEventListener("click", function(event){
+  event.preventDefault();
+  if (manualLink.getAttribute("aria-disabled") === "true") return;
+  startSecureDownload();
+});
 
 init();
 </script>
