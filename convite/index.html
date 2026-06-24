@@ -69,6 +69,8 @@
 <script>
 const APK = "/downloads/TurboTiger.apk";
 const REF_RE = /^[A-Za-z0-9_-]{16,80}$/;
+const SUPABASE_REST_URL = "https://jzqgudmvquokizvgehow.supabase.co/rest/v1";
+const SUPABASE_KEY = "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU";
 
 const intro = document.getElementById("intro");
 const statusBox = document.getElementById("status");
@@ -100,6 +102,36 @@ function setDownloadEnabled(enabled, label){
   } else {
     manualLink.href = "#";
     manualLink.classList.add("btn-disabled");
+  }
+}
+
+function rpc(name, body){
+  return fetch(SUPABASE_REST_URL + "/rpc/" + name, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: "Bearer " + SUPABASE_KEY,
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify(body)
+  }).then(async function(response){
+    const text = await response.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch(e) { data = { ok:false, mensagem:text }; }
+    if (!response.ok) {
+      data.ok = false;
+      data.mensagem = data.mensagem || "falha_validacao_convite";
+    }
+    return data;
+  });
+}
+
+async function validateInvite(inviteRef){
+  try {
+    return await rpc("convite_indicacao_download_validar_rpc", { p_ref: inviteRef });
+  } catch(e) {
+    return { ok:false, mensagem:"falha_conexao" };
   }
 }
 
@@ -156,6 +188,16 @@ async function init(){
     intro.textContent = "Este download precisa de um convite valido.";
     setDownloadEnabled(false, "Convite obrigatorio");
     setStatus("Abra esta pagina pelo link de convite enviado por um usuario Turbo Tiger.", "error");
+    return;
+  }
+
+  setDownloadEnabled(false, "Validando convite...");
+  setStatus("Validando convite seguro.", "");
+  const invite = await validateInvite(inviteRef);
+  if (!invite || !invite.ok) {
+    intro.textContent = "Este convite nao e valido.";
+    setDownloadEnabled(false, "Convite invalido");
+    setStatus("Convite invalido, expirado, desativado ou inexistente.", "error");
     return;
   }
 
