@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
@@ -1119,6 +1119,28 @@ function applyCheckout(data){
     }
   }
 
+  const gatewayData = data.gateway_dados || {};
+  const existingPixQr = data.pix_qr_code || gatewayData.pix_qr_code || null;
+  const existingPixExpiration = String(data.pix_expira_em || gatewayData.pix_expira_em ||
+    (existingPixQr && (existingPixQr.expirationDate || existingPixQr.expiration_date)) || '');
+  const existingPixExpiresAt = existingPixExpiration ? new Date(existingPixExpiration).getTime() : 0;
+  const existingPixValid = existingPixQr &&
+    (existingPixQr.payload || existingPixQr.encodedImage || existingPixQr.encoded_image) &&
+    (!existingPixExpiresAt || existingPixExpiresAt > Date.now());
+  if (existingPixValid &&
+      String(data.forma_pagamento || '').toLowerCase().indexOf('pix') >= 0 &&
+      String(data.gateway_status || '').toLowerCase() !== 'pago') {
+    renderPixResult({
+      ok: true,
+      checkout_ref: data.checkout_ref || checkoutRef,
+      forma_pagamento: data.forma_pagamento || 'pix',
+      link: location.href,
+      pix_expira_em: existingPixExpiration,
+      pix_qr_code: existingPixQr
+    });
+    return;
+  }
+
   updatePixProgramadoVisibility();
   refreshCheckoutButton();
 }
@@ -1142,6 +1164,22 @@ async function validateCheckout(){
   applyCheckout(data);
 }
 
+function notifyAppPixGenerated(data){
+  try {
+    const qr = data.pix_qr_code || {};
+    const expirationDate = String(data.pix_expira_em || qr.expirationDate || qr.expiration_date || '');
+    const payload = {
+      checkout_ref: data.checkout_ref || checkoutRef,
+      forma_pagamento: data.forma_pagamento || currentPaymentMethod(),
+      pix_expira_em: expirationDate,
+      link: location.href
+    };
+    if (window.TurboTigerHistoricoBridge && window.TurboTigerHistoricoBridge.post) {
+      window.TurboTigerHistoricoBridge.post('LICENCA_PIX_GERADO:' + JSON.stringify(payload));
+    }
+  } catch(e) {}
+}
+
 function renderPixResult(data){
   stopPixExpirationTimer();
   const qr = data.pix_qr_code || {};
@@ -1159,6 +1197,7 @@ function renderPixResult(data){
   pixResult.style.display = 'block';
   setStatus('Pix gerado. Assim que o pagamento for confirmado, a assinatura ser\u00e1 liberada no app.', 'ok');
   setButton(false, 'Aguardando pagamento Pix');
+  notifyAppPixGenerated(data);
   if (expirationTime > Date.now()) {
     pixExpirationTimer = setTimeout(function(){
       stopPaymentPolling();
