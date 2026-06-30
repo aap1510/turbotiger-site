@@ -144,6 +144,34 @@
     });
   }
 
+  function setupFixedFooterCopyright() {
+    var ticking = false;
+
+    function updateState() {
+      var root = document.documentElement;
+      var scrollTop = window.pageYOffset || root.scrollTop || 0;
+      var viewportHeight = window.innerHeight || root.clientHeight || 0;
+      var pageHeight = Math.max(
+        root.scrollHeight,
+        document.body ? document.body.scrollHeight : 0
+      );
+      var atEnd = scrollTop + viewportHeight >= pageHeight - 80;
+
+      document.body.classList.toggle("tt-site-footer-end", atEnd);
+      ticking = false;
+    }
+
+    function requestUpdate() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(updateState);
+    }
+
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    requestUpdate();
+  }
+
   async function updateTurboTigerContacts() {
     var insideApp = isInsideTurboTigerApp();
     if (insideApp) propagateTurboTigerAppMarker();
@@ -184,8 +212,12 @@
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", updateTurboTigerContacts);
+    document.addEventListener("DOMContentLoaded", function () {
+      updateTurboTigerContacts();
+      setupFixedFooterCopyright();
+    });
   } else {
     updateTurboTigerContacts();
+    setupFixedFooterCopyright();
   }
 }());
