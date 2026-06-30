@@ -71,11 +71,37 @@
         }
 
         .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
             background: #f8f9fa;
             padding: 16px;
             border-radius: 8px;
             margin-bottom: 28px;
             color: #333;
+        }
+
+        .nav-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            flex: 0 0 auto;
+        }
+
+        .nav-logo img {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
         }
 
         .box {
@@ -114,6 +140,15 @@
                 padding: 20px;
                 border-radius: 10px;
             }
+
+            .nav-links {
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .nav-menu {
+                gap: 10px;
+            }
         }
 
         @media print {
@@ -140,10 +175,15 @@
 <div class="container">
 
     <div class="nav-links">
-        <strong>Acesso rápido:</strong>
-        <a href="#privacidade">Política de Privacidade</a> |
-        <a href="#termos">Termos de Uso</a> |
-        <a href="#contato">Contato</a>
+        <a class="nav-logo" href="/" aria-label="Página principal Turbo Tiger">
+            <img data-tt-image="logo_geral" alt="Turbo Tiger" hidden>
+        </a>
+        <nav class="nav-menu" aria-label="Menu principal">
+            <a href="/">Home</a>
+            <a href="#privacidade">Política de Privacidade</a>
+            <a href="#termos">Termos de Uso</a>
+            <a href="#contato">Contato</a>
+        </nav>
     </div>
 
     <section id="privacidade">
