@@ -19,7 +19,7 @@
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:#f7f7f7}
-  .top{background:linear-gradient(180deg,rgba(0,0,0,.72),rgba(0,0,0,.42)),url('assets/bg-900x900.webp') center/cover no-repeat;color:#fff;padding:28px 18px 54px}
+  .top{background:linear-gradient(180deg,rgba(0,0,0,.72),rgba(0,0,0,.42));color:#fff;padding:28px 18px 54px}
   .wrap{max-width:1120px;margin:0 auto}
   .brand{display:flex;align-items:center;gap:12px}
   .brand img{width:52px;height:52px;border-radius:10px;box-shadow:0 8px 22px rgba(0,0,0,.35)}
@@ -96,12 +96,13 @@
     .copy-row button{padding:12px}
   }
 </style>
+<link rel="stylesheet" href="assets/turbotiger-site-ui.css" />
 </head>
-<body>
+<body data-tt-background="fundo_geral">
 <header class="top">
   <div class="wrap">
     <div class="brand">
-      <img src="assets/logo-300x300.webp" alt="Turbo Tiger">
+      <img data-tt-image="logo_geral" alt="Turbo Tiger" hidden>
       <div>
         <strong>Turbo Tiger</strong>
         <span>Assinatura Premium</span>
@@ -1383,5 +1384,18 @@ updatePixProgramadoVisibility();
 updateSummary();
 validateCheckout();
 </script>
+<footer class="tt-site-footer">
+  <a class="tt-social-link tt-social-left" data-tt-contact="instagram" href="#" target="_blank" rel="noopener" aria-label="Instagram Turbo Tiger" hidden>
+    <img alt="Instagram">
+  </a>
+  <small>&copy; 2026 Turbo Tiger</small>
+  <a class="tt-social-link tt-social-right" data-tt-contact="facebook" href="#" target="_blank" rel="noopener" aria-label="Facebook Turbo Tiger" hidden>
+    <img alt="Facebook">
+  </a>
+</footer>
+<a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden>
+  <img alt="WhatsApp">
+</a>
+<script src="assets/turbotiger-site-ui.js"></script>
 </body>
 </html>
