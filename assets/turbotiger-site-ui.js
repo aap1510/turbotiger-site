@@ -144,6 +144,44 @@
     });
   }
 
+  function ensureHeadLink(rel, type) {
+    var selector = type ? "link[rel='" + rel + "'][type='" + type + "']" : "link[rel='" + rel + "']";
+    var link = document.head.querySelector(selector);
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = rel;
+      if (type) link.type = type;
+      document.head.appendChild(link);
+    }
+    return link;
+  }
+
+  function replaceExtension(url, extension) {
+    url = normalizeValue(url);
+    if (!url) return "";
+    var hash = "";
+    var hashPos = url.indexOf("#");
+    if (hashPos >= 0) {
+      hash = url.slice(hashPos);
+      url = url.slice(0, hashPos);
+    }
+    var query = "";
+    var queryPos = url.indexOf("?");
+    if (queryPos >= 0) {
+      query = url.slice(queryPos);
+      url = url.slice(0, queryPos);
+    }
+    return url.replace(/\.[^\/.]+$/, extension) + query + hash;
+  }
+
+  function updateFavicon(iconUrl) {
+    iconUrl = normalizeValue(iconUrl);
+    if (!iconUrl) return;
+
+    ensureHeadLink("icon", "image/webp").href = cacheBustUrl(iconUrl);
+    ensureHeadLink("shortcut icon", "").href = cacheBustUrl(replaceExtension(iconUrl, ".ico"));
+  }
+
   function setupFixedFooterCopyright() {
     var ticking = false;
 
@@ -184,7 +222,8 @@
       insideApp ? Promise.resolve("") : fetchConfig("turbotiger_imagens", "icone_whatsapp"),
       fetchConfig("turbotiger_imagens", "fundo_geral"),
       fetchConfig("turbotiger_imagens", "logo_geral"),
-      fetchConfig("turbotiger_imagens", "tiger_abertura")
+      fetchConfig("turbotiger_imagens", "tiger_abertura"),
+      fetchConfig("turbotiger_imagens", "icone_turbotiger")
     ]);
     var instagram = contacts[0] || DEFAULT_INSTAGRAM;
     var facebook = contacts[1] || DEFAULT_FACEBOOK;
@@ -194,6 +233,7 @@
     var generalBackground = contacts[5];
     var generalLogo = contacts[6];
     var openingTiger = contacts[7];
+    var turboTigerIcon = contacts[8];
     var whatsappPhone = insideApp ? "" : await firstConfig([
       ["turbotiger_contatos", "whatsapp"],
       ["whatsapp", "nr_suporte_humano"],
@@ -209,6 +249,7 @@
     updateConfiguredBackground("fundo_geral", generalBackground);
     updateConfiguredImage("logo_geral", generalLogo);
     updateConfiguredImage("tiger_abertura", openingTiger);
+    updateFavicon(turboTigerIcon);
   }
 
   if (document.readyState === "loading") {
