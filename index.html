@@ -27,7 +27,9 @@
   h2{font-size:26px;line-height:1.1;margin-bottom:10px}
   h3{font-size:18px;margin-bottom:8px}
   .lead{margin:0;color:#eef3ff;max-width:720px;font-size:19px;line-height:1.35}
-  .hero-socials{display:flex;align-items:center;gap:6px;margin-top:-6px}
+  .hero-socials{display:flex;align-items:center;gap:4px;margin-top:-8px;min-height:44px;overflow:visible;line-height:0}
+  .hero-socials .tt-social-link{width:44px;height:44px;min-width:44px;flex:0 0 44px;overflow:visible}
+  .hero-socials .tt-social-link img{width:38px;height:38px;max-width:none;max-height:none;object-fit:contain;display:block}
   .header-tiger{position:absolute;right:0;top:0;max-height:100%;width:auto;object-fit:contain;z-index:0;aspect-ratio:1;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 72%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,#000 0%,#000 72%,rgba(0,0,0,0) 100%)}
   main{padding:20px 16px;margin-top:-40px}
   .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 12px 30px rgba(2,6,23,.08)}
@@ -83,15 +85,15 @@
   <section class="card">
     <div class="split">
       <div class="copy">
-        <h2>Junte-se &agrave;<br>Turbo Tiger</h2>
+        <h2>Junte-se &agrave; nós</h2>
         <p class="info">Estat&iacute;sticas, estrat&eacute;gias e gerenciamento de bancas. Convide amigos com seu login, acompanhe quem voc&ecirc; indicou e ganhe benef&iacute;cios.</p>
-        <p class="info"><strong>Compatibilidade:</strong> o Turbo Tiger Beta requer aparelho Android 64-bit. Aparelhos 32-bit n&atilde;o s&atilde;o compat&iacute;veis. Ainda não está disponível para iOS (iPhone).</p>
         <div class="cta" id="ctaArea">
           <a id="btnShare" class="btn btn-primary" href="turbotiger://convite?acao=gerar_convite">Compartilhar</a>
           <a class="btn btn-ghost" href="/politicaetermos.html">Pol&iacute;tica & Termos</a>
         </div>
         <p class="fine">O convite deve ser enviado por um usu&aacute;rio logado no app Turbo Tiger. A p&aacute;gina de download &eacute; aberta somente pelo link seguro do convite.</p>
-      </div>
+		<p class="fine"><strong>Compatibilidade:</strong> o Turbo Tiger Beta requer aparelho Android 64-bit. Aparelhos 32-bit n&atilde;o s&atilde;o compat&iacute;veis. Ainda não está disponível para iOS (iPhone).</p>
+	  </div>
       <div class="panel">
         <strong>Principais benef&iacute;cios</strong>
         <ul>
