@@ -6,10 +6,44 @@
   var DEFAULT_INSTAGRAM = "https://www.instagram.com/turbotiger.com.br";
   var DEFAULT_FACEBOOK = "https://www.facebook.com/turbotiger.com.br";
   var WHATSAPP_MESSAGE = "Ol\u00e1, suporte Turbo Tiger. Estou chamando o atendimento pelo site do Turbo Tiger. Preciso de ajuda.";
+  var LOCAL_IMAGE_FILES = {
+    instagramIcon: "icone-instagram-96x96.webp",
+    facebookIcon: "icone-facebook-96x96.webp",
+    whatsappIcon: "icone-whatsapp-96x96.webp",
+    background: "bg-900x900.webp",
+    logo: "logo-300x300.webp",
+    tiger: "tiger-500x500.webp",
+    icon: "icone-turbotiger-raio.webp"
+  };
 
   function normalizeValue(value) {
     if (value === null || value === undefined) return "";
     return String(value).trim();
+  }
+
+  function localAssetUrl(fileName) {
+    var script = document.currentScript;
+    var scripts;
+    var src = "";
+    var i;
+
+    if (!script || !script.src || script.src.indexOf("turbotiger-site-ui.js") < 0) {
+      scripts = document.getElementsByTagName("script");
+      for (i = scripts.length - 1; i >= 0; i -= 1) {
+        src = scripts[i].src || scripts[i].getAttribute("src") || "";
+        if (src.indexOf("turbotiger-site-ui.js") >= 0) {
+          script = scripts[i];
+          break;
+        }
+      }
+    }
+
+    try {
+      src = script && script.src ? script.src : window.location.href;
+      return new URL(fileName, src.replace(/[^\/?#]*(?:[?#].*)?$/, "")).toString();
+    } catch (e) {
+      return "assets/" + fileName;
+    }
   }
 
   async function fetchConfig(category, type) {
@@ -182,6 +216,13 @@
     ensureHeadLink("shortcut icon", "").href = cacheBustUrl(replaceExtension(iconUrl, ".ico"));
   }
 
+  function updateLocalImages() {
+    updateConfiguredBackground("fundo_geral", localAssetUrl(LOCAL_IMAGE_FILES.background));
+    updateConfiguredImage("logo_geral", localAssetUrl(LOCAL_IMAGE_FILES.logo));
+    updateConfiguredImage("tiger_abertura", localAssetUrl(LOCAL_IMAGE_FILES.tiger));
+    updateFavicon(localAssetUrl(LOCAL_IMAGE_FILES.icon));
+  }
+
   function setupFixedFooterCopyright() {
     var ticking = false;
 
@@ -213,27 +254,17 @@
   async function updateTurboTigerContacts() {
     var insideApp = isInsideTurboTigerApp();
     if (insideApp) propagateTurboTigerAppMarker();
+    updateLocalImages();
 
     var contacts = await Promise.all([
       fetchConfig("turbotiger_contatos", "instagram"),
-      fetchConfig("turbotiger_contatos", "facebook"),
-      fetchConfig("turbotiger_imagens", "icone_instagram"),
-      fetchConfig("turbotiger_imagens", "icone_facebook"),
-      insideApp ? Promise.resolve("") : fetchConfig("turbotiger_imagens", "icone_whatsapp"),
-      fetchConfig("turbotiger_imagens", "fundo_geral"),
-      fetchConfig("turbotiger_imagens", "logo_geral"),
-      fetchConfig("turbotiger_imagens", "tiger_abertura"),
-      fetchConfig("turbotiger_imagens", "icone_turbotiger")
+      fetchConfig("turbotiger_contatos", "facebook")
     ]);
     var instagram = contacts[0] || DEFAULT_INSTAGRAM;
     var facebook = contacts[1] || DEFAULT_FACEBOOK;
-    var instagramIcon = contacts[2];
-    var facebookIcon = contacts[3];
-    var whatsappIcon = contacts[4];
-    var generalBackground = contacts[5];
-    var generalLogo = contacts[6];
-    var openingTiger = contacts[7];
-    var turboTigerIcon = contacts[8];
+    var instagramIcon = localAssetUrl(LOCAL_IMAGE_FILES.instagramIcon);
+    var facebookIcon = localAssetUrl(LOCAL_IMAGE_FILES.facebookIcon);
+    var whatsappIcon = localAssetUrl(LOCAL_IMAGE_FILES.whatsappIcon);
     var whatsappPhone = insideApp ? "" : await firstConfig([
       ["turbotiger_contatos", "whatsapp"],
       ["whatsapp", "nr_suporte_humano"],
@@ -246,10 +277,6 @@
     updateSocial("[data-tt-contact='instagram']", instagram, instagramIcon);
     updateSocial("[data-tt-contact='facebook']", facebook, facebookIcon);
     updateSocial("[data-tt-contact='whatsapp']", whatsapp, whatsappIcon);
-    updateConfiguredBackground("fundo_geral", generalBackground);
-    updateConfiguredImage("logo_geral", generalLogo);
-    updateConfiguredImage("tiger_abertura", openingTiger);
-    updateFavicon(turboTigerIcon);
   }
 
   if (document.readyState === "loading") {
