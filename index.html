@@ -1,0 +1,159 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Turbo Tiger - App & Comunidade</title>
+<meta name="description" content="Comunidade Turbo Tiger, estrategia e app para acompanhar suas bets.">
+<style>
+  :root{
+    --accent:#f4b400;
+    --accent-dark:#c88e00;
+    --ink:#111;
+    --muted:#454545;
+    --card:#fff;
+    --line:#e8e8e8;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fafafa}
+  header{position:relative;height:230px;max-height:230px;overflow:hidden;padding:28px 16px;color:#fff;background:transparent}
+  .wrap{max-width:1000px;margin:0 auto;width:100%}
+  .hero{display:flex;flex-direction:column;gap:18px;align-items:flex-start;position:relative;z-index:1;padding-right:220px;text-shadow:0 2px 4px rgba(0,0,0,.6)}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{width:72px;height:72px;object-fit:contain;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .brand span{opacity:.95;line-height:1.25}
+  h1,h2,h3,p{margin-top:0}
+  h1{margin:0;font-size:26px}
+  h2{font-size:26px;line-height:1.1;margin-bottom:10px}
+  h3{font-size:18px;margin-bottom:8px}
+  .lead{margin:0;color:#eef3ff;max-width:720px;font-size:19px;line-height:1.35}
+  .hero-socials{display:flex;align-items:center;gap:8px;margin-top:-8px}
+  .header-tiger{position:absolute;right:0;top:0;max-height:100%;width:auto;object-fit:contain;z-index:0;aspect-ratio:1;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 72%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,#000 0%,#000 72%,rgba(0,0,0,0) 100%)}
+  main{padding:20px 16px;margin-top:-40px}
+  .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 12px 30px rgba(2,6,23,.08)}
+  .split{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .copy{flex:1;min-width:260px}
+  .panel{width:260px;min-width:200px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+  .panel ul{text-align:left;margin:10px 0 0;padding-left:18px;color:#333}
+  .panel li{margin:6px 0}
+  .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:12px 16px;border-radius:10px;font-weight:700;text-decoration:none;cursor:pointer;border:0}
+  .btn-primary{background:var(--accent);color:#111}
+  .btn-primary:active{background:var(--accent-dark)}
+  .btn-ghost{background:transparent;border:2px solid #eee;color:#111}
+  .info{color:var(--muted);font-size:15px;line-height:1.5;margin-bottom:10px}
+  .fine{color:#676767;font-size:13px;line-height:1.45;margin-top:10px}
+  footer{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin:18px 0;color:#777;font-size:14px}
+  .social-link{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:999px;text-decoration:none}
+  .social-link img{width:30px;height:30px;object-fit:contain;display:block}
+  .social-left{justify-self:start}
+  .social-right{justify-self:end}
+  @media(max-width:640px){
+    header{padding:18px}
+    .brand img{width:56px;height:56px}
+    h1{font-size:20px}
+    h2{font-size:23px}
+    .hero{gap:12px;padding-right:120px}
+    .panel{width:100%}
+  }
+</style>
+<link rel="stylesheet" href="assets/turbotiger-site-ui.css" />
+</head>
+<body data-tt-background="fundo_geral" style="--tt-site-background-url:url('assets/bg-900x900.webp')">
+<header>
+  <div class="wrap hero">
+    <div class="brand">
+      <img data-tt-image="logo_geral" src="assets/logo-300x300.webp" alt="Turbo Tiger">
+      <span>App & Comunidade<br>para bets</span>
+    </div>
+    <p class="lead">Pra turbinar<br>sua banca!</p>
+    <div class="hero-socials" aria-label="Redes sociais Turbo Tiger">
+      <a class="tt-social-link" data-tt-contact="instagram" href="https://www.instagram.com/turbotiger.com.br" target="_blank" rel="noopener" aria-label="Instagram Turbo Tiger">
+        <img src="assets/icone-instagram-96x96.webp" alt="Instagram">
+      </a>
+      <a class="tt-social-link" data-tt-contact="facebook" href="https://www.facebook.com/turbotiger.com.br" target="_blank" rel="noopener" aria-label="Facebook Turbo Tiger">
+        <img src="assets/icone-facebook-96x96.webp" alt="Facebook">
+      </a>
+    </div>
+  </div>
+  <img data-tt-image="tiger_abertura" src="assets/tiger-500x500.webp" alt="Tiger" class="header-tiger">
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <div class="split">
+      <div class="copy">
+        <h2 id="mainTitle">Junte-se a n&oacute;s</h2>
+        <p class="info" id="mainDescription">Conhe&ccedil;a o Turbo Tiger, acompanhe novidades, conte&uacute;dos e recursos para organizar suas bets. Acesse nossas redes sociais e descubra tudo o que estamos preparando para a comunidade.</p>
+        <div class="cta" id="ctaArea">
+          <a id="btnShare" class="btn btn-primary" href="turbotiger://convite?acao=gerar_convite" hidden>Compartilhar</a>
+          <a class="btn btn-ghost" href="/politicaetermos.html">Pol&iacute;tica & Termos</a>
+        </div>
+        <p class="fine" id="inviteInfo">Para baixar o Turbo Tiger, voc&ecirc; precisa receber o convite de um membro. A p&aacute;gina de download &eacute; aberta somente pelo link seguro do convite.</p>
+		<p class="fine"><strong>Compatibilidade:</strong><br>- O Turbo Tiger Beta requer aparelho Android 64-bit. Aparelhos 32-bit nao sao compativeis.<br>- Ainda não está liberado a versão para iOS (iPhone).</p>
+	  </div>
+      <div class="panel">
+        <strong>Principais benef&iacute;cios</strong>
+        <ul>
+          <li>Registro autom&aacute;tico de bets</li>
+          <li>Relat&oacute;rios e totais no app</li>
+          <li>Notifica&ccedil;&otilde;es e alertas</li>
+          <li>Indica&ccedil;&otilde;es com benef&iacute;cios</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="referralHow" style="margin-top:14px" hidden>
+    <h3>Como funciona a indica&ccedil;&atilde;o</h3>
+    <p class="info">No app, toque em <strong>Compartilhar</strong>. O Android abre a tela nativa de compartilhamento para copiar o link ou enviar direto pelo WhatsApp, Messenger, Instagram e outros apps dispon&iacute;veis.</p>
+    <ol class="info">
+      <li>O amigo recebe seu link seguro de convite.</li>
+      <li>Se ainda n&atilde;o tiver o Turbo Tiger, o link abre a p&aacute;gina de download.</li>
+      <li>Depois de instalar, ao tocar no mesmo link, o Android abre o Turbo Tiger diretamente com seu convite.</li>
+    </ol>
+  </section>
+
+  <footer class="tt-site-footer">
+    <small>&copy; 2026 Turbo Tiger</small>
+  </footer>
+</main>
+<a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden>
+  <img src="assets/icone-whatsapp-96x96.webp" alt="WhatsApp">
+</a>
+<script>
+function turboTigerShareInvite(event) {
+  try {
+    if (window.TurboTigerHistoricoBridge && typeof window.TurboTigerHistoricoBridge.post === "function") {
+      if (event && typeof event.preventDefault === "function") {
+        event.preventDefault();
+      }
+      window.TurboTigerHistoricoBridge.post("TURBO_SHARE_INVITE");
+      return false;
+    }
+  } catch(e) {}
+  return true;
+}
+
+const shareButton = document.getElementById("btnShare");
+const inviteInfo = document.getElementById("inviteInfo");
+const mainTitle = document.getElementById("mainTitle");
+const mainDescription = document.getElementById("mainDescription");
+const referralHow = document.getElementById("referralHow");
+const isTurboTigerApp = window.TurboTigerHistoricoBridge &&
+  typeof window.TurboTigerHistoricoBridge.post === "function";
+
+if (isTurboTigerApp) {
+  mainTitle.textContent = "Convide seus amigos";
+  mainDescription.textContent = "Compartilhe o Turbo Tiger com seus amigos, acompanhe quem você indicou e ganhe benefícios.";
+  inviteInfo.textContent = "A página de download é aberta somente pelo link seguro do convite.";
+  shareButton.hidden = false;
+  referralHow.hidden = false;
+}
+
+shareButton.addEventListener("click", turboTigerShareInvite);
+</script>
+<script src="assets/turbotiger-site-ui.js"></script>
+</body>
+</html>
