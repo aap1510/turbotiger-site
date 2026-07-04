@@ -15,6 +15,7 @@
     --line:#e8e8e8;
   }
   *{box-sizing:border-box}
+  [hidden]{display:none!important}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fafafa}
   header{position:relative;height:230px;max-height:230px;overflow:hidden;padding:28px 16px;color:#fff;background:transparent}
   .wrap{max-width:1000px;margin:0 auto;width:100%}
@@ -83,13 +84,13 @@
   <section class="card">
     <div class="split">
       <div class="copy">
-        <h2>Junte-se &agrave; nós</h2>
-        <p class="info">Estat&iacute;sticas, estrat&eacute;gias e gerenciamento de bancas. Convide amigos com seu login, acompanhe quem voc&ecirc; indicou e ganhe benef&iacute;cios.</p>
+        <h2 id="mainTitle">Junte-se a n&oacute;s</h2>
+        <p class="info" id="mainDescription">Conhe&ccedil;a o Turbo Tiger, acompanhe novidades, conte&uacute;dos e recursos para organizar suas bets. Acesse nossas redes sociais e descubra tudo o que estamos preparando para a comunidade.</p>
         <div class="cta" id="ctaArea">
-          <a id="btnShare" class="btn btn-primary" href="turbotiger://convite?acao=gerar_convite">Compartilhar</a>
+          <a id="btnShare" class="btn btn-primary" href="turbotiger://convite?acao=gerar_convite" hidden>Compartilhar</a>
           <a class="btn btn-ghost" href="/politicaetermos.html">Pol&iacute;tica & Termos</a>
         </div>
-        <p class="fine">O convite deve ser enviado por um usu&aacute;rio logado no app Turbo Tiger. A p&aacute;gina de download &eacute; aberta somente pelo link seguro do convite.</p>
+        <p class="fine" id="inviteInfo">Para baixar o Turbo Tiger, voc&ecirc; precisa receber o convite de um membro. A p&aacute;gina de download &eacute; aberta somente pelo link seguro do convite.</p>
 		<p class="fine"><strong>Compatibilidade:</strong><br>- O Turbo Tiger Beta requer aparelho Android 64-bit. Aparelhos 32-bit nao sao compativeis.<br>- Ainda não está liberado a versão para iOS (iPhone).</p>
 	  </div>
       <div class="panel">
@@ -104,7 +105,7 @@
     </div>
   </section>
 
-  <section class="card" style="margin-top:14px">
+  <section class="card" id="referralHow" style="margin-top:14px" hidden>
     <h3>Como funciona a indica&ccedil;&atilde;o</h3>
     <p class="info">No app, toque em <strong>Compartilhar</strong>. O Android abre a tela nativa de compartilhamento para copiar o link ou enviar direto pelo WhatsApp, Messenger, Instagram e outros apps dispon&iacute;veis.</p>
     <ol class="info">
@@ -136,6 +137,21 @@ function turboTigerShareInvite(event) {
 }
 
 const shareButton = document.getElementById("btnShare");
+const inviteInfo = document.getElementById("inviteInfo");
+const mainTitle = document.getElementById("mainTitle");
+const mainDescription = document.getElementById("mainDescription");
+const referralHow = document.getElementById("referralHow");
+const isTurboTigerApp = window.TurboTigerHistoricoBridge &&
+  typeof window.TurboTigerHistoricoBridge.post === "function";
+
+if (isTurboTigerApp) {
+  mainTitle.textContent = "Convide seus amigos";
+  mainDescription.textContent = "Compartilhe o Turbo Tiger com seus amigos, acompanhe quem você indicou e ganhe benefícios.";
+  inviteInfo.textContent = "A página de download é aberta somente pelo link seguro do convite.";
+  shareButton.hidden = false;
+  referralHow.hidden = false;
+}
+
 shareButton.addEventListener("click", turboTigerShareInvite);
 </script>
 <script src="assets/turbotiger-site-ui.js"></script>
