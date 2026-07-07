@@ -5,7 +5,7 @@
   var SUPABASE_KEY = "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU";
   var DEFAULT_INSTAGRAM = "https://www.instagram.com/turbotiger.com.br";
   var DEFAULT_FACEBOOK = "https://www.facebook.com/turbotiger.com.br";
-  var WHATSAPP_MESSAGE = "Ol\u00e1, suporte Turbo Tiger. Estou chamando o atendimento pelo site do Turbo Tiger. Preciso de ajuda.";
+  var WHATSAPP_MESSAGE = "Ol\u00e1, suporte Turbo Tiger. Estou chamando o atendimento pelo site. Preciso de ajuda.";
   var LOCAL_IMAGE_FILES = {
     instagramIcon: "icone-instagram-96x96.webp",
     facebookIcon: "icone-facebook-96x96.webp",
