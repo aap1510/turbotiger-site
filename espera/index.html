@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lista de espera Turbo Tiger</title>
+<meta name="description" content="Entre na lista de espera do Turbo Tiger e receba acesso antecipado quando a nova fase for liberada." />
+<style>
+  :root{
+    --gold:#f4b400;
+    --gold-dark:#b97800;
+    --ink:#15120a;
+    --muted:#625b4b;
+    --line:#e6dcc4;
+    --paper:#fffaf0;
+    --white:#fff;
+    --green:#13795b;
+    --red:#a12828;
+    --black:#080704;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    min-height:100vh;
+    color:var(--ink);
+    background:#191510;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  body:before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    background:
+      linear-gradient(90deg,rgba(0,0,0,.72),rgba(0,0,0,.22) 58%,rgba(0,0,0,.62)),
+      var(--tt-site-background-url);
+    background-position:center;
+    background-size:cover;
+  }
+  a{color:inherit}
+  .wrap{width:min(1120px,100% - 32px);margin:0 auto}
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:22px 0 10px;
+    color:#fff;
+  }
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .brand img{width:54px;height:54px;border-radius:12px;object-fit:contain;box-shadow:0 8px 26px rgba(0,0,0,.35)}
+  .brand strong{display:block;font-size:18px;line-height:1}
+  .brand span{display:block;margin-top:4px;color:#f8e6a4;font-size:13px}
+  .age-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:34px;
+    padding:7px 11px;
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:999px;
+    color:#fff;
+    font-weight:800;
+    background:rgba(0,0,0,.34);
+  }
+  .hero{
+    min-height:calc(100vh - 86px);
+    display:grid;
+    grid-template-columns:minmax(0,1.02fr) minmax(340px,.72fr);
+    align-items:center;
+    gap:28px;
+    padding:18px 0 96px;
+  }
+  .copy{color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin:0 0 16px;
+    color:#ffe38a;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:0;
+    font-size:13px;
+  }
+  .eyebrow:before{content:"";width:26px;height:3px;border-radius:999px;background:var(--gold)}
+  h1{
+    margin:0;
+    max-width:720px;
+    font-size:clamp(38px,5.5vw,70px);
+    line-height:.96;
+    letter-spacing:0;
+  }
+  .lead{
+    max-width:650px;
+    margin:18px 0 0;
+    color:#fff5ce;
+    font-size:20px;
+    line-height:1.42;
+  }
+  .proofs{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+    max-width:680px;
+    margin:26px 0 0;
+  }
+  .proof{
+    min-height:88px;
+    padding:14px;
+    border:1px solid rgba(255,255,255,.22);
+    border-radius:8px;
+    background:rgba(0,0,0,.34);
+    color:#fff;
+  }
+  .proof strong{display:block;font-size:20px;color:#ffe08a}
+  .proof span{display:block;margin-top:6px;font-size:13px;line-height:1.35;color:#f4eedc}
+  .panel{
+    background:var(--paper);
+    border:1px solid rgba(255,255,255,.55);
+    border-radius:8px;
+    box-shadow:0 22px 70px rgba(0,0,0,.42);
+    overflow:hidden;
+  }
+  .form-head{padding:20px 20px 14px;background:#fff;border-bottom:1px solid var(--line)}
+  .form-head h2{margin:0;font-size:24px;letter-spacing:0}
+  .form-head p{margin:8px 0 0;color:var(--muted);line-height:1.45}
+  form{padding:18px 20px 20px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .field.full{grid-column:1 / -1}
+  label{font-weight:800;font-size:13px;color:#2b2416}
+  input,select{
+    width:100%;
+    min-height:46px;
+    border:1px solid #d5c9af;
+    border-radius:8px;
+    background:#fff;
+    color:var(--ink);
+    padding:10px 12px;
+    font:inherit;
+    outline:none;
+  }
+  input:focus,select:focus{border-color:var(--gold-dark);box-shadow:0 0 0 3px rgba(244,180,0,.22)}
+  .checks{display:grid;gap:10px;margin:12px 0 14px}
+  .check{
+    display:grid;
+    grid-template-columns:22px 1fr;
+    gap:10px;
+    align-items:start;
+    color:#2e2718;
+    font-size:14px;
+    line-height:1.38;
+  }
+  .check input{width:18px;height:18px;min-height:18px;margin:1px 0 0;accent-color:var(--gold-dark)}
+  .legal-note{
+    margin:10px 0 0;
+    padding:12px;
+    border:1px solid #ead9ad;
+    border-radius:8px;
+    background:#fff8df;
+    color:#55492f;
+    font-size:13px;
+    line-height:1.45;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    min-height:50px;
+    border:0;
+    border-radius:8px;
+    padding:12px 16px;
+    background:var(--gold);
+    color:#140f04;
+    font-weight:900;
+    cursor:pointer;
+    text-decoration:none;
+  }
+  .btn:hover{background:#ffc928}
+  .btn:disabled{cursor:not-allowed;opacity:.62}
+  .btn.secondary{background:#15120a;color:#fff}
+  .btn.link{background:transparent;color:#18130a;border:1px solid #d8c8a4}
+  .status{min-height:20px;margin:10px 0 0;font-size:14px;color:var(--muted)}
+  .status.error{color:var(--red);font-weight:800}
+  .result{padding:20px;background:#fff}
+  .rank{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:14px;
+    align-items:center;
+    padding:16px;
+    border-radius:8px;
+    background:#111;
+    color:#fff;
+  }
+  .rank strong{display:block;font-size:42px;line-height:1;color:#ffe08a}
+  .rank span{display:block;color:#f5edd2;line-height:1.35}
+  .share-box{
+    margin-top:14px;
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fffaf0;
+  }
+  .share-link{
+    width:100%;
+    margin-top:8px;
+    border:1px dashed #c2aa70;
+    border-radius:8px;
+    background:#fff;
+    padding:10px;
+    color:#3c3118;
+    word-break:break-all;
+    font-size:14px;
+  }
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#edf8f3;
+    color:#115c45;
+    font-size:13px;
+    font-weight:800;
+  }
+  .badge.warn{background:#fff3cd;color:#6f4b00}
+  .below{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    padding:0 0 96px;
+  }
+  .info-band{
+    padding:18px;
+    border-radius:8px;
+    background:rgba(255,255,255,.94);
+    color:#211a0e;
+  }
+  .info-band h3{margin:0 0 8px;font-size:18px}
+  .info-band p{margin:0;color:#5a503f;line-height:1.5}
+  .info-band ul{margin:10px 0 0;padding-left:18px;color:#4a402f;line-height:1.55}
+  .ref-banner{
+    display:none;
+    margin:0 0 14px;
+    padding:12px 14px;
+    border-radius:8px;
+    background:#eaf8f0;
+    color:#125a43;
+    font-weight:800;
+  }
+  .return-box{
+    display:none;
+    margin:0 0 14px;
+    padding:12px 14px;
+    border:1px solid #d6c7a6;
+    border-radius:8px;
+    background:#fffaf0;
+    color:#3c311b;
+  }
+  .return-box strong{display:block;margin-bottom:4px}
+  .return-box a{display:inline-flex;margin-top:8px;font-weight:900;color:#111}
+  .loading{opacity:.68;pointer-events:none}
+  @media(max-width:840px){
+    .hero{grid-template-columns:1fr;align-items:start;padding-top:8px}
+    .copy{padding-top:18px}
+    .proofs{grid-template-columns:1fr}
+    .below{grid-template-columns:1fr}
+  }
+  @media(max-width:560px){
+    .wrap{width:min(100% - 22px,1120px)}
+    .topbar{padding-top:14px}
+    .brand img{width:46px;height:46px}
+    .hero{min-height:auto;padding-bottom:34px}
+    h1{font-size:38px}
+    .lead{font-size:17px}
+    .grid,.actions{grid-template-columns:1fr}
+    .form-head,form,.result{padding-left:16px;padding-right:16px}
+    .rank{grid-template-columns:1fr}
+  }
+</style>
+<link rel="stylesheet" href="../assets/turbotiger-site-ui.css" />
+</head>
+<body data-tt-background="fundo_geral" style="--tt-site-background-url:url('../assets/bg-900x900.webp')">
+<header class="wrap topbar">
+  <a class="brand" href="/" aria-label="Turbo Tiger">
+    <img data-tt-image="logo_geral" src="../assets/logo-300x300.webp" alt="Turbo Tiger">
+    <span><strong>Turbo Tiger</strong><span>Lista de espera</span></span>
+  </a>
+  <span class="age-pill">18+</span>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="copy">
+      <p class="eyebrow" id="statusPublico">Acesso antecipado</p>
+      <h1 id="heroTitle">Entre na lista de espera do Turbo Tiger</h1>
+      <p class="lead" id="heroSubtitle">Organize suas bets, acompanhe seus resultados e receba acesso antecipado quando a nova fase for liberada.</p>
+      <div class="proofs" aria-label="Resumo da lista de espera">
+        <div class="proof"><strong id="totalLista">--</strong><span>pessoas na lista de espera</span></div>
+        <div class="proof"><strong id="pontosIndicacao">+3</strong><span>pontos por amigo cadastrado</span></div>
+        <div class="proof"><strong>18+</strong><span>conteudo exclusivo para maiores de idade</span></div>
+      </div>
+    </div>
+
+    <section class="panel" id="signupPanel">
+      <div class="form-head">
+        <div class="ref-banner" id="refBanner">Voce chegou por um convite. Complete o cadastro para validar a indicacao.</div>
+        <div class="return-box" id="returnBox">
+          <strong>Voce ja tem uma lista ativa.</strong>
+          <span>Acompanhe suas indicacoes ou reenvie seu link pessoal.</span><br>
+          <a id="returnPanelLink" href="/espera/minha-lista/">Abrir meu painel</a>
+        </div>
+        <h2>Reservar meu acesso</h2>
+        <p id="benefitText">Sua posicao fica registrada e seu link pessoal sera criado ao finalizar.</p>
+      </div>
+
+      <form id="waitlistForm" novalidate>
+        <div class="grid">
+          <div class="field full" id="fieldNome">
+            <label for="nome">Nome</label>
+            <input id="nome" name="nome" autocomplete="given-name" maxlength="80" placeholder="Como devemos te chamar?" />
+          </div>
+          <div class="field" id="fieldEmail">
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" autocomplete="email" maxlength="160" placeholder="seu@email.com" />
+          </div>
+          <div class="field" id="fieldWhatsApp">
+            <label for="whatsapp">WhatsApp</label>
+            <input id="whatsapp" name="whatsapp" inputmode="tel" autocomplete="tel" maxlength="24" placeholder="(00) 00000-0000" />
+          </div>
+          <div class="field">
+            <label for="uf">Estado</label>
+            <select id="uf" name="uf">
+              <option value="">Selecione</option>
+              <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
+              <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
+              <option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option>
+              <option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+              <option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option>
+              <option>SE</option><option>TO</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="cidade">Cidade</label>
+            <input id="cidade" name="cidade" maxlength="80" autocomplete="address-level2" placeholder="Opcional" />
+          </div>
+        </div>
+
+        <div class="checks">
+          <label class="check" id="checkMaior18">
+            <input id="maior18" type="checkbox" />
+            <span>Confirmo que tenho 18 anos ou mais. O Turbo Tiger e destinado exclusivamente a maiores de idade.</span>
+          </label>
+          <label class="check" id="checkTermos">
+            <input id="termos" type="checkbox" />
+            <span>Li e aceito a Politica de Privacidade, os Termos de Uso e as informacoes legais desta lista de espera.</span>
+          </label>
+          <label class="check" id="checkOptinEmail">
+            <input id="optinEmail" type="checkbox" />
+            <span>Quero receber novidades e avisos de liberacao por e-mail.</span>
+          </label>
+          <label class="check" id="checkOptinWhatsApp">
+            <input id="optinWhatsApp" type="checkbox" />
+            <span>Quero receber novidades e avisos de liberacao por WhatsApp.</span>
+          </label>
+        </div>
+
+        <button class="btn" id="submitBtn" type="submit">Entrar na lista de espera</button>
+        <p class="status" id="formStatus" role="status"></p>
+        <p class="legal-note" id="legalNote">Ferramenta de organizacao e acompanhamento. Nao ha promessa de ganhos, lucro ou resultado em apostas.</p>
+      </form>
+
+      <div class="result" id="resultPanel" hidden>
+        <div class="rank">
+          <strong id="resultPosition">#--</strong>
+          <span id="resultText">Seu cadastro foi recebido. Compartilhe seu link para subir na lista quando seus amigos tambem se cadastrarem.</span>
+        </div>
+        <div class="badge-row">
+          <span class="badge" id="resultPoints">0 pontos</span>
+          <span class="badge" id="resultRefs">0 indicacoes confirmadas</span>
+          <span class="badge warn" id="resultVerify" hidden>Confirmacoes pendentes</span>
+        </div>
+        <div class="share-box">
+          <strong>Seu link pessoal</strong>
+          <div class="share-link" id="shareLink"></div>
+          <div class="actions">
+            <button class="btn secondary" id="copyBtn" type="button">Copiar link</button>
+            <button class="btn link" id="shareBtn" type="button">Compartilhar</button>
+          </div>
+          <div class="actions" style="grid-template-columns:1fr">
+            <a class="btn" id="panelBtn" href="/espera/minha-lista/">Acompanhar minhas indicacoes</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section class="below">
+    <div class="info-band">
+      <h3>Como a indicacao conta</h3>
+      <p id="refRule">O amigo precisa completar o cadastro na lista para a indicacao contar.</p>
+      <ul>
+        <li>Seu link identifica quem veio por voce.</li>
+        <li>Quando o amigo conclui o cadastro, os pontos entram na sua posicao.</li>
+        <li>Na liberacao do app, o vinculo segue para o sistema de indicacao do Turbo Tiger.</li>
+      </ul>
+    </div>
+    <div class="info-band">
+      <h3>Informacoes legais</h3>
+      <p id="legalAds">Conteudo permitido somente para maiores de 18 anos. O Turbo Tiger organiza informacoes e nao incentiva aposta irresponsavel.</p>
+      <ul>
+        <li>Sem promessa de lucro, ganho ou resultado.</li>
+        <li>Use com responsabilidade.</li>
+        <li><a id="termsLink" href="/politicaetermos.html">Politica de Privacidade e Termos</a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="tt-site-footer">
+  <small>&copy; 2026 Turbo Tiger</small>
+</footer>
+<a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden>
+  <img src="../assets/icone-whatsapp-96x96.webp" alt="WhatsApp">
+</a>
+
+<script>
+(function(){
+  "use strict";
+
+  const SUPABASE_REST_URL = "https://jzqgudmvquokizvgehow.supabase.co/rest/v1";
+  const SUPABASE_KEY = "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU";
+  const DEFAULT_SLUG = "lancamento-beta";
+  const WHATSAPP_SHARE = "Entrei na lista de espera do Turbo Tiger. Se cadastra pelo meu link para ganhar acesso antecipado comigo:";
+  const state = {
+    config: null,
+    ref: "",
+    shareLink: "",
+    panelLink: "",
+    sessionId: "",
+    attribution: {}
+  };
+
+  const $ = (id) => document.getElementById(id);
+
+  const defaults = {
+    campos: {
+      pedir_nome: true,
+      pedir_email: true,
+      pedir_whatsapp: true,
+      exigir_nome: true,
+      exigir_email: true,
+      exigir_whatsapp: false,
+      exigir_maior_18: true,
+      exigir_termos: true,
+      exigir_optin_email: false,
+      exigir_optin_whatsapp: false
+    },
+    verificacao: {
+      email: { exigir: false, enviar_agora: false },
+      whatsapp: { exigir: false, enviar_agora: false }
+    },
+    indicacao: {
+      ativo: true,
+      pontos_por_cadastro_confirmado: 3,
+      regra_publica: "O amigo precisa completar o cadastro na lista para a indicacao contar."
+    },
+    ads: {},
+    legal: {
+      aviso_18: "Conteudo e cadastro permitidos somente para maiores de 18 anos.",
+      sem_promessa: "O Turbo Tiger e uma ferramenta de organizacao e acompanhamento. Nao promete ganhos, lucro ou resultado em apostas.",
+      politica_url: "/politicaetermos.html"
+    }
+  };
+
+  function normalize(value){
+    return value === null || value === undefined ? "" : String(value).trim();
+  }
+
+  function boolValue(value, fallback){
+    if (value === true || value === false) return value;
+    return fallback;
+  }
+
+  function params(){
+    return new URLSearchParams(window.location.search);
+  }
+
+  function getSessionId(){
+    try {
+      let value = localStorage.getItem("tt_espera_session_id");
+      if (!value) {
+        value = "sess_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem("tt_espera_session_id", value);
+      }
+      return value;
+    } catch(e) {
+      return "sess_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
+  }
+
+  function collectAttribution(){
+    const p = params();
+    const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+    const clickKeys = ["fbclid", "gclid", "gbraid", "wbraid", "ttclid", "kwai_click_id", "twclid", "li_fat_id", "msclkid", "click_id"];
+    const utms = {};
+    const clicks = {};
+    const all = {};
+
+    p.forEach((value, key) => {
+      all[key] = value;
+      if (utmKeys.includes(key)) utms[key] = value;
+      if (clickKeys.includes(key)) clicks[key] = value;
+    });
+
+    let channel = normalize(utms.utm_source || "");
+    if (!channel && clicks.fbclid) channel = "meta";
+    if (!channel && (clicks.gclid || clicks.gbraid || clicks.wbraid || clicks.msclkid)) channel = "google";
+    if (!channel && clicks.ttclid) channel = "tiktok";
+    if (!channel && clicks.kwai_click_id) channel = "kwai";
+    if (!channel) channel = "direto";
+
+    return { utms, clicks, all, channel };
+  }
+
+  function showReturnBox(){
+    try {
+      const panelLink = normalize(localStorage.getItem("tt_espera_painel_link"));
+      const shareLink = normalize(localStorage.getItem("tt_espera_link"));
+      if (!panelLink && !shareLink) return;
+      if (panelLink) $("returnPanelLink").href = panelLink;
+      $("returnBox").style.display = "block";
+    } catch(e) {}
+  }
+
+  async function rpc(name, body){
+    const response = await fetch(SUPABASE_REST_URL + "/rpc/" + name, {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify(body || {})
+    });
+    const text = await response.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch(e) { data = { ok:false, mensagem:text }; }
+    if (!response.ok) {
+      data.ok = false;
+      data.mensagem = data.mensagem || "falha_conexao";
+    }
+    return data;
+  }
+
+  function updateField(fieldId, inputId, visible, required){
+    const field = $(fieldId);
+    const input = $(inputId);
+    field.hidden = !visible;
+    input.required = visible && required;
+    if (!visible) input.value = "";
+  }
+
+  function updateCheck(rowId, inputId, visible, required){
+    const row = $(rowId);
+    const input = $(inputId);
+    row.hidden = !visible;
+    input.required = visible && required;
+    if (!visible) input.checked = false;
+  }
+
+  function applyConfig(config){
+    const promo = config.promocao || {};
+    const campos = Object.assign({}, defaults.campos, promo.campos || {});
+    const verificacao = Object.assign({}, defaults.verificacao, promo.verificacao || {});
+    const indicacao = Object.assign({}, defaults.indicacao, promo.indicacao || {});
+    const legal = Object.assign({}, defaults.legal, promo.legal || {});
+
+    $("heroTitle").textContent = promo.titulo || "Entre na lista de espera do Turbo Tiger";
+    $("heroSubtitle").textContent = promo.subtitulo || "Organize suas bets, acompanhe seus resultados e receba acesso antecipado.";
+    $("benefitText").textContent = promo.beneficio || "Sua posicao fica registrada e seu link pessoal sera criado ao finalizar.";
+    $("statusPublico").textContent = promo.status_publico === "lista_aberta" ? "Lista aberta" : "Acesso antecipado";
+    $("totalLista").textContent = Number(promo.total_lista || 0).toLocaleString("pt-BR");
+    $("pontosIndicacao").textContent = "+" + Number(indicacao.pontos_por_cadastro_confirmado || 0);
+    $("refRule").textContent = indicacao.regra_publica || defaults.indicacao.regra_publica;
+    $("legalNote").textContent = legal.sem_promessa || defaults.legal.sem_promessa;
+    $("legalAds").textContent = [legal.aviso_18, legal.sem_promessa, legal.jogo_responsavel].filter(Boolean).join(" ");
+    $("termsLink").href = legal.politica_url || "/politicaetermos.html";
+
+    updateField("fieldNome", "nome", true, boolValue(campos.exigir_nome, true));
+    updateField("fieldEmail", "email", boolValue(campos.pedir_email, true), boolValue(campos.exigir_email, true));
+    updateField("fieldWhatsApp", "whatsapp", boolValue(campos.pedir_whatsapp, true), boolValue(campos.exigir_whatsapp, false));
+    updateCheck("checkMaior18", "maior18", true, boolValue(campos.exigir_maior_18, true));
+    updateCheck("checkTermos", "termos", true, boolValue(campos.exigir_termos, true));
+    updateCheck("checkOptinEmail", "optinEmail", boolValue(campos.pedir_email, true), boolValue(campos.exigir_optin_email, false));
+    updateCheck("checkOptinWhatsApp", "optinWhatsApp", boolValue(campos.pedir_whatsapp, true), boolValue(campos.exigir_optin_whatsapp, false));
+
+    if (state.ref) {
+      $("refBanner").style.display = "block";
+    }
+    showReturnBox();
+
+    state.config = { promo, campos, verificacao, indicacao, legal };
+    initPixels(promo.ads || {});
+  }
+
+  function addScript(src, id){
+    if (id && document.getElementById(id)) return;
+    const s = document.createElement("script");
+    s.async = true;
+    if (id) s.id = id;
+    s.src = src;
+    document.head.appendChild(s);
+  }
+
+  function initPixels(ads){
+    const meta = ads.meta || {};
+    const google = ads.google || {};
+    const tiktok = ads.tiktok || {};
+
+    if (meta.pixel_id && !window.fbq) {
+      window.fbq = function(){ window.fbq.callMethod ? window.fbq.callMethod.apply(window.fbq, arguments) : window.fbq.queue.push(arguments); };
+      window.fbq.queue = [];
+      window.fbq.loaded = true;
+      window.fbq.version = "2.0";
+      addScript("https://connect.facebook.net/en_US/fbevents.js", "tt-meta-pixel");
+      window.fbq("init", meta.pixel_id);
+      window.fbq("track", "PageView");
+    }
+
+    if (google.gtag_id && !window.gtag) {
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function(){ window.dataLayer.push(arguments); };
+      window.gtag("js", new Date());
+      window.gtag("config", google.gtag_id);
+      addScript("https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(google.gtag_id), "tt-google-tag");
+    }
+
+    if (tiktok.pixel_id && !window.ttq) {
+      window.ttq = { track:function(){}, page:function(){} };
+      addScript("https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + encodeURIComponent(tiktok.pixel_id) + "&lib=ttq", "tt-tiktok-pixel");
+    }
+
+    track("page_view", {});
+  }
+
+  function track(name, data){
+    const payload = Object.assign({ source:"espera", channel:state.attribution.channel }, data || {});
+    try {
+      if (window.fbq) {
+        if (name === "lead") window.fbq("track", "Lead", payload);
+        if (name === "complete_registration") window.fbq("track", "CompleteRegistration", payload);
+      }
+    } catch(e) {}
+    try {
+      if (window.gtag) {
+        window.gtag("event", name === "lead" ? "generate_lead" : name, payload);
+      }
+    } catch(e) {}
+    try {
+      if (window.ttq && typeof window.ttq.track === "function") {
+        if (name === "lead") window.ttq.track("SubmitForm", payload);
+      }
+    } catch(e) {}
+  }
+
+  function friendlyError(code){
+    const map = {
+      maior_18_obrigatorio: "Confirme que voce tem 18 anos ou mais.",
+      aceite_legal_obrigatorio: "Aceite os termos e informacoes legais para continuar.",
+      nome_obrigatorio: "Informe seu nome.",
+      email_obrigatorio: "Informe seu e-mail.",
+      whatsapp_obrigatorio: "Informe seu WhatsApp.",
+      email_invalido: "Confira o e-mail informado.",
+      whatsapp_invalido: "Confira o WhatsApp informado.",
+      optin_email_obrigatorio: "Autorize o recebimento por e-mail para continuar.",
+      optin_whatsapp_obrigatorio: "Autorize o recebimento por WhatsApp para continuar.",
+      email_whatsapp_em_cadastros_diferentes: "Este e-mail e este WhatsApp aparecem em cadastros diferentes. Use apenas um deles ou fale com o suporte.",
+      lista_indisponivel: "A lista de espera esta indisponivel agora.",
+      falha_cadastro_lista: "Nao foi possivel salvar agora. Tente novamente."
+    };
+    return map[code] || "Nao foi possivel salvar agora. Tente novamente.";
+  }
+
+  function buildPayload(){
+    const attribution = state.attribution;
+    const p = params();
+    return {
+      slug: p.get("promo") || DEFAULT_SLUG,
+      ref: state.ref,
+      nome: $("nome").value,
+      email: $("email").value,
+      whatsapp: $("whatsapp").value,
+      uf: $("uf").value,
+      cidade: $("cidade").value,
+      pais: "BR",
+      session_id: state.sessionId,
+      sistema: /android/i.test(navigator.userAgent) ? "android" : (/iphone|ipad|ipod/i.test(navigator.userAgent) ? "ios" : "web"),
+      dispositivo: navigator.userAgent || "",
+      idioma: navigator.language || "pt-BR",
+      maior_18: $("maior18").checked,
+      termos: $("termos").checked,
+      politica: $("termos").checked,
+      optin_email: $("optinEmail").checked,
+      optin_whatsapp: $("optinWhatsApp").checked,
+      origem: "hotpage_espera",
+      canal_ads: attribution.channel,
+      utm_source: attribution.utms.utm_source || "",
+      utm_medium: attribution.utms.utm_medium || "",
+      utm_campaign: attribution.utms.utm_campaign || "",
+      utm_content: attribution.utms.utm_content || "",
+      utm_term: attribution.utms.utm_term || "",
+      click_ids: attribution.clicks,
+      atribuicao: attribution.all,
+      user_agent: navigator.userAgent || "",
+      extras: {
+        href: window.location.href,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+      }
+    };
+  }
+
+  function showResult(data){
+    state.shareLink = data.link_indicacao || "";
+    state.panelLink = data.painel_link || "";
+    $("waitlistForm").hidden = true;
+    $("resultPanel").hidden = false;
+    $("resultPosition").textContent = "#" + (data.posicao || "--");
+    $("resultPoints").textContent = (data.pontos || 0) + " pontos";
+    $("resultRefs").textContent = (data.indicacoes_confirmadas || 0) + " indicacoes confirmadas";
+    $("shareLink").textContent = state.shareLink;
+
+    const emailPending = data.email_verificacao_status === "pendente";
+    const whatsappPending = data.whatsapp_verificacao_status === "pendente";
+    $("resultVerify").hidden = !(emailPending || whatsappPending);
+    if (state.panelLink) {
+      $("panelBtn").href = state.panelLink;
+    }
+    if (data.email_notificacao_status === "enfileirada") {
+      $("resultVerify").hidden = false;
+      $("resultVerify").textContent = "Enviamos seu link por e-mail";
+    }
+
+    try {
+      localStorage.setItem("tt_espera_codigo", data.codigo || "");
+      localStorage.setItem("tt_espera_link", state.shareLink);
+      localStorage.setItem("tt_espera_painel_link", state.panelLink);
+    } catch(e) {}
+
+    track("lead", { codigo:data.codigo, posicao:data.posicao });
+    track("complete_registration", { codigo:data.codigo, posicao:data.posicao });
+  }
+
+  async function submitForm(event){
+    event.preventDefault();
+    const form = $("waitlistForm");
+    const status = $("formStatus");
+
+    if (!form.reportValidity()) return;
+
+    $("signupPanel").classList.add("loading");
+    $("submitBtn").disabled = true;
+    status.className = "status";
+    status.textContent = "Reservando sua posicao...";
+
+    try {
+      const data = await rpc("espera_lead_cadastrar_rpc", { p_payload: buildPayload() });
+      if (!data.ok) {
+        status.className = "status error";
+        status.textContent = friendlyError(data.mensagem);
+        return;
+      }
+      status.textContent = "";
+      showResult(data);
+    } catch(e) {
+      status.className = "status error";
+      status.textContent = "Falha de conexao. Tente novamente.";
+    } finally {
+      $("signupPanel").classList.remove("loading");
+      $("submitBtn").disabled = false;
+    }
+  }
+
+  async function copyLink(){
+    if (!state.shareLink) return;
+    try {
+      await navigator.clipboard.writeText(state.shareLink);
+      $("copyBtn").textContent = "Link copiado";
+      setTimeout(() => { $("copyBtn").textContent = "Copiar link"; }, 1800);
+    } catch(e) {
+      window.prompt("Copie seu link:", state.shareLink);
+    }
+  }
+
+  async function shareLink(){
+    if (!state.shareLink) return;
+    track("share_referral", {});
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Lista de espera Turbo Tiger",
+          text: WHATSAPP_SHARE,
+          url: state.shareLink
+        });
+        return;
+      } catch(e) {}
+    }
+    window.open("https://wa.me/?text=" + encodeURIComponent(WHATSAPP_SHARE + " " + state.shareLink), "_blank", "noopener");
+  }
+
+  async function registerVisit(){
+    try {
+      await rpc("espera_visita_registrar_rpc", {
+        p_payload: {
+          slug: params().get("promo") || DEFAULT_SLUG,
+          ref: state.ref,
+          session_id: state.sessionId,
+          origem: "hotpage_espera",
+          canal_ads: state.attribution.channel,
+          utm_source: state.attribution.utms.utm_source || "",
+          utm_medium: state.attribution.utms.utm_medium || "",
+          utm_campaign: state.attribution.utms.utm_campaign || "",
+          utm_content: state.attribution.utms.utm_content || "",
+          utm_term: state.attribution.utms.utm_term || "",
+          click_ids: state.attribution.clicks,
+          atribuicao: state.attribution.all,
+          user_agent: navigator.userAgent || "",
+          href: location.href
+        }
+      });
+    } catch(e) {}
+  }
+
+  async function init(){
+    state.ref = normalize(params().get("ref"));
+    state.sessionId = getSessionId();
+    state.attribution = collectAttribution();
+    $("waitlistForm").addEventListener("submit", submitForm);
+    $("copyBtn").addEventListener("click", copyLink);
+    $("shareBtn").addEventListener("click", shareLink);
+
+    try {
+      const config = await rpc("espera_config_rpc", { p_slug: params().get("promo") || DEFAULT_SLUG });
+      if (config.ok) {
+        applyConfig(config);
+      } else {
+        applyConfig({ promocao:{} });
+      }
+    } catch(e) {
+      applyConfig({ promocao:{} });
+    }
+    registerVisit();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+}());
+</script>
+<script src="../assets/turbotiger-site-ui.js"></script>
+</body>
+</html>

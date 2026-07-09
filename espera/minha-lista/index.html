@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Minha lista Turbo Tiger</title>
+<meta name="description" content="Acompanhe sua posicao e suas indicacoes na lista de espera Turbo Tiger." />
+<style>
+  :root{
+    --gold:#f4b400;
+    --gold-soft:#fff3c4;
+    --ink:#17130a;
+    --muted:#665d4d;
+    --line:#e5d9bd;
+    --paper:#fffaf0;
+    --white:#fff;
+    --green:#116047;
+    --red:#a12828;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  body{
+    margin:0;
+    min-height:100vh;
+    color:var(--ink);
+    background:#1a120d;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  body:before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    background:
+      linear-gradient(180deg,rgba(0,0,0,.62),rgba(0,0,0,.28) 45%,rgba(0,0,0,.72)),
+      var(--tt-site-background-url);
+    background-size:cover;
+    background-position:center;
+  }
+  a{color:inherit}
+  .wrap{width:min(1040px,100% - 28px);margin:0 auto}
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+    padding:22px 0;
+    color:#fff;
+  }
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .brand img{width:52px;height:52px;border-radius:12px;object-fit:contain}
+  .brand strong{display:block;font-size:18px;line-height:1}
+  .brand span{display:block;margin-top:4px;color:#ffe7a4;font-size:13px}
+  .age{display:inline-flex;min-height:34px;align-items:center;padding:7px 12px;border:1px solid rgba(255,255,255,.34);border-radius:999px;font-weight:900}
+  .hero{
+    display:grid;
+    grid-template-columns:minmax(0,.86fr) minmax(340px,.72fr);
+    gap:18px;
+    align-items:start;
+    padding:10px 0 88px;
+  }
+  .headline{color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.46);padding-top:42px}
+  .headline p{margin:0 0 14px;color:#ffe38a;font-weight:900;text-transform:uppercase;font-size:13px}
+  h1{margin:0;max-width:620px;font-size:clamp(36px,5vw,62px);line-height:1;letter-spacing:0}
+  .lead{margin:18px 0 0;max-width:580px;color:#fff6d8;font-size:18px;line-height:1.5}
+  .panel{
+    background:var(--paper);
+    border:1px solid rgba(255,255,255,.56);
+    border-radius:8px;
+    box-shadow:0 22px 70px rgba(0,0,0,.42);
+    overflow:hidden;
+  }
+  .panel-head{padding:20px;background:#fff;border-bottom:1px solid var(--line)}
+  .panel-head h2{margin:0;font-size:24px}
+  .panel-head p{margin:8px 0 0;color:var(--muted);line-height:1.45}
+  .content{padding:18px 20px 20px}
+  .rank{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:16px;
+    align-items:center;
+    padding:18px;
+    border-radius:8px;
+    background:#111;
+    color:#fff;
+  }
+  .rank strong{font-size:52px;line-height:1;color:#ffe08a}
+  .rank span{color:#f7efd4;line-height:1.45}
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin-top:12px;
+  }
+  .stat{
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+  }
+  .stat strong{display:block;font-size:24px;color:#201606}
+  .stat span{display:block;margin-top:4px;color:var(--muted);font-size:13px;line-height:1.35}
+  .share{
+    margin-top:12px;
+    padding:14px;
+    border:1px solid #d8c6a1;
+    border-radius:8px;
+    background:#fff8df;
+  }
+  .share-link{
+    margin-top:8px;
+    padding:10px;
+    border:1px dashed #bfa767;
+    border-radius:8px;
+    background:#fff;
+    color:#352a13;
+    word-break:break-all;
+    font-size:14px;
+  }
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:48px;
+    border:0;
+    border-radius:8px;
+    padding:11px 14px;
+    background:var(--gold);
+    color:#160f04;
+    font-weight:900;
+    cursor:pointer;
+    text-decoration:none;
+  }
+  .btn.secondary{background:#15110a;color:#fff}
+  .btn.ghost{background:#fff;color:#1b1509;border:1px solid #d8c6a1}
+  .list{
+    margin-top:14px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    overflow:hidden;
+  }
+  .list-head{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px;
+    border-bottom:1px solid var(--line);
+    background:#fffdf7;
+    font-weight:900;
+  }
+  .person{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:10px;
+    align-items:center;
+    padding:12px 14px;
+    border-bottom:1px solid #f0e8d6;
+  }
+  .person:last-child{border-bottom:0}
+  .person strong{display:block}
+  .person span{display:block;margin-top:3px;color:var(--muted);font-size:13px}
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    min-height:28px;
+    border-radius:999px;
+    padding:5px 9px;
+    background:#edf8f3;
+    color:var(--green);
+    font-size:12px;
+    font-weight:900;
+    white-space:nowrap;
+  }
+  .tag.wait{background:#fff3cd;color:#6f4b00}
+  .empty{
+    padding:16px;
+    color:var(--muted);
+    line-height:1.45;
+  }
+  .message{
+    padding:20px;
+    border-radius:8px;
+    background:#fff;
+    color:#3c311e;
+    line-height:1.5;
+  }
+  .message.error{border-left:5px solid var(--red)}
+  .below{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    padding:0 0 90px;
+  }
+  .info{
+    padding:16px;
+    border-radius:8px;
+    background:rgba(255,255,255,.94);
+  }
+  .info h3{margin:0 0 8px}
+  .info p{margin:0;color:var(--muted);line-height:1.5}
+  @media(max-width:820px){
+    .hero{grid-template-columns:1fr}
+    .headline{padding-top:8px}
+    .below{grid-template-columns:1fr}
+  }
+  @media(max-width:520px){
+    .wrap{width:min(100% - 22px,1040px)}
+    .rank{grid-template-columns:1fr}
+    .stats,.actions{grid-template-columns:1fr}
+    .person{grid-template-columns:1fr}
+  }
+</style>
+<link rel="stylesheet" href="../../assets/turbotiger-site-ui.css" />
+</head>
+<body data-tt-background="fundo_geral" style="--tt-site-background-url:url('../../assets/bg-900x900.webp')">
+<header class="wrap topbar">
+  <a class="brand" href="/espera/" aria-label="Turbo Tiger">
+    <img data-tt-image="logo_geral" src="../../assets/logo-300x300.webp" alt="Turbo Tiger">
+    <span><strong>Turbo Tiger</strong><span>Minha lista</span></span>
+  </a>
+  <span class="age">18+</span>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="headline">
+      <p>Acompanhe sua posicao</p>
+      <h1>Seu painel da lista de espera</h1>
+      <div class="lead">Veja sua posicao, acompanhe os cadastros confirmados e reenvie seu link pessoal sempre que quiser.</div>
+    </div>
+
+    <section class="panel" id="panel">
+      <div class="panel-head">
+        <h2 id="panelTitle">Carregando painel</h2>
+        <p id="panelIntro">Validando seu link seguro.</p>
+      </div>
+      <div class="content" id="content">
+        <div class="message">Aguarde um instante...</div>
+      </div>
+    </section>
+  </section>
+
+  <section class="below">
+    <div class="info">
+      <h3>Como subir na lista</h3>
+      <p>Compartilhe seu link. A indicacao so conta quando o amigo completa o cadastro na lista de espera.</p>
+    </div>
+    <div class="info">
+      <h3>Privacidade</h3>
+      <p>O painel mostra apenas nomes resumidos e status da indicacao. E-mail e WhatsApp dos seus amigos nao aparecem aqui.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="tt-site-footer">
+  <small>&copy; 2026 Turbo Tiger</small>
+</footer>
+<a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden>
+  <img src="../../assets/icone-whatsapp-96x96.webp" alt="WhatsApp">
+</a>
+
+<script>
+(function(){
+  "use strict";
+
+  const SUPABASE_REST_URL = "https://jzqgudmvquokizvgehow.supabase.co/rest/v1";
+  const SUPABASE_KEY = "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU";
+  const SHARE_TEXT = "Estou na lista de espera do Turbo Tiger. Entra pelo meu link para irmos juntos nessa liberacao:";
+  const $ = (id) => document.getElementById(id);
+  let current = null;
+
+  function normalize(value){
+    return value === null || value === undefined ? "" : String(value).trim();
+  }
+
+  function getToken(){
+    const params = new URLSearchParams(location.search);
+    const token = normalize(params.get("token"));
+    if (token) return token;
+
+    try {
+      const saved = normalize(localStorage.getItem("tt_espera_painel_link"));
+      if (saved) {
+        const url = new URL(saved, location.href);
+        return normalize(url.searchParams.get("token"));
+      }
+    } catch(e) {}
+    return "";
+  }
+
+  async function rpc(name, body){
+    const response = await fetch(SUPABASE_REST_URL + "/rpc/" + name, {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify(body || {})
+    });
+    const text = await response.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch(e) { data = { ok:false, mensagem:text }; }
+    if (!response.ok) {
+      data.ok = false;
+      data.mensagem = data.mensagem || "falha_conexao";
+    }
+    return data;
+  }
+
+  function statusLabel(status){
+    if (status === "ativou_no_app") return "Ativou no app";
+    if (status === "cadastro_confirmado") return "Cadastro confirmado";
+    return "Em andamento";
+  }
+
+  function renderEmptyToken(){
+    $("panelTitle").textContent = "Link seguro necessario";
+    $("panelIntro").textContent = "Use o botao enviado depois do cadastro ou entre novamente na lista.";
+    $("content").innerHTML = [
+      '<div class="message error">',
+      '<strong>Nao encontrei seu token de acompanhamento.</strong><br>',
+      'Volte para a lista de espera, informe seus dados novamente e enviaremos um novo link seguro do painel.',
+      '<div class="actions"><a class="btn" href="/espera/">Abrir lista de espera</a></div>',
+      '</div>'
+    ].join("");
+  }
+
+  function renderError(){
+    $("panelTitle").textContent = "Painel nao encontrado";
+    $("panelIntro").textContent = "O link pode estar incompleto ou ter sido substituido por um link mais novo.";
+    $("content").innerHTML = [
+      '<div class="message error">',
+      '<strong>Nao foi possivel abrir este painel.</strong><br>',
+      'Entre novamente na lista com seu e-mail ou WhatsApp para receber um novo link de acompanhamento.',
+      '<div class="actions"><a class="btn" href="/espera/">Entrar novamente</a></div>',
+      '</div>'
+    ].join("");
+  }
+
+  function renderPanel(data){
+    current = data;
+    $("panelTitle").textContent = "Oi, " + (data.nome || "Tiger");
+    $("panelIntro").textContent = "Sua lista esta ativa. Reenvie seu link para quem ainda nao completou o cadastro.";
+
+    const people = Array.isArray(data.indicados) ? data.indicados : [];
+    const peopleHtml = people.length ? people.map((item) => {
+      const ok = item.status === "cadastro_confirmado" || item.status === "ativou_no_app";
+      return [
+        '<div class="person">',
+        '<div><strong>', escapeHtml(item.nome || "Cadastro"), '</strong>',
+        '<span>', ok ? 'Indicacao validada para sua lista.' : 'Aguardando conclusao.', '</span></div>',
+        '<span class="tag', ok ? '' : ' wait', '">', statusLabel(item.status), '</span>',
+        '</div>'
+      ].join("");
+    }).join("") : '<div class="empty">Quando seus amigos completarem o cadastro pelo seu link, eles aparecem aqui.</div>';
+
+    $("content").innerHTML = [
+      '<div class="rank"><strong>#', data.posicao || '--', '</strong><span>Essa e sua posicao atual na lista. Seus pontos sobem quando amigos completam o cadastro pelo seu link.</span></div>',
+      '<div class="stats">',
+      '<div class="stat"><strong>', data.pontos || 0, '</strong><span>pontos totais</span></div>',
+      '<div class="stat"><strong>', data.indicacoes_confirmadas || 0, '</strong><span>cadastros confirmados</span></div>',
+      '<div class="stat"><strong>', data.visitantes_link || 0, '</strong><span>pessoas que abriram seu link</span></div>',
+      '<div class="stat"><strong>', data.indicacoes_ativadas_app || 0, '</strong><span>ativacoes futuras no app</span></div>',
+      '</div>',
+      '<div class="share"><strong>Seu link pessoal</strong><div class="share-link" id="shareLink">', escapeHtml(data.link_indicacao || ''), '</div>',
+      '<div class="actions"><button class="btn secondary" id="copyBtn" type="button">Copiar link</button><button class="btn ghost" id="shareBtn" type="button">Compartilhar</button></div></div>',
+      '<div class="list"><div class="list-head"><span>Suas indicacoes</span><span>', people.length, '</span></div>', peopleHtml, '</div>'
+    ].join("");
+
+    $("copyBtn").addEventListener("click", copyLink);
+    $("shareBtn").addEventListener("click", shareLink);
+
+    try {
+      localStorage.setItem("tt_espera_link", data.link_indicacao || "");
+      localStorage.setItem("tt_espera_painel_link", data.painel_link || location.href);
+    } catch(e) {}
+  }
+
+  function escapeHtml(value){
+    return normalize(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  async function copyLink(){
+    if (!current || !current.link_indicacao) return;
+    try {
+      await navigator.clipboard.writeText(current.link_indicacao);
+      $("copyBtn").textContent = "Link copiado";
+      setTimeout(() => { $("copyBtn").textContent = "Copiar link"; }, 1600);
+    } catch(e) {
+      window.prompt("Copie seu link:", current.link_indicacao);
+    }
+  }
+
+  async function shareLink(){
+    if (!current || !current.link_indicacao) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Lista de espera Turbo Tiger",
+          text: SHARE_TEXT,
+          url: current.link_indicacao
+        });
+        return;
+      } catch(e) {}
+    }
+    window.open("https://wa.me/?text=" + encodeURIComponent(SHARE_TEXT + " " + current.link_indicacao), "_blank", "noopener");
+  }
+
+  async function init(){
+    const token = getToken();
+    if (!token) {
+      renderEmptyToken();
+      return;
+    }
+
+    try {
+      const data = await rpc("espera_lead_painel_rpc", { p_token: token });
+      if (!data.ok) {
+        renderError();
+        return;
+      }
+      renderPanel(data);
+    } catch(e) {
+      renderError();
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+}());
+</script>
+<script src="../../assets/turbotiger-site-ui.js"></script>
+</body>
+</html>
