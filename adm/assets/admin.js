@@ -41,6 +41,7 @@
     missing_authorization: "Sess\u00e3o expirada. Entre novamente.",
     modelo_nao_salvo: "N\u00e3o foi poss\u00edvel salvar o modelo.",
     nao_autenticado: "Entre para continuar.",
+    nenhum_destinatario_push: "Nenhum destinat\u00e1rio encontrado para esta configura\u00e7\u00e3o.",
     perfil_admin_invalido: "Perfil administrativo inv\u00e1lido.",
     perfil_protegido: "O perfil de super administrador n\u00e3o pode ser desativado.",
     push_broadcast_sem_permissao: "Seu perfil n\u00e3o permite enviar para todos os aparelhos.",
@@ -89,10 +90,23 @@
     if (data.ok === false) return friendlyMessage(data.error || data.message || "Nao foi possivel concluir a operacao.");
     if (data.dry_run) return "Simulacao concluida. Tokens encontrados: " + (data.tokens || 0) + ".";
     if (Object.prototype.hasOwnProperty.call(data, "sent")) {
+      if ((data.sent || 0) === 0 && (data.failed || 0) === 0) {
+        return zeroPushMessage(data);
+      }
       return "Envio concluido. Enviadas: " + (data.sent || 0) + ". Falhas: " + (data.failed || 0) + ".";
     }
     if (data.ok === true) return "Operacao concluida.";
     return safeJson(data);
+  }
+
+  function zeroPushMessage(data) {
+    var parts = [];
+    if (data.destino_tipo) parts.push("Destino: " + data.destino_tipo);
+    if (data.plataformas) parts.push("Plataforma: " + String(data.plataformas));
+    if (Object.prototype.hasOwnProperty.call(data, "tokens_resolvidos")) {
+      parts.push("Antes do filtro: " + (data.tokens_resolvidos || 0));
+    }
+    return friendlyMessage(data.error || "nenhum_destinatario_push") + (parts.length ? " " + parts.join(". ") + "." : "");
   }
 
   function readSession() {
@@ -345,7 +359,7 @@
 
   function renderMetrics() {
     var m = (state.catalogo && state.catalogo.metricas) || {};
-    qs("metricTokens").textContent = m.tokens_ativos || 0;
+    qs("metricUsers").textContent = m.usuarios_cadastrados || 0;
     qs("metricDevices").textContent = m.dispositivos_ativos || 0;
     qs("metricLinked").textContent = m.dispositivos_vinculados || 0;
     qs("metricOpen").textContent = m.app_aberto || 0;
@@ -443,7 +457,9 @@
   }
 
   function selectedPlatforms() {
-    var platforms = checkboxValues("[data-platform]");
+    var platforms = Array.prototype.slice.call(document.querySelectorAll("[data-platform]:checked"))
+      .map(function (input) { return input.getAttribute("data-platform") || input.value; })
+      .filter(Boolean);
     if (!platforms.length) throw new Error("informe_plataforma");
     return platforms;
   }

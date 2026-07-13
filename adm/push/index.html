@@ -39,7 +39,7 @@
       </div>
 
       <section class="metric-grid" aria-label="Resumo de notificacoes">
-        <div class="metric"><strong id="metricTokens">0</strong><span>Tokens ativos</span></div>
+        <div class="metric"><strong id="metricUsers">0</strong><span>Usu&aacute;rios</span></div>
         <div class="metric"><strong id="metricDevices">0</strong><span>Aparelhos ativos</span></div>
         <div class="metric"><strong id="metricLinked">0</strong><span>Vinculados</span></div>
         <div class="metric"><strong id="metricOpen">0</strong><span>App aberto</span></div>
@@ -104,11 +104,11 @@
               <div class="section-label">Plataforma</div>
               <div class="choice-grid compact" id="sendPlatformOptions">
                 <label class="choice-item">
-                  <input type="checkbox" data-platform="android" checked>
+                  <input type="checkbox" data-platform="android" value="android" checked>
                   <span>Android</span>
                 </label>
                 <label class="choice-item">
-                  <input type="checkbox" data-platform="ios" checked>
+                  <input type="checkbox" data-platform="ios" value="ios" checked>
                   <span>iOS</span>
                 </label>
               </div>
@@ -133,23 +133,22 @@
               <div class="section-label">Pr&eacute;via</div>
               <div class="phone-preview" aria-label="Previa da notificacao">
                 <div class="phone-shell">
-                  <div class="phone-notch"></div>
                   <div class="phone-screen">
-                    <div class="phone-topbar">
-                      <span>00:42</span>
-                      <span>5G 82%</span>
-                    </div>
+                    <span class="phone-camera" aria-hidden="true"></span>
                     <div class="phone-shade">
-                      <div class="shade-handle"></div>
                       <div class="push-card">
                         <div class="push-card-head">
                           <div class="push-app">
                             <span class="push-icon">
-                              <img src="../../assets/logo-300x300.webp" alt="">
+                              <img src="../assets/icone-turbotiger-notificacao-dourado.png" alt="">
                             </span>
-                            <span>Turbo Tiger</span>
+                            <span class="push-meta">
+                              <span>TIGER</span>
+                              <span class="push-meta-dot"></span>
+                              <span>agora</span>
+                            </span>
                           </div>
-                          <span>agora</span>
+                          <span class="push-collapse" aria-hidden="true">&gt;</span>
                         </div>
                         <div class="push-content">
                           <strong id="previewTitle">Turbo Tiger</strong>
@@ -266,6 +265,6 @@
     </main>
   </div>
 
-  <script src="../assets/admin.js?v=20260713-03"></script>
+  <script src="../assets/admin.js?v=20260713-04"></script>
 </body>
 </html>
