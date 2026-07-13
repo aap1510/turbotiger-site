@@ -100,6 +100,33 @@
     font-size:20px;
     line-height:1.42;
   }
+  .launch-countdown{
+    display:none;
+    max-width:680px;
+    margin:22px 0 0;
+    border:1px solid rgba(255,255,255,.26);
+    border-radius:8px;
+    background:rgba(0,0,0,.44);
+    color:#fff;
+    overflow:hidden;
+  }
+  .launch-countdown.is-visible{display:grid;grid-template-columns:auto 1fr}
+  .count-days{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-width:116px;
+    padding:16px;
+    background:#ffe08a;
+    color:#1c1404;
+    text-align:center;
+  }
+  .count-days strong{display:block;font-size:38px;line-height:1}
+  .count-days span{display:block;margin-top:4px;font-size:12px;font-weight:900;text-transform:uppercase}
+  .count-copy{padding:15px 16px}
+  .count-copy strong{display:block;color:#ffe08a;font-size:17px}
+  .count-copy span{display:block;margin-top:5px;color:#fff5d5;line-height:1.35}
+  .count-copy small{display:block;margin-top:7px;color:#e7ddbd;font-size:12px}
   .proofs{
     display:grid;
     grid-template-columns:repeat(3,minmax(0,1fr));
@@ -144,6 +171,36 @@
     outline:none;
   }
   input:focus,select:focus{border-color:var(--gold-dark);box-shadow:0 0 0 3px rgba(244,180,0,.22)}
+  input:disabled,select:disabled{background:#f2ead8;color:#8b806b;cursor:not-allowed}
+  .autocomplete{position:relative}
+  .city-list{
+    position:absolute;
+    z-index:8;
+    left:0;
+    right:0;
+    top:calc(100% + 4px);
+    max-height:218px;
+    overflow:auto;
+    border:1px solid #d5c9af;
+    border-radius:8px;
+    background:#fff;
+    box-shadow:0 14px 34px rgba(45,34,11,.2);
+  }
+  .city-option{
+    width:100%;
+    min-height:42px;
+    border:0;
+    border-bottom:1px solid #f0e6cf;
+    background:#fff;
+    padding:10px 12px;
+    color:#2b2416;
+    text-align:left;
+    cursor:pointer;
+    font:inherit;
+  }
+  .city-option:hover,.city-option:focus{background:#fff5d6;outline:none}
+  .city-option:last-child{border-bottom:0}
+  .field-hint{min-height:16px;color:#8b2e2e;font-size:12px;font-weight:800}
   .checks{display:grid;gap:10px;margin:12px 0 14px}
   .check{
     display:grid;
@@ -281,6 +338,8 @@
     h1{font-size:38px}
     .lead{font-size:17px}
     .grid,.actions{grid-template-columns:1fr}
+    .launch-countdown.is-visible{grid-template-columns:1fr}
+    .count-days{justify-content:flex-start}
     .form-head,form,.result{padding-left:16px;padding-right:16px}
     .rank{grid-template-columns:1fr}
   }
@@ -302,6 +361,14 @@
       <p class="eyebrow" id="statusPublico">Acesso antecipado</p>
       <h1 id="heroTitle">Entre na lista de espera do Turbo Tiger</h1>
       <p class="lead" id="heroSubtitle">Organize suas bets, acompanhe seus resultados e receba acesso antecipado quando a nova fase for liberada.</p>
+      <div class="launch-countdown" id="launchCountdown" aria-live="polite">
+        <div class="count-days"><div><strong id="launchDays">--</strong><span>dias</span></div></div>
+        <div class="count-copy">
+          <strong id="launchTitle">Liberacao do Turbo Tiger</strong>
+          <span id="launchText">Faltam -- dias para liberacao do Turbo Tiger</span>
+          <small id="launchDateText"></small>
+        </div>
+      </div>
       <div class="proofs" aria-label="Resumo da lista de espera">
         <div class="proof"><strong id="totalLista">--</strong><span>pessoas na lista de espera</span></div>
         <div class="proof"><strong id="pontosIndicacao">+3</strong><span>pontos por amigo cadastrado</span></div>
@@ -335,7 +402,7 @@
             <label for="whatsapp">WhatsApp</label>
             <input id="whatsapp" name="whatsapp" inputmode="tel" autocomplete="tel" maxlength="24" placeholder="(00) 00000-0000" />
           </div>
-          <div class="field">
+          <div class="field" id="fieldUF">
             <label for="uf">Estado</label>
             <select id="uf" name="uf">
               <option value="">Selecione</option>
@@ -347,9 +414,11 @@
               <option>SE</option><option>TO</option>
             </select>
           </div>
-          <div class="field">
+          <div class="field autocomplete" id="fieldCidade">
             <label for="cidade">Cidade</label>
-            <input id="cidade" name="cidade" maxlength="80" autocomplete="address-level2" placeholder="Opcional" />
+            <input id="cidade" name="cidade" maxlength="80" autocomplete="off" placeholder="Selecione o estado primeiro" disabled />
+            <div class="city-list" id="cityList" role="listbox" hidden></div>
+            <div class="field-hint" id="cityHelp" aria-live="polite"></div>
           </div>
         </div>
 
@@ -360,7 +429,7 @@
           </label>
           <label class="check" id="checkTermos">
             <input id="termos" type="checkbox" />
-            <span>Li e aceito a Politica de Privacidade, os Termos de Uso e as informacoes legais desta lista de espera.</span>
+            <span>Li e aceito a <a id="termsPrivacyLink" href="/politicaetermos.html" target="_blank" rel="noopener">Política de Privacidade</a>, os <a id="termsUseLink" href="/politicaetermos.html" target="_blank" rel="noopener">Termos de Uso</a> e as informacoes legais desta lista de espera.</span>
           </label>
           <label class="check" id="checkOptinEmail">
             <input id="optinEmail" type="checkbox" />
@@ -372,7 +441,7 @@
           </label>
         </div>
 
-        <button class="btn" id="submitBtn" type="submit">Entrar na lista de espera</button>
+        <button class="btn" id="submitBtn" type="submit" disabled>Entrar na lista de espera</button>
         <p class="status" id="formStatus" role="status"></p>
         <p class="legal-note" id="legalNote">Ferramenta de organizacao e acompanhamento. Nao ha promessa de ganhos, lucro ou resultado em apostas.</p>
       </form>
@@ -418,7 +487,7 @@
       <ul>
         <li>Sem promessa de lucro, ganho ou resultado.</li>
         <li>Use com responsabilidade.</li>
-        <li><a id="termsLink" href="/politicaetermos.html">Politica de Privacidade e Termos</a></li>
+        <li><a id="termsLink" href="/politicaetermos.html">Política de Privacidade e Termos de Uso</a></li>
       </ul>
     </div>
   </section>
@@ -439,13 +508,29 @@
   const SUPABASE_KEY = "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU";
   const DEFAULT_SLUG = "lancamento-beta";
   const WHATSAPP_SHARE = "Entrei na lista de espera do Turbo Tiger. Se cadastra pelo meu link para ganhar acesso antecipado comigo:";
+  const DDD_BR = new Set([
+    "11","12","13","14","15","16","17","18","19",
+    "21","22","24","27","28",
+    "31","32","33","34","35","37","38",
+    "41","42","43","44","45","46","47","48","49",
+    "51","53","54","55",
+    "61","62","63","64","65","66","67","68","69",
+    "71","73","74","75","77","79",
+    "81","82","83","84","85","86","87","88","89",
+    "91","92","93","94","95","96","97","98","99"
+  ]);
   const state = {
     config: null,
     ref: "",
     shareLink: "",
     panelLink: "",
     sessionId: "",
-    attribution: {}
+    attribution: {},
+    cities: [],
+    selectedCity: null,
+    cityTimer: null,
+    launchTimer: null,
+    submitting: false
   };
 
   const $ = (id) => document.getElementById(id);
@@ -455,9 +540,13 @@
       pedir_nome: true,
       pedir_email: true,
       pedir_whatsapp: true,
+      pedir_uf: true,
+      pedir_cidade: true,
       exigir_nome: true,
       exigir_email: true,
-      exigir_whatsapp: false,
+      exigir_whatsapp: true,
+      exigir_uf: true,
+      exigir_cidade: true,
       exigir_maior_18: true,
       exigir_termos: true,
       exigir_optin_email: false,
@@ -477,6 +566,14 @@
       aviso_18: "Conteudo e cadastro permitidos somente para maiores de 18 anos.",
       sem_promessa: "O Turbo Tiger e uma ferramenta de organizacao e acompanhamento. Nao promete ganhos, lucro ou resultado em apostas.",
       politica_url: "/politicaetermos.html"
+    },
+    release: {
+      contador_ativo: false,
+      contador_titulo: "Liberacao do Turbo Tiger",
+      contador_chamada: "Faltam {dias} dias para liberacao do Turbo Tiger",
+      contador_encerrado: "A liberacao do Turbo Tiger ja comecou",
+      data_lancamento: "",
+      data_lancamento_texto: ""
     }
   };
 
@@ -484,9 +581,159 @@
     return value === null || value === undefined ? "" : String(value).trim();
   }
 
+  function digitsOnly(value){
+    return normalize(value).replace(/\D/g, "");
+  }
+
+  function normalizePhoneDigits(value){
+    let digits = digitsOnly(value);
+    if (digits.length === 13 && digits.startsWith("55")) {
+      digits = digits.slice(2);
+    }
+    return digits.slice(0, 11);
+  }
+
+  function maskWhatsApp(value){
+    const digits = normalizePhoneDigits(value);
+    const ddd = digits.slice(0, 2);
+    const part1 = digits.slice(2, 7);
+    const part2 = digits.slice(7, 11);
+    if (digits.length <= 2) return ddd ? "(" + ddd : "";
+    if (digits.length <= 7) return "(" + ddd + ") " + part1;
+    return "(" + ddd + ") " + part1 + "-" + part2;
+  }
+
+  function isValidWhatsApp(value){
+    const digits = normalizePhoneDigits(value);
+    return digits.length === 11 && digits[2] === "9" && DDD_BR.has(digits.slice(0, 2));
+  }
+
+  function isValidEmail(value){
+    const text = normalize(value);
+    const at = text.indexOf("@");
+    if (!text || at < 1 || text.indexOf("@", at + 1) !== -1) return false;
+    const local = text.slice(0, at);
+    const domain = text.slice(at + 1);
+    if (!local || !domain) return false;
+    if (local.startsWith(".") || local.endsWith(".") || local.includes("..")) return false;
+    if (!/^[A-Za-z0-9!#$%&'*+/=?^_`{|}~.-]+$/.test(local)) return false;
+    if (domain.startsWith(".") || domain.endsWith(".") || domain.includes("..")) return false;
+    if (!domain.includes(".")) return false;
+    if (domain.startsWith("-") || domain.endsWith("-")) return false;
+    if (/(^|\.)-/.test(domain) || /-(\.|$)/.test(domain)) return false;
+    return /^[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(domain);
+  }
+
+  function normalizeSearchText(value){
+    return normalize(value)
+      .toLocaleLowerCase("pt-BR")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function escapeHtml(value){
+    return normalize(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   function boolValue(value, fallback){
     if (value === true || value === false) return value;
     return fallback;
+  }
+
+  function fieldActive(inputId){
+    const input = $(inputId);
+    const field = input ? input.closest(".field") : null;
+    return !!input && !!field && !field.hidden;
+  }
+
+  function fieldRequired(inputId){
+    const input = $(inputId);
+    return fieldActive(inputId) && !!input.required;
+  }
+
+  function normalizeCity(raw){
+    const city = raw || {};
+    const nome = normalize(city.nome || city.cidade || city.nome_cidade);
+    const uf = normalize(city.uf || city.estado_uf || $("uf").value).toUpperCase();
+    const ibge = normalize(city.ibge || city.codigo_ibge || city.cidade_ibge);
+    const idCidade = normalize(city.id_cidade || city.cod_cidade || city.codigo_cidade);
+    const idEstado = normalize(city.id_estado || city.cod_estado || city.codigo_estado);
+    const idPais = normalize(city.id_pais || city.cod_pais || city.codigo_pais);
+    return Object.assign({}, city, {
+      nome,
+      uf,
+      ibge,
+      id_cidade: idCidade,
+      cod_cidade: normalize(city.cod_cidade || idCidade),
+      id_estado: idEstado,
+      cod_estado: normalize(city.cod_estado || idEstado),
+      id_pais: idPais,
+      cod_pais: normalize(city.cod_pais || idPais)
+    });
+  }
+
+  function cityPayloadValue(city){
+    const c = normalizeCity(city);
+    return c.ibge || c.nome;
+  }
+
+  function parseLaunchDate(release){
+    const raw = normalize(release && release.data_lancamento);
+    if (!raw) return null;
+    const date = new Date(raw);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function formatLaunchDate(date, release){
+    const configured = normalize(release && release.data_lancamento_texto);
+    if (configured) return configured;
+    try {
+      return new Intl.DateTimeFormat("pt-BR", {
+        timeZone: normalize(release && release.data_lancamento_timezone) || "America/Sao_Paulo",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date);
+    } catch(e) {
+      return "";
+    }
+  }
+
+  function renderLaunchCountdown(release){
+    const box = $("launchCountdown");
+    if (!box) return;
+    window.clearInterval(state.launchTimer);
+
+    const cfg = Object.assign({}, defaults.release, release || {});
+    const date = parseLaunchDate(cfg);
+    if (!boolValue(cfg.contador_ativo, false) || !date) {
+      box.classList.remove("is-visible");
+      return;
+    }
+
+    const update = () => {
+      const diff = date.getTime() - Date.now();
+      const days = Math.max(0, Math.ceil(diff / 86400000));
+      const text = diff <= 0
+        ? (cfg.contador_encerrado || defaults.release.contador_encerrado)
+        : (cfg.contador_chamada || defaults.release.contador_chamada).replace("{dias}", days.toLocaleString("pt-BR"));
+
+      $("launchDays").textContent = days.toLocaleString("pt-BR");
+      $("launchTitle").textContent = cfg.contador_titulo || defaults.release.contador_titulo;
+      $("launchText").textContent = text;
+      $("launchDateText").textContent = formatLaunchDate(date, cfg) ? "Previsao: " + formatLaunchDate(date, cfg) : "";
+      box.classList.add("is-visible");
+    };
+
+    update();
+    state.launchTimer = window.setInterval(update, 60000);
   }
 
   function params(){
@@ -578,12 +825,17 @@
     if (!visible) input.checked = false;
   }
 
+  function isVisible(el){
+    return !!el && !el.hidden && el.offsetParent !== null;
+  }
+
   function applyConfig(config){
     const promo = config.promocao || {};
     const campos = Object.assign({}, defaults.campos, promo.campos || {});
     const verificacao = Object.assign({}, defaults.verificacao, promo.verificacao || {});
     const indicacao = Object.assign({}, defaults.indicacao, promo.indicacao || {});
     const legal = Object.assign({}, defaults.legal, promo.legal || {});
+    const release = Object.assign({}, defaults.release, promo.release || {});
 
     $("heroTitle").textContent = promo.titulo || "Entre na lista de espera do Turbo Tiger";
     $("heroSubtitle").textContent = promo.subtitulo || "Organize suas bets, acompanhe seus resultados e receba acesso antecipado.";
@@ -595,21 +847,39 @@
     $("legalNote").textContent = legal.sem_promessa || defaults.legal.sem_promessa;
     $("legalAds").textContent = [legal.aviso_18, legal.sem_promessa, legal.jogo_responsavel].filter(Boolean).join(" ");
     $("termsLink").href = legal.politica_url || "/politicaetermos.html";
+    $("termsPrivacyLink").href = legal.politica_url || "/politicaetermos.html";
+    $("termsUseLink").href = legal.politica_url || "/politicaetermos.html";
 
-    updateField("fieldNome", "nome", true, boolValue(campos.exigir_nome, true));
-    updateField("fieldEmail", "email", boolValue(campos.pedir_email, true), boolValue(campos.exigir_email, true));
-    updateField("fieldWhatsApp", "whatsapp", boolValue(campos.pedir_whatsapp, true), boolValue(campos.exigir_whatsapp, false));
+    const exigirNome = boolValue(campos.exigir_nome, true);
+    const exigirUf = boolValue(campos.exigir_uf, true);
+    const exigirCidade = boolValue(campos.exigir_cidade, true);
+    const exigirOptinEmail = boolValue(campos.exigir_optin_email, false);
+    const exigirOptinWhatsApp = boolValue(campos.exigir_optin_whatsapp, false);
+    const pedirNome = boolValue(campos.pedir_nome, true) || exigirNome;
+    const pedirEmail = boolValue(campos.pedir_email, true);
+    const pedirWhatsApp = boolValue(campos.pedir_whatsapp, true);
+    const pedirUf = boolValue(campos.pedir_uf, true) || exigirUf || exigirCidade;
+    const pedirCidade = pedirUf && (boolValue(campos.pedir_cidade, true) || exigirCidade);
+
+    updateField("fieldNome", "nome", pedirNome, exigirNome);
+    updateField("fieldEmail", "email", pedirEmail, boolValue(campos.exigir_email, true));
+    updateField("fieldWhatsApp", "whatsapp", pedirWhatsApp, boolValue(campos.exigir_whatsapp, true));
+    updateField("fieldUF", "uf", pedirUf, exigirUf || exigirCidade);
+    updateField("fieldCidade", "cidade", pedirCidade, exigirCidade);
     updateCheck("checkMaior18", "maior18", true, boolValue(campos.exigir_maior_18, true));
     updateCheck("checkTermos", "termos", true, boolValue(campos.exigir_termos, true));
-    updateCheck("checkOptinEmail", "optinEmail", boolValue(campos.pedir_email, true), boolValue(campos.exigir_optin_email, false));
-    updateCheck("checkOptinWhatsApp", "optinWhatsApp", boolValue(campos.pedir_whatsapp, true), boolValue(campos.exigir_optin_whatsapp, false));
+    updateCheck("checkOptinEmail", "optinEmail", pedirEmail || exigirOptinEmail, exigirOptinEmail);
+    updateCheck("checkOptinWhatsApp", "optinWhatsApp", pedirWhatsApp || exigirOptinWhatsApp, exigirOptinWhatsApp);
 
     if (state.ref) {
       $("refBanner").style.display = "block";
     }
     showReturnBox();
+    renderLaunchCountdown(release);
 
-    state.config = { promo, campos, verificacao, indicacao, legal };
+    state.config = { promo, campos, verificacao, indicacao, legal, release };
+    updateCityAvailability();
+    updateFormState();
     initPixels(promo.ads || {});
   }
 
@@ -673,6 +943,174 @@
     } catch(e) {}
   }
 
+  function updateCityAvailability(){
+    const uf = $("uf").value;
+    const cityInput = $("cidade");
+    const cityField = $("fieldCidade");
+    const cityVisible = !cityField.hidden;
+    cityInput.disabled = !cityVisible || !uf;
+    cityInput.placeholder = uf ? "Digite e selecione a cidade" : "Selecione o estado primeiro";
+    if (!uf || !cityVisible) {
+      state.cities = [];
+      state.selectedCity = null;
+      cityInput.value = "";
+      $("cityHelp").textContent = "";
+      renderCityList([]);
+    }
+  }
+
+  function renderCityList(cities){
+    const list = $("cityList");
+    if (!cities.length) {
+      list.hidden = true;
+      list.innerHTML = "";
+      return;
+    }
+    list.innerHTML = cities.map((city, index) => [
+      '<button class="city-option" type="button" role="option" data-index="', index, '">',
+      escapeHtml(city.nome), ' - ', escapeHtml(city.uf),
+      '</button>'
+    ].join("")).join("");
+    list.hidden = false;
+    list.querySelectorAll(".city-option").forEach((button) => {
+      button.addEventListener("mousedown", (event) => event.preventDefault());
+      button.addEventListener("click", () => selectCity(cities[Number(button.dataset.index)]));
+    });
+  }
+
+  function selectCity(city){
+    const normalized = normalizeCity(city);
+    if (!normalized.nome || !cityPayloadValue(normalized)) return;
+    state.selectedCity = normalized;
+    $("cidade").value = normalized.nome;
+    $("cityHelp").textContent = "";
+    renderCityList([]);
+    updateFormState();
+  }
+
+  function matchTypedCity(){
+    const typed = normalizeSearchText($("cidade").value);
+    if (!typed) return null;
+    return state.cities.find((city) => normalizeSearchText(city.nome) === typed) || null;
+  }
+
+  async function loadCities(search){
+    const uf = $("uf").value;
+    if (!uf || $("cidade").disabled) {
+      renderCityList([]);
+      return;
+    }
+    try {
+      const data = await rpc("espera_cidades_uf_rpc", {
+        p_uf: uf,
+        p_busca: search || "",
+        p_limite: 40
+      });
+      const rows = data.ok && Array.isArray(data.cidades) ? data.cidades : [];
+      state.cities = rows
+        .map(normalizeCity)
+        .filter((city) => city.nome && city.uf === uf && cityPayloadValue(city));
+      renderCityList(state.cities);
+      if (normalize(search) && !state.cities.length) {
+        $("cityHelp").textContent = "Nenhuma cidade encontrada para este estado.";
+      } else if (!state.selectedCity) {
+        $("cityHelp").textContent = "";
+      }
+    } catch(e) {
+      state.cities = [];
+      renderCityList([]);
+      $("cityHelp").textContent = "Nao foi possivel carregar as cidades agora.";
+    }
+    updateFormState();
+  }
+
+  function scheduleCitySearch(){
+    window.clearTimeout(state.cityTimer);
+    state.selectedCity = null;
+    $("cityHelp").textContent = "";
+    updateFormState();
+    const search = $("cidade").value;
+    state.cityTimer = window.setTimeout(() => loadCities(search), 180);
+  }
+
+  function validateCitySelection(showMessage){
+    const cityField = $("fieldCidade");
+    if (cityField.hidden) return true;
+    const cityText = normalize($("cidade").value);
+    const needsCity = fieldRequired("cidade") || !!cityText;
+    if (!needsCity) {
+      if (showMessage) $("cityHelp").textContent = "";
+      return true;
+    }
+    if (!$("uf").value) {
+      if (showMessage) $("cityHelp").textContent = "Selecione o estado primeiro.";
+      return false;
+    }
+    if (!cityText) {
+      if (showMessage) $("cityHelp").textContent = "Selecione sua cidade.";
+      return false;
+    }
+    if (
+      state.selectedCity &&
+      state.selectedCity.uf === $("uf").value &&
+      normalizeSearchText(state.selectedCity.nome) === normalizeSearchText(cityText) &&
+      cityPayloadValue(state.selectedCity)
+    ) {
+      return true;
+    }
+    const exact = matchTypedCity();
+    if (exact) {
+      selectCity(exact);
+      return true;
+    }
+    if (showMessage) $("cityHelp").textContent = "Escolha uma cidade da lista.";
+    return false;
+  }
+
+  function fieldFilled(inputId){
+    const input = $(inputId);
+    if (!input || !fieldActive(inputId)) return true;
+    return normalize(input.value) !== "";
+  }
+
+  function requiredCheckOk(inputId){
+    const input = $(inputId);
+    const row = input ? input.closest(".check") : null;
+    if (!input || !row || row.hidden || !input.required) return true;
+    return input.checked;
+  }
+
+  function getFormProblem(){
+    const email = normalize($("email").value);
+    const whatsapp = normalize($("whatsapp").value);
+    const uf = normalize($("uf").value);
+    const city = normalize($("cidade").value);
+
+    if (fieldRequired("nome") && !fieldFilled("nome")) return "Informe seu nome.";
+    if (fieldRequired("email") && !email) return "Informe seu e-mail.";
+    if (fieldActive("email") && email && !isValidEmail(email)) return "Confira o e-mail informado.";
+    if (fieldRequired("whatsapp") && !whatsapp) return "Informe seu WhatsApp.";
+    if (fieldActive("whatsapp") && whatsapp && !isValidWhatsApp(whatsapp)) return "Confira o WhatsApp informado.";
+    if (fieldRequired("uf") && !uf) return "Selecione seu estado.";
+    if ((fieldRequired("cidade") || city) && !validateCitySelection(false)) return "Selecione sua cidade na lista.";
+    if (!requiredCheckOk("maior18")) return "Confirme que voce tem 18 anos ou mais.";
+    if (!requiredCheckOk("termos")) return "Aceite a politica e os termos para continuar.";
+    if (!requiredCheckOk("optinEmail")) return "Autorize o recebimento por e-mail para continuar.";
+    if (!requiredCheckOk("optinWhatsApp")) return "Autorize o recebimento por WhatsApp para continuar.";
+    return "";
+  }
+
+  function updateFormState(){
+    if (state.submitting) return;
+    const problem = getFormProblem();
+    $("submitBtn").disabled = !!problem;
+    if (!problem && $("formStatus").classList.contains("error")) {
+      $("formStatus").className = "status";
+      $("formStatus").textContent = "";
+    }
+    return !problem;
+  }
+
   function friendlyError(code){
     const map = {
       maior_18_obrigatorio: "Confirme que voce tem 18 anos ou mais.",
@@ -682,6 +1120,13 @@
       whatsapp_obrigatorio: "Informe seu WhatsApp.",
       email_invalido: "Confira o e-mail informado.",
       whatsapp_invalido: "Confira o WhatsApp informado.",
+      uf_obrigatoria: "Selecione seu estado.",
+      uf_invalida: "Selecione um estado valido.",
+      cidade_obrigatoria: "Selecione sua cidade.",
+      cidade_invalida: "Escolha uma cidade valida da lista.",
+      email_ja_usuario: "Este e-mail ja esta cadastrado como usuario. Faca login pelo app Turbo Tiger.",
+      whatsapp_ja_usuario: "Este WhatsApp ja esta cadastrado como usuario. Faca login pelo app Turbo Tiger.",
+      ja_cadastrado_lista: "Voce ja esta na lista. Reenviamos seu acesso e seu link de indicacao.",
       optin_email_obrigatorio: "Autorize o recebimento por e-mail para continuar.",
       optin_whatsapp_obrigatorio: "Autorize o recebimento por WhatsApp para continuar.",
       email_whatsapp_em_cadastros_diferentes: "Este e-mail e este WhatsApp aparecem em cadastros diferentes. Use apenas um deles ou fale com o suporte.",
@@ -694,6 +1139,8 @@
   function buildPayload(){
     const attribution = state.attribution;
     const p = params();
+    const selectedCity = normalizeCity(state.selectedCity);
+    const cityValue = cityPayloadValue(selectedCity);
     return {
       slug: p.get("promo") || DEFAULT_SLUG,
       ref: state.ref,
@@ -701,8 +1148,17 @@
       email: $("email").value,
       whatsapp: $("whatsapp").value,
       uf: $("uf").value,
-      cidade: $("cidade").value,
+      cidade: cityValue,
+      cidade_ibge: selectedCity.ibge || null,
+      cidade_nome: selectedCity.nome || "",
+      id_cidade: selectedCity.id_cidade || null,
+      cod_cidade: selectedCity.cod_cidade || null,
+      id_estado: selectedCity.id_estado || null,
+      cod_estado: selectedCity.cod_estado || null,
+      id_pais: selectedCity.id_pais || null,
+      cod_pais: selectedCity.cod_pais || null,
       pais: "BR",
+      pais_codigo: "BR",
       session_id: state.sessionId,
       sistema: /android/i.test(navigator.userAgent) ? "android" : (/iphone|ipad|ipod/i.test(navigator.userAgent) ? "ios" : "web"),
       dispositivo: navigator.userAgent || "",
@@ -724,7 +1180,16 @@
       user_agent: navigator.userAgent || "",
       extras: {
         href: window.location.href,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+        localizacao: {
+          pais_codigo: "BR",
+          uf: $("uf").value,
+          cidade_ibge: selectedCity.ibge || null,
+          cidade_nome: selectedCity.nome || "",
+          id_cidade: selectedCity.id_cidade || null,
+          id_estado: selectedCity.id_estado || null,
+          id_pais: selectedCity.id_pais || null
+        }
       }
     };
   }
@@ -735,9 +1200,15 @@
     $("waitlistForm").hidden = true;
     $("resultPanel").hidden = false;
     $("resultPosition").textContent = "#" + (data.posicao || "--");
+    $("resultText").textContent = data.ja_cadastrado
+      ? "Voce ja estava na lista. Seu link de acompanhamento foi renovado e seu convite continua valendo."
+      : "Seu cadastro foi recebido. Compartilhe seu link para subir na lista quando seus amigos tambem se cadastrarem.";
     $("resultPoints").textContent = (data.pontos || 0) + " pontos";
     $("resultRefs").textContent = (data.indicacoes_confirmadas || 0) + " indicacoes confirmadas";
     $("shareLink").textContent = state.shareLink;
+    if (data.total_lista !== undefined && data.total_lista !== null) {
+      $("totalLista").textContent = Number(data.total_lista || 0).toLocaleString("pt-BR");
+    }
 
     const emailPending = data.email_verificacao_status === "pendente";
     const whatsappPending = data.whatsapp_verificacao_status === "pendente";
@@ -747,7 +1218,10 @@
     }
     if (data.email_notificacao_status === "enfileirada") {
       $("resultVerify").hidden = false;
-      $("resultVerify").textContent = "Enviamos seu link por e-mail";
+      $("resultVerify").textContent = "Link enviado para a fila de e-mail";
+    } else if (data.email_notificacao_status === "ja_enfileirada_recentemente") {
+      $("resultVerify").hidden = false;
+      $("resultVerify").textContent = "Link ja solicitado por e-mail";
     }
 
     try {
@@ -765,8 +1239,18 @@
     const form = $("waitlistForm");
     const status = $("formStatus");
 
+    const problem = getFormProblem();
+    if (problem) {
+      validateCitySelection(true);
+      status.className = "status error";
+      status.textContent = problem;
+      updateFormState();
+      return;
+    }
+
     if (!form.reportValidity()) return;
 
+    state.submitting = true;
     $("signupPanel").classList.add("loading");
     $("submitBtn").disabled = true;
     status.className = "status";
@@ -785,8 +1269,9 @@
       status.className = "status error";
       status.textContent = "Falha de conexao. Tente novamente.";
     } finally {
+      state.submitting = false;
       $("signupPanel").classList.remove("loading");
-      $("submitBtn").disabled = false;
+      updateFormState();
     }
   }
 
@@ -847,6 +1332,36 @@
     $("waitlistForm").addEventListener("submit", submitForm);
     $("copyBtn").addEventListener("click", copyLink);
     $("shareBtn").addEventListener("click", shareLink);
+    ["nome", "email", "maior18", "termos", "optinEmail", "optinWhatsApp"].forEach((id) => {
+      $(id).addEventListener("input", updateFormState);
+      $(id).addEventListener("change", updateFormState);
+    });
+    $("whatsapp").addEventListener("input", () => {
+      $("whatsapp").value = maskWhatsApp($("whatsapp").value);
+      updateFormState();
+    });
+    $("uf").addEventListener("change", () => {
+      state.selectedCity = null;
+      $("cidade").value = "";
+      $("cityHelp").textContent = "";
+      updateCityAvailability();
+      if ($("uf").value) loadCities("");
+      updateFormState();
+    });
+    $("cidade").addEventListener("input", scheduleCitySearch);
+    $("cidade").addEventListener("focus", () => {
+      if ($("uf").value && !$("cidade").disabled) loadCities($("cidade").value);
+    });
+    $("cidade").addEventListener("blur", () => {
+      window.setTimeout(() => {
+        renderCityList([]);
+        validateCitySelection(true);
+        updateFormState();
+      }, 140);
+    });
+    ["termsPrivacyLink", "termsUseLink"].forEach((id) => {
+      $(id).addEventListener("click", (event) => event.stopPropagation());
+    });
 
     try {
       const config = await rpc("espera_config_rpc", { p_slug: params().get("promo") || DEFAULT_SLUG });

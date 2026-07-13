@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Turbo Tiger Admin</title>
+<meta name="description" content="Acesso administrativo Turbo Tiger.">
+<link rel="stylesheet" href="assets/admin.css" />
+</head>
+<body class="admin-login-body" data-admin-page="login">
+  <main class="login-box" aria-labelledby="loginTitle">
+    <div class="login-brand">
+      <img src="../assets/logo-300x300.webp" alt="Turbo Tiger">
+      <div>
+        <h1 id="loginTitle">Turbo Tiger Admin</h1>
+        <span>Acesso administrativo</span>
+      </div>
+    </div>
+
+    <form class="login-form" id="adminLoginForm">
+      <label class="field">
+        <span>E-mail</span>
+        <input id="loginEmail" type="email" autocomplete="username" required>
+      </label>
+
+      <label class="field">
+        <span>Senha</span>
+        <input id="loginPassword" type="password" autocomplete="current-password" required>
+      </label>
+
+      <button class="btn btn-primary" id="loginButton" type="submit">Entrar</button>
+      <div class="status" id="loginStatus" role="status"></div>
+    </form>
+  </main>
+
+  <script src="assets/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Notifica&ccedil;&otilde;es - Turbo Tiger Admin</title>
+<meta name="description" content="Painel administrativo de notificacoes Turbo Tiger.">
+<link rel="stylesheet" href="../assets/admin.css?v=20260713-03" />
+</head>
+<body data-admin-page="push">
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <img src="../../assets/logo-300x300.webp" alt="Turbo Tiger">
+        <div>
+          <h1>Admin</h1>
+          <span id="adminIdentity">Turbo Tiger</span>
+        </div>
+      </div>
+
+      <nav class="admin-nav" aria-label="Areas administrativas">
+        <a class="nav-link" href="../admin/">Administra&ccedil;&atilde;o</a>
+        <a class="nav-link is-active" href="./">Notifica&ccedil;&otilde;es</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost" id="switchAccountButton" type="button">Trocar conta</button>
+        <button class="btn btn-danger" id="logoutButton" type="button">Sair</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-title">
+          <h1>Notifica&ccedil;&otilde;es</h1>
+          <span id="pageStatus" class="status-line">Carregando</span>
+        </div>
+        <button class="btn btn-ghost" id="reloadButton" type="button">Atualizar</button>
+      </div>
+
+      <section class="metric-grid" aria-label="Resumo de notificacoes">
+        <div class="metric"><strong id="metricTokens">0</strong><span>Tokens ativos</span></div>
+        <div class="metric"><strong id="metricDevices">0</strong><span>Aparelhos ativos</span></div>
+        <div class="metric"><strong id="metricLinked">0</strong><span>Vinculados</span></div>
+        <div class="metric"><strong id="metricOpen">0</strong><span>App aberto</span></div>
+        <div class="metric"><strong id="metricLogged">0</strong><span>Logados agora</span></div>
+      </section>
+
+      <div class="tabs" role="tablist">
+        <button class="tab-button is-active" type="button" data-tab="send">Envio</button>
+        <button class="tab-button" type="button" data-tab="models">Modelos</button>
+        <button class="tab-button" type="button" data-tab="history">Hist&oacute;rico</button>
+      </div>
+
+      <section class="panel" data-panel="send">
+        <div class="panel-header">
+          <h2>Novo envio</h2>
+          <label class="check-field">
+            <input id="sendDryRun" type="checkbox" checked>
+            <span>Simular</span>
+          </label>
+        </div>
+        <div class="panel-body">
+          <form id="pushSendForm" class="form-grid">
+            <label class="field">
+              <span>Categoria</span>
+              <select id="sendCategoria" required></select>
+            </label>
+            <label class="field">
+              <span>Tipo</span>
+              <input id="sendTipo" value="manual" maxlength="80" required>
+            </label>
+            <label class="field">
+              <span>T&iacute;tulo</span>
+              <input id="sendTitulo" maxlength="120" required>
+            </label>
+            <label class="field">
+              <span>Prioridade</span>
+              <select id="sendPrioridade">
+                <option value="baixa">Baixa</option>
+                <option value="normal">Normal</option>
+                <option value="alta" selected>Alta</option>
+                <option value="urgente">Urgente</option>
+              </select>
+            </label>
+            <label class="field wide">
+              <span>Mensagem</span>
+              <textarea id="sendMensagem" maxlength="600" required></textarea>
+            </label>
+            <label class="check-field">
+              <input id="sendUsarImagem" type="checkbox">
+              <span>Usar imagem</span>
+            </label>
+            <label class="field" id="sendImagemUrlField" hidden>
+              <span>URL da imagem</span>
+              <input id="sendImagemUrl" type="url" placeholder="https://">
+            </label>
+            <label class="field">
+              <span>Destino</span>
+              <select id="sendDestinoTipo"></select>
+            </label>
+            <div class="wide" id="sendDestinoOptions"></div>
+            <div class="wide">
+              <div class="section-label">Plataforma</div>
+              <div class="choice-grid compact" id="sendPlatformOptions">
+                <label class="choice-item">
+                  <input type="checkbox" data-platform="android" checked>
+                  <span>Android</span>
+                </label>
+                <label class="choice-item">
+                  <input type="checkbox" data-platform="ios" checked>
+                  <span>iOS</span>
+                </label>
+              </div>
+            </div>
+            <label class="field">
+              <span>Limite</span>
+              <input id="sendLimit" type="number" min="1" max="10000" value="200">
+            </label>
+            <label class="field">
+              <span>Privacidade</span>
+              <select id="sendPrivacidade">
+                <option value="publico">Publico</option>
+                <option value="usuario">Usuario</option>
+                <option value="sensivel">Sensivel</option>
+              </select>
+            </label>
+            <div class="btn-row wide">
+              <button class="btn btn-primary" id="sendButton" type="submit">Enviar</button>
+              <button class="btn btn-ghost" id="fillFromModelButton" type="button">Usar modelo</button>
+            </div>
+            <div class="wide">
+              <div class="section-label">Pr&eacute;via</div>
+              <div class="phone-preview" aria-label="Previa da notificacao">
+                <div class="phone-shell">
+                  <div class="phone-notch"></div>
+                  <div class="phone-screen">
+                    <div class="phone-topbar">
+                      <span>00:42</span>
+                      <span>5G 82%</span>
+                    </div>
+                    <div class="phone-shade">
+                      <div class="shade-handle"></div>
+                      <div class="push-card">
+                        <div class="push-card-head">
+                          <div class="push-app">
+                            <span class="push-icon">
+                              <img src="../../assets/logo-300x300.webp" alt="">
+                            </span>
+                            <span>Turbo Tiger</span>
+                          </div>
+                          <span>agora</span>
+                        </div>
+                        <div class="push-content">
+                          <strong id="previewTitle">Turbo Tiger</strong>
+                          <p id="previewBody">Sua mensagem aparece aqui.</p>
+                        </div>
+                        <div class="push-media" id="previewMedia" hidden>
+                          <img class="push-image" id="previewImage" alt="">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+          <pre class="result-box" id="sendResult"></pre>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="models" hidden>
+        <div class="panel-header">
+          <h2>Modelo padr&atilde;o</h2>
+          <span class="status-line" id="modelStatus"></span>
+        </div>
+        <div class="panel-body">
+          <form id="pushModelForm" class="form-grid">
+            <label class="field">
+              <span>Categoria</span>
+              <select id="modelCategoria" required></select>
+            </label>
+            <label class="field">
+              <span>Tipo</span>
+              <input id="modelTipo" value="padrao" maxlength="80" required>
+            </label>
+            <label class="field">
+              <span>T&iacute;tulo padr&atilde;o</span>
+              <input id="modelTitulo" maxlength="120">
+            </label>
+            <label class="field">
+              <span>Prioridade</span>
+              <select id="modelPrioridade">
+                <option value="baixa">Baixa</option>
+                <option value="normal">Normal</option>
+                <option value="alta">Alta</option>
+                <option value="urgente">Urgente</option>
+              </select>
+            </label>
+            <label class="field wide">
+              <span>Mensagem padr&atilde;o</span>
+              <textarea id="modelMensagem" maxlength="600"></textarea>
+            </label>
+            <label class="check-field">
+              <input id="modelUsarImagem" type="checkbox">
+              <span>Usar imagem</span>
+            </label>
+            <label class="field" id="modelImagemUrlField" hidden>
+              <span>URL da imagem</span>
+              <input id="modelImagemUrl" type="url" placeholder="https://">
+            </label>
+            <label class="field">
+              <span>Canal Android</span>
+              <input id="modelCanalAndroid" maxlength="120">
+            </label>
+            <label class="check-field">
+              <input id="modelAtivo" type="checkbox" checked>
+              <span>Ativo</span>
+            </label>
+            <div class="wide image-preview" id="modelImagePreview" aria-hidden="true"></div>
+            <div class="btn-row wide">
+              <button class="btn btn-primary" id="modelSaveButton" type="submit">Salvar modelo</button>
+              <button class="btn btn-ghost" id="modelReloadButton" type="button">Recarregar</button>
+            </div>
+          </form>
+          <div class="table-wrap" style="margin-top:16px">
+            <table>
+              <thead>
+                <tr>
+                  <th>Categoria</th>
+                  <th>Tipo</th>
+                  <th>T&iacute;tulo</th>
+                  <th>Prioridade</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="modelsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="history" hidden>
+        <div class="panel-header">
+          <h2>Hist&oacute;rico</h2>
+          <button class="btn btn-ghost" id="historyReloadButton" type="button">Recarregar</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Envio</th>
+                  <th>Categoria</th>
+                  <th>Destino</th>
+                  <th>Status</th>
+                  <th>Mensagem</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../assets/admin.js?v=20260713-03"></script>
+</body>
+</html>

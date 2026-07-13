@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Administra&ccedil;&atilde;o - Turbo Tiger Admin</title>
+<meta name="description" content="Painel administrativo Turbo Tiger.">
+<link rel="stylesheet" href="../assets/admin.css" />
+</head>
+<body data-admin-page="admin">
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <img src="../../assets/logo-300x300.webp" alt="Turbo Tiger">
+        <div>
+          <h1>Admin</h1>
+          <span id="adminIdentity">Turbo Tiger</span>
+        </div>
+      </div>
+
+      <nav class="admin-nav" aria-label="Areas administrativas">
+        <a class="nav-link is-active" href="./">Administra&ccedil;&atilde;o</a>
+        <a class="nav-link" href="../push/">Notifica&ccedil;&otilde;es</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost" id="switchAccountButton" type="button">Trocar conta</button>
+        <button class="btn btn-danger" id="logoutButton" type="button">Sair</button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-title">
+          <h1>Administra&ccedil;&atilde;o</h1>
+          <span id="pageStatus" class="status-line">Carregando</span>
+        </div>
+        <button class="btn btn-ghost" id="reloadButton" type="button">Atualizar</button>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab-button is-active" type="button" data-tab="users">Usu&aacute;rios</button>
+        <button class="tab-button" type="button" data-tab="profiles">Perfis</button>
+        <button class="tab-button" type="button" data-tab="areas">&Aacute;reas</button>
+      </div>
+
+      <section class="panel" data-panel="users">
+        <div class="panel-header">
+          <h2>Usu&aacute;rios administrativos</h2>
+          <span class="status-line" id="userStatus"></span>
+        </div>
+        <div class="panel-body">
+          <form id="adminUserForm" class="form-grid">
+            <input id="admUserCod" type="hidden">
+            <label class="field">
+              <span>E-mail do Supabase Auth</span>
+              <input id="admUserEmail" type="email" autocomplete="off" required>
+            </label>
+            <label class="field">
+              <span>Nome</span>
+              <input id="admUserNome" autocomplete="off">
+            </label>
+            <label class="field">
+              <span>Perfil</span>
+              <select id="admUserPerfil" required></select>
+            </label>
+            <label class="check-field">
+              <input id="admUserAtivo" type="checkbox" checked>
+              <span>Ativo</span>
+            </label>
+            <div class="btn-row wide">
+              <button class="btn btn-primary" id="admUserSaveButton" type="submit">Salvar usu&aacute;rio</button>
+              <button class="btn btn-ghost" id="admUserNewButton" type="button">Novo</button>
+            </div>
+          </form>
+
+          <div class="table-wrap" style="margin-top:16px">
+            <table>
+              <thead>
+                <tr>
+                  <th>Usu&aacute;rio</th>
+                  <th>Perfil</th>
+                  <th>Status</th>
+                  <th>&Uacute;ltimo login</th>
+                  <th>A&ccedil;&atilde;o</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="profiles" hidden>
+        <div class="panel-header">
+          <h2>Perfis de acesso</h2>
+          <span class="status-line" id="profileStatus"></span>
+        </div>
+        <div class="panel-body">
+          <form id="adminProfileForm" class="form-grid">
+            <label class="field">
+              <span>Chave</span>
+              <input id="admProfileChave" autocomplete="off" required>
+            </label>
+            <label class="field">
+              <span>Nome</span>
+              <input id="admProfileNome" autocomplete="off" required>
+            </label>
+            <label class="field wide">
+              <span>Descri&ccedil;&atilde;o</span>
+              <textarea id="admProfileDescricao"></textarea>
+            </label>
+            <label class="check-field">
+              <input id="admProfileAtivo" type="checkbox" checked>
+              <span>Ativo</span>
+            </label>
+            <div class="wide">
+              <div class="section-label">Permiss&otilde;es por &aacute;rea</div>
+              <div class="permission-grid" id="profilePermissions"></div>
+            </div>
+            <div class="btn-row wide">
+              <button class="btn btn-primary" id="admProfileSaveButton" type="submit">Salvar perfil</button>
+              <button class="btn btn-ghost" id="admProfileNewButton" type="button">Novo</button>
+            </div>
+          </form>
+
+          <div class="table-wrap" style="margin-top:16px">
+            <table>
+              <thead>
+                <tr>
+                  <th>Perfil</th>
+                  <th>&Aacute;reas</th>
+                  <th>Status</th>
+                  <th>A&ccedil;&atilde;o</th>
+                </tr>
+              </thead>
+              <tbody id="adminProfilesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="areas" hidden>
+        <div class="panel-header">
+          <h2>&Aacute;reas administrativas</h2>
+          <span class="status-line" id="areaStatus"></span>
+        </div>
+        <div class="panel-body">
+          <form id="adminAreaForm" class="form-grid">
+            <label class="field">
+              <span>Chave</span>
+              <input id="admAreaChave" autocomplete="off" required>
+            </label>
+            <label class="field">
+              <span>Nome</span>
+              <input id="admAreaNome" autocomplete="off" required>
+            </label>
+            <label class="field wide">
+              <span>Descri&ccedil;&atilde;o</span>
+              <textarea id="admAreaDescricao"></textarea>
+            </label>
+            <label class="field">
+              <span>Ordem</span>
+              <input id="admAreaOrdem" type="number" value="100">
+            </label>
+            <label class="check-field">
+              <input id="admAreaAtivo" type="checkbox" checked>
+              <span>Ativa</span>
+            </label>
+            <div class="btn-row wide">
+              <button class="btn btn-primary" id="admAreaSaveButton" type="submit">Salvar &aacute;rea</button>
+              <button class="btn btn-ghost" id="admAreaNewButton" type="button">Nova</button>
+            </div>
+          </form>
+
+          <div class="table-wrap" style="margin-top:16px">
+            <table>
+              <thead>
+                <tr>
+                  <th>&Aacute;rea</th>
+                  <th>Descri&ccedil;&atilde;o</th>
+                  <th>Ordem</th>
+                  <th>Status</th>
+                  <th>A&ccedil;&atilde;o</th>
+                </tr>
+              </thead>
+              <tbody id="adminAreasTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../assets/admin.js"></script>
+</body>
+</html>
