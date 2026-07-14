@@ -270,19 +270,123 @@
     return date.toLocaleDateString("pt-BR") + " " + date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
   }
 
-  function activeModel(categoria, tipo) {
+  function restoreSelectValue(select, value) {
+    if (!select) return;
+    var wanted = String(value || "");
+    var found = false;
+    Array.prototype.forEach.call(select.options, function (option) {
+      if (option.value === wanted) found = true;
+    });
+    if (found) {
+      select.value = wanted;
+    } else if (select.options.length) {
+      select.selectedIndex = 0;
+    }
+  }
+
+  function exactModel(categoria, tipo) {
     var modelos = (state.catalogo && state.catalogo.modelos) || [];
     var wanted = tipo || "padrao";
     return modelos.find(function (m) {
       return m.categoria === categoria && m.tipo === wanted;
-    }) || modelos.find(function (m) {
-      return m.categoria === categoria && m.tipo === "padrao";
     }) || null;
+  }
+
+  function activeModel(categoria, tipo) {
+    var wanted = tipo || "padrao";
+    return exactModel(categoria, wanted) || exactModel(categoria, "padrao") || null;
   }
 
   function currentCategoryDefault(categoria) {
     var categorias = (state.catalogo && state.catalogo.categorias) || [];
     return categorias.find(function (item) { return item.chave === categoria; }) || null;
+  }
+
+  function humanizeTipo(tipo) {
+    return String(tipo || "")
+      .replace(/_/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/^./, function (letter) { return letter.toUpperCase(); }) || "Padrao";
+  }
+
+  function modelTypeOptions(categoria) {
+    var map = {};
+    ((state.catalogo && state.catalogo.tipos_notificacao) || []).forEach(function (item) {
+      if (item.categoria !== categoria || !item.tipo) return;
+      map[item.tipo] = {
+        tipo: item.tipo,
+        nome: item.nome || humanizeTipo(item.tipo),
+        descricao: item.descricao || "",
+        ordem: item.ordem || 999,
+        titulo_padrao: item.titulo_padrao || "",
+        mensagem_padrao: item.mensagem_padrao || "",
+        placeholders_json: item.placeholders_json || [],
+        contexto_exemplo_json: item.contexto_exemplo_json || {},
+        automatico: item.automatico === true,
+        manual: item.manual !== false
+      };
+    });
+    ((state.catalogo && state.catalogo.modelos) || []).forEach(function (model) {
+      if (model.categoria !== categoria || !model.tipo) return;
+      var option = map[model.tipo] || {
+        tipo: model.tipo,
+        nome: model.nome || humanizeTipo(model.tipo),
+        descricao: model.descricao || "",
+        ordem: model.ordem || 999,
+        placeholders_json: model.placeholders_json || [],
+        contexto_exemplo_json: model.contexto_exemplo_json || {},
+        automatico: model.automatico === true,
+        manual: model.manual !== false
+      };
+      option.titulo_padrao = model.titulo_padrao || option.titulo_padrao || "";
+      option.mensagem_padrao = model.mensagem_padrao || option.mensagem_padrao || "";
+      option.prioridade = model.prioridade || option.prioridade || "";
+      option.canal_android = model.canal_android || option.canal_android || "";
+      map[model.tipo] = option;
+    });
+    return Object.keys(map).map(function (key) { return map[key]; }).sort(function (a, b) {
+      return (a.ordem - b.ordem) || a.nome.localeCompare(b.nome);
+    });
+  }
+
+  function currentModelTypeOption(categoria, tipo) {
+    return modelTypeOptions(categoria).find(function (item) { return item.tipo === tipo; }) || null;
+  }
+
+  function fillModelTypeSelect(preferredTipo) {
+    var select = qs("modelTipo");
+    var categoria = qs("modelCategoria") && qs("modelCategoria").value;
+    if (!select || !categoria) return;
+    var current = preferredTipo || select.value || "padrao";
+    select.innerHTML = "";
+    modelTypeOptions(categoria).forEach(function (item) {
+      var option = document.createElement("option");
+      option.value = item.tipo;
+      option.textContent = item.nome + " (" + item.tipo + ")";
+      select.appendChild(option);
+    });
+    restoreSelectValue(select, current);
+  }
+
+  function fillSendTypeSelect(preferredTipo) {
+    var select = qs("sendTipo");
+    var categoria = qs("sendCategoria") && qs("sendCategoria").value;
+    if (!select || !categoria) return;
+    var options = sendModelOptions(categoria);
+    var current = preferredTipo || select.value || "manual";
+    select.innerHTML = "";
+    options.forEach(function (item) {
+      var option = document.createElement("option");
+      option.value = item.tipo;
+      option.textContent = item.nome + " (" + item.tipo + ")";
+      select.appendChild(option);
+    });
+    restoreSelectValue(select, current);
+  }
+
+  function sendModelOptions(categoria) {
+    return modelTypeOptions(categoria).filter(function (item) { return item.manual !== false; });
   }
 
   function applyModelToSend() {
@@ -298,30 +402,80 @@
     qs("sendImagemUrl").value = modelo.imagem_url || "";
     updateSendImageField();
     updatePushPreview();
+    renderSendModelPicker();
+  }
+
+  function renderSendModelPicker() {
+    var box = qs("sendModelPicker");
+    if (!box) return;
+    var categoria = qs("sendCategoria") && qs("sendCategoria").value;
+    var selectedTipo = qs("sendTipo") && qs("sendTipo").value;
+    var rows = categoria ? sendModelOptions(categoria) : [];
+
+    if (!rows.length) {
+      box.innerHTML = "<div class=\"status-line\">Nenhum modelo manual encontrado para esta categoria.</div>";
+      return;
+    }
+
+    box.innerHTML =
+      "<div class=\"section-label\">Modelos da categoria</div>" +
+      "<div class=\"send-model-list\">" +
+      rows.map(function (option) {
+        var model = exactModel(categoria, option.tipo);
+        var title = (model && model.titulo_padrao) || option.titulo_padrao || "Turbo Tiger";
+        var message = (model && model.mensagem_padrao) || option.mensagem_padrao || "";
+        var active = option.tipo === selectedTipo ? " is-selected" : "";
+        var modo = [option.automatico ? "Automatico" : "", option.manual ? "Manual" : ""].filter(Boolean).join(" / ");
+        return "<button class=\"send-model-card" + active + "\" type=\"button\" data-send-model=\"" + escapeHtml(option.tipo) + "\">" +
+          "<span class=\"send-model-card-title\">" + escapeHtml(option.nome || humanizeTipo(option.tipo)) + "</span>" +
+          "<span class=\"send-model-card-key\">" + escapeHtml(option.tipo) + (modo ? " - " + escapeHtml(modo) : "") + "</span>" +
+          "<strong>" + escapeHtml(title) + "</strong>" +
+          "<span class=\"send-model-card-message\">" + escapeHtml(message) + "</span>" +
+        "</button>";
+      }).join("") +
+      "</div>";
+  }
+
+  function toggleSendModelPicker() {
+    var box = qs("sendModelPicker");
+    if (!box) return;
+    renderSendModelPicker();
+    box.hidden = !box.hidden;
+  }
+
+  function hideSendModelPicker() {
+    var box = qs("sendModelPicker");
+    if (box) box.hidden = true;
+  }
+
+  function chooseSendModel(tipo) {
+    if (!tipo || !qs("sendTipo")) return;
+    restoreSelectValue(qs("sendTipo"), tipo);
+    applyModelToSend();
+    hideSendModelPicker();
   }
 
   function applyModelToEditor() {
     var categoria = qs("modelCategoria") && qs("modelCategoria").value;
     var tipo = qs("modelTipo") && qs("modelTipo").value;
-    var modelo = activeModel(categoria, tipo);
+    var modelo = exactModel(categoria, tipo);
+    var fallback = modelo ? null : activeModel(categoria, "padrao");
+    var option = currentModelTypeOption(categoria, tipo);
     var defaults = currentCategoryDefault(categoria);
-    qs("modelTitulo").value = (modelo && modelo.titulo_padrao) || "Turbo Tiger";
-    qs("modelMensagem").value = (modelo && modelo.mensagem_padrao) || "";
+    qs("modelTitulo").value = (modelo && modelo.titulo_padrao) || (option && option.titulo_padrao) || (fallback && fallback.titulo_padrao) || "Turbo Tiger";
+    qs("modelMensagem").value = (modelo && modelo.mensagem_padrao) || (option && option.mensagem_padrao) || (fallback && fallback.mensagem_padrao) || "";
     qs("modelUsarImagem").checked = !!(modelo && modelo.usar_imagem);
     qs("modelImagemUrl").value = (modelo && modelo.imagem_url) || "";
     qs("modelCanalAndroid").value = (modelo && modelo.canal_android) || (defaults && defaults.canal_android_padrao) || "";
     qs("modelPrioridade").value = (modelo && modelo.prioridade) || (defaults && defaults.prioridade_padrao) || "alta";
     qs("modelAtivo").checked = !modelo || modelo.ativo !== false;
     updateModelImageField();
-    updateImagePreview();
+    updateModelPreview();
+    renderModels();
   }
 
   function updateImagePreview() {
-    var preview = qs("modelImagePreview");
-    if (!preview) return;
-    var url = qs("modelImagemUrl") ? qs("modelImagemUrl").value.trim() : "";
-    var checked = qs("modelUsarImagem") && qs("modelUsarImagem").checked;
-    preview.style.backgroundImage = checked && /^https:\/\//i.test(url) ? "url('" + url.replace(/'/g, "%27") + "')" : "none";
+    updateModelPreview();
   }
 
   function updateSendImageField() {
@@ -336,16 +490,14 @@
     field.hidden = !(qs("modelUsarImagem") && qs("modelUsarImagem").checked);
   }
 
-  function updatePushPreview() {
-    if (!qs("previewTitle")) return;
-    var title = qs("sendTitulo") ? qs("sendTitulo").value.trim() : "";
-    var body = qs("sendMensagem") ? qs("sendMensagem").value.trim() : "";
-    var useImage = qs("sendUsarImagem") && qs("sendUsarImagem").checked;
-    var imageUrl = qs("sendImagemUrl") ? qs("sendImagemUrl").value.trim() : "";
-    var media = qs("previewMedia");
-    var image = qs("previewImage");
-    qs("previewTitle").textContent = title || "Turbo Tiger";
-    qs("previewBody").textContent = body || "Sua mensagem aparece aqui.";
+  function updateNotificationPreview(titleId, bodyId, mediaId, imageId, title, body, useImage, imageUrl) {
+    var titleEl = qs(titleId);
+    var bodyEl = qs(bodyId);
+    if (!titleEl || !bodyEl) return;
+    var media = qs(mediaId);
+    var image = qs(imageId);
+    titleEl.textContent = title || "Turbo Tiger";
+    bodyEl.textContent = body || "Sua mensagem aparece aqui.";
     if (media && image) {
       var showImage = useImage && /^https:\/\//i.test(imageUrl);
       media.hidden = !showImage;
@@ -355,6 +507,32 @@
         image.removeAttribute("src");
       }
     }
+  }
+
+  function updatePushPreview() {
+    updateNotificationPreview(
+      "previewTitle",
+      "previewBody",
+      "previewMedia",
+      "previewImage",
+      qs("sendTitulo") ? qs("sendTitulo").value.trim() : "",
+      qs("sendMensagem") ? qs("sendMensagem").value.trim() : "",
+      qs("sendUsarImagem") && qs("sendUsarImagem").checked,
+      qs("sendImagemUrl") ? qs("sendImagemUrl").value.trim() : ""
+    );
+  }
+
+  function updateModelPreview() {
+    updateNotificationPreview(
+      "modelPreviewTitle",
+      "modelPreviewBody",
+      "modelPreviewMedia",
+      "modelPreviewImage",
+      qs("modelTitulo") ? qs("modelTitulo").value.trim() : "",
+      qs("modelMensagem") ? qs("modelMensagem").value.trim() : "",
+      qs("modelUsarImagem") && qs("modelUsarImagem").checked,
+      qs("modelImagemUrl") ? qs("modelImagemUrl").value.trim() : ""
+    );
   }
 
   function renderMetrics() {
@@ -467,15 +645,32 @@
   function renderModels() {
     var tbody = qs("modelsTableBody");
     if (!tbody) return;
+    var categoria = qs("modelCategoria") && qs("modelCategoria").value;
+    var selectedTipo = qs("modelTipo") && qs("modelTipo").value;
+    var rows = categoria ? modelTypeOptions(categoria) : [];
     tbody.innerHTML = "";
-    ((state.catalogo && state.catalogo.modelos) || []).forEach(function (model) {
+    if (!rows.length) {
       var tr = document.createElement("tr");
+      tr.innerHTML = "<td colspan=\"5\" class=\"status-line\">Nenhuma configuracao encontrada.</td>";
+      tbody.appendChild(tr);
+      return;
+    }
+    rows.forEach(function (option) {
+      var model = exactModel(categoria, option.tipo);
+    var title = (model && model.titulo_padrao) || option.titulo_padrao || "";
+    var priority = (model && model.prioridade) || (currentCategoryDefault(categoria) && currentCategoryDefault(categoria).prioridade_padrao) || "";
+    var statusClass = model ? (model.ativo ? "ok" : "bad") : "warn";
+    var statusText = model ? (model.ativo ? "Ativo" : "Inativo") : "Nao configurado";
+      var modo = [option.automatico ? "Automatico" : "", option.manual ? "Manual" : ""].filter(Boolean).join(" / ");
+      var tr = document.createElement("tr");
+      tr.className = option.tipo === selectedTipo ? "is-selected" : "";
+      tr.setAttribute("data-model-row", option.tipo);
       tr.innerHTML =
-        "<td>" + escapeHtml(model.categoria) + "</td>" +
-        "<td>" + escapeHtml(model.tipo) + "</td>" +
-        "<td>" + escapeHtml(model.titulo_padrao || "") + "</td>" +
-        "<td>" + escapeHtml(model.prioridade || "") + "</td>" +
-        "<td><span class=\"pill " + (model.ativo ? "ok" : "bad") + "\">" + (model.ativo ? "Ativo" : "Inativo") + "</span></td>";
+        "<td><strong>" + escapeHtml(option.nome) + "</strong><br><span class=\"status-line\">" + escapeHtml(option.tipo) + (option.descricao ? " - " + escapeHtml(option.descricao) : "") + (modo ? " - " + escapeHtml(modo) : "") + "</span></td>" +
+        "<td>" + escapeHtml(title) + "</td>" +
+        "<td>" + escapeHtml(priority) + "</td>" +
+        "<td><span class=\"pill " + statusClass + "\">" + statusText + "</span></td>" +
+        "<td><div class=\"row-actions\"><button class=\"btn btn-ghost btn-small\" type=\"button\" data-edit-model=\"" + escapeHtml(option.tipo) + "\">Editar</button></div></td>";
       tbody.appendChild(tr);
     });
   }
@@ -812,6 +1007,11 @@
   }
 
   async function loadCatalog() {
+    var sendCategoria = qs("sendCategoria") && qs("sendCategoria").value;
+    var sendTipo = qs("sendTipo") && qs("sendTipo").value;
+    var sendDestinoTipo = qs("sendDestinoTipo") && qs("sendDestinoTipo").value;
+    var modelCategoria = qs("modelCategoria") && qs("modelCategoria").value;
+    var modelTipo = qs("modelTipo") && qs("modelTipo").value;
     state.catalogo = await rpc("adm_push_catalogo_rpc", {});
     if (!state.catalogo || state.catalogo.ok !== true) {
       throw new Error((state.catalogo && state.catalogo.error) || "catalogo_indisponivel");
@@ -820,9 +1020,15 @@
     fillSelect(qs("sendCategoria"), categorias, "chave", "nome");
     fillSelect(qs("modelCategoria"), categorias, "chave", "nome");
     fillSelect(qs("sendDestinoTipo"), state.catalogo.destinos || [], "tipo", "nome");
+    restoreSelectValue(qs("sendCategoria"), sendCategoria);
+    restoreSelectValue(qs("sendDestinoTipo"), sendDestinoTipo);
+    restoreSelectValue(qs("modelCategoria"), modelCategoria);
+    fillSendTypeSelect(sendTipo);
+    fillModelTypeSelect(modelTipo);
     renderDestinoOptions();
     renderMetrics();
     renderModels();
+    renderSendModelPicker();
     applyModelToSend();
     applyModelToEditor();
   }
@@ -910,6 +1116,13 @@
     }
   }
 
+  function editModelType(tipo) {
+    if (!tipo || !qs("modelTipo")) return;
+    restoreSelectValue(qs("modelTipo"), tipo);
+    applyModelToEditor();
+    if (qs("modelTitulo")) qs("modelTitulo").focus();
+  }
+
   function setupTabs() {
     Array.prototype.forEach.call(document.querySelectorAll("[data-tab]"), function (button) {
       button.addEventListener("click", function () {
@@ -988,10 +1201,19 @@
     qs("modelReloadButton").addEventListener("click", async function () {
       await loadCatalog();
     });
-    qs("fillFromModelButton").addEventListener("click", applyModelToSend);
+    qs("fillFromModelButton").addEventListener("click", toggleSendModelPicker);
     qs("pushSendForm").addEventListener("submit", sendPush);
     qs("pushModelForm").addEventListener("submit", saveModel);
-    qs("sendCategoria").addEventListener("change", applyModelToSend);
+    qs("sendCategoria").addEventListener("change", function () {
+      fillSendTypeSelect("manual");
+      hideSendModelPicker();
+      renderSendModelPicker();
+      applyModelToSend();
+    });
+    qs("sendTipo").addEventListener("change", function () {
+      applyModelToSend();
+      renderSendModelPicker();
+    });
     qs("sendDestinoTipo").addEventListener("change", renderDestinoOptions);
     qs("sendTitulo").addEventListener("input", updatePushPreview);
     qs("sendMensagem").addEventListener("input", updatePushPreview);
@@ -1000,12 +1222,27 @@
       updateSendImageField();
       updatePushPreview();
     });
-    qs("modelCategoria").addEventListener("change", applyModelToEditor);
+    qs("modelCategoria").addEventListener("change", function () {
+      fillModelTypeSelect("padrao");
+      applyModelToEditor();
+    });
     qs("modelTipo").addEventListener("change", applyModelToEditor);
+    qs("modelTitulo").addEventListener("input", updateModelPreview);
+    qs("modelMensagem").addEventListener("input", updateModelPreview);
     qs("modelImagemUrl").addEventListener("input", updateImagePreview);
     qs("modelUsarImagem").addEventListener("change", function () {
       updateModelImageField();
       updateImagePreview();
+    });
+    qs("modelsTableBody").addEventListener("click", function (event) {
+      var target = event.target.closest("[data-edit-model], [data-model-row]");
+      if (!target) return;
+      editModelType(target.getAttribute("data-edit-model") || target.getAttribute("data-model-row"));
+    });
+    qs("sendModelPicker").addEventListener("click", function (event) {
+      var target = event.target.closest("[data-send-model]");
+      if (!target) return;
+      chooseSendModel(target.getAttribute("data-send-model"));
     });
     await bootPush();
   }

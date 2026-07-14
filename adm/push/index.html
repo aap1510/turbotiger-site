@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Notifica&ccedil;&otilde;es - Turbo Tiger Admin</title>
 <meta name="description" content="Painel administrativo de notificacoes Turbo Tiger.">
-<link rel="stylesheet" href="../assets/admin.css?v=20260713-03" />
+<link rel="stylesheet" href="../assets/admin.css?v=20260714-03" />
 </head>
 <body data-admin-page="push">
   <div class="admin-shell">
@@ -68,7 +68,7 @@
             </label>
             <label class="field">
               <span>Tipo</span>
-              <input id="sendTipo" value="manual" maxlength="80" required>
+              <select id="sendTipo" required></select>
             </label>
             <label class="field">
               <span>T&iacute;tulo</span>
@@ -129,6 +129,7 @@
               <button class="btn btn-primary" id="sendButton" type="submit">Enviar</button>
               <button class="btn btn-ghost" id="fillFromModelButton" type="button">Usar modelo</button>
             </div>
+            <div class="wide send-model-picker" id="sendModelPicker" hidden></div>
             <div class="wide">
               <div class="section-label">Pr&eacute;via</div>
               <div class="phone-preview" aria-label="Previa da notificacao">
@@ -170,7 +171,7 @@
 
       <section class="panel" data-panel="models" hidden>
         <div class="panel-header">
-          <h2>Modelo padr&atilde;o</h2>
+          <h2>Modelos por tipo</h2>
           <span class="status-line" id="modelStatus"></span>
         </div>
         <div class="panel-body">
@@ -180,8 +181,8 @@
               <select id="modelCategoria" required></select>
             </label>
             <label class="field">
-              <span>Tipo</span>
-              <input id="modelTipo" value="padrao" maxlength="80" required>
+              <span>Tipo de mensagem</span>
+              <select id="modelTipo" required></select>
             </label>
             <label class="field">
               <span>T&iacute;tulo padr&atilde;o</span>
@@ -216,7 +217,40 @@
               <input id="modelAtivo" type="checkbox" checked>
               <span>Ativo</span>
             </label>
-            <div class="wide image-preview" id="modelImagePreview" aria-hidden="true"></div>
+            <div class="wide model-preview-wrap">
+              <div class="section-label">Pr&eacute;via</div>
+              <div class="phone-preview" aria-label="Previa do modelo de notificacao">
+                <div class="phone-shell">
+                  <div class="phone-screen">
+                    <span class="phone-camera" aria-hidden="true"></span>
+                    <div class="phone-shade">
+                      <div class="push-card">
+                        <div class="push-card-head">
+                          <div class="push-app">
+                            <span class="push-icon">
+                              <img src="../assets/icone-turbotiger-notificacao-dourado.png" alt="">
+                            </span>
+                            <span class="push-meta">
+                              <span>TIGER</span>
+                              <span class="push-meta-dot"></span>
+                              <span>agora</span>
+                            </span>
+                          </div>
+                          <span class="push-collapse" aria-hidden="true">&gt;</span>
+                        </div>
+                        <div class="push-content">
+                          <strong id="modelPreviewTitle">Turbo Tiger</strong>
+                          <p id="modelPreviewBody">Sua mensagem aparece aqui.</p>
+                        </div>
+                        <div class="push-media" id="modelPreviewMedia" hidden>
+                          <img class="push-image" id="modelPreviewImage" alt="">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="btn-row wide">
               <button class="btn btn-primary" id="modelSaveButton" type="submit">Salvar modelo</button>
               <button class="btn btn-ghost" id="modelReloadButton" type="button">Recarregar</button>
@@ -226,11 +260,11 @@
             <table>
               <thead>
                 <tr>
-                  <th>Categoria</th>
-                  <th>Tipo</th>
+                  <th>Configura&ccedil;&atilde;o</th>
                   <th>T&iacute;tulo</th>
                   <th>Prioridade</th>
                   <th>Status</th>
+                  <th>A&ccedil;&atilde;o</th>
                 </tr>
               </thead>
               <tbody id="modelsTableBody"></tbody>
@@ -265,6 +299,6 @@
     </main>
   </div>
 
-  <script src="../assets/admin.js?v=20260713-04"></script>
+  <script src="../assets/admin.js?v=20260714-03"></script>
 </body>
 </html>
