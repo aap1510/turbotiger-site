@@ -353,6 +353,7 @@ let cardCpfLookupLoading = false;
 let cardCpfLookupError = '';
 let paymentRoutes = { cartao:true, pix_avulso:true, pix_programado:true };
 let paymentConfirmedHandled = false;
+let paymentProcessing = false;
 
 const statusBox = document.getElementById('checkoutStatus');
 const checkoutBtn = document.getElementById('checkoutBtn');
@@ -548,6 +549,7 @@ function returnToAppAfterPayment(){
 function handlePaymentConfirmed(message, buttonText){
   if (paymentConfirmedHandled) return;
   paymentConfirmedHandled = true;
+  paymentProcessing = false;
   stopPaymentPolling();
   stopPixExpirationTimer();
   setStatus(message || 'Pagamento confirmado. Sua assinatura foi liberada no app.', 'ok');
@@ -997,9 +999,11 @@ function validateCard(showMessage){
     ok = false;
     message = 'Informe o n\u00famero do endere\u00e7o do titular.';
     buttonText = 'Informe o n\u00famero';
+  } else {
+    message = 'Dados do cart\u00e3o prontos para processar.';
   }
 
-  if (showMessage || !ok) {
+  if (showMessage || !ok || cardStatus.classList.contains('error')) {
     cardStatus.textContent = message;
     cardStatus.className = 'field-note' + (ok ? '' : ' error');
   }
@@ -1024,6 +1028,12 @@ function validatePayment(showMessage){
 }
 
 function refreshCheckoutButton(){
+  if (paymentProcessing) {
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = baseButtonText;
+    return;
+  }
+
   if (!baseButtonEnabled) {
     checkoutBtn.disabled = true;
     checkoutBtn.textContent = baseButtonText;
@@ -1036,6 +1046,11 @@ function refreshCheckoutButton(){
 }
 
 function resetPaymentState(){
+  if (paymentProcessing) {
+    refreshCheckoutButton();
+    return;
+  }
+
   stopPixExpirationTimer();
   pixResult.style.display = 'none';
   if (checkoutOk) {
@@ -1237,6 +1252,8 @@ function renderPixResult(data){
 }
 
 checkoutBtn.addEventListener('click', async function(){
+  if (paymentProcessing) return;
+
   if (!checkoutOk) {
     setStatus('Abra a assinatura pelo app Turbo Tiger para vincular o pagamento ao seu usu\u00e1rio.', 'error');
     return;
@@ -1248,6 +1265,7 @@ checkoutBtn.addEventListener('click', async function(){
     return;
   }
 
+  paymentProcessing = true;
   const formaPagamento = currentPaymentMethod();
   const checkoutPayload = {
     checkout_ref: checkoutRef,
@@ -1280,6 +1298,7 @@ checkoutBtn.addEventListener('click', async function(){
       ? 'Não foi possível conectar ao gateway de pagamento: ' + detalheErro
       : 'Não foi possível conectar ao gateway de pagamento. Verifique sua internet e tente novamente.',
       'error');
+    paymentProcessing = false;
     setButton(true, selectedPay === 'cartao' ? 'Tentar novamente' : 'Gerar Pix novamente');
     return;
   }
@@ -1292,6 +1311,7 @@ checkoutBtn.addEventListener('click', async function(){
         ? 'N\u00e3o foi poss\u00edvel processar o pagamento: ' + detalheErro
         : 'N\u00e3o foi poss\u00edvel processar o pagamento. Tente novamente.');
     setStatus(message, 'error');
+    paymentProcessing = false;
     setButton(true, selectedPay === 'cartao' ? 'Tentar novamente' : 'Gerar Pix novamente');
     return;
   }
@@ -1302,6 +1322,7 @@ checkoutBtn.addEventListener('click', async function(){
   }
 
   if (data.pix_qr_code) {
+    paymentProcessing = false;
     renderPixResult(data);
     return;
   }
