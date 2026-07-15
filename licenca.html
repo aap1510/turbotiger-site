@@ -326,8 +326,11 @@ const plans = Object.assign({}, fallbackPlans);
 
 const SUPABASE_REST_URL = 'https://jzqgudmvquokizvgehow.supabase.co/rest/v1';
 const SUPABASE_FUNCTION_URL = 'https://jzqgudmvquokizvgehow.supabase.co/functions/v1/asaas-gateway/checkout';
+const SUPABASE_CONSULTAR_CPF_URL = 'https://jzqgudmvquokizvgehow.supabase.co/functions/v1/consultar-cpf';
 const SUPABASE_KEY = 'sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU';
-const checkoutRef = (new URLSearchParams(location.search).get('checkout') || '').trim();
+const urlParams = new URLSearchParams(location.search);
+const checkoutRef = (urlParams.get('checkout') || '').trim();
+const appAcesso = (urlParams.get('app_acesso') || '').trim();
 
 let selectedPlan = 'anual';
 let selectedPay = 'cartao';
@@ -772,7 +775,7 @@ async function consultarCpfPagadorSeNecessario(){
   refreshCheckoutButton();
 
   try {
-    const data = await withTimeout(rpc('consultar_cpf_serpro_rpc', { p_cpf: cpf }), 8000, 'consulta_cpf_timeout');
+    const data = await withTimeout(consultarCpf(cpf), 8000, 'consulta_cpf_timeout');
     if (seq !== payerCpfLookupSeq) return;
     const nome = String(data && data.nome || '').trim().replace(/\s+/g, ' ');
     if (!nome) throw new Error(data && (data.mensagem || data.message) || 'CPF sem nome retornado.');
@@ -832,7 +835,7 @@ async function consultarCpfTitularCartaoSeNecessario(){
   refreshCheckoutButton();
 
   try {
-    const data = await rpc('consultar_cpf_serpro_rpc', { p_cpf: cpf });
+    const data = await consultarCpf(cpf);
     if (seq !== cardCpfLookupSeq) return;
     const nome = String(data && data.nome || '').trim().replace(/\s+/g, ' ');
     if (!nome) throw new Error(data && (data.mensagem || data.message) || 'CPF sem nome retornado.');
@@ -1065,6 +1068,28 @@ function rpc(name, body){
   });
 }
 
+function consultarCpf(cpf){
+  return fetch(SUPABASE_CONSULTAR_CPF_URL, {
+    method: 'POST',
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: 'Bearer ' + SUPABASE_KEY,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({ p_cpf: cpf, checkout_ref: checkoutRef, app_acesso: appAcesso })
+  }).then(async function(response){
+    const text = await response.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch(e) { data = { ok:false, mensagem:text }; }
+    if (!response.ok) {
+      data.ok = false;
+      data.mensagem = data.message || data.msg || data.mensagem || 'erro_consulta_cpf';
+    }
+    return data;
+  });
+}
+
 function gatewayCheckout(body){
   return fetch(SUPABASE_FUNCTION_URL, {
     method: 'POST',
@@ -1149,13 +1174,13 @@ function applyCheckout(data){
 async function validateCheckout(){
   setButton(false, 'Validando acesso...');
 
-  if (!checkoutRef) {
+  if (!checkoutRef || !appAcesso) {
     setStatus('Para assinar, abra esta p\u00e1gina pelo bot\u00e3o Assine agora dentro do app Turbo Tiger.', 'error');
     setButton(false, 'Abra pelo app para assinar');
     return;
   }
 
-  const data = await rpc('assinatura_checkout_resolver_rpc', { p_checkout_ref: checkoutRef });
+  const data = await rpc('assinatura_checkout_resolver_rpc', { p_checkout_ref: checkoutRef, p_app_acesso: appAcesso });
   if (!data.ok) {
     setStatus('Este link de assinatura expirou ou n\u00e3o \u00e9 v\u00e1lido. Abra novamente pelo app Turbo Tiger.', 'error');
     setButton(false, 'Abra pelo app para assinar');
@@ -1226,6 +1251,7 @@ checkoutBtn.addEventListener('click', async function(){
   const formaPagamento = currentPaymentMethod();
   const checkoutPayload = {
     checkout_ref: checkoutRef,
+    app_acesso: appAcesso,
     plano: selectedPlan,
     forma_pagamento: formaPagamento,
     email_cobranca: checkoutEmail
@@ -1287,7 +1313,7 @@ checkoutBtn.addEventListener('click', async function(){
 function startPaymentPolling(){
   stopPaymentPolling();
   pollTimer = setInterval(async function(){
-    const data = await rpc('assinatura_checkout_resolver_rpc', { p_checkout_ref: checkoutRef });
+    const data = await rpc('assinatura_checkout_resolver_rpc', { p_checkout_ref: checkoutRef, p_app_acesso: appAcesso });
     if (data && data.ok && (data.gateway_status === 'pago' || data.status === 'pago')) {
       handlePaymentConfirmed('Pagamento confirmado. Sua assinatura foi liberada no app.', 'Pagamento confirmado');
     }

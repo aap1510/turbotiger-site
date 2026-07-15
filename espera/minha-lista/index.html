@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Minha lista Turbo Tiger</title>
-<meta name="description" content="Acompanhe sua posicao e suas indicacoes na lista de espera Turbo Tiger." />
+<meta name="description" content="Acompanhe sua posição e suas indicações na lista de espera Turbo Tiger." />
 <style>
   :root{
     --gold:#f4b400;
@@ -256,9 +256,9 @@
 <main class="wrap">
   <section class="hero">
     <div class="headline">
-      <p>Acompanhe sua posicao</p>
+      <p>Acompanhe sua posição</p>
       <h1>Seu painel da lista de espera</h1>
-      <div class="lead">Veja sua posicao, acompanhe os cadastros confirmados e reenvie seu link pessoal sempre que quiser.</div>
+      <div class="lead">Veja sua posição, acompanhe os cadastros confirmados e reenvie seu link pessoal sempre que quiser.</div>
     </div>
 
     <section class="panel" id="panel">
@@ -275,11 +275,11 @@
   <section class="below">
     <div class="info">
       <h3>Como subir na lista</h3>
-      <p>Compartilhe seu link. A indicacao so conta quando o amigo completa o cadastro na lista de espera.</p>
+      <p>Compartilhe seu link. A indicação só conta quando o amigo completa o cadastro na lista de espera.</p>
     </div>
     <div class="info">
       <h3>Privacidade</h3>
-      <p>O painel mostra apenas nomes resumidos e status da indicacao. E-mail e WhatsApp dos seus amigos nao aparecem aqui.</p>
+      <p>O painel mostra apenas nomes resumidos e status da indicação. E-mail e WhatsApp dos seus amigos não aparecem aqui.</p>
     </div>
   </section>
 </main>
@@ -297,7 +297,7 @@
 
   const SUPABASE_REST_URL = "https://jzqgudmvquokizvgehow.supabase.co/rest/v1";
   const SUPABASE_KEY = "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU";
-  const SHARE_TEXT = "Estou na lista de espera do Turbo Tiger. Entra pelo meu link para irmos juntos nessa liberacao:";
+  const SHARE_TEXT = "Estou na lista de espera do Turbo Tiger. Entre pelo meu link para acompanharmos juntos essa liberação:";
   const $ = (id) => document.getElementById(id);
   let current = null;
   let countdownTimer = null;
@@ -341,8 +341,8 @@
     return [
       '<div class="launch-countdown" id="panelLaunchCountdown" aria-live="polite">',
       '<div class="count-days"><div><strong id="panelLaunchDays">--</strong><span>dias</span></div></div>',
-      '<div class="count-copy"><strong id="panelLaunchTitle">Liberacao do Turbo Tiger</strong>',
-      '<span id="panelLaunchText">Faltam -- dias para liberacao do Turbo Tiger</span>',
+      '<div class="count-copy"><strong id="panelLaunchTitle">Liberação do Turbo Tiger</strong>',
+      '<span id="panelLaunchText">Faltam -- dias para liberação do Turbo Tiger</span>',
       '<small id="panelLaunchDateText"></small></div>',
       '</div>'
     ].join("");
@@ -357,13 +357,13 @@
     const update = () => {
       const diff = date.getTime() - Date.now();
       const days = Math.max(0, Math.ceil(diff / 86400000));
-      const template = normalize(release && release.contador_chamada) || "Faltam {dias} dias para liberacao do Turbo Tiger";
-      const ended = normalize(release && release.contador_encerrado) || "A liberacao do Turbo Tiger ja comecou";
+      const template = normalize(release && release.contador_chamada) || "Faltam {dias} dias para liberação do Turbo Tiger";
+      const ended = normalize(release && release.contador_encerrado) || "A liberação do Turbo Tiger já começou";
       const dateText = formatLaunchDate(date, release);
       $("panelLaunchDays").textContent = days.toLocaleString("pt-BR");
-      $("panelLaunchTitle").textContent = normalize(release && release.contador_titulo) || "Liberacao do Turbo Tiger";
+      $("panelLaunchTitle").textContent = normalize(release && release.contador_titulo) || "Liberação do Turbo Tiger";
       $("panelLaunchText").textContent = diff <= 0 ? ended : template.replace("{dias}", days.toLocaleString("pt-BR"));
-      $("panelLaunchDateText").textContent = dateText ? "Previsao: " + dateText : "";
+      $("panelLaunchDateText").textContent = dateText ? "Previsão: " + dateText : "";
     };
 
     update();
@@ -419,11 +419,11 @@
   }
 
   function renderEmptyToken(){
-    $("panelTitle").textContent = "Link seguro necessario";
-    $("panelIntro").textContent = "Use o botao enviado depois do cadastro ou entre novamente na lista.";
+    $("panelTitle").textContent = "Link seguro necessário";
+    $("panelIntro").textContent = "Use o botão enviado depois do cadastro ou entre novamente na lista.";
     $("content").innerHTML = [
       '<div class="message error">',
-      '<strong>Nao encontrei seu token de acompanhamento.</strong><br>',
+      '<strong>Não encontrei seu token de acompanhamento.</strong><br>',
       'Volte para a lista de espera, informe seus dados novamente e enviaremos um novo link seguro do painel.',
       '<div class="actions"><a class="btn" href="/espera/">Abrir lista de espera</a></div>',
       '</div>'
@@ -431,11 +431,11 @@
   }
 
   function renderError(){
-    $("panelTitle").textContent = "Painel nao encontrado";
-    $("panelIntro").textContent = "O link pode estar incompleto ou ter sido substituido por um link mais novo.";
+    $("panelTitle").textContent = "Painel não encontrado";
+    $("panelIntro").textContent = "O link pode estar incompleto ou ter sido substituído por um link mais novo.";
     $("content").innerHTML = [
       '<div class="message error">',
-      '<strong>Nao foi possivel abrir este painel.</strong><br>',
+      '<strong>Não foi possível abrir este painel.</strong><br>',
       'Entre novamente na lista com seu e-mail ou WhatsApp para receber um novo link de acompanhamento.',
       '<div class="actions"><a class="btn" href="/espera/">Entrar novamente</a></div>',
       '</div>'
@@ -445,7 +445,7 @@
   function renderPanel(data){
     current = data;
     $("panelTitle").textContent = "Oi, " + (data.nome || "Tiger");
-    $("panelIntro").textContent = "Sua lista esta ativa. Reenvie seu link para quem ainda nao completou o cadastro.";
+    $("panelIntro").textContent = "Sua lista está ativa. Reenvie seu link para quem ainda não completou o cadastro.";
 
     const people = Array.isArray(data.indicados) ? data.indicados : [];
     const peopleHtml = people.length ? people.map((item) => {
@@ -453,14 +453,14 @@
       return [
         '<div class="person">',
         '<div><strong>', escapeHtml(item.nome || "Cadastro"), '</strong>',
-        '<span>', ok ? 'Indicacao validada para sua lista.' : 'Aguardando conclusao.', '</span></div>',
+        '<span>', ok ? 'Indicação validada para sua lista.' : 'Aguardando conclusão.', '</span></div>',
         '<span class="tag', ok ? '' : ' wait', '">', statusLabel(item.status), '</span>',
         '</div>'
       ].join("");
     }).join("") : '<div class="empty">Quando seus amigos completarem o cadastro pelo seu link, eles aparecem aqui.</div>';
 
     $("content").innerHTML = [
-      '<div class="rank"><strong>#', data.posicao || '--', '</strong><span>Essa e sua posicao atual na lista. Seus pontos sobem quando amigos completam o cadastro pelo seu link.</span></div>',
+      '<div class="rank"><strong>#', data.posicao || '--', '</strong><span>Essa é sua posição atual na lista. Seus pontos sobem quando amigos completam o cadastro pelo seu link.</span></div>',
       launchCountdownHtml(data.release || {}),
       '<div class="stats">',
       '<div class="stat"><strong>', formatNumber(data.total_lista), '</strong><span>pessoas na lista de espera</span></div>',
@@ -470,7 +470,7 @@
       '</div>',
       '<div class="share"><strong>Seu link pessoal</strong><div class="share-link" id="shareLink">', escapeHtml(data.link_indicacao || ''), '</div>',
       '<div class="actions"><button class="btn secondary" id="copyBtn" type="button">Copiar link</button><button class="btn ghost" id="shareBtn" type="button">Compartilhar</button></div></div>',
-      '<div class="list"><div class="list-head"><span>Suas indicacoes</span><span>', people.length, '</span></div>', peopleHtml, '</div>'
+      '<div class="list"><div class="list-head"><span>Suas indicações</span><span>', people.length, '</span></div>', peopleHtml, '</div>'
     ].join("");
 
     $("copyBtn").addEventListener("click", copyLink);
