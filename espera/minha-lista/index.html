@@ -113,6 +113,7 @@
   }
   .rank strong{font-size:52px;line-height:1;color:#ffe08a}
   .rank span{color:#f7efd4;line-height:1.45}
+  .rank small{display:block;margin-top:7px;color:#d8cda8;font-size:12px;line-height:1.35}
   .rank + .launch-countdown{margin-top:12px}
   .stats{
     display:grid;
@@ -448,6 +449,10 @@
     $("panelIntro").textContent = "Sua lista está ativa. Reenvie seu link para quem ainda não completou o cadastro.";
 
     const people = Array.isArray(data.indicados) ? data.indicados : [];
+    const entryPosition = Number(data.posicao_entrada || data.posicao_base || 0);
+    const entryHtml = entryPosition > 0
+      ? '<small>Você entrou na lista na posição #' + formatNumber(entryPosition) + '.</small>'
+      : '';
     const peopleHtml = people.length ? people.map((item) => {
       const ok = item.status === "cadastro_confirmado" || item.status === "ativou_no_app";
       return [
@@ -460,7 +465,7 @@
     }).join("") : '<div class="empty">Quando seus amigos completarem o cadastro pelo seu link, eles aparecem aqui.</div>';
 
     $("content").innerHTML = [
-      '<div class="rank"><strong>#', data.posicao || '--', '</strong><span>Essa é sua posição atual na lista. Seus pontos sobem quando amigos completam o cadastro pelo seu link.</span></div>',
+      '<div class="rank"><strong>#', data.posicao || '--', '</strong><span>Essa é sua posição atual na lista. Seus pontos sobem quando amigos completam o cadastro pelo seu link.', entryHtml, '</span></div>',
       launchCountdownHtml(data.release || {}),
       '<div class="stats">',
       '<div class="stat"><strong>', formatNumber(data.total_lista), '</strong><span>pessoas na lista de espera</span></div>',

@@ -825,6 +825,7 @@
     const p = params();
     const utmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
     const clickKeys = ["fbclid", "gclid", "gbraid", "wbraid", "ttclid", "kwai_click_id", "twclid", "li_fat_id", "msclkid", "click_id"];
+    const hasReferral = normalize(p.get("ref")) !== "";
     const utms = {};
     const clicks = {};
     const all = {};
@@ -842,7 +843,18 @@
     if (!channel && clicks.kwai_click_id) channel = "kwai";
     if (!channel) channel = "direto";
 
-    return { utms, clicks, all, channel };
+    const sourceType = hasReferral ? "indicacao" : (channel === "direto" ? "organico" : "ads");
+    all.origem_aquisicao = sourceType;
+    if (hasReferral && channel !== "direto") all.canal_ads_informado = channel;
+
+    return {
+      utms,
+      clicks,
+      all,
+      channel: sourceType === "ads" ? channel : "",
+      sourceType,
+      isReferral: hasReferral
+    };
   }
 
   function showReturnBox(){
@@ -966,6 +978,8 @@
   }
 
   function initPixels(ads){
+    if (state.attribution.sourceType === "indicacao") return;
+
     const meta = ads.meta || {};
     const google = ads.google || {};
     const tiktok = ads.tiktok || {};
@@ -997,7 +1011,13 @@
   }
 
   function track(name, data){
-    const payload = Object.assign({ source:"espera", channel:state.attribution.channel }, data || {});
+    if (state.attribution.sourceType === "indicacao" && (name === "lead" || name === "complete_registration")) return;
+
+    const payload = Object.assign({
+      source:"espera",
+      channel:state.attribution.channel || state.attribution.sourceType,
+      origem_aquisicao:state.attribution.sourceType
+    }, data || {});
     try {
       if (window.fbq) {
         if (name === "lead") window.fbq("track", "Lead", payload);
@@ -1482,7 +1502,8 @@
       optin_email: $("optinEmail").checked,
       optin_whatsapp: $("optinWhatsApp").checked,
       origem: "hotpage_espera",
-      canal_ads: attribution.channel,
+      origem_aquisicao: attribution.sourceType,
+      canal_ads: attribution.sourceType === "ads" ? attribution.channel : "",
       utm_source: attribution.utms.utm_source || "",
       utm_medium: attribution.utms.utm_medium || "",
       utm_campaign: attribution.utms.utm_campaign || "",
@@ -1662,7 +1683,8 @@
           ref: state.ref,
           session_id: state.sessionId,
           origem: "hotpage_espera",
-          canal_ads: state.attribution.channel,
+          origem_aquisicao: state.attribution.sourceType,
+          canal_ads: state.attribution.sourceType === "ads" ? state.attribution.channel : "",
           utm_source: state.attribution.utms.utm_source || "",
           utm_medium: state.attribution.utms.utm_medium || "",
           utm_campaign: state.attribution.utms.utm_campaign || "",
