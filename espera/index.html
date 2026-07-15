@@ -430,7 +430,7 @@
       <form id="waitlistForm" novalidate>
         <div class="grid">
           <div class="field full" id="fieldNome">
-            <label for="nome">Nome</label>
+            <label for="nome">Primeiro nome</label>
             <input id="nome" name="nome" autocomplete="given-name" maxlength="80" placeholder="Como devemos te chamar?" />
           </div>
           <div class="field" id="fieldEmail">
@@ -1434,10 +1434,10 @@
       cidade_invalida: "Escolha uma cidade valida da lista.",
       email_ja_usuario: "E-mail ja cadastrado para membro do app. Faca login pelo app Turbo Tiger.",
       whatsapp_ja_usuario: "WhatsApp ja cadastrado para membro do app. Faca login pelo app Turbo Tiger.",
-      email_ja_lista: "E-mail ja cadastrado na lista de espera. Reenviamos o acesso ao painel e seu link de indicacao.",
-      whatsapp_ja_lista: "WhatsApp ja cadastrado na lista de espera. Reenviamos o acesso ao painel e seu link de indicacao.",
-      email_whatsapp_ja_lista: "E-mail e WhatsApp ja cadastrados na lista de espera. Reenviamos o acesso ao painel e seu link de indicacao.",
-      ja_cadastrado_lista: "Cadastro ja encontrado na lista de espera. Reenviamos seu acesso e seu link de indicacao.",
+      email_ja_lista: "E-mail ja cadastrado na lista de espera. Se for seu cadastro, use o acesso enviado para esse e-mail.",
+      whatsapp_ja_lista: "WhatsApp ja cadastrado na lista de espera. Se for seu cadastro, confira o e-mail usado na lista para acessar o painel.",
+      email_whatsapp_ja_lista: "E-mail e WhatsApp ja cadastrados na lista de espera. Se for seu cadastro, use o acesso enviado para esse e-mail.",
+      ja_cadastrado_lista: "Cadastro ja encontrado na lista de espera. Por seguranca, o acesso ao painel nao e liberado direto por aqui.",
       email_disponivel: "E-mail disponivel para entrar na lista.",
       whatsapp_disponivel: "WhatsApp disponivel para entrar na lista.",
       optin_email_obrigatorio: "Autorize o recebimento por e-mail para continuar.",
@@ -1520,6 +1520,18 @@
     return friendlyError("ja_cadastrado_lista");
   }
 
+  function waitlistBlockedMessage(data){
+    const base = waitlistExistingMessage(data);
+    const emailStatus = normalize(data && data.email_notificacao_status);
+    if (emailStatus === "enfileirada") {
+      return base + " Enviamos agora o acesso para o e-mail ja cadastrado.";
+    }
+    if (emailStatus === "ja_enfileirada_recentemente") {
+      return base + " O acesso ja foi enviado recentemente para o e-mail cadastrado.";
+    }
+    return base;
+  }
+
   function showResult(data){
     state.shareLink = data.link_indicacao || "";
     state.panelLink = data.painel_link || "";
@@ -1600,7 +1612,7 @@
       const data = await rpc("espera_lead_cadastrar_rpc", { p_payload: buildPayload() });
       if (!data.ok) {
         status.className = "status error";
-        status.textContent = friendlyError(data.mensagem);
+        status.textContent = data.ja_cadastrado ? waitlistBlockedMessage(data) : friendlyError(data.mensagem);
         return;
       }
       status.textContent = "";
