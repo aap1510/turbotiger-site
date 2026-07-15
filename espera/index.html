@@ -201,7 +201,16 @@
   .city-option:hover,.city-option:focus{background:#fff5d6;outline:none}
   .city-option:last-child{border-bottom:0}
   .field-hint{min-height:16px;color:#8b2e2e;font-size:12px;font-weight:800}
+  .field-hint.ok{color:var(--green)}
+  .field-hint.warn{color:#6f4b00}
   .checks{display:grid;gap:10px;margin:12px 0 14px}
+  .check-alert{
+    margin:0 0 -3px 32px;
+    color:var(--red);
+    font-size:12px;
+    font-weight:900;
+    line-height:1.35;
+  }
   .check{
     display:grid;
     grid-template-columns:22px 1fr;
@@ -397,10 +406,12 @@
           <div class="field" id="fieldEmail">
             <label for="email">E-mail</label>
             <input id="email" name="email" type="email" autocomplete="email" maxlength="160" placeholder="seu@email.com" />
+            <div class="field-hint" id="emailHelp" aria-live="polite"></div>
           </div>
           <div class="field" id="fieldWhatsApp">
             <label for="whatsapp">WhatsApp</label>
             <input id="whatsapp" name="whatsapp" inputmode="tel" autocomplete="tel" maxlength="24" placeholder="(00) 00000-0000" />
+            <div class="field-hint" id="whatsappHelp" aria-live="polite"></div>
           </div>
           <div class="field" id="fieldUF">
             <label for="uf">Estado</label>
@@ -423,12 +434,14 @@
         </div>
 
         <div class="checks">
+          <div class="check-alert" id="maior18Alert" role="alert" hidden>Obrigatorio marcar que voce tem 18 anos ou mais.</div>
           <label class="check" id="checkMaior18">
-            <input id="maior18" type="checkbox" />
+            <input id="maior18" type="checkbox" aria-describedby="maior18Alert" />
             <span>Confirmo que tenho 18 anos ou mais. O Turbo Tiger e destinado exclusivamente a maiores de idade.</span>
           </label>
+          <div class="check-alert" id="termosAlert" role="alert" hidden>Obrigatorio aceitar a Politica de Privacidade e os Termos de Uso.</div>
           <label class="check" id="checkTermos">
-            <input id="termos" type="checkbox" />
+            <input id="termos" type="checkbox" aria-describedby="termosAlert" />
             <span>Li e aceito a <a id="termsPrivacyLink" href="/politicaetermos.html" target="_blank" rel="noopener">Política de Privacidade</a>, os <a id="termsUseLink" href="/politicaetermos.html" target="_blank" rel="noopener">Termos de Uso</a> e as informacoes legais desta lista de espera.</span>
           </label>
           <label class="check" id="checkOptinEmail">
@@ -529,6 +542,8 @@
     cities: [],
     selectedCity: null,
     cityTimer: null,
+    contactTimer: null,
+    contactSeq: 0,
     launchTimer: null,
     submitting: false
   };
@@ -815,6 +830,8 @@
     field.hidden = !visible;
     input.required = visible && required;
     if (!visible) input.value = "";
+    if (!visible && inputId === "email") setFieldHint("emailHelp", "");
+    if (!visible && inputId === "whatsapp") setFieldHint("whatsappHelp", "");
   }
 
   function updateCheck(rowId, inputId, visible, required){
@@ -823,6 +840,7 @@
     row.hidden = !visible;
     input.required = visible && required;
     if (!visible) input.checked = false;
+    setCheckAlert(inputId, "");
   }
 
   function isVisible(el){
@@ -943,6 +961,111 @@
     } catch(e) {}
   }
 
+  function setFieldHint(id, message, kind){
+    const el = $(id);
+    if (!el) return;
+    const text = normalize(message);
+    el.className = "field-hint" + (kind ? " " + kind : "");
+    el.textContent = text;
+  }
+
+  function contactHintKind(status){
+    if (status === "disponivel") return "ok";
+    if (status === "lista") return "warn";
+    if (status === "app" || status === "invalido") return "";
+    return "";
+  }
+
+  function contactHintMessage(kind, result){
+    const status = normalize(result && result.status);
+    const code = normalize(result && result.mensagem);
+    if (!status || status === "vazio") return "";
+    if (code === "email_disponivel") return "E-mail disponivel para entrar na lista.";
+    if (code === "whatsapp_disponivel") return "WhatsApp disponivel para entrar na lista.";
+    if (kind === "email" && status === "lista") return friendlyError("email_ja_lista");
+    if (kind === "whatsapp" && status === "lista") return friendlyError("whatsapp_ja_lista");
+    return friendlyError(code);
+  }
+
+  function applyContactResult(kind, data){
+    if (!data || !data.ok) return;
+    const email = data.email || {};
+    const whatsapp = data.whatsapp || {};
+
+    if (kind === "email") {
+      setFieldHint("emailHelp", contactHintMessage("email", email), contactHintKind(email.status));
+    }
+    if (kind === "whatsapp") {
+      setFieldHint("whatsappHelp", contactHintMessage("whatsapp", whatsapp), contactHintKind(whatsapp.status));
+    }
+
+    if (data.conflito_lista) {
+      setFieldHint("emailHelp", friendlyError("email_whatsapp_em_cadastros_diferentes"), "");
+      setFieldHint("whatsappHelp", friendlyError("email_whatsapp_em_cadastros_diferentes"), "");
+    }
+  }
+
+  async function checkContact(kind){
+    const email = normalize($("email").value);
+    const whatsapp = normalize($("whatsapp").value);
+    const emailOk = fieldActive("email") && email && isValidEmail(email);
+    const whatsappOk = fieldActive("whatsapp") && whatsapp && isValidWhatsApp(whatsapp);
+    const checkEmail = kind === "email" && emailOk;
+    const checkWhatsApp = kind === "whatsapp" && whatsappOk;
+
+    if (!checkEmail && !checkWhatsApp) return;
+
+    const seq = ++state.contactSeq;
+    if (checkEmail) setFieldHint("emailHelp", "Verificando e-mail...", "warn");
+    if (checkWhatsApp) setFieldHint("whatsappHelp", "Verificando WhatsApp...", "warn");
+
+    try {
+      const data = await rpc("espera_contato_verificar_rpc", {
+        p_payload: {
+          email: checkEmail ? email : "",
+          whatsapp: checkWhatsApp ? whatsapp : ""
+        }
+      });
+      if (seq !== state.contactSeq) return;
+      applyContactResult(kind, data);
+    } catch(e) {
+      if (seq !== state.contactSeq) return;
+      if (checkEmail) setFieldHint("emailHelp", "Nao foi possivel verificar o e-mail agora.", "");
+      if (checkWhatsApp) setFieldHint("whatsappHelp", "Nao foi possivel verificar o WhatsApp agora.", "");
+    }
+  }
+
+  function scheduleContactCheck(kind, immediate){
+    window.clearTimeout(state.contactTimer);
+    state.contactTimer = window.setTimeout(() => checkContact(kind), immediate ? 0 : 520);
+  }
+
+  function handleEmailContactInput(immediate, showInvalid){
+    const value = normalize($("email").value);
+    if (!value) {
+      setFieldHint("emailHelp", "");
+      return;
+    }
+    if (!isValidEmail(value)) {
+      setFieldHint("emailHelp", showInvalid ? "Confira o e-mail informado." : "");
+      return;
+    }
+    scheduleContactCheck("email", immediate);
+  }
+
+  function handleWhatsAppContactInput(immediate, showInvalid){
+    const value = normalize($("whatsapp").value);
+    if (!value) {
+      setFieldHint("whatsappHelp", "");
+      return;
+    }
+    if (!isValidWhatsApp(value)) {
+      setFieldHint("whatsappHelp", showInvalid ? "Confira o WhatsApp informado." : "");
+      return;
+    }
+    scheduleContactCheck("whatsapp", immediate);
+  }
+
   function updateCityAvailability(){
     const uf = $("uf").value;
     const cityInput = $("cidade");
@@ -1058,11 +1181,6 @@
     ) {
       return true;
     }
-    const exact = matchTypedCity();
-    if (exact) {
-      selectCity(exact);
-      return true;
-    }
     if (showMessage) $("cityHelp").textContent = "Escolha uma cidade da lista.";
     return false;
   }
@@ -1080,7 +1198,52 @@
     return input.checked;
   }
 
-  function getFormProblem(){
+  function checkAlertId(inputId){
+    const map = {
+      maior18: "maior18Alert",
+      termos: "termosAlert"
+    };
+    return map[inputId] || "";
+  }
+
+  function checkRequiredMessage(inputId){
+    const map = {
+      maior18: "Obrigatorio marcar que voce tem 18 anos ou mais.",
+      termos: "Obrigatorio aceitar a Politica de Privacidade e os Termos de Uso."
+    };
+    return map[inputId] || "Obrigatorio marcar esta opcao.";
+  }
+
+  function setCheckAlert(inputId, message){
+    const alertId = checkAlertId(inputId);
+    const box = alertId ? $(alertId) : null;
+    if (!box) return;
+    const text = normalize(message);
+    box.textContent = text;
+    box.hidden = !text;
+  }
+
+  function validateRequiredChecks(showMessage){
+    const ids = ["maior18", "termos", "optinEmail", "optinWhatsApp"];
+    let firstMessage = "";
+    let ok = true;
+
+    ids.forEach((id) => {
+      if (requiredCheckOk(id)) {
+        setCheckAlert(id, "");
+        return;
+      }
+
+      ok = false;
+      const message = checkRequiredMessage(id);
+      if (!firstMessage) firstMessage = message;
+      if (showMessage) setCheckAlert(id, message);
+    });
+
+    return { ok, message: firstMessage };
+  }
+
+  function getInputProblem(){
     const email = normalize($("email").value);
     const whatsapp = normalize($("whatsapp").value);
     const uf = normalize($("uf").value);
@@ -1093,18 +1256,23 @@
     if (fieldActive("whatsapp") && whatsapp && !isValidWhatsApp(whatsapp)) return "Confira o WhatsApp informado.";
     if (fieldRequired("uf") && !uf) return "Selecione seu estado.";
     if ((fieldRequired("cidade") || city) && !validateCitySelection(false)) return "Selecione sua cidade na lista.";
-    if (!requiredCheckOk("maior18")) return "Confirme que voce tem 18 anos ou mais.";
-    if (!requiredCheckOk("termos")) return "Aceite a politica e os termos para continuar.";
-    if (!requiredCheckOk("optinEmail")) return "Autorize o recebimento por e-mail para continuar.";
-    if (!requiredCheckOk("optinWhatsApp")) return "Autorize o recebimento por WhatsApp para continuar.";
     return "";
   }
 
-  function updateFormState(){
+  function getFormProblem(){
+    const inputProblem = getInputProblem();
+    if (inputProblem) return inputProblem;
+    const checkResult = validateRequiredChecks(false);
+    return checkResult.ok ? "" : checkResult.message;
+  }
+
+  function updateFormState(options){
     if (state.submitting) return;
-    const problem = getFormProblem();
+    const keepStatus = !!(options && options.keepStatus);
+    const problem = getInputProblem();
+    validateRequiredChecks(false);
     $("submitBtn").disabled = !!problem;
-    if (!problem && $("formStatus").classList.contains("error")) {
+    if (!problem && !keepStatus && $("formStatus").classList.contains("error")) {
       $("formStatus").className = "status";
       $("formStatus").textContent = "";
     }
@@ -1124,9 +1292,14 @@
       uf_invalida: "Selecione um estado valido.",
       cidade_obrigatoria: "Selecione sua cidade.",
       cidade_invalida: "Escolha uma cidade valida da lista.",
-      email_ja_usuario: "Este e-mail ja esta cadastrado como usuario. Faca login pelo app Turbo Tiger.",
-      whatsapp_ja_usuario: "Este WhatsApp ja esta cadastrado como usuario. Faca login pelo app Turbo Tiger.",
-      ja_cadastrado_lista: "Voce ja esta na lista. Reenviamos seu acesso e seu link de indicacao.",
+      email_ja_usuario: "E-mail ja cadastrado para membro do app. Faca login pelo app Turbo Tiger.",
+      whatsapp_ja_usuario: "WhatsApp ja cadastrado para membro do app. Faca login pelo app Turbo Tiger.",
+      email_ja_lista: "E-mail ja cadastrado na lista de espera. Reenviamos o acesso ao painel e seu link de indicacao.",
+      whatsapp_ja_lista: "WhatsApp ja cadastrado na lista de espera. Reenviamos o acesso ao painel e seu link de indicacao.",
+      email_whatsapp_ja_lista: "E-mail e WhatsApp ja cadastrados na lista de espera. Reenviamos o acesso ao painel e seu link de indicacao.",
+      ja_cadastrado_lista: "Cadastro ja encontrado na lista de espera. Reenviamos seu acesso e seu link de indicacao.",
+      email_disponivel: "E-mail disponivel para entrar na lista.",
+      whatsapp_disponivel: "WhatsApp disponivel para entrar na lista.",
       optin_email_obrigatorio: "Autorize o recebimento por e-mail para continuar.",
       optin_whatsapp_obrigatorio: "Autorize o recebimento por WhatsApp para continuar.",
       email_whatsapp_em_cadastros_diferentes: "Este e-mail e este WhatsApp aparecem em cadastros diferentes. Use apenas um deles ou fale com o suporte.",
@@ -1194,6 +1367,19 @@
     };
   }
 
+  function waitlistExistingMessage(data){
+    const code = normalize(data && data.mensagem);
+    if (code) {
+      const mapped = friendlyError(code);
+      if (mapped !== "Nao foi possivel salvar agora. Tente novamente.") return mapped;
+    }
+
+    if (data && data.cadastro_existente_por === "email") return friendlyError("email_ja_lista");
+    if (data && data.cadastro_existente_por === "whatsapp") return friendlyError("whatsapp_ja_lista");
+    if (data && data.cadastro_existente_por === "email_whatsapp") return friendlyError("email_whatsapp_ja_lista");
+    return friendlyError("ja_cadastrado_lista");
+  }
+
   function showResult(data){
     state.shareLink = data.link_indicacao || "";
     state.panelLink = data.painel_link || "";
@@ -1201,7 +1387,7 @@
     $("resultPanel").hidden = false;
     $("resultPosition").textContent = "#" + (data.posicao || "--");
     $("resultText").textContent = data.ja_cadastrado
-      ? "Voce ja estava na lista. Seu link de acompanhamento foi renovado e seu convite continua valendo."
+      ? waitlistExistingMessage(data)
       : "Seu cadastro foi recebido. Compartilhe seu link para subir na lista quando seus amigos tambem se cadastrarem.";
     $("resultPoints").textContent = (data.pontos || 0) + " pontos";
     $("resultRefs").textContent = (data.indicacoes_confirmadas || 0) + " indicacoes confirmadas";
@@ -1232,6 +1418,13 @@
 
     track("lead", { codigo:data.codigo, posicao:data.posicao });
     track("complete_registration", { codigo:data.codigo, posicao:data.posicao });
+
+    if (state.panelLink) {
+      $("panelBtn").textContent = "Abrindo meu painel...";
+      window.setTimeout(() => {
+        window.location.assign(state.panelLink);
+      }, data.ja_cadastrado ? 2500 : 450);
+    }
   }
 
   async function submitForm(event){
@@ -1239,12 +1432,20 @@
     const form = $("waitlistForm");
     const status = $("formStatus");
 
-    const problem = getFormProblem();
+    const problem = getInputProblem();
     if (problem) {
       validateCitySelection(true);
       status.className = "status error";
       status.textContent = problem;
       updateFormState();
+      return;
+    }
+
+    const checkResult = validateRequiredChecks(true);
+    if (!checkResult.ok) {
+      status.className = "status";
+      status.textContent = "";
+      updateFormState({ keepStatus: true });
       return;
     }
 
@@ -1271,7 +1472,7 @@
     } finally {
       state.submitting = false;
       $("signupPanel").classList.remove("loading");
-      updateFormState();
+      updateFormState({ keepStatus: true });
     }
   }
 
@@ -1336,10 +1537,14 @@
       $(id).addEventListener("input", updateFormState);
       $(id).addEventListener("change", updateFormState);
     });
+    $("email").addEventListener("input", () => handleEmailContactInput(false, false));
+    $("email").addEventListener("blur", () => handleEmailContactInput(true, true));
     $("whatsapp").addEventListener("input", () => {
       $("whatsapp").value = maskWhatsApp($("whatsapp").value);
+      handleWhatsAppContactInput(false, false);
       updateFormState();
     });
+    $("whatsapp").addEventListener("blur", () => handleWhatsAppContactInput(true, true));
     $("uf").addEventListener("change", () => {
       state.selectedCity = null;
       $("cidade").value = "";

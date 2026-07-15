@@ -413,6 +413,11 @@
     return "Em andamento";
   }
 
+  function formatNumber(value){
+    const number = Number(value || 0);
+    return Number.isFinite(number) ? number.toLocaleString("pt-BR") : "0";
+  }
+
   function renderEmptyToken(){
     $("panelTitle").textContent = "Link seguro necessario";
     $("panelIntro").textContent = "Use o botao enviado depois do cadastro ou entre novamente na lista.";
@@ -458,10 +463,10 @@
       '<div class="rank"><strong>#', data.posicao || '--', '</strong><span>Essa e sua posicao atual na lista. Seus pontos sobem quando amigos completam o cadastro pelo seu link.</span></div>',
       launchCountdownHtml(data.release || {}),
       '<div class="stats">',
-      '<div class="stat"><strong>', data.pontos || 0, '</strong><span>pontos totais</span></div>',
-      '<div class="stat"><strong>', data.indicacoes_confirmadas || 0, '</strong><span>cadastros confirmados</span></div>',
-      '<div class="stat"><strong>', data.visitantes_link || 0, '</strong><span>pessoas que abriram seu link</span></div>',
-      '<div class="stat"><strong>', data.indicacoes_ativadas_app || 0, '</strong><span>ativacoes futuras no app</span></div>',
+      '<div class="stat"><strong>', formatNumber(data.total_lista), '</strong><span>pessoas na lista de espera</span></div>',
+      '<div class="stat"><strong>', formatNumber(data.visitantes_link), '</strong><span>pessoas que abriram seu link</span></div>',
+      '<div class="stat"><strong>', formatNumber(data.indicacoes_confirmadas), '</strong><span>cadastros confirmados</span></div>',
+      '<div class="stat"><strong>', formatNumber(data.pontos), '</strong><span>pontos totais</span></div>',
       '</div>',
       '<div class="share"><strong>Seu link pessoal</strong><div class="share-link" id="shareLink">', escapeHtml(data.link_indicacao || ''), '</div>',
       '<div class="actions"><button class="btn secondary" id="copyBtn" type="button">Copiar link</button><button class="btn ghost" id="shareBtn" type="button">Compartilhar</button></div></div>',
