@@ -45,6 +45,7 @@
     perfil_admin_invalido: "Perfil administrativo inv\u00e1lido.",
     perfil_protegido: "O perfil de super administrador n\u00e3o pode ser desativado.",
     push_broadcast_sem_permissao: "Seu perfil n\u00e3o permite enviar para todos os aparelhos.",
+    push_contexto_real_indisponivel: "N\u00e3o encontrei contexto real para preencher este modelo. Aguarde um evento autom\u00e1tico desse tipo ou envie uma mensagem sem placeholders.",
     sem_permissao_admin: "Sem permiss\u00e3o para administra\u00e7\u00e3o.",
     sem_permissao_areas: "Sem permiss\u00e3o para alterar \u00e1reas administrativas.",
     sem_permissao_configurar_push: "Sem permiss\u00e3o para configurar notifica\u00e7\u00f5es.",
