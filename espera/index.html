@@ -55,7 +55,7 @@
   .brand span{display:block;margin-top:4px;color:#f8e6a4;font-size:13px}
   .age-pill{
     display:inline-flex;
-    align-items:center;
+    align-items:start;
     justify-content:center;
     min-height:34px;
     padding:7px 11px;
@@ -69,11 +69,11 @@
     min-height:calc(100vh - 86px);
     display:grid;
     grid-template-columns:minmax(0,1.02fr) minmax(340px,.72fr);
-    align-items:center;
+    align-items:start;
     gap:28px;
     padding:18px 0 96px;
   }
-  .copy{color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+  .copy{align-self:start;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.5)}
   .eyebrow{
     display:inline-flex;
     align-items:center;
@@ -89,7 +89,7 @@
   h1{
     margin:0;
     max-width:720px;
-    font-size:clamp(38px,5.5vw,70px);
+    font-size:clamp(32px,4.9vw,64px);
     line-height:.96;
     letter-spacing:0;
   }
@@ -145,6 +145,7 @@
   .proof strong{display:block;font-size:20px;color:#ffe08a}
   .proof span{display:block;margin-top:6px;font-size:13px;line-height:1.35;color:#f4eedc}
   .panel{
+    align-self:start;
     background:var(--paper);
     border:1px solid rgba(255,255,255,.55);
     border-radius:8px;
@@ -173,12 +174,12 @@
   input:focus,select:focus{border-color:var(--gold-dark);box-shadow:0 0 0 3px rgba(244,180,0,.22)}
   input:disabled,select:disabled{background:#f2ead8;color:#8b806b;cursor:not-allowed}
   .autocomplete{position:relative}
-  .city-list{
+  .uf-list,.city-list{
     position:absolute;
     z-index:8;
     left:0;
     right:0;
-    top:calc(100% + 4px);
+    top:70px;
     max-height:218px;
     overflow:auto;
     border:1px solid #d5c9af;
@@ -186,6 +187,8 @@
     background:#fff;
     box-shadow:0 14px 34px rgba(45,34,11,.2);
   }
+  .uf-list{max-height:188px}
+  #uf[readonly]{cursor:pointer}
   .city-option{
     width:100%;
     min-height:42px;
@@ -205,13 +208,37 @@
   .field-hint.warn{color:#6f4b00}
   .checks{display:grid;gap:10px;margin:12px 0 14px}
   .check-alert{
-    margin:0 0 -3px 32px;
-    color:var(--red);
+    z-index:5;
+    grid-column:1 / -1;
+    grid-row:2;
+    justify-self:start;
+    margin:6px 0 2px 0;
+    max-width:220px;
+    padding:8px 10px;
+    border:1px solid #f0b7b7;
+    border-radius:8px;
+    background:#fff7f7;
+    color:#8f2020;
     font-size:12px;
     font-weight:900;
     line-height:1.35;
+    box-shadow:0 8px 20px rgba(80,25,10,.16);
+    pointer-events:none;
+  }
+  .check-alert:after{
+    content:"";
+    position:absolute;
+    left:3px;
+    top:-7px;
+    width:12px;
+    height:12px;
+    border-left:1px solid #f0b7b7;
+    border-top:1px solid #f0b7b7;
+    background:#fff7f7;
+    transform:rotate(45deg);
   }
   .check{
+    position:relative;
     display:grid;
     grid-template-columns:22px 1fr;
     gap:10px;
@@ -221,6 +248,8 @@
     line-height:1.38;
   }
   .check input{width:18px;height:18px;min-height:18px;margin:1px 0 0;accent-color:var(--gold-dark)}
+  .check input{grid-column:1;grid-row:1}
+  .check > span:not(.check-alert){grid-column:2;grid-row:1}
   .legal-note{
     margin:10px 0 0;
     padding:12px;
@@ -413,17 +442,10 @@
             <input id="whatsapp" name="whatsapp" inputmode="tel" autocomplete="tel" maxlength="24" placeholder="(00) 00000-0000" />
             <div class="field-hint" id="whatsappHelp" aria-live="polite"></div>
           </div>
-          <div class="field" id="fieldUF">
+          <div class="field autocomplete" id="fieldUF">
             <label for="uf">Estado</label>
-            <select id="uf" name="uf">
-              <option value="">Selecione</option>
-              <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option>
-              <option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option>
-              <option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option>
-              <option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
-              <option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option>
-              <option>SE</option><option>TO</option>
-            </select>
+            <input id="uf" name="uf" maxlength="24" autocomplete="off" placeholder="Digite UF ou estado" />
+            <div class="uf-list" id="ufList" role="listbox" hidden></div>
           </div>
           <div class="field autocomplete" id="fieldCidade">
             <label for="cidade">Cidade</label>
@@ -434,14 +456,14 @@
         </div>
 
         <div class="checks">
-          <div class="check-alert" id="maior18Alert" role="alert" hidden>Obrigatorio marcar que voce tem 18 anos ou mais.</div>
           <label class="check" id="checkMaior18">
             <input id="maior18" type="checkbox" aria-describedby="maior18Alert" />
+            <span class="check-alert" id="maior18Alert" role="alert" hidden>É obrigatório marcar essa opção.</span>
             <span>Confirmo que tenho 18 anos ou mais. O Turbo Tiger e destinado exclusivamente a maiores de idade.</span>
           </label>
-          <div class="check-alert" id="termosAlert" role="alert" hidden>Obrigatorio aceitar a Politica de Privacidade e os Termos de Uso.</div>
           <label class="check" id="checkTermos">
             <input id="termos" type="checkbox" aria-describedby="termosAlert" />
+            <span class="check-alert" id="termosAlert" role="alert" hidden>É obrigatório marcar essa opção.</span>
             <span>Li e aceito a <a id="termsPrivacyLink" href="/politicaetermos.html" target="_blank" rel="noopener">Política de Privacidade</a>, os <a id="termsUseLink" href="/politicaetermos.html" target="_blank" rel="noopener">Termos de Uso</a> e as informacoes legais desta lista de espera.</span>
           </label>
           <label class="check" id="checkOptinEmail">
@@ -532,6 +554,35 @@
     "81","82","83","84","85","86","87","88","89",
     "91","92","93","94","95","96","97","98","99"
   ]);
+  const STATES = [
+    { uf:"AC", nome:"Acre" },
+    { uf:"AL", nome:"Alagoas" },
+    { uf:"AP", nome:"Amapa" },
+    { uf:"AM", nome:"Amazonas" },
+    { uf:"BA", nome:"Bahia" },
+    { uf:"CE", nome:"Ceara" },
+    { uf:"DF", nome:"Distrito Federal" },
+    { uf:"ES", nome:"Espirito Santo" },
+    { uf:"GO", nome:"Goias" },
+    { uf:"MA", nome:"Maranhao" },
+    { uf:"MT", nome:"Mato Grosso" },
+    { uf:"MS", nome:"Mato Grosso do Sul" },
+    { uf:"MG", nome:"Minas Gerais" },
+    { uf:"PA", nome:"Para" },
+    { uf:"PB", nome:"Paraiba" },
+    { uf:"PR", nome:"Parana" },
+    { uf:"PE", nome:"Pernambuco" },
+    { uf:"PI", nome:"Piaui" },
+    { uf:"RJ", nome:"Rio de Janeiro" },
+    { uf:"RN", nome:"Rio Grande do Norte" },
+    { uf:"RS", nome:"Rio Grande do Sul" },
+    { uf:"RO", nome:"Rondonia" },
+    { uf:"RR", nome:"Roraima" },
+    { uf:"SC", nome:"Santa Catarina" },
+    { uf:"SP", nome:"Sao Paulo" },
+    { uf:"SE", nome:"Sergipe" },
+    { uf:"TO", nome:"Tocantins" }
+  ];
   const state = {
     config: null,
     ref: "",
@@ -540,6 +591,7 @@
     sessionId: "",
     attribution: {},
     cities: [],
+    selectedUf: "",
     selectedCity: null,
     cityTimer: null,
     contactTimer: null,
@@ -674,7 +726,7 @@
   function normalizeCity(raw){
     const city = raw || {};
     const nome = normalize(city.nome || city.cidade || city.nome_cidade);
-    const uf = normalize(city.uf || city.estado_uf || $("uf").value).toUpperCase();
+    const uf = normalize(city.uf || city.estado_uf || state.selectedUf).toUpperCase();
     const ibge = normalize(city.ibge || city.codigo_ibge || city.cidade_ibge);
     const idCidade = normalize(city.id_cidade || city.cod_cidade || city.codigo_cidade);
     const idEstado = normalize(city.id_estado || city.cod_estado || city.codigo_estado);
@@ -1066,8 +1118,90 @@
     scheduleContactCheck("whatsapp", immediate);
   }
 
+  function closeUfList(){
+    const list = $("ufList");
+    if (!list) return;
+    list.hidden = true;
+    list.innerHTML = "";
+  }
+
+  function matchingStates(searchText){
+    const search = normalizeSearchText(searchText);
+    return STATES.filter((state) => {
+      if (!search) return true;
+      return normalizeSearchText(state.uf).includes(search) ||
+        normalizeSearchText(state.nome).includes(search);
+    });
+  }
+
+  function exactStateMatch(searchText){
+    const search = normalizeSearchText(searchText);
+    if (!search) return null;
+    return STATES.find((state) =>
+      normalizeSearchText(state.uf) === search ||
+      normalizeSearchText(state.nome) === search
+    ) || null;
+  }
+
+  function selectTypedUf(allowSingleMatch){
+    const typed = $("uf").value;
+    const exact = exactStateMatch(typed);
+    const matches = matchingStates(typed);
+    const chosen = exact || (allowSingleMatch && matches.length === 1 ? matches[0] : null);
+    if (!chosen) return false;
+    selectUf(chosen.uf);
+    return true;
+  }
+
+  function renderUfList(){
+    const list = $("ufList");
+    if (!list || $("fieldUF").hidden) return;
+    const states = matchingStates($("uf").value);
+
+    if (!states.length) {
+      list.innerHTML = '<div class="city-option" role="option">Nenhum estado encontrado</div>';
+      list.hidden = false;
+      return;
+    }
+
+    list.innerHTML = states.map((state) => [
+      '<button class="city-option" type="button" role="option" data-uf="', state.uf, '">',
+      state.uf, ' - ', escapeHtml(state.nome),
+      '</button>'
+    ].join("")).join("");
+    list.hidden = false;
+    list.querySelectorAll(".city-option").forEach((button) => {
+      button.addEventListener("mousedown", (event) => event.preventDefault());
+      button.addEventListener("click", () => selectUf(button.dataset.uf));
+    });
+  }
+
+  function handleUfChange(){
+    const uf = state.selectedUf;
+    $("uf").value = uf;
+    state.selectedCity = null;
+    $("cidade").value = "";
+    $("cityHelp").textContent = "";
+    updateCityAvailability();
+    if (state.selectedUf) loadCities("");
+    updateFormState();
+  }
+
+  function selectUf(uf){
+    const next = normalize(uf).toUpperCase();
+    if (state.selectedUf === next) {
+      $("uf").value = next;
+      closeUfList();
+      return;
+    }
+    state.selectedUf = next;
+    $("uf").value = next;
+    closeUfList();
+    handleUfChange();
+  }
+
   function updateCityAvailability(){
-    const uf = $("uf").value;
+    const uf = state.selectedUf;
     const cityInput = $("cidade");
     const cityField = $("fieldCidade");
     const cityVisible = !cityField.hidden;
@@ -1118,7 +1252,7 @@
   }
 
   async function loadCities(search){
-    const uf = $("uf").value;
+    const uf = state.selectedUf;
     if (!uf || $("cidade").disabled) {
       renderCityList([]);
       return;
@@ -1165,7 +1299,7 @@
       if (showMessage) $("cityHelp").textContent = "";
       return true;
     }
-    if (!$("uf").value) {
+    if (!state.selectedUf) {
       if (showMessage) $("cityHelp").textContent = "Selecione o estado primeiro.";
       return false;
     }
@@ -1175,7 +1309,7 @@
     }
     if (
       state.selectedCity &&
-      state.selectedCity.uf === $("uf").value &&
+      state.selectedCity.uf === state.selectedUf &&
       normalizeSearchText(state.selectedCity.nome) === normalizeSearchText(cityText) &&
       cityPayloadValue(state.selectedCity)
     ) {
@@ -1188,6 +1322,7 @@
   function fieldFilled(inputId){
     const input = $(inputId);
     if (!input || !fieldActive(inputId)) return true;
+    if (inputId === "uf") return !!state.selectedUf;
     return normalize(input.value) !== "";
   }
 
@@ -1207,11 +1342,7 @@
   }
 
   function checkRequiredMessage(inputId){
-    const map = {
-      maior18: "Obrigatorio marcar que voce tem 18 anos ou mais.",
-      termos: "Obrigatorio aceitar a Politica de Privacidade e os Termos de Uso."
-    };
-    return map[inputId] || "Obrigatorio marcar esta opcao.";
+    return "É obrigatório marcar essa opção.";
   }
 
   function setCheckAlert(inputId, message){
@@ -1227,6 +1358,7 @@
     const ids = ["maior18", "termos", "optinEmail", "optinWhatsApp"];
     let firstMessage = "";
     let ok = true;
+    let firstMissing = "";
 
     ids.forEach((id) => {
       if (requiredCheckOk(id)) {
@@ -1237,8 +1369,13 @@
       ok = false;
       const message = checkRequiredMessage(id);
       if (!firstMessage) firstMessage = message;
-      if (showMessage) setCheckAlert(id, message);
+      if (!firstMissing) firstMissing = id;
+      setCheckAlert(id, "");
     });
+
+    if (showMessage && firstMissing) {
+      setCheckAlert(firstMissing, checkRequiredMessage(firstMissing));
+    }
 
     return { ok, message: firstMessage };
   }
@@ -1246,7 +1383,7 @@
   function getInputProblem(){
     const email = normalize($("email").value);
     const whatsapp = normalize($("whatsapp").value);
-    const uf = normalize($("uf").value);
+    const uf = normalize(state.selectedUf);
     const city = normalize($("cidade").value);
 
     if (fieldRequired("nome") && !fieldFilled("nome")) return "Informe seu nome.";
@@ -1254,7 +1391,7 @@
     if (fieldActive("email") && email && !isValidEmail(email)) return "Confira o e-mail informado.";
     if (fieldRequired("whatsapp") && !whatsapp) return "Informe seu WhatsApp.";
     if (fieldActive("whatsapp") && whatsapp && !isValidWhatsApp(whatsapp)) return "Confira o WhatsApp informado.";
-    if (fieldRequired("uf") && !uf) return "Selecione seu estado.";
+    if (fieldRequired("uf") && !uf) return "Selecione seu estado na lista.";
     if ((fieldRequired("cidade") || city) && !validateCitySelection(false)) return "Selecione sua cidade na lista.";
     return "";
   }
@@ -1320,7 +1457,7 @@
       nome: $("nome").value,
       email: $("email").value,
       whatsapp: $("whatsapp").value,
-      uf: $("uf").value,
+      uf: state.selectedUf,
       cidade: cityValue,
       cidade_ibge: selectedCity.ibge || null,
       cidade_nome: selectedCity.nome || "",
@@ -1356,7 +1493,7 @@
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
         localizacao: {
           pais_codigo: "BR",
-          uf: $("uf").value,
+          uf: state.selectedUf,
           cidade_ibge: selectedCity.ibge || null,
           cidade_nome: selectedCity.nome || "",
           id_cidade: selectedCity.id_cidade || null,
@@ -1545,17 +1682,43 @@
       updateFormState();
     });
     $("whatsapp").addEventListener("blur", () => handleWhatsAppContactInput(true, true));
-    $("uf").addEventListener("change", () => {
+    $("uf").addEventListener("focus", renderUfList);
+    $("uf").addEventListener("click", renderUfList);
+    $("uf").addEventListener("input", () => {
+      state.selectedUf = "";
       state.selectedCity = null;
       $("cidade").value = "";
       $("cityHelp").textContent = "";
       updateCityAvailability();
-      if ($("uf").value) loadCities("");
+      renderUfList();
       updateFormState();
+    });
+    $("uf").addEventListener("change", () => {
+      if (!state.selectedUf) selectTypedUf(true);
+      updateFormState();
+    });
+    $("uf").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        if (!selectTypedUf(true)) renderUfList();
+      } else if (event.key === "ArrowDown") {
+        event.preventDefault();
+        renderUfList();
+      }
+      if (event.key === "Escape") {
+        closeUfList();
+      }
+    });
+    $("uf").addEventListener("blur", () => {
+      window.setTimeout(() => {
+        if (!state.selectedUf) selectTypedUf(true);
+        closeUfList();
+        updateFormState();
+      }, 140);
     });
     $("cidade").addEventListener("input", scheduleCitySearch);
     $("cidade").addEventListener("focus", () => {
-      if ($("uf").value && !$("cidade").disabled) loadCities($("cidade").value);
+      if (state.selectedUf && !$("cidade").disabled) loadCities($("cidade").value);
     });
     $("cidade").addEventListener("blur", () => {
       window.setTimeout(() => {
