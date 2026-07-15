@@ -552,6 +552,11 @@ function handlePaymentConfirmed(message, buttonText){
   paymentProcessing = false;
   stopPaymentPolling();
   stopPixExpirationTimer();
+  try {
+    if (window.TurboTigerHistoricoBridge && window.TurboTigerHistoricoBridge.post) {
+      window.TurboTigerHistoricoBridge.post('LICENCA_PAGAMENTO_CONFIRMADO:' + checkoutRef);
+    }
+  } catch(e) {}
   setStatus(message || 'Pagamento confirmado. Sua assinatura foi liberada no app.', 'ok');
   setButton(false, buttonText || 'Pagamento confirmado');
   returnToAppAfterPayment();
