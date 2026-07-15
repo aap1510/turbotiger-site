@@ -1241,7 +1241,6 @@ function renderPixResult(data){
   notifyAppPixGenerated(data);
   if (expirationTime > Date.now()) {
     pixExpirationTimer = setTimeout(function(){
-      stopPaymentPolling();
       pixResult.style.display = 'none';
       pixCopyCode.value = '';
       setStatus('Este Pix venceu. Gere um novo QR Code para pagar.', 'error');
