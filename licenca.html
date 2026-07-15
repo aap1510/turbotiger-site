@@ -183,6 +183,10 @@
           <label for="registrationCpf">CPF do cadastro</label>
           <input id="registrationCpf" type="text" readonly disabled placeholder="Carregando CPF do app">
         </div>
+        <div class="field full">
+          <label for="registrationWhatsapp">WhatsApp do cadastro</label>
+          <input id="registrationWhatsapp" type="text" readonly disabled placeholder="Carregando WhatsApp do app">
+        </div>
       </div>
 
       <label class="option-line" for="samePayer">
@@ -221,15 +225,15 @@
             <label for="cardHolderName" id="cardHolderNameLabel">Titular do cart&atilde;o</label>
             <input id="cardHolderName" type="text" readonly disabled placeholder="Preenchido automaticamente pelo CPF">
           </div>
-          <div class="field">
+          <div class="field" id="cardPhoneField" style="display:none">
             <label for="cardPhone">Telefone do titular</label>
             <input id="cardPhone" type="text" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="DDD + n&uacute;mero">
           </div>
-          <div class="field">
+          <div class="field" id="cardCepField" style="display:none">
             <label for="cardCep">CEP do titular</label>
             <input id="cardCep" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="9" placeholder="00000-000">
           </div>
-          <div class="field">
+          <div class="field" id="cardAddressNumberField" style="display:none">
             <label for="cardAddressNumber">N&uacute;mero do endere&ccedil;o</label>
             <input id="cardAddressNumber" type="text" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="N&uacute;mero">
           </div>
@@ -331,12 +335,15 @@ const SUPABASE_KEY = 'sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU';
 const urlParams = new URLSearchParams(location.search);
 const checkoutRef = (urlParams.get('checkout') || '').trim();
 const appAcesso = (urlParams.get('app_acesso') || '').trim();
+const checkoutCepParam = digitsOnly(urlParams.get('cep') || urlParams.get('codepost') || '').slice(0, 8);
+const checkoutAddressNumberParam = digitsOnly(urlParams.get('numero_endereco') || urlParams.get('endereco_numero') || '').slice(0, 12);
 
 let selectedPlan = 'anual';
 let selectedPay = 'cartao';
 let checkoutOk = false;
 let checkoutEmail = '';
 let checkoutCpf = '';
+let checkoutWhatsapp = '';
 let baseButtonEnabled = false;
 let baseButtonText = 'Validando acesso...';
 let pollTimer = null;
@@ -362,12 +369,19 @@ const payerNameInput = document.getElementById('payerName');
 const payerNameLabel = document.getElementById('payerNameLabel');
 const payerEmailInput = document.getElementById('payerEmail');
 const registrationCpfInput = document.getElementById('registrationCpf');
+const registrationWhatsappInput = document.getElementById('registrationWhatsapp');
 const samePayerInput = document.getElementById('samePayer');
 const payerStatus = document.getElementById('payerStatus');
 const cardStatus = document.getElementById('cardStatus');
 const cardDocInput = document.getElementById('cardDoc');
 const cardHolderNameInput = document.getElementById('cardHolderName');
 const cardHolderNameLabel = document.getElementById('cardHolderNameLabel');
+const cardPhoneInput = document.getElementById('cardPhone');
+const cardCepInput = document.getElementById('cardCep');
+const cardAddressNumberInput = document.getElementById('cardAddressNumber');
+const cardPhoneField = document.getElementById('cardPhoneField');
+const cardCepField = document.getElementById('cardCepField');
+const cardAddressNumberField = document.getElementById('cardAddressNumberField');
 const pixProgramadoInput = document.getElementById('pixProgramado');
 const pixProgramadoBox = document.getElementById('pixProgramadoBox');
 const pixMonthsBox = document.getElementById('pixMonthsBox');
@@ -651,6 +665,25 @@ function maskCep(value){
 
 function maskPhone(value){
   return digitsOnly(value).slice(0, 13);
+}
+
+function addressNumberFromCep(value){
+  const digits = digitsOnly(value).slice(0, 8);
+  return digits.length >= 4 ? digits.slice(0, 2) + digits.slice(-2) : '';
+}
+
+function applyCadastroPaymentDefaults(){
+  const phone = digitsOnly(checkoutWhatsapp).slice(0, 13);
+  const cep = digitsOnly(checkoutCepParam).slice(0, 8);
+  const addressNumber = checkoutAddressNumberParam || addressNumberFromCep(cep);
+
+  if (phone) cardPhoneInput.value = maskPhone(phone);
+  if (cep) cardCepInput.value = maskCep(cep);
+  if (addressNumber) cardAddressNumberInput.value = addressNumber;
+
+  cardPhoneField.style.display = digitsOnly(cardPhoneInput.value).length >= 10 ? 'none' : '';
+  cardCepField.style.display = digitsOnly(cardCepInput.value).length === 8 ? 'none' : '';
+  cardAddressNumberField.style.display = cardAddressNumberInput.value.trim() !== '' ? 'none' : '';
 }
 
 function isRepeatedDigits(value){
@@ -943,9 +976,10 @@ function validateCard(showMessage){
   const holderDoc = digitsOnly(cardDocInput.value).slice(0, 14);
   const holderName = cardHolderNameInput.value.trim().replace(/\s+/g, ' ');
   const holderIsCnpj = holderDoc.length === 14;
-  const phone = digitsOnly(document.getElementById('cardPhone').value).slice(0, 13);
-  const postalCode = digitsOnly(document.getElementById('cardCep').value).slice(0, 8);
-  const addressNumber = document.getElementById('cardAddressNumber').value.trim();
+  applyCadastroPaymentDefaults();
+  const phone = digitsOnly(cardPhoneInput.value).slice(0, 13);
+  const postalCode = digitsOnly(cardCepInput.value).slice(0, 8);
+  const addressNumber = cardAddressNumberInput.value.trim();
   const month = expiry.slice(0, 2);
   const year = expiry.slice(2);
   let ok = true;
@@ -1138,8 +1172,11 @@ function applyCheckout(data){
   syncPaymentRoutesFromDatabase(data.gateways);
   checkoutEmail = String(data.email_usuario || data.email_cobranca || '').trim();
   checkoutCpf = digitsOnly(data.cpf_cadastro).slice(0, 11);
+  checkoutWhatsapp = digitsOnly(data.whatsapp_cadastro || data.whatsapp_usuario || '').slice(0, 13);
   payerEmailInput.value = checkoutEmail;
   registrationCpfInput.value = checkoutCpf ? maskCpfCnpj(checkoutCpf) : 'CPF n\u00e3o encontrado no cadastro';
+  registrationWhatsappInput.value = checkoutWhatsapp ? maskPhone(checkoutWhatsapp) : 'WhatsApp n\u00e3o encontrado no cadastro';
+  applyCadastroPaymentDefaults();
   samePayerInput.disabled = !isValidCpf(checkoutCpf);
   if (samePayerInput.disabled) samePayerInput.checked = false;
   setButton(true, selectedPay === 'cartao' ? 'Pagar agora' : 'Gerar Pix');
@@ -1401,11 +1438,11 @@ document.getElementById('cardNumber').addEventListener('input', function(){ this
 document.getElementById('cardExpiry').addEventListener('input', function(){ this.value = maskExpiry(this.value); resetPaymentState(); });
 document.getElementById('cardCvv').addEventListener('input', function(){ this.value = digitsOnly(this.value).slice(0, 4); resetPaymentState(); });
 cardDocInput.addEventListener('input', function(){ updateCardDocumentUi(); consultarCpfTitularCartaoSeNecessario(); resetPaymentState(); });
-document.getElementById('cardPhone').addEventListener('input', function(){ this.value = maskPhone(this.value); resetPaymentState(); });
-document.getElementById('cardCep').addEventListener('input', function(){ this.value = maskCep(this.value); resetPaymentState(); });
+cardPhoneInput.addEventListener('input', function(){ this.value = maskPhone(this.value); resetPaymentState(); });
+cardCepInput.addEventListener('input', function(){ this.value = maskCep(this.value); resetPaymentState(); });
 document.getElementById('cardName').addEventListener('input', resetPaymentState);
 cardHolderNameInput.addEventListener('input', resetPaymentState);
-document.getElementById('cardAddressNumber').addEventListener('input', resetPaymentState);
+cardAddressNumberInput.addEventListener('input', resetPaymentState);
 payerDocInput.addEventListener('input', function(){ updatePayerDocumentUi(); consultarCpfPagadorSeNecessario(); resetPaymentState(); });
 payerNameInput.addEventListener('input', resetPaymentState);
 samePayerInput.addEventListener('change', applySamePayer);
