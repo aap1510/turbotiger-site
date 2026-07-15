@@ -208,6 +208,7 @@
   .field-hint.warn{color:#6f4b00}
   .checks{display:grid;gap:10px;margin:12px 0 14px}
   .check-alert{
+    position:relative;
     z-index:5;
     grid-column:1 / -1;
     grid-row:2;
@@ -228,7 +229,7 @@
   .check-alert:after{
     content:"";
     position:absolute;
-    left:3px;
+    left:11px;
     top:-7px;
     width:12px;
     height:12px;
@@ -890,7 +891,9 @@
     const row = $(rowId);
     const input = $(inputId);
     row.hidden = !visible;
-    input.required = visible && required;
+    input.required = false;
+    input.dataset.required = visible && required ? "true" : "false";
+    input.setAttribute("aria-required", visible && required ? "true" : "false");
     if (!visible) input.checked = false;
     setCheckAlert(inputId, "");
   }
@@ -1329,7 +1332,7 @@
   function requiredCheckOk(inputId){
     const input = $(inputId);
     const row = input ? input.closest(".check") : null;
-    if (!input || !row || row.hidden || !input.required) return true;
+    if (!input || !row || row.hidden || input.dataset.required !== "true") return true;
     return input.checked;
   }
 
@@ -1370,7 +1373,7 @@
       const message = checkRequiredMessage(id);
       if (!firstMessage) firstMessage = message;
       if (!firstMissing) firstMissing = id;
-      setCheckAlert(id, "");
+      if (showMessage) setCheckAlert(id, "");
     });
 
     if (showMessage && firstMissing) {
@@ -1582,7 +1585,6 @@
     if (!checkResult.ok) {
       status.className = "status";
       status.textContent = "";
-      updateFormState({ keepStatus: true });
       return;
     }
 
