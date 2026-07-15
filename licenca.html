@@ -183,7 +183,7 @@
           <label for="registrationCpf">CPF do cadastro</label>
           <input id="registrationCpf" type="text" readonly disabled placeholder="Carregando CPF do app">
         </div>
-        <div class="field full">
+        <div class="field full" style="display:none">
           <label for="registrationWhatsapp">WhatsApp do cadastro</label>
           <input id="registrationWhatsapp" type="text" readonly disabled placeholder="Carregando WhatsApp do app">
         </div>
@@ -206,7 +206,7 @@
             <input id="cardNumber" type="text" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="0000 0000 0000 0000">
           </div>
           <div class="field full">
-            <label for="cardName">Titular do cart&atilde;o</label>
+            <label for="cardName">Nome impresso</label>
             <input id="cardName" type="text" autocomplete="cc-name" maxlength="80" placeholder="Nome do titular">
           </div>
           <div class="field">
@@ -218,12 +218,12 @@
             <input id="cardCvv" type="text" inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="000">
           </div>
           <div class="field">
-            <label for="cardDoc">CPF/CNPJ do titular</label>
+            <label for="cardDoc">CPF titular do cart&atilde;o</label>
             <input id="cardDoc" type="text" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="Somente n&uacute;meros">
           </div>
           <div class="field">
-            <label for="cardHolderName" id="cardHolderNameLabel">Titular do cart&atilde;o</label>
-            <input id="cardHolderName" type="text" readonly disabled placeholder="Preenchido automaticamente pelo CPF">
+            <label for="cardHolderName" id="cardHolderNameLabel">Nome completo</label>
+            <input id="cardHolderName" type="text" readonly disabled placeholder="Preenchido automaticamente">
           </div>
           <div class="field" id="cardPhoneField" style="display:none">
             <label for="cardPhone">Telefone do titular</label>
