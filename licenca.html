@@ -273,7 +273,7 @@
         </div>
         <div class="payer-grid" id="pixPayerFields">
           <div class="field">
-            <label for="payerDoc">CPF/CNPJ</label>
+            <label for="payerDoc">CPF</label>
             <input id="payerDoc" type="text" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="Digite somente n&uacute;meros">
           </div>
           <div class="field">
@@ -773,7 +773,7 @@ function updatePayerDocumentUi(){
   payerDocInput.value = maskCpfCnpj(digits);
   const isCnpj = digits.length > 11;
   payerNameLabel.textContent = isCnpj ? 'Raz\u00e3o social' : 'Nome completo';
-  payerNameInput.placeholder = isCnpj ? 'Raz\u00e3o social' : 'Preenchido automaticamente pelo CPF';
+  payerNameInput.placeholder = isCnpj ? 'Raz\u00e3o social' : 'Preenchido automaticamente';
   payerNameInput.autocomplete = isCnpj ? 'organization' : 'name';
   setFieldLocked(payerNameInput, !isCnpj);
 
@@ -843,7 +843,7 @@ function updateCardDocumentUi(){
   cardDocInput.value = maskCpfCnpj(digits);
   const isCnpj = digits.length > 11;
   cardHolderNameLabel.textContent = isCnpj ? 'Razão social do titular' : 'Titular do cartão';
-  cardHolderNameInput.placeholder = isCnpj ? 'Razão social' : 'Preenchido automaticamente pelo CPF';
+  cardHolderNameInput.placeholder = isCnpj ? 'Razão social' : 'Preenchido automaticamente';
   cardHolderNameInput.autocomplete = isCnpj ? 'organization' : 'name';
   setFieldLocked(cardHolderNameInput, !isCnpj);
 
@@ -939,7 +939,7 @@ function validatePix(showMessage){
   const isCnpj = documentDigits.length > 11;
   let ok = true;
   let message = 'Informe os dados do pagador para gerar o Pix.';
-  let buttonText = 'Informe CPF/CNPJ';
+  let buttonText = 'Informe CPF';
 
   if (!checkoutEmail) {
     ok = false;
@@ -947,7 +947,7 @@ function validatePix(showMessage){
     buttonText = 'Carregando e-mail';
   } else if (documentDigits.length !== 11 && documentDigits.length !== 14) {
     ok = false;
-    message = 'Informe um CPF ou CNPJ v\u00e1lido para o pagador.';
+    message = 'Informe um CPF v\u00e1lido para o pagador.';
   } else if (!isValidCpfCnpj(documentDigits)) {
     ok = false;
     message = documentDigits.length === 14 ? 'CNPJ inv\u00e1lido. Confira os n\u00fameros digitados.' : 'CPF inv\u00e1lido. Confira os n\u00fameros digitados.';
