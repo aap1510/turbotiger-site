@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MMN - Turbo Tiger Admin</title>
+<meta name="description" content="Painel MMN Turbo Tiger.">
+<link rel="canonical" href="https://turbotiger.com.br/adm/mmn/">
+<link rel="icon" href="https://turbotiger.com.br/assets/icone-turbotiger-raio.ico">
+<link rel="apple-touch-icon" href="https://turbotiger.com.br/assets/logo-300x300.webp">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MMN - Turbo Tiger Admin">
+<meta property="og:description" content="Painel MMN Turbo Tiger.">
+<meta property="og:url" content="https://turbotiger.com.br/adm/mmn/">
+<meta property="og:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
+<meta property="og:image:secure_url" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Turbo Tiger - App e comunidade para bets">
+<meta property="og:site_name" content="Turbo Tiger">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MMN - Turbo Tiger Admin">
+<meta name="twitter:description" content="Painel MMN Turbo Tiger.">
+<meta name="twitter:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
+<link rel="stylesheet" href="../assets/admin.css?v=20260720-mmn-01" />
+<link rel="stylesheet" href="mmn.css?v=20260720-mmn-01" />
+</head>
+<body data-admin-page="mmn">
+  <div class="admin-shell mmn-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <img src="../../assets/logo-300x300.webp" alt="Turbo Tiger">
+        <div>
+          <h1>Admin</h1>
+          <span id="adminIdentity">Turbo Tiger</span>
+        </div>
+      </div>
+
+      <nav class="admin-nav" aria-label="Areas administrativas">
+        <a class="nav-link" href="../admin/">Administra&ccedil;&atilde;o</a>
+        <a class="nav-link" href="../push/">Notifica&ccedil;&otilde;es</a>
+        <a class="nav-link is-active" href="./">MMN</a>
+        <a class="nav-link" href="../../sobolao/?role=admin">S&oacute; Bol&atilde;o</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-ghost" id="switchAccountButton" type="button">
+          <span class="mmn-ico" aria-hidden="true">&#8635;</span>
+          <span>Trocar conta</span>
+        </button>
+        <button class="btn btn-danger" id="logoutButton" type="button">
+          <span class="mmn-ico" aria-hidden="true">&times;</span>
+          <span>Sair</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-title">
+          <h1>MMN</h1>
+          <span id="pageStatus" class="status-line">Carregando</span>
+        </div>
+        <div class="mmn-top-actions">
+          <div class="mmn-role-switch" role="tablist" aria-label="Perfil de acesso">
+            <button class="mmn-role is-active" type="button" data-role="admin">Admin</button>
+            <button class="mmn-role" type="button" data-role="suporte">Suporte</button>
+            <button class="mmn-role" type="button" data-role="usuario">Usu&aacute;rio</button>
+          </div>
+          <button class="btn btn-ghost" id="reloadButton" type="button">
+            <span class="mmn-ico" aria-hidden="true">&#8635;</span>
+            <span>Atualizar</span>
+          </button>
+        </div>
+      </div>
+
+      <section class="panel mmn-login-panel" id="mmnLoginPanel">
+        <div class="panel-header">
+          <h2>Acesso MMN</h2>
+          <span class="status-line" id="loginStatus"></span>
+        </div>
+        <div class="panel-body">
+          <form id="mmnLoginForm" class="form-grid">
+            <label class="field">
+              <span>E-mail</span>
+              <input id="loginEmail" type="email" autocomplete="username" required>
+            </label>
+            <label class="field">
+              <span>Senha</span>
+              <input id="loginPassword" type="password" autocomplete="current-password" required>
+            </label>
+            <label class="field">
+              <span>Entrar como</span>
+              <select id="loginRole">
+                <option value="admin">Administra&ccedil;&atilde;o</option>
+                <option value="suporte">Suporte</option>
+                <option value="usuario">Usu&aacute;rio</option>
+              </select>
+            </label>
+            <div class="btn-row">
+              <button class="btn btn-primary" id="loginButton" type="submit">Entrar</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <div id="mmnApp" hidden>
+        <section class="mmn-alert" id="backendNotice" hidden>
+          <strong>Modo demonstrativo</strong>
+          <span>Os RPCs do MMN ainda n&atilde;o responderam. Os n&uacute;meros abaixo s&atilde;o uma pr&eacute;via operacional.</span>
+        </section>
+
+        <section class="metric-grid mmn-metric-grid" aria-label="Resumo MMN">
+          <div class="metric"><strong id="metricAtivos">0</strong><span>Usu&aacute;rios ativos</span></div>
+          <div class="metric"><strong id="metricMRR">R$ 0,00</strong><span>MRR estimado</span></div>
+          <div class="metric"><strong id="metricPayout">0%</strong><span>Payout</span></div>
+          <div class="metric"><strong id="metricComissoes">R$ 0,00</strong><span>Comiss&otilde;es</span></div>
+          <div class="metric"><strong id="metricBonificacoes">R$ 0,00</strong><span>B&ocirc;nus</span></div>
+          <div class="metric"><strong id="metricPendencias">0</strong><span>Pend&ecirc;ncias</span></div>
+        </section>
+
+        <div class="tabs mmn-tabs" role="tablist">
+          <button class="tab-button is-active" type="button" data-tab="resumo" data-access="admin suporte usuario">Resumo</button>
+          <button class="tab-button" type="button" data-tab="usuarios" data-access="admin suporte">Usu&aacute;rios</button>
+          <button class="tab-button" type="button" data-tab="rede" data-access="admin suporte usuario">Rede</button>
+          <button class="tab-button" type="button" data-tab="comissoes" data-access="admin suporte usuario">Comiss&otilde;es</button>
+          <button class="tab-button" type="button" data-tab="premios" data-access="admin suporte usuario">Pr&ecirc;mios</button>
+          <button class="tab-button" type="button" data-tab="simulador" data-access="admin suporte">Simulador</button>
+          <button class="tab-button" type="button" data-tab="regras" data-access="admin">Regras</button>
+        </div>
+
+        <section class="panel" data-panel="resumo">
+          <div class="panel-header">
+            <h2>Opera&ccedil;&atilde;o</h2>
+            <span class="status-line" id="summaryStatus">Receita confirmada, comiss&atilde;o vari&aacute;vel</span>
+          </div>
+          <div class="panel-body mmn-summary-grid">
+            <div class="mmn-kpi-board">
+              <div class="mmn-kpi">
+                <span>Ticket Premium</span>
+                <strong id="summaryTicket">R$ 19,90</strong>
+              </div>
+              <div class="mmn-kpi">
+                <span>Limite de payout</span>
+                <strong id="summaryPayoutCap">33%</strong>
+              </div>
+              <div class="mmn-kpi">
+                <span>N&iacute;veis ativos</span>
+                <strong id="summaryLevels">6</strong>
+              </div>
+              <div class="mmn-kpi">
+                <span>Margem rede</span>
+                <strong id="summaryMargin">0%</strong>
+              </div>
+            </div>
+            <div class="mmn-levels-card">
+              <div class="section-label">Distribui&ccedil;&atilde;o por n&iacute;vel</div>
+              <div class="mmn-level-bars" id="levelBars"></div>
+            </div>
+            <div class="mmn-timeline-card">
+              <div class="section-label">Ciclo de crescimento</div>
+              <div class="mmn-timeline" id="growthTimeline"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="usuarios" hidden>
+          <div class="panel-header">
+            <h2>Usu&aacute;rios e suporte</h2>
+            <span class="status-line" id="usersStatus"></span>
+          </div>
+          <div class="panel-body">
+            <form class="inline-grid mmn-filter-form" id="userFilterForm">
+              <label class="field">
+                <span>Buscar</span>
+                <input id="userSearch" autocomplete="off" placeholder="login, c&oacute;digo ou nome">
+              </label>
+              <label class="field">
+                <span>Status</span>
+                <select id="userStatusFilter">
+                  <option value="">Todos</option>
+                  <option value="ativo">Ativos</option>
+                  <option value="pendente">Pendentes</option>
+                  <option value="bloqueado">Bloqueados</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Rank</span>
+                <select id="userRankFilter">
+                  <option value="">Todos</option>
+                  <option value="executivo">Executivo</option>
+                  <option value="senior">Senior</option>
+                  <option value="master">Master</option>
+                  <option value="elite">Elite</option>
+                </select>
+              </label>
+              <div class="btn-row">
+                <button class="btn btn-primary" type="submit">Filtrar</button>
+              </div>
+            </form>
+            <div class="table-wrap mmn-table-gap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Usu&aacute;rio</th>
+                    <th>Indicador</th>
+                    <th>Diretos</th>
+                    <th>Ativos rede</th>
+                    <th>Rank</th>
+                    <th>Status</th>
+                    <th>A&ccedil;&atilde;o</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="rede" hidden>
+          <div class="panel-header">
+            <h2>Linha de indica&ccedil;&atilde;o</h2>
+            <span class="status-line" id="networkStatus"></span>
+          </div>
+          <div class="panel-body">
+            <div class="mmn-network-toolbar">
+              <label class="field">
+                <span>Usu&aacute;rio base</span>
+                <select id="networkUserSelect"></select>
+              </label>
+              <button class="btn btn-ghost" id="copyInviteButton" type="button">
+                <span class="mmn-ico" aria-hidden="true">&#10697;</span>
+                <span>Copiar convite</span>
+              </button>
+            </div>
+            <div class="mmn-network-grid">
+              <div class="mmn-chain">
+                <div class="section-label">6 acima</div>
+                <div id="lineAbove" class="mmn-chain-list"></div>
+              </div>
+              <div class="mmn-self-card" id="networkSelf"></div>
+              <div class="mmn-chain">
+                <div class="section-label">6 abaixo</div>
+                <div id="lineBelow" class="mmn-chain-list"></div>
+              </div>
+            </div>
+            <div class="mmn-directs">
+              <div class="section-label">Indicados diretos</div>
+              <div id="directsList" class="mmn-person-grid"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="comissoes" hidden>
+          <div class="panel-header">
+            <h2>Comissionamentos</h2>
+            <span class="status-line" id="commissionStatus"></span>
+          </div>
+          <div class="panel-body">
+            <div class="mmn-payout-strip">
+              <span>Confirmado: <strong id="commissionConfirmed">R$ 0,00</strong></span>
+              <span>Pendente: <strong id="commissionPending">R$ 0,00</strong></span>
+              <span>Retido: <strong id="commissionHeld">R$ 0,00</strong></span>
+            </div>
+            <div class="table-wrap mmn-table-gap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Per&iacute;odo</th>
+                    <th>Benefici&aacute;rio</th>
+                    <th>Origem</th>
+                    <th>N&iacute;vel</th>
+                    <th>Base</th>
+                    <th>%</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="commissionsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="premios" hidden>
+          <div class="panel-header">
+            <h2>Premia&ccedil;&otilde;es e bonifica&ccedil;&otilde;es</h2>
+            <span class="status-line" id="awardsStatus"></span>
+          </div>
+          <div class="panel-body">
+            <div class="mmn-awards-grid" id="awardsGrid"></div>
+            <div class="table-wrap mmn-table-gap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Crit&eacute;rio</th>
+                    <th>Pool</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="rankTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="simulador" hidden>
+          <div class="panel-header">
+            <h2>Simulador</h2>
+            <span class="status-line">Baseado no plano de 24 meses</span>
+          </div>
+          <div class="panel-body">
+            <form id="simulatorForm" class="form-grid">
+              <label class="field">
+                <span>Usu&aacute;rios ativos</span>
+                <input id="simUsers" type="number" min="1" value="300000">
+              </label>
+              <label class="field">
+                <span>Ticket mensal</span>
+                <input id="simTicket" type="number" min="1" step="0.01" value="19.90">
+              </label>
+              <label class="field">
+                <span>Payout m&aacute;ximo (%)</span>
+                <input id="simPayout" type="number" min="1" max="33" step="0.1" value="33">
+              </label>
+              <label class="field">
+                <span>Continuidade (%)</span>
+                <input id="simContinuity" type="number" min="1" max="100" step="1" value="60">
+              </label>
+              <label class="field">
+                <span>Churn mensal (%)</span>
+                <input id="simChurn" type="number" min="0" max="80" step="0.1" value="16.67">
+              </label>
+              <label class="field">
+                <span>Expans&atilde;o m&eacute;dia</span>
+                <input id="simExpansion" type="number" min="0" step="1" value="6">
+              </label>
+              <div class="btn-row wide">
+                <button class="btn btn-primary" type="submit">Calcular</button>
+              </div>
+            </form>
+            <div class="mmn-sim-grid" id="simulatorResults"></div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="regras" hidden>
+          <div class="panel-header">
+            <h2>Regras e integra&ccedil;&atilde;o</h2>
+            <span class="status-line" id="rulesStatus">Contrato local</span>
+          </div>
+          <div class="panel-body mmn-rules-grid">
+            <div>
+              <div class="section-label">Percentuais</div>
+              <div id="rulesLevels" class="mmn-rule-list"></div>
+            </div>
+            <div>
+              <div class="section-label">Qualifica&ccedil;&atilde;o</div>
+              <div id="qualificationRules" class="mmn-rule-list"></div>
+            </div>
+            <div class="mmn-sql-box">
+              <strong>SQL do m&oacute;dulo</strong>
+              <span>Arquivo local: <code>supabase-mmn.sql</code></span>
+              <span>Schema sugerido: <code>mod_mmn</code></span>
+              <span>RPCs: <code>mmn_usuario_painel_rpc</code>, <code>adm_mmn_painel_rpc</code>, <code>adm_mmn_rede_usuario_rpc</code></span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="mmn.js?v=20260720-mmn-01"></script>
+</body>
+</html>

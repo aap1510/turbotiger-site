@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>So Bolao - Turbo Tiger</title>
+<meta name="description" content="Modulo So Bolao integrado ao ecossistema Turbo Tiger.">
+<link rel="canonical" href="https://turbotiger.com.br/sobolao/">
+<link rel="icon" href="../assets/icone-turbotiger-raio.ico">
+<link rel="apple-touch-icon" href="../assets/logo-300x300.webp">
+<meta property="og:type" content="website">
+<meta property="og:title" content="So Bolao - Turbo Tiger">
+<meta property="og:description" content="Organizacao de boloes lotericos com painel para usuarios, administracao, suporte e lotericas parceiras.">
+<meta property="og:url" content="https://turbotiger.com.br/sobolao/">
+<meta property="og:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
+<meta property="og:site_name" content="Turbo Tiger">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="So Bolao - Turbo Tiger">
+<meta name="twitter:description" content="Modulo de bolao integrado ao Turbo Tiger.">
+<meta name="twitter:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
+<link rel="stylesheet" href="assets/sobolao.css?v=20260720-02" />
+</head>
+<body data-sobolao-page="app">
+  <div class="sb-shell">
+    <aside class="sb-sidebar">
+      <a class="sb-brand" href="../" aria-label="Turbo Tiger">
+        <img src="../assets/logo-300x300.webp" alt="Turbo Tiger">
+        <span>
+          <strong>So Bolao</strong>
+          <small>Turbo Tiger</small>
+        </span>
+      </a>
+
+      <nav class="sb-menu" aria-label="Menu So Bolao">
+        <button class="sb-menu-link is-active" type="button" data-tab="visao" data-access="admin suporte usuario loterica">
+          <span class="sb-menu-ico" aria-hidden="true">01</span>
+          <span>Visao</span>
+        </button>
+        <button class="sb-menu-link" type="button" data-tab="boloes" data-access="admin suporte usuario">
+          <span class="sb-menu-ico" aria-hidden="true">02</span>
+          <span>Boloes</span>
+        </button>
+        <button class="sb-menu-link" type="button" data-tab="meus" data-access="usuario">
+          <span class="sb-menu-ico" aria-hidden="true">03</span>
+          <span>Meus boloes</span>
+        </button>
+        <button class="sb-menu-link" type="button" data-tab="resultados" data-access="admin suporte usuario loterica">
+          <span class="sb-menu-ico" aria-hidden="true">04</span>
+          <span>Resultados</span>
+        </button>
+        <button class="sb-menu-link" type="button" data-tab="premios" data-access="admin suporte usuario">
+          <span class="sb-menu-ico" aria-hidden="true">05</span>
+          <span>Premios</span>
+        </button>
+        <button class="sb-menu-link" type="button" data-tab="lotericas" data-access="admin suporte loterica">
+          <span class="sb-menu-ico" aria-hidden="true">06</span>
+          <span>Lotericas</span>
+        </button>
+        <button class="sb-menu-link" type="button" data-tab="suporte" data-access="admin suporte usuario loterica">
+          <span class="sb-menu-ico" aria-hidden="true">07</span>
+          <span>Suporte</span>
+        </button>
+        <button class="sb-menu-link" type="button" data-tab="admin" data-access="admin suporte">
+          <span class="sb-menu-ico" aria-hidden="true">08</span>
+          <span>Admin</span>
+        </button>
+      </nav>
+
+      <div class="sb-sidebar-foot">
+        <button class="sb-btn sb-btn-ghost" id="switchAccountButton" type="button">Trocar conta</button>
+        <button class="sb-btn sb-btn-danger" id="logoutButton" type="button">Sair</button>
+      </div>
+    </aside>
+
+    <main class="sb-main">
+      <header class="sb-topbar">
+        <div>
+          <p class="sb-eyebrow">Modulo acoplado Turbo Tiger</p>
+          <h1>So Bolao</h1>
+          <span id="pageStatus" class="sb-status">Carregando</span>
+        </div>
+        <div class="sb-top-actions">
+          <div class="sb-role-switch" role="tablist" aria-label="Perfil de acesso">
+            <button class="sb-role is-active" type="button" data-role="usuario">Usuario</button>
+            <button class="sb-role" type="button" data-role="admin">Admin</button>
+            <button class="sb-role" type="button" data-role="suporte">Suporte</button>
+            <button class="sb-role" type="button" data-role="loterica">Loterica</button>
+          </div>
+          <button class="sb-btn sb-btn-ghost" id="reloadButton" type="button">Atualizar</button>
+        </div>
+      </header>
+
+      <section class="sb-login-panel" id="loginPanel">
+        <div class="sb-panel-head">
+          <div>
+            <h2>Acesso So Bolao</h2>
+            <span id="loginStatus" class="sb-status"></span>
+          </div>
+          <button class="sb-btn sb-btn-ghost" id="demoButton" type="button">Abrir previa local</button>
+        </div>
+        <form id="loginForm" class="sb-form-grid">
+          <label class="sb-field">
+            <span>E-mail</span>
+            <input id="loginEmail" type="email" autocomplete="username" required>
+          </label>
+          <label class="sb-field">
+            <span>Senha</span>
+            <input id="loginPassword" type="password" autocomplete="current-password" required>
+          </label>
+          <label class="sb-field">
+            <span>Entrar como</span>
+            <select id="loginRole">
+              <option value="usuario">Usuario</option>
+              <option value="admin">Administracao</option>
+              <option value="suporte">Suporte</option>
+              <option value="loterica">Loterica parceira</option>
+            </select>
+          </label>
+          <div class="sb-form-actions">
+            <button class="sb-btn sb-btn-primary" id="loginButton" type="submit">Entrar</button>
+          </div>
+        </form>
+      </section>
+
+      <div id="sobolaoApp" hidden>
+        <section class="sb-notice" id="backendNotice" hidden>
+          <strong>Previa operacional</strong>
+          <span>O painel esta usando dados locais porque os RPCs ainda nao responderam.</span>
+        </section>
+
+        <section class="sb-metrics" aria-label="Resumo So Bolao">
+          <article class="sb-metric"><strong id="metricBoloes">0</strong><span>Boloes ativos</span></article>
+          <article class="sb-metric"><strong id="metricCotas">0</strong><span>Cotas reservadas</span></article>
+          <article class="sb-metric"><strong id="metricPremios">R$ 0,00</strong><span>Premios apurados</span></article>
+          <article class="sb-metric"><strong id="metricGestao">R$ 0,00</strong><span>Taxa de gestao</span></article>
+          <article class="sb-metric"><strong id="metricParceiras">0</strong><span>Lotericas parceiras</span></article>
+          <article class="sb-metric"><strong id="metricPendencias">0</strong><span>Pendencias</span></article>
+        </section>
+
+        <section class="sb-panel" data-panel="visao">
+          <div class="sb-panel-head">
+            <div>
+              <h2>Operacao</h2>
+              <span class="sb-status" id="summaryStatus">Taxa de gestao, repasse e auditoria separados</span>
+            </div>
+            <span class="sb-pill ok">Nao e casa de apostas</span>
+          </div>
+          <div class="sb-panel-body sb-summary-grid">
+            <div class="sb-kpi-board">
+              <div class="sb-kpi"><span>Taxa de gestao</span><strong id="summaryTaxa">10%</strong></div>
+              <div class="sb-kpi"><span>Conversao alvo</span><strong id="summaryConversao">30%</strong></div>
+              <div class="sb-kpi"><span>Apostas medias</span><strong id="summaryApostasMes">4/mes</strong></div>
+              <div class="sb-kpi"><span>Ticket oficial</span><strong id="summaryTicket">R$ 6,00</strong></div>
+            </div>
+            <div class="sb-flow">
+              <div class="sb-section-label">Esteira operacional</div>
+              <div id="operationFlow" class="sb-flow-list"></div>
+            </div>
+            <div class="sb-next-draws">
+              <div class="sb-section-label">Proximos concursos</div>
+              <div id="nextDraws" class="sb-draw-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="sb-panel" data-panel="boloes" hidden>
+          <div class="sb-panel-head">
+            <div>
+              <h2>Boloes disponiveis</h2>
+              <span class="sb-status" id="boloesStatus"></span>
+            </div>
+            <div class="sb-filter-row">
+              <label class="sb-field sb-field-inline">
+                <span>Modalidade</span>
+                <select id="filterModalidade"></select>
+              </label>
+              <label class="sb-field sb-field-inline">
+                <span>Status</span>
+                <select id="filterStatus">
+                  <option value="">Todos</option>
+                  <option value="aberto">Aberto</option>
+                  <option value="fechando">Fechando</option>
+                  <option value="registrado">Registrado</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="sb-panel-body">
+            <form id="joinForm" class="sb-join-strip">
+              <label class="sb-field">
+                <span>Bolao</span>
+                <select id="joinBolao"></select>
+              </label>
+              <label class="sb-field">
+                <span>Cotas</span>
+                <input id="joinCotas" type="number" min="1" value="1">
+              </label>
+              <div class="sb-slip-summary" aria-live="polite">
+                <span id="slipMode">Escolha manual</span>
+                <strong id="slipCounter">0/6 numeros</strong>
+                <small id="slipHint">Marque os numeros da cartela.</small>
+              </div>
+              <input id="joinNumeros" type="hidden">
+              <button class="sb-btn sb-btn-primary" id="joinButton" type="submit">Reservar cota</button>
+            </form>
+            <section class="sb-slip" id="palpiteCartela" aria-labelledby="slipTitle">
+              <div class="sb-slip-head">
+                <div>
+                  <h3 id="slipTitle">Cartela do palpite</h3>
+                  <span class="sb-status" id="slipSubtitle">Selecione um bolao para montar a cartela.</span>
+                </div>
+                <div class="sb-slip-actions">
+                  <button class="sb-btn sb-btn-ghost sb-btn-small" id="slipRandomButton" type="button">Palpite rapido</button>
+                  <button class="sb-btn sb-btn-ghost sb-btn-small" id="slipClearButton" type="button">Limpar</button>
+                </div>
+              </div>
+              <div class="sb-slip-selected" id="slipSelected"></div>
+              <div class="sb-number-grid" id="slipNumberGrid"></div>
+            </section>
+            <div class="sb-card-grid" id="boloesGrid"></div>
+          </div>
+        </section>
+
+        <section class="sb-panel" data-panel="meus" hidden>
+          <div class="sb-panel-head">
+            <div>
+              <h2>Meus boloes</h2>
+              <span class="sb-status" id="myStatus"></span>
+            </div>
+          </div>
+          <div class="sb-panel-body">
+            <div class="sb-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Bolao</th>
+                    <th>Concurso</th>
+                    <th>Cotas</th>
+                    <th>Pago</th>
+                    <th>Status</th>
+                    <th>Palpite</th>
+                    <th>Documento</th>
+                  </tr>
+                </thead>
+                <tbody id="myTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="sb-panel" data-panel="resultados" hidden>
+          <div class="sb-panel-head">
+            <div>
+              <h2>Resultados das loterias</h2>
+              <span class="sb-status" id="resultsStatus"></span>
+            </div>
+          </div>
+          <div class="sb-panel-body">
+            <div class="sb-result-grid" id="resultsGrid"></div>
+          </div>
+        </section>
+
+        <section class="sb-panel" data-panel="premios" hidden>
+          <div class="sb-panel-head">
+            <div>
+              <h2>Premios e rateios</h2>
+              <span class="sb-status" id="awardsStatus"></span>
+            </div>
+          </div>
+          <div class="sb-panel-body">
+            <div class="sb-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Bolao</th>
+                    <th>Faixa</th>
+                    <th>Total</th>
+                    <th>Minha parte</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="awardsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="sb-panel" data-panel="lotericas" hidden>
+          <div class="sb-panel-head">
+            <div>
+              <h2>Lotericas parceiras</h2>
+              <span class="sb-status" id="partnersStatus"></span>
+            </div>
+          </div>
+          <div class="sb-panel-body sb-partner-layout">
+            <div class="sb-card-grid" id="partnersGrid"></div>
+            <div class="sb-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Bolao</th>
+                    <th>Repasse</th>
+                    <th>Comprovante</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="partnerQueueBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="sb-panel" data-panel="suporte" hidden>
+          <div class="sb-panel-head">
+            <div>
+              <h2>Suporte</h2>
+              <span class="sb-status" id="supportStatus"></span>
+            </div>
+          </div>
+          <div class="sb-panel-body sb-support-grid">
+            <form id="supportForm" class="sb-form-stack">
+              <label class="sb-field">
+                <span>Assunto</span>
+                <input id="supportSubject" autocomplete="off" required>
+              </label>
+              <label class="sb-field">
+                <span>Mensagem</span>
+                <textarea id="supportMessage" required></textarea>
+              </label>
+              <button class="sb-btn sb-btn-primary" id="supportButton" type="submit">Abrir chamado</button>
+            </form>
+            <div class="sb-ticket-list" id="ticketsList"></div>
+          </div>
+        </section>
+
+        <section class="sb-panel" data-panel="admin" hidden>
+          <div class="sb-panel-head">
+            <div>
+              <h2>Administracao So Bolao</h2>
+              <span class="sb-status" id="adminStatus"></span>
+            </div>
+          </div>
+          <div class="sb-panel-body">
+            <div class="sb-admin-grid">
+              <form id="adminBolaoForm" class="sb-form-grid">
+                <h3 class="sb-form-title">Bolao</h3>
+                <input id="adminBolaoId" type="hidden">
+                <label class="sb-field">
+                  <span>Titulo</span>
+                  <input id="adminBolaoTitulo" autocomplete="off" required>
+                </label>
+                <label class="sb-field">
+                  <span>Modalidade</span>
+                  <input id="adminBolaoModalidade" value="mega_sena" autocomplete="off" required>
+                </label>
+                <label class="sb-field">
+                  <span>Concurso</span>
+                  <input id="adminBolaoConcurso" type="number" min="1" required>
+                </label>
+                <label class="sb-field">
+                  <span>Data do sorteio</span>
+                  <input id="adminBolaoSorteio" type="date" required>
+                </label>
+                <label class="sb-field">
+                  <span>CNPJ loterica</span>
+                  <input id="adminBolaoLoterica" autocomplete="off">
+                </label>
+                <label class="sb-field">
+                  <span>Cotas</span>
+                  <input id="adminBolaoCotas" type="number" min="1" value="100" required>
+                </label>
+                <label class="sb-field">
+                  <span>Valor oficial por cota</span>
+                  <input id="adminBolaoValor" type="number" min="0.01" step="0.01" value="6.00" required>
+                </label>
+                <label class="sb-field">
+                  <span>Taxa de gestao (%)</span>
+                  <input id="adminBolaoTaxa" type="number" min="0" step="0.1" value="10" required>
+                </label>
+                <label class="sb-field">
+                  <span>Limite de entrada</span>
+                  <input id="adminBolaoLimite" type="datetime-local" required>
+                </label>
+                <label class="sb-field">
+                  <span>Status</span>
+                  <select id="adminBolaoStatus">
+                    <option value="rascunho">Rascunho</option>
+                    <option value="aberto">Aberto</option>
+                    <option value="fechando">Fechando</option>
+                    <option value="registrado">Registrado</option>
+                    <option value="apurado">Apurado</option>
+                    <option value="encerrado">Encerrado</option>
+                  </select>
+                </label>
+                <label class="sb-field sb-wide">
+                  <span>Numeros registrados</span>
+                  <input id="adminBolaoNumeros" autocomplete="off" placeholder="Ex.: 05, 11, 23, 32, 44, 56">
+                </label>
+                <div class="sb-form-actions sb-wide">
+                  <button class="sb-btn sb-btn-primary" id="adminBolaoButton" type="submit">Salvar bolao</button>
+                  <button class="sb-btn sb-btn-ghost" id="adminBolaoNovo" type="button">Novo</button>
+                </div>
+              </form>
+
+              <form id="partnerForm" class="sb-form-grid">
+                <h3 class="sb-form-title">Loterica</h3>
+                <input id="partnerId" type="hidden">
+                <label class="sb-field">
+                  <span>Nome</span>
+                  <input id="partnerName" autocomplete="off" required>
+                </label>
+                <label class="sb-field">
+                  <span>CNPJ</span>
+                  <input id="partnerCnpj" autocomplete="off" required>
+                </label>
+                <label class="sb-field">
+                  <span>Cidade</span>
+                  <input id="partnerCity" autocomplete="off">
+                </label>
+                <label class="sb-field">
+                  <span>UF</span>
+                  <input id="partnerUf" maxlength="2" autocomplete="off">
+                </label>
+                <label class="sb-field">
+                  <span>WhatsApp</span>
+                  <input id="partnerWhatsapp" autocomplete="off">
+                </label>
+                <label class="sb-field">
+                  <span>Status</span>
+                  <select id="partnerStatus">
+                    <option value="analise">Analise</option>
+                    <option value="ativa">Ativa</option>
+                    <option value="pausada">Pausada</option>
+                    <option value="bloqueada">Bloqueada</option>
+                  </select>
+                </label>
+                <div class="sb-form-actions sb-wide">
+                  <button class="sb-btn sb-btn-secondary" id="partnerButton" type="submit">Salvar loterica</button>
+                  <button class="sb-btn sb-btn-ghost" id="partnerNovo" type="button">Nova</button>
+                </div>
+              </form>
+            </div>
+            <div class="sb-table-wrap sb-admin-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fila operacional</th>
+                    <th>Responsavel</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Acao</th>
+                  </tr>
+                </thead>
+                <tbody id="adminQueueBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/sobolao.js?v=20260720-02"></script>
+</body>
+</html>

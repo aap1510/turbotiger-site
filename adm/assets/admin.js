@@ -37,6 +37,7 @@
     informe_plataforma: "Selecione pelo menos uma plataforma.",
     informe_token: "Informe o token de destino.",
     informe_usuarios: "Informe pelo menos um usu\u00e1rio.",
+    invalid_credentials: "E-mail ou senha invalidos.",
     invalid_grant: "E-mail ou senha inv\u00e1lidos.",
     missing_authorization: "Sess\u00e3o expirada. Entre novamente.",
     modelo_nao_salvo: "N\u00e3o foi poss\u00edvel salvar o modelo.",
@@ -49,8 +50,10 @@
     sem_permissao_admin: "Sem permiss\u00e3o para administra\u00e7\u00e3o.",
     sem_permissao_areas: "Sem permiss\u00e3o para alterar \u00e1reas administrativas.",
     sem_permissao_configurar_push: "Sem permiss\u00e3o para configurar notifica\u00e7\u00f5es.",
+    sem_permissao_mmn: "Sem permiss\u00e3o para acessar o MMN.",
     sem_permissao_perfis: "Sem permiss\u00e3o para alterar perfis administrativos.",
     sem_permissao_push: "Sem permiss\u00e3o para acessar notifica\u00e7\u00f5es.",
+    sem_permissao_sobolao: "Sem permiss\u00e3o para acessar o S\u00f3 Bol\u00e3o.",
     sem_permissao_usuarios: "Sem permiss\u00e3o para alterar usu\u00e1rios administrativos.",
     sessao_expirada: "Sess\u00e3o expirada. Entre novamente.",
     usuario_auth_nao_encontrado: "Usu\u00e1rio n\u00e3o encontrado no Supabase Auth."
@@ -164,7 +167,15 @@
       },
       body: JSON.stringify({ email: email, password: password })
     });
-    var data = await parseResponse(response);
+    var data;
+    try {
+      data = await parseResponse(response);
+    } catch (error) {
+      if (response.status === 400 || response.status === 401) {
+        throw new Error("E-mail ou senha invalidos.");
+      }
+      throw error;
+    }
     return {
       access_token: data.access_token,
       refresh_token: data.refresh_token,
@@ -1151,6 +1162,14 @@
           window.location.href = "push/";
           return;
         }
+        if (contexto && contexto.ok === true && Array.isArray(contexto.areas) && contexto.areas.indexOf("mmn") >= 0) {
+          window.location.href = "mmn/";
+          return;
+        }
+        if (contexto && contexto.ok === true && Array.isArray(contexto.areas) && contexto.areas.indexOf("sobolao") >= 0) {
+          window.location.href = "../sobolao/?role=admin";
+          return;
+        }
       } catch (error) {
         clearSession();
       }
@@ -1170,11 +1189,11 @@
           clearSession();
           throw new Error((contexto && contexto.error) || "sem_permissao_admin");
         }
-        if (!Array.isArray(contexto.areas) || (contexto.areas.indexOf("push") === -1 && contexto.areas.indexOf("admin") === -1)) {
+        if (!Array.isArray(contexto.areas) || (contexto.areas.indexOf("push") === -1 && contexto.areas.indexOf("admin") === -1 && contexto.areas.indexOf("mmn") === -1 && contexto.areas.indexOf("sobolao") === -1)) {
           clearSession();
           throw new Error("sem_permissao_admin");
         }
-        window.location.href = contexto.areas.indexOf("admin") >= 0 ? "admin/" : "push/";
+        window.location.href = contexto.areas.indexOf("admin") >= 0 ? "admin/" : (contexto.areas.indexOf("push") >= 0 ? "push/" : (contexto.areas.indexOf("mmn") >= 0 ? "mmn/" : "../sobolao/?role=admin"));
       } catch (error) {
         setStatus(qs("loginStatus"), error.message || String(error), "error");
       } finally {
