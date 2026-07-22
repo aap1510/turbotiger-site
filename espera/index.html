@@ -71,6 +71,7 @@
     color:#fff;
   }
   .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .brand-home{display:flex;flex:0 0 auto}
   .brand img{width:54px;height:54px;border-radius:12px;object-fit:contain;box-shadow:0 8px 26px rgba(0,0,0,.35)}
   .brand strong{display:block;font-size:18px;line-height:1}
   .brand span{display:block;margin-top:4px;color:#f8e6a4;font-size:13px}
@@ -433,10 +434,10 @@
 </head>
 <body data-tt-background="fundo_geral" style="--tt-site-background-url:url('../assets/bg-900x900.webp')">
 <header class="wrap topbar">
-  <a class="brand" href="/" aria-label="Turbo Tiger">
-    <img data-tt-image="logo_geral" src="../assets/logo-300x300.webp" alt="Turbo Tiger">
+  <div class="brand">
+    <a class="brand-home" href="/" aria-label="Voltar para a página inicial"><img data-tt-image="logo_geral" src="../assets/logo-300x300.webp" alt="Turbo Tiger"></a>
     <span><strong>Turbo Tiger</strong><span>Lista de espera</span></span>
-  </a>
+  </div>
   <button class="age-pill" type="button" data-tt-age-notice aria-label="Informações sobre o acesso para maiores de 18 anos">18+</button>
 </header>
 
@@ -594,7 +595,7 @@
 </main>
 
 <footer class="tt-site-footer">
-  <small><a href="/sobre-nos.html">Sobre nós</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/politicaetermos.html">Política de privacidade &amp; Termos de uso</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&copy; 2026 Turbo Tiger</small>
+  <small><a href="/">Home</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/sobre-nos.html">Sobre</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/politicaetermos.html">Política de privacidade &amp; Termos de uso</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&copy; 2026 Turbo Tiger</small>
 </footer>
 <a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden>
   <img src="../assets/icone-whatsapp-96x96.webp" alt="WhatsApp">

@@ -21,6 +21,7 @@
   .site-header{padding:28px 0 0}
   .nav{display:flex;align-items:center;justify-content:space-between;gap:24px}
   .brand{display:flex;align-items:center;gap:15px}
+  .brand-home{display:flex;flex:0 0 auto}
   .brand img{width:90px;height:90px;object-fit:contain;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
   .brand-copy{align-self:center;width:219px;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:20px;font-weight:700;line-height:1.25;letter-spacing:normal;opacity:.95}
   .brand-copy strong{display:block;font-size:inherit;font-weight:700;white-space:nowrap}
@@ -73,7 +74,7 @@
 <header class="site-header">
   <div class="wrap nav">
     <div class="brand">
-      <img data-tt-image="logo_geral" src="assets/logo-300x300.webp" alt="Turbo Tiger">
+      <a class="brand-home" href="/" aria-label="Voltar para a página inicial"><img data-tt-image="logo_geral" src="assets/logo-300x300.webp" alt="Turbo Tiger"></a>
       <span class="brand-copy"><strong>App &amp; Comunidade</strong><strong>para Jogo Responsável</strong></span>
       <button class="brand-age" type="button" data-tt-age-notice aria-label="Informações sobre o acesso para maiores de 18 anos">18+</button>
     </div>
@@ -120,7 +121,7 @@
 
 <footer class="site-footer tt-site-footer">
   <div class="wrap footer-inner">
-    <small><a href="/politicaetermos.html">Privacidade &amp; Termos de uso</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&copy; 2026 Turbo Tiger</small>
+    <small><a href="/">Home</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/politicaetermos.html">Privacidade &amp; Termos de uso</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&copy; 2026 Turbo Tiger</small>
   </div>
 </footer>
 <a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden><img src="assets/icone-whatsapp-96x96.webp" alt="WhatsApp"></a>
