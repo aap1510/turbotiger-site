@@ -9,6 +9,8 @@
   var LOCAL_IMAGE_FILES = {
     instagramIcon: "icone-instagram-96x96.webp",
     facebookIcon: "icone-facebook-96x96.webp",
+    xIcon: "icone-rede_x-96x96.webp",
+    telegramIcon: "icone-telegram-96x96.webp",
     whatsappIcon: "icone-whatsapp-96x96.webp",
     background: "bg-900x900.webp",
     logo: "logo-300x300.webp",
@@ -251,6 +253,62 @@
     requestUpdate();
   }
 
+  function setupAgeNotice() {
+    var triggers = document.querySelectorAll("[data-tt-age-notice]");
+    if (!triggers.length) return;
+
+    var lastTrigger = null;
+    var modal = document.createElement("div");
+    modal.className = "tt-age-modal";
+    modal.hidden = true;
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-labelledby", "ttAgeModalTitle");
+    modal.innerHTML = [
+      '<div class="tt-age-modal-card">',
+      '<div class="tt-age-modal-head">',
+      '<span class="tt-age-modal-badge" aria-hidden="true">18+</span>',
+      '<h2 id="ttAgeModalTitle">Acesso exclusivo<br>para maiores de idade</h2>',
+      '</div>',
+      '<div class="tt-age-modal-copy">',
+      '<p>O Turbo Tiger verifica a idade por meio do CPF, utilizando dados oficiais da Receita Federal disponibilizados pelo Serpro, empresa pública do Governo Federal, em serviço acessado por meio da plataforma Gov.br.</p>',
+      '<p>O acesso ao aplicativo é permitido exclusivamente a pessoas com 18 (dezoito) anos ou mais.</p>',
+      '</div>',
+      '<button class="tt-age-modal-close" type="button">Entendi</button>',
+      '</div>'
+    ].join("");
+    document.body.appendChild(modal);
+
+    var closeButton = modal.querySelector(".tt-age-modal-close");
+
+    function closeModal() {
+      modal.hidden = true;
+      document.body.classList.remove("tt-age-modal-open");
+      if (lastTrigger) lastTrigger.focus();
+    }
+
+    function openModal(trigger) {
+      lastTrigger = trigger;
+      modal.hidden = false;
+      document.body.classList.add("tt-age-modal-open");
+      closeButton.focus();
+    }
+
+    triggers.forEach(function (button) {
+      button.addEventListener("click", function () {
+        openModal(button);
+      });
+    });
+
+    closeButton.addEventListener("click", closeModal);
+    modal.addEventListener("click", function (event) {
+      if (event.target === modal) closeModal();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !modal.hidden) closeModal();
+    });
+  }
+
   async function updateTurboTigerContacts() {
     var insideApp = isInsideTurboTigerApp();
     if (insideApp) propagateTurboTigerAppMarker();
@@ -258,12 +316,18 @@
 
     var contacts = await Promise.all([
       fetchConfig("turbotiger_contatos", "instagram"),
-      fetchConfig("turbotiger_contatos", "facebook")
+      fetchConfig("turbotiger_contatos", "facebook"),
+      fetchConfig("turbotiger_contatos", "x"),
+      fetchConfig("turbotiger_contatos", "telegram")
     ]);
     var instagram = contacts[0] || DEFAULT_INSTAGRAM;
     var facebook = contacts[1] || DEFAULT_FACEBOOK;
+    var x = contacts[2];
+    var telegram = contacts[3];
     var instagramIcon = localAssetUrl(LOCAL_IMAGE_FILES.instagramIcon);
     var facebookIcon = localAssetUrl(LOCAL_IMAGE_FILES.facebookIcon);
+    var xIcon = localAssetUrl(LOCAL_IMAGE_FILES.xIcon);
+    var telegramIcon = localAssetUrl(LOCAL_IMAGE_FILES.telegramIcon);
     var whatsappIcon = localAssetUrl(LOCAL_IMAGE_FILES.whatsappIcon);
     var whatsappPhone = insideApp ? "" : await firstConfig([
       ["turbotiger_contatos", "whatsapp"],
@@ -276,6 +340,8 @@
 
     updateSocial("[data-tt-contact='instagram']", instagram, instagramIcon);
     updateSocial("[data-tt-contact='facebook']", facebook, facebookIcon);
+    updateSocial("[data-tt-contact='x']", x, xIcon);
+    updateSocial("[data-tt-contact='telegram']", telegram, telegramIcon);
     updateSocial("[data-tt-contact='whatsapp']", whatsapp, whatsappIcon);
   }
 
@@ -283,9 +349,11 @@
     document.addEventListener("DOMContentLoaded", function () {
       updateTurboTigerContacts();
       setupFixedFooterCopyright();
+      setupAgeNotice();
     });
   } else {
     updateTurboTigerContacts();
     setupFixedFooterCopyright();
+    setupAgeNotice();
   }
 }());

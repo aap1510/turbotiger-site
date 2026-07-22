@@ -43,6 +43,16 @@ body[data-tt-background] {
   transition: opacity .18s ease;
 }
 
+.tt-site-footer small a {
+  color: inherit;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.tt-site-footer small a:hover {
+  text-decoration: underline;
+}
+
 body.tt-site-footer-end .tt-site-footer small {
   opacity: 1;
 }
@@ -51,16 +61,27 @@ body.tt-site-footer-end .tt-site-footer small {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  opacity: 1;
+  filter: none;
   text-decoration: none;
   pointer-events: auto;
 }
 
 .tt-social-link img {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  opacity: 1;
+  filter: none;
   object-fit: contain;
   display: block;
 }
@@ -73,6 +94,123 @@ body.tt-site-footer-end .tt-site-footer small {
   justify-self: end;
 }
 
+.tt-age-modal[hidden] {
+  display: none !important;
+}
+
+.tt-age-modal {
+  position: fixed;
+  z-index: 10000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(4, 5, 7, .76);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.tt-age-modal-card {
+  width: min(100%, 470px);
+  padding: 34px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 22px;
+  background: #111318;
+  color: #fff;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .55);
+}
+
+.tt-age-modal-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.tt-age-modal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  flex: 0 0 auto;
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .34);
+  color: #fff;
+  font-weight: 800;
+}
+
+.tt-age-modal-card h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 27px;
+  line-height: 1.05;
+  letter-spacing: -.035em;
+}
+
+.tt-age-modal-copy {
+  margin-bottom: 28px;
+}
+
+.tt-age-modal-card p {
+  margin: 0 0 14px;
+  color: #d4d6dc;
+  font-size: 16px;
+  line-height: 1.65;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+.tt-age-modal-card p:last-child {
+  margin-bottom: 0;
+}
+
+.tt-age-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  background: #f4b400;
+  color: #17130a;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.tt-age-modal-close:hover {
+  background: #ffd76a;
+}
+
+.tt-age-modal-close:focus-visible {
+  outline: 3px solid rgba(255, 215, 106, .48);
+  outline-offset: 3px;
+}
+
+body.tt-age-modal-open {
+  overflow: hidden;
+}
+
+@media (max-width: 560px) {
+  .tt-age-modal-card {
+    padding: 28px 24px;
+    border-radius: 18px;
+  }
+
+  .tt-age-modal-card h2 {
+    font-size: 24px;
+  }
+
+  .tt-age-modal-head {
+    gap: 13px;
+  }
+}
+
 .tt-whatsapp-float {
   position: fixed;
   right: 18px;
@@ -81,11 +219,11 @@ body.tt-site-footer-end .tt-site-footer small {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   background: #25d366;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, .28);
+  box-shadow: 0 8px 5px -5px rgba(0, 0, 0, .48);
   text-decoration: none;
 }
 
@@ -94,8 +232,8 @@ body.tt-site-footer-end .tt-site-footer small {
 }
 
 .tt-whatsapp-float img {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
   display: block;
 }
@@ -110,16 +248,21 @@ body.tt-site-footer-end .tt-site-footer small {
     width: calc(100% - 22px);
   }
 
+  .tt-site-footer small {
+    white-space: normal;
+    text-align: center;
+  }
+
   .tt-whatsapp-float {
     right: 14px;
     bottom: 14px;
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
   }
 
   .tt-whatsapp-float img {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
   }
 }
 

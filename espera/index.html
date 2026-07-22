@@ -83,9 +83,12 @@
     border:1px solid rgba(255,255,255,.35);
     border-radius:999px;
     color:#fff;
+    font:inherit;
     font-weight:800;
     background:rgba(0,0,0,.34);
+    cursor:pointer;
   }
+  .age-pill:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
   .hero{
     min-height:calc(100vh - 86px);
     display:grid;
@@ -227,6 +230,27 @@
   .field-hint{min-height:16px;color:#8b2e2e;font-size:12px;font-weight:800}
   .field-hint.ok{color:var(--green)}
   .field-hint.warn{color:#6f4b00}
+  .platform-field{margin:2px 0 14px;padding:0;border:0}
+  .platform-field legend{margin-bottom:8px;font-weight:800;font-size:13px;color:#2b2416}
+  .platform-options{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .platform-option{position:relative;cursor:pointer}
+  .platform-option input{position:absolute;opacity:0;pointer-events:none}
+  .platform-option span{
+    display:flex;
+    min-height:46px;
+    align-items:center;
+    justify-content:center;
+    padding:9px 10px;
+    border:1px solid #d5c9af;
+    border-radius:8px;
+    background:#fff;
+    color:#2b2416;
+    font-size:13px;
+    font-weight:800;
+    text-align:center;
+  }
+  .platform-option input:checked + span{border-color:var(--gold-dark);background:#fff2c2;box-shadow:0 0 0 2px rgba(244,180,0,.18)}
+  .platform-option input:focus-visible + span{outline:3px solid rgba(244,180,0,.28);outline-offset:1px}
   .checks{display:grid;gap:10px;margin:12px 0 14px}
   .check-alert{
     position:relative;
@@ -398,6 +422,7 @@
     h1{font-size:38px}
     .lead{font-size:17px}
     .grid,.actions{grid-template-columns:1fr}
+    .platform-options{grid-template-columns:1fr}
     .launch-countdown.is-visible{grid-template-columns:1fr}
     .count-days{justify-content:flex-start}
     .form-head,form,.result{padding-left:16px;padding-right:16px}
@@ -412,7 +437,7 @@
     <img data-tt-image="logo_geral" src="../assets/logo-300x300.webp" alt="Turbo Tiger">
     <span><strong>Turbo Tiger</strong><span>Lista de espera</span></span>
   </a>
-  <span class="age-pill">18+</span>
+  <button class="age-pill" type="button" data-tt-age-notice aria-label="Informações sobre o acesso para maiores de 18 anos">18+</button>
 </header>
 
 <main class="wrap">
@@ -476,6 +501,24 @@
             <div class="field-hint" id="cityHelp" aria-live="polite"></div>
           </div>
         </div>
+
+        <fieldset class="platform-field">
+          <legend>Para qual versão você quer receber o aviso?</legend>
+          <div class="platform-options">
+            <label class="platform-option">
+              <input id="plataformaAndroid" name="plataformaInteresse" type="radio" value="android" required />
+              <span>Android</span>
+            </label>
+            <label class="platform-option">
+              <input id="plataformaIos" name="plataformaInteresse" type="radio" value="ios" required />
+              <span>iPhone (iOS)</span>
+            </label>
+            <label class="platform-option">
+              <input id="plataformaAmbos" name="plataformaInteresse" type="radio" value="ambos" required />
+              <span>Android e iOS</span>
+            </label>
+          </div>
+        </fieldset>
 
         <div class="checks">
           <label class="check" id="checkMaior18">
@@ -551,7 +594,7 @@
 </main>
 
 <footer class="tt-site-footer">
-  <small>&copy; 2026 Turbo Tiger</small>
+  <small><a href="/sobre-nos.html">Sobre nós</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/politicaetermos.html">Política de privacidade &amp; Termos de uso</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&copy; 2026 Turbo Tiger</small>
 </footer>
 <a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden>
   <img src="../assets/icone-whatsapp-96x96.webp" alt="WhatsApp">
@@ -1437,6 +1480,7 @@
     if (fieldActive("whatsapp") && whatsapp && !isValidWhatsApp(whatsapp)) return "Confira o WhatsApp informado.";
     if (fieldRequired("uf") && !uf) return "Selecione seu estado na lista.";
     if ((fieldRequired("cidade") || city) && !validateCitySelection(false)) return "Selecione sua cidade na lista.";
+    if (!document.querySelector('input[name="plataformaInteresse"]:checked')) return "Escolha Android, iPhone (iOS) ou os dois.";
     return "";
   }
 
@@ -1495,6 +1539,9 @@
     const p = params();
     const selectedCity = normalizeCity(state.selectedCity);
     const cityValue = cityPayloadValue(selectedCity);
+    const plataformaInteresse = document.querySelector('input[name="plataformaInteresse"]:checked').value;
+    const interesseAndroid = plataformaInteresse === "android" || plataformaInteresse === "ambos";
+    const interesseIos = plataformaInteresse === "ios" || plataformaInteresse === "ambos";
     return {
       slug: p.get("promo") || DEFAULT_SLUG,
       ref: state.ref,
@@ -1522,6 +1569,9 @@
       politica: $("termos").checked,
       optin_email: $("optinEmail").checked,
       optin_whatsapp: $("optinWhatsApp").checked,
+      plataforma_interesse: plataformaInteresse,
+      interesse_android: interesseAndroid,
+      interesse_ios: interesseIos,
       origem: "hotpage_espera",
       origem_aquisicao: attribution.sourceType,
       canal_ads: attribution.sourceType === "ads" ? attribution.channel : "",
@@ -1536,6 +1586,9 @@
       extras: {
         href: window.location.href,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+        plataforma_interesse: plataformaInteresse,
+        interesse_android: interesseAndroid,
+        interesse_ios: interesseIos,
         localizacao: {
           pais_codigo: "BR",
           uf: state.selectedUf,
@@ -1730,6 +1783,9 @@
     ["nome", "email", "maior18", "termos", "optinEmail", "optinWhatsApp"].forEach((id) => {
       $(id).addEventListener("input", updateFormState);
       $(id).addEventListener("change", updateFormState);
+    });
+    document.querySelectorAll('input[name="plataformaInteresse"]').forEach((input) => {
+      input.addEventListener("change", updateFormState);
     });
     $("email").addEventListener("input", () => handleEmailContactInput(false, false));
     $("email").addEventListener("blur", () => handleEmailContactInput(true, true));

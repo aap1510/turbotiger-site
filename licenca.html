@@ -327,7 +327,7 @@
     </div>
     <div class="status" id="checkoutStatus">Validando acesso seguro pelo app...</div>
     <button class="cta" type="button" id="checkoutBtn" disabled>Validando acesso...</button>
-    <p class="fine" id="sumFine">No cart&atilde;o, voc&ecirc; paga R$ 238,80 agora e fica com 12 meses de uso liberados. O Turbo Tiger Beta requer aparelho Android 64-bit.</p>
+    <p class="fine" id="sumFine">No cart&atilde;o, voc&ecirc; paga R$ 238,80 agora e fica com 12 meses de uso liberados. O Turbo Tiger βeta requer aparelho Android 64-bit.</p>
     <div class="pix-result" id="pixResult">
       <div class="pay-title">Pix gerado</div>
       <div class="muted" id="pixResultText">Pague o QR Code para liberar o acesso no app.</div>
@@ -436,7 +436,7 @@ function updateSummary(){
     document.getElementById('sumPeriod').textContent = months + ' meses';
     document.getElementById('sumAmountLabel').textContent = 'Pix de hoje';
     document.getElementById('sumTotal').textContent = plan.monthly;
-    document.getElementById('sumFine').textContent = 'No Pix programado mensal, voc\u00ea paga ' + plan.monthly + ' agora e a Asaas gera as pr\u00f3ximas ' + nextCount + ' cobran\u00e7as mensais no mesmo valor.' + promoText + ' O Turbo Tiger Beta requer aparelho Android 64-bit.';
+    document.getElementById('sumFine').textContent = 'No Pix programado mensal, voc\u00ea paga ' + plan.monthly + ' agora e a Asaas gera as pr\u00f3ximas ' + nextCount + ' cobran\u00e7as mensais no mesmo valor.' + promoText + ' O Turbo Tiger βeta requer aparelho Android 64-bit.';
     return;
   }
 
@@ -450,7 +450,7 @@ function updateSummary(){
     : '';
   document.getElementById('sumFine').textContent = (payMethod === 'cartao' ? 'No cart\u00e3o' : 'No Pix') + ', voc\u00ea paga ' + plan.total + ' agora e fica com ' + liberadoTexto + '.' +
     promoText +
-    ' O Turbo Tiger Beta requer aparelho Android 64-bit.';
+    ' O Turbo Tiger βeta requer aparelho Android 64-bit.';
 }
 
 function setStatus(message, kind){
@@ -1494,7 +1494,7 @@ updateSummary();
 validateCheckout();
 </script>
 <footer class="tt-site-footer">
-  <small>&copy; 2026 Turbo Tiger</small>
+  <small><a href="/sobre-nos.html">Sobre nós</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/politicaetermos.html">Política de privacidade &amp; Termos de uso</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&copy; 2026 Turbo Tiger</small>
 </footer>
 <a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden>
   <img src="assets/icone-whatsapp-96x96.webp" alt="WhatsApp">

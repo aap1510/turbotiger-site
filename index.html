@@ -3,143 +3,465 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Turbo Tiger - App & Comunidade</title>
-<meta name="description" content="Comunidade Turbo Tiger, estrategia e app para acompanhar suas bets.">
+<title>Turbo Tiger - Controle e Jogo Responsável</title>
+<meta name="description" content="Controle financeiro, organização, histórico e estatísticas para quem aposta com mais consciência e responsabilidade.">
 <link rel="canonical" href="https://turbotiger.com.br/">
 <link rel="icon" href="https://turbotiger.com.br/assets/icone-turbotiger-raio.ico">
 <link rel="apple-touch-icon" href="https://turbotiger.com.br/assets/logo-300x300.webp">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Turbo Tiger - App &amp; Comunidade">
-<meta property="og:description" content="Comunidade Turbo Tiger, estrategia e app para acompanhar suas bets.">
+<meta property="og:title" content="Turbo Tiger - Controle e Jogo Responsável">
+<meta property="og:description" content="Organização, consciência e responsabilidade para quem aposta.">
 <meta property="og:url" content="https://turbotiger.com.br/">
 <meta property="og:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
 <meta property="og:image:secure_url" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Turbo Tiger - App e comunidade para bets">
+<meta property="og:image:alt" content="Turbo Tiger - Controle e jogo responsável">
 <meta property="og:site_name" content="Turbo Tiger">
 <meta property="og:locale" content="pt_BR">
 <meta property="fb:app_id" content="2239320349905002">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Turbo Tiger - App &amp; Comunidade">
-<meta name="twitter:description" content="Comunidade Turbo Tiger, estrategia e app para acompanhar suas bets.">
+<meta name="twitter:title" content="Turbo Tiger - Controle e Jogo Responsável">
+<meta name="twitter:description" content="Organização, consciência e responsabilidade para quem aposta.">
 <meta name="twitter:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
-<meta name="twitter:image:alt" content="Turbo Tiger - App e comunidade para bets">
+<meta name="twitter:image:alt" content="Turbo Tiger - Controle e jogo responsável">
 <style>
   :root{
-    --accent:#f4b400;
-    --accent-dark:#c88e00;
-    --ink:#111;
-    --muted:#454545;
-    --card:#fff;
-    --line:#e8e8e8;
+    --gold:#f4b400;
+    --gold-soft:#ffd76a;
+    --gold-deep:#a66d00;
+    --ink:#111318;
+    --muted:#626773;
+    --surface:#fff;
+    --surface-soft:#f5f5f2;
+    --line:rgba(17,19,24,.1);
+    --dark:#111318;
+    --dark-soft:#1b1e25;
+    --shadow:0 24px 70px rgba(17,19,24,.09);
   }
   *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
   [hidden]{display:none!important}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fafafa}
-  header{position:relative;height:230px;max-height:230px;overflow:hidden;padding:28px 16px;color:#fff;background:transparent}
-  .wrap{max-width:1000px;margin:0 auto;width:100%}
-  .hero{display:flex;flex-direction:column;gap:18px;align-items:flex-start;position:relative;z-index:1;padding-right:220px;text-shadow:0 2px 4px rgba(0,0,0,.6)}
-  .brand{display:flex;align-items:center;gap:12px}
-  .brand img{width:72px;height:72px;object-fit:contain;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-  .brand span{opacity:.95;line-height:1.25}
+  body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#f7f7f4;line-height:1.5;-webkit-font-smoothing:antialiased}
+  body[data-tt-background]{background-image:none!important;padding-bottom:0!important}
+  a{color:inherit}
+  img{max-width:100%}
   h1,h2,h3,p{margin-top:0}
-  h1{margin:0;font-size:26px}
-  h2{font-size:26px;line-height:1.1;margin-bottom:10px}
-  h3{font-size:18px;margin-bottom:8px}
-  .lead{margin:0;color:#eef3ff;max-width:720px;font-size:19px;line-height:1.35}
-  .hero-socials{display:flex;align-items:center;gap:8px;margin-top:-8px}
-  .header-tiger{position:absolute;right:0;top:0;max-height:100%;width:auto;object-fit:contain;z-index:0;aspect-ratio:1;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 72%,rgba(0,0,0,0) 100%);mask-image:linear-gradient(to bottom,#000 0%,#000 72%,rgba(0,0,0,0) 100%)}
-  main{padding:20px 16px;margin-top:-40px}
-  .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 12px 30px rgba(2,6,23,.08)}
-  .split{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-  .copy{flex:1;min-width:260px}
-  .panel{width:260px;min-width:200px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
-  .panel ul{text-align:left;margin:10px 0 0;padding-left:18px;color:#333}
-  .panel li{margin:6px 0}
-  .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:12px 16px;border-radius:10px;font-weight:700;text-decoration:none;cursor:pointer;border:0}
-  .btn-primary{background:var(--accent);color:#111}
-  .btn-primary:active{background:var(--accent-dark)}
-  .btn-ghost{background:transparent;border:2px solid #eee;color:#111}
-  .info{color:var(--muted);font-size:15px;line-height:1.5;margin-bottom:10px}
-  .fine{color:#676767;font-size:13px;line-height:1.45;margin-top:10px}
-  footer{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin:18px 0;color:#777;font-size:14px}
-  .social-link{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:999px;text-decoration:none}
-  .social-link img{width:30px;height:30px;object-fit:contain;display:block}
-  .social-left{justify-self:start}
-  .social-right{justify-self:end}
+  h1,h2,h3{letter-spacing:-.035em}
+  .wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;margin:0 0 22px;color:var(--gold-deep);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+  .eyebrow::before{display:none}
+  .section-title{max-width:760px;margin-bottom:24px;font-size:clamp(36px,5.4vw,72px);line-height:.98}
+  .section-copy{max-width:700px;color:var(--muted);font-size:clamp(17px,2vw,21px);line-height:1.65}
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 24px;border:1px solid transparent;border-radius:999px;font-size:15px;font-weight:800;text-decoration:none;transition:transform .2s ease,box-shadow .2s ease,background .2s ease}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-primary{background:var(--gold);color:#17130a;box-shadow:0 12px 30px rgba(244,180,0,.24)}
+  .btn-primary:hover{background:var(--gold-soft);box-shadow:0 16px 36px rgba(244,180,0,.3)}
+  .btn-ghost{border-color:var(--line);background:rgba(255,255,255,.7);color:var(--ink)}
+
+  .site-header{position:absolute;inset:0 0 auto;z-index:10;padding:24px 0}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .brand{display:flex;align-items:center;gap:13px;text-decoration:none}
+  .brand img{width:48px;height:48px;object-fit:contain;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.28)}
+  .brand-copy{color:#fff;font-size:13px;font-weight:650;line-height:1.25;letter-spacing:.01em}
+  .brand-copy strong{display:block;font-size:15px}
+  .hero-socials{display:flex;align-items:center;gap:6px}
+  .tt-social-link,.tt-social-link:hover{background:none;border:0;box-shadow:none;opacity:1;filter:none;transform:none;transition:none}
+
+  .hero{position:relative;display:grid;min-height:820px;overflow:hidden;background:radial-gradient(circle at 78% 20%,rgba(244,180,0,.14),transparent 32%),linear-gradient(135deg,#0d0f13 0%,#181b22 58%,#0b0d11 100%);color:#fff}
+  .hero::after{content:"";position:absolute;inset:auto 0 0;height:180px;background:linear-gradient(transparent,#0d0f13);pointer-events:none}
+  .hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);align-items:center;gap:48px;padding:150px 0 110px}
+  .hero-copy{max-width:760px}
+  .hero .eyebrow{flex-direction:row;align-items:flex-start;gap:.45em;margin-bottom:34px;color:var(--gold-soft)}
+  .hero .eyebrow>span{white-space:nowrap}
+  .hero .eyebrow .eyebrow-white{color:#fff}
+  .benefits .eyebrow .eyebrow-white{color:#fff}
+  .benefits .eyebrow,.compatibility .eyebrow{color:var(--gold-soft)}
+  .hero-title{margin-bottom:28px;font-size:clamp(54px,7.8vw,104px);font-weight:750;line-height:.88;letter-spacing:-.065em}
+  .hero-title span{display:block;color:var(--gold)}
+  .hero-lead{max-width:660px;margin-bottom:34px;color:#d4d6dc;font-size:clamp(19px,2.1vw,25px);line-height:1.45}
+  .hero-impact{display:flex;align-items:center;gap:18px;margin:0;color:#fff;font-size:16px;font-weight:700}
+  .hero-impact::before{content:"";width:48px;height:1px;background:var(--gold)}
+  .hero-visual{position:relative;align-self:end;min-height:580px}
+  .hero-tiger{position:absolute;right:0;bottom:-110px;width:min(452px,36.72vw);max-width:none;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 72%,transparent 98%);mask-image:linear-gradient(to bottom,#000 0%,#000 72%,transparent 98%)}
+
+  .intro{background:#0d0f13;color:#fff;padding:130px 0}
+  .intro-grid{display:grid;grid-template-columns:.7fr 1.3fr;gap:80px;align-items:start}
+  .intro-index{color:var(--gold);font-size:14px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+  .intro h2{max-width:820px;margin-bottom:34px;font-size:clamp(38px,5.6vw,76px);line-height:1.02}
+  .intro p{max-width:720px;color:#bec1c9;font-size:clamp(18px,2vw,22px);line-height:1.7}
+  .intro .purpose{margin:42px 0 0;padding-left:24px;border-left:2px solid var(--gold);color:#fff;font-weight:750}
+
+  .benefits{padding:140px 0;background:var(--surface)}
+  .benefits-head{display:flex;justify-content:space-between;align-items:end;gap:40px;margin-bottom:70px}
+  .benefits-head .section-title{margin-bottom:0;font-size:clamp(32px,5vw,68px)}
+  .benefits-phrase{max-width:280px;margin:0;color:var(--muted);font-size:18px;text-align:right}
+  .benefit-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+  .benefit{min-height:270px;padding:38px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);transition:background .25s ease,transform .25s ease}
+  .benefit:hover{position:relative;background:var(--surface-soft);transform:translateY(-4px)}
+  .benefit-number{display:block;margin-bottom:58px;color:var(--gold-deep);font-size:12px;font-weight:800;letter-spacing:.14em}
+  .benefit h3{margin-bottom:12px;font-size:24px}
+  .benefit p{margin:0;color:var(--muted);font-size:16px;line-height:1.6}
+
+  .statement{padding:150px 0;background:var(--surface-soft);text-align:center}
+  .statement p{max-width:1000px;margin:0 auto;font-size:clamp(42px,7vw,92px);font-weight:760;line-height:.98;letter-spacing:-.06em}
+  .statement span{color:var(--gold-deep)}
+  .statement span{text-shadow:0 2px 8px rgba(0,0,0,.42),0 1px 2px rgba(0,0,0,.48)}
+
+  .compatibility{padding:130px 0;background:var(--surface)}
+  .compat-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:90px;align-items:center}
+  .device-list{display:grid;gap:16px}
+  .device{display:flex;align-items:center;gap:22px;padding:26px 28px;border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 12px 36px rgba(17,19,24,.05)}
+  .device-icon{display:grid;place-items:center;width:54px;height:54px;flex:0 0 54px;border-radius:17px;background:var(--dark);color:var(--gold);font-size:24px;font-weight:900}
+  .device h3{margin:0 0 3px;color:#000;font-size:19px}
+  .device p span{display:block}
+  .device p{margin:0;color:var(--muted);font-size:14px}
+  .device.pending{background:var(--surface-soft);box-shadow:none}
+  .device.pending .device-icon{background:#e7e7e2;color:#6f737c}
+
+  .mission{padding:150px 0;background:linear-gradient(145deg,#171a21,#0d0f13);color:#fff}
+  .mission-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:90px}
+  .mission .eyebrow{color:var(--gold-soft)}
+  .mission h2{margin:0;font-size:clamp(44px,6vw,82px);line-height:.98}
+  .mission-copy p{color:#c8cad1;font-size:clamp(18px,2vw,22px);line-height:1.7}
+  .mission-copy .mission-close{margin-top:42px;color:#fff;font-size:clamp(24px,3vw,38px);font-weight:750;line-height:1.2}
+
+  .beta{padding:130px 0;background:var(--gold)}
+  .beta-card{display:grid;grid-template-columns:1.2fr .8fr;gap:70px;align-items:end}
+  .beta .eyebrow{color:#4b3300}
+  .beta .eyebrow::before{background:#4b3300}
+  .beta h2{margin-bottom:26px;font-size:clamp(48px,7vw,88px);line-height:.92}
+  .beta p{max-width:720px;margin-bottom:0;color:#3c2d08;font-size:19px;line-height:1.65}
+  .beta-actions{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+  .beta .btn-primary{background:var(--ink);color:#fff;box-shadow:0 18px 40px rgba(17,19,24,.22)}
+  .beta .btn-primary:hover{background:var(--gold-soft);color:#17130a}
+  .beta .btn-ghost{border-color:rgba(17,19,24,.22);background:transparent}
+  .beta-note{color:#4b3300;font-size:13px;font-weight:650}
+
+  .referral{padding:80px 0;background:#fff}
+  .referral-card{padding:42px;border:1px solid var(--line);border-radius:26px}
+  .referral h3{font-size:28px}
+  .referral ol{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin:28px 0 0;padding:0;counter-reset:steps;list-style:none}
+  .referral li{color:var(--muted);counter-increment:steps}
+  .referral li::before{content:"0" counter(steps);display:block;margin-bottom:12px;color:var(--gold-deep);font-size:12px;font-weight:800;letter-spacing:.14em}
+
+  .commitment{padding:130px 0 90px;background:#0b0d11;color:#fff}
+  .commitment-grid{display:grid;grid-template-columns:.7fr 1.3fr;gap:90px}
+  .commitment .eyebrow{color:var(--gold-soft)}
+  .commitment-lines{display:grid;gap:0}
+  .commitment-lines p{margin:0;padding:18px 0;border-bottom:1px solid rgba(255,255,255,.11);font-size:clamp(22px,3vw,36px);font-weight:720;line-height:1.15}
+  .commitment-lines .commitment-final{padding-top:30px;border:0;color:#bfc2ca;font-size:18px;font-weight:450;line-height:1.65;text-shadow:0 2px 6px rgba(0,0,0,.60)}
+  .commitment-title-accent{color:var(--gold);text-shadow:0 2px 6px rgba(0,0,0,.60)}
+  .site-footer{padding:30px 0 50px;background:#0b0d11;color:#a7aab2}
+  .footer-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-top:26px;border-top:1px solid rgba(255,255,255,.1)}
+  .footer-inner small{opacity:1!important;color:#a7aab2!important}
+  .footer-inner a{font-size:13px;text-decoration:none}
+  .footer-inner a:hover{color:#fff}
+  .tt-site-footer{position:static!important;transform:none!important;display:block!important;width:auto!important;margin:0!important;pointer-events:auto!important}
+  .tt-site-footer small{opacity:1!important;text-shadow:none!important}
+
+  @media(max-width:900px){
+    .hero{min-height:760px}
+    .hero-inner{grid-template-columns:1fr;padding-top:145px}
+    .hero-copy{position:relative;z-index:2}
+    .hero-visual{position:absolute;right:-60px;bottom:0;width:50%;min-height:500px;opacity:.56}
+    .hero-tiger{right:0;width:444px}
+    .intro-grid,.compat-grid,.mission-grid,.commitment-grid{grid-template-columns:1fr;gap:40px}
+    .benefit-grid{grid-template-columns:repeat(2,1fr)}
+    .beta-card{grid-template-columns:1fr;gap:40px}
+  }
   @media(max-width:640px){
-    header{padding:18px}
+    .wrap{width:min(100% - 32px,1180px)}
+    .site-header{padding:18px 0}
+    .brand img{width:42px;height:42px}
+    .brand-copy{font-size:11px}.brand-copy strong{font-size:13px}
+    .hero{min-height:760px}
+    .hero-inner{display:flex;align-items:flex-start;padding:132px 0 92px}
+    .hero-title{font-size:clamp(49px,15vw,68px)}
+    .hero-lead{font-size:18px}
+    .hero-impact{align-items:flex-start;font-size:14px}
+    .hero-impact::before{margin-top:11px;flex:0 0 26px}
+    .hero-visual{right:-95px;width:78%;opacity:.35}
+    .hero-tiger{right:0;bottom:-70px;width:329px}
+    .intro,.benefits,.compatibility,.mission,.beta,.commitment{padding:90px 0}
+    .intro h2{font-size:40px}
+    .benefits-head{align-items:start;flex-direction:column;margin-bottom:42px}
+    .benefits-phrase{text-align:left}
+    .benefit-grid{grid-template-columns:1fr}
+    .benefit{min-height:auto;padding:30px}
+    .benefit-number{margin-bottom:36px}
+    .statement{padding:100px 0}
+    .statement p{font-size:45px}
+    .device{padding:22px}
+    .mission h2{font-size:48px}
+    .beta h2{font-size:56px}
+    .beta-actions{align-items:stretch}
+    .beta-actions .btn{width:100%;text-align:center}
+    .referral{padding:60px 0}
+    .referral-card{padding:28px}
+    .referral ol{grid-template-columns:1fr}
+    .commitment-lines p{font-size:26px}
+    .footer-inner{align-items:flex-start;flex-direction:column}
+  }
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn,.tt-social-link,.benefit{transition:none}}
+
+  /* Fundo clássico e refinamentos finais da landing page. */
+  html body[data-tt-background]{
+    background-color:#0b0d11!important;
+    background-image:linear-gradient(to bottom,rgba(255,255,255,.10) 0,rgba(255,255,255,0) 120px),var(--tt-site-background-url)!important;
+    background-position:center top,center top!important;
+    background-size:100% 120px,cover!important;
+    background-repeat:no-repeat,no-repeat!important;
+    background-attachment:scroll,fixed!important;
+  }
+  body *{text-shadow:none}
+  .eyebrow,.eyebrow>span{text-shadow:0 2px 5px rgba(0,0,0,.42)}
+  .eyebrow .eyebrow-white{ text-shadow:none }
+  .hero,.intro,.benefits,.statement,.compatibility,.mission,.beta,.referral,.commitment,.site-footer{background:transparent!important}
+  .hero::after{display:none}
+  .site-header{padding:28px 0 0}
+  .nav{width:100%;max-width:1180px}
+  .brand{gap:15px}
+  .brand img{width:90px;height:90px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .brand-copy{align-self:center;width:219px;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:20px;font-weight:700;line-height:1.25;letter-spacing:normal;opacity:.95}
+  .brand-copy strong{display:block;font-size:inherit;font-weight:700;white-space:nowrap}
+  .brand-age{display:inline-flex;align-items:start;justify-content:center;min-height:34px;padding:7px 11px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(0,0,0,.34);color:#fff;font:inherit;font-weight:800;line-height:normal;cursor:pointer}
+  .brand-age:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .hero-socials{position:absolute;top:23px;right:18px;left:auto;gap:0}
+  .tt-social-link,.tt-social-link:hover{background:transparent;border:0;transform:none}
+  .tt-social-link[data-tt-contact="x"]{width:27px;height:27px}
+  .tt-social-link[data-tt-contact="x"] img{width:24px;height:24px}
+  .hero{min-height:600px}
+  .hero-inner{grid-template-columns:1fr minmax(320px,.85fr);align-items:start;padding:165px 0 70px}
+  .hero-copy{width:160px;max-width:160px}
+  .hero-title{width:max-content;margin-bottom:38px;font-size:50px;font-weight:750;line-height:1.05;letter-spacing:-.035em;text-shadow:0 2px 6px rgba(0,0,0,.60)}
+  .hero-title span{color:var(--gold)}
+  .hero-title>span{white-space:nowrap;text-shadow:0 2px 6px rgba(0,0,0,.60)}
+  .hero-title span{display:block}
+  .hero-title .hero-title-second{margin-top:28px;color:#fff}
+  .hero-title-break{display:none}
+  .hero-lead{width:min(660px,calc(100vw - 48px));max-width:660px;font-size:19px;text-shadow:0 2px 6px rgba(0,0,0,.38)}
+  .hero-impact{display:block;width:min(540px,calc(100vw - 48px));padding-left:20px;border-left:2px solid var(--gold);font-size:16px;line-height:1.55}
+  .hero-impact::before{display:none}
+  .hero-impact span{display:block}
+  .hero-visual{position:absolute;top:130px;right:0;width:min(452px,36.72vw);min-height:400px;opacity:1}
+  .hero-tiger{top:-40px;right:-80px;bottom:auto;width:122.27%;opacity:1;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 calc(40% - 10px),rgba(0,0,0,.92) calc(48% - 10px),rgba(0,0,0,.55) calc(68% - 10px),transparent calc(96% - 10px));mask-image:linear-gradient(to bottom,#000 0%,#000 calc(40% - 10px),rgba(0,0,0,.92) calc(48% - 10px),rgba(0,0,0,.55) calc(68% - 10px),transparent calc(96% - 10px))}
+  .intro{padding:45px 0 110px}
+  .benefits,.statement,.compatibility,.mission,.beta,.commitment{color:#fff}
+  .intro p,.benefits-phrase,.benefit p,.section-copy,.mission-copy p,.beta p,.beta-note,.commitment-lines .commitment-final{color:#eef0f4}
+  .benefit-number{display:none}
+  .benefit{min-height:110px;padding:22px;background:transparent;border-color:rgba(255,255,255,.32)}
+  .benefit:hover{background:rgba(255,255,255,.08)}
+  .benefit-grid{border-color:rgba(255,255,255,.32)}
+  .statement{text-align:left}
+  .statement p{margin:0;font-size:clamp(42px,7vw,92px)}
+  .statement span{color:var(--gold)}
+  .device{box-shadow:none}
+  .device.pending{box-shadow:none}
+  .mission{background:transparent!important}
+  .beta .eyebrow,.beta-note{color:var(--gold-soft)}
+  .beta .eyebrow::before{background:var(--gold)}
+  .beta .btn-primary{background:var(--gold);color:#17130a}
+  .beta .btn-ghost{color:#fff;border-color:rgba(255,255,255,.6);background:transparent}
+  .commitment-lines{padding-left:0;border-left:0}
+  .commitment-promises{padding-left:24px;border-left:2px solid var(--gold)}
+  .commitment-lines p{padding:0;border:0;font-size:clamp(18px,2vw,22px);font-weight:750;line-height:1.7}
+  .commitment-lines .commitment-final{padding-top:28px;font-weight:450}
+  .site-footer{padding:30px 0 50px}
+  .footer-inner{justify-content:center;border-color:rgba(255,255,255,.2);text-align:center}
+  .footer-inner small{color:#fff!important}
+  .footer-inner a{color:#fff}
+  @media(max-width:900px){
+    .hero-inner{padding-top:165px}
+    .hero-visual{top:125px;right:0;width:min(444px,58vw)}
+  }
+  @media(max-width:640px){
+    html body[data-tt-background]{background-image:linear-gradient(to bottom,rgba(255,255,255,.10) 0,rgba(255,255,255,0) 94px),var(--tt-site-background-url)!important;background-size:100% 94px,cover!important}
+    .site-header{padding:18px 0 0}
+    .nav{width:min(100% - 32px,1180px)}
+    .hero-socials{top:13px;right:14px}
+    .brand{gap:12px}
     .brand img{width:56px;height:56px}
-    h1{font-size:20px}
-    h2{font-size:23px}
-    .hero{gap:12px;padding-right:120px}
-    .panel{width:100%}
+    .brand-copy{width:175px;font-size:16px}
+    .hero{min-height:540px}
+    .hero-inner{padding:112px 0 60px}
+    .hero-copy{width:140px;max-width:140px}
+    .hero .eyebrow{flex-direction:column;gap:0;margin-bottom:22px}
+    .hero-title{width:140px;margin-bottom:26px;font-size:28px}
+    .hero-title .hero-title-second{margin-top:14px}
+    .hero-title-break{display:block}
+    .hero-visual{top:112px;width:min(329px,84vw)}
+    .hero-tiger{top:-52px;right:-65px;width:95%}
+    .hero-lead,.hero-impact{width:calc(100vw - 32px)}
+    .intro{padding-top:40px}
   }
 </style>
 <link rel="stylesheet" href="assets/turbotiger-site-ui.css" />
 </head>
 <body data-tt-background="fundo_geral" style="--tt-site-background-url:url('assets/bg-900x900.webp')">
-<header>
-  <div class="wrap hero">
+<header class="site-header">
+  <div class="wrap nav">
     <div class="brand">
       <img data-tt-image="logo_geral" src="assets/logo-300x300.webp" alt="Turbo Tiger">
-      <span>App & Comunidade<br>para bets</span>
+      <span class="brand-copy"><strong>App &amp; Comunidade</strong><strong>para Jogo Responsável</strong></span>
+      <button class="brand-age" type="button" data-tt-age-notice aria-label="Informações sobre o acesso para maiores de 18 anos">18+</button>
     </div>
-    <p class="lead">Pra turbinar<br>sua banca!</p>
     <div class="hero-socials" aria-label="Redes sociais Turbo Tiger">
-      <a class="tt-social-link" data-tt-contact="instagram" href="https://www.instagram.com/turbotiger.com.br" target="_blank" rel="noopener" aria-label="Instagram Turbo Tiger">
+      <a class="tt-social-link" data-tt-contact="instagram" href="https://www.instagram.com/turbotiger.com.br" target="_blank" rel="noopener" aria-label="Instagram Turbo Tiger" hidden>
         <img src="assets/icone-instagram-96x96.webp" alt="Instagram">
       </a>
-      <a class="tt-social-link" data-tt-contact="facebook" href="https://www.facebook.com/turbotiger.com.br" target="_blank" rel="noopener" aria-label="Facebook Turbo Tiger">
+      <a class="tt-social-link" data-tt-contact="facebook" href="https://www.facebook.com/turbotiger.com.br" target="_blank" rel="noopener" aria-label="Facebook Turbo Tiger" hidden>
         <img src="assets/icone-facebook-96x96.webp" alt="Facebook">
+      </a>
+      <a class="tt-social-link" data-tt-contact="x" href="#" target="_blank" rel="noopener" aria-label="X Turbo Tiger" hidden>
+        <img src="assets/icone-rede_x-96x96.webp" alt="X">
+      </a>
+      <a class="tt-social-link" data-tt-contact="telegram" href="#" target="_blank" rel="noopener" aria-label="Telegram Turbo Tiger" hidden>
+        <img src="assets/icone-telegram-96x96.webp" alt="Telegram">
       </a>
     </div>
   </div>
-  <img data-tt-image="tiger_abertura" src="assets/tiger-500x500.webp" alt="Tiger" class="header-tiger">
 </header>
 
-<main class="wrap">
-  <section class="card">
-    <div class="split">
-      <div class="copy">
-        <h2 id="mainTitle">Junte-se a n&oacute;s</h2>
-        <p class="info" id="mainDescription">Conhe&ccedil;a o Turbo Tiger, acompanhe novidades, conte&uacute;dos e recursos para organizar suas bets. Acesse nossas redes sociais e descubra tudo o que estamos preparando para a comunidade.</p>
-        <div class="cta" id="ctaArea">
-          <a id="btnShare" class="btn btn-primary" href="turbotiger://convite?acao=gerar_convite" hidden>Compartilhar</a>
-          <a class="btn btn-ghost" href="/politicaetermos.html">Pol&iacute;tica & Termos</a>
-        </div>
-        <p class="fine" id="inviteInfo">Para baixar o Turbo Tiger, voc&ecirc; precisa receber o convite de um membro. A p&aacute;gina de download &eacute; aberta somente pelo link seguro do convite.</p>
-		<p class="fine"><strong>Compatibilidade:</strong><br>- O Turbo Tiger Beta requer aparelho Android 64-bit. Aparelhos 32-bit nao sao compativeis.<br>- Ainda não está liberado a versão para iOS (iPhone).</p>
-	  </div>
-      <div class="panel">
-        <strong>Principais benef&iacute;cios</strong>
-        <ul>
-          <li>Registro autom&aacute;tico de bets</li>
-          <li>Relat&oacute;rios e totais no app</li>
-          <li>Notifica&ccedil;&otilde;es e alertas</li>
-          <li>Indica&ccedil;&otilde;es com benef&iacute;cios</li>
-        </ul>
+<main>
+  <section class="hero" id="inicio">
+    <div class="wrap hero-inner">
+      <div class="hero-copy">
+        <p class="eyebrow"><span>Tecnologia para</span><span>escolhas <span class="eyebrow-white">conscientes</span></span></p>
+        <h1 class="hero-title"><span>Controle <br class="hero-title-break">sua banca.</span><span class="hero-title-second">Controle <br class="hero-title-break">suas decisões.</span></h1>
+        <p class="hero-lead">A ferramenta para quem já aposta e busca mais organização, consciência e responsabilidade, com IA para apoiar sua jornada.</p>
+        <p class="hero-impact"><span>O jogo pode ser imprevisível.</span><span>Seu controle não precisa ser.</span></p>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <img data-tt-image="tiger_abertura" src="assets/tiger-500x500.webp" alt="" class="hero-tiger">
+    </div>
+  </section>
+
+  <section class="intro" aria-labelledby="introTitle">
+    <div class="wrap intro-grid">
+      <p class="intro-index">Controle muda tudo.</p>
+      <div>
+        <h2 id="introTitle">Mais clareza para quem já aposta.</h2>
+        <p>O Turbo Tiger é uma ferramenta criada para ajudar quem já aposta a manter o controle financeiro, acompanhar resultados, organizar sua banca e desenvolver hábitos mais conscientes.</p>
+        <p class="purpose">Nosso propósito não é incentivar apostas.<br>Nosso propósito é incentivar responsabilidade.</p>
       </div>
     </div>
   </section>
 
-  <section class="card" id="referralHow" style="margin-top:14px" hidden>
-    <h3>Como funciona a indica&ccedil;&atilde;o</h3>
-    <p class="info">No app, toque em <strong>Compartilhar</strong>. O Android abre a tela nativa de compartilhamento para copiar o link ou enviar direto pelo WhatsApp, Messenger, Instagram e outros apps dispon&iacute;veis.</p>
-    <ol class="info">
-      <li>O amigo recebe seu link seguro de convite.</li>
-      <li>Se ainda n&atilde;o tiver o Turbo Tiger, o link abre a p&aacute;gina de download.</li>
-      <li>Depois de instalar, ao tocar no mesmo link, o Android abre o Turbo Tiger diretamente com seu convite.</li>
-    </ol>
+  <section class="benefits" aria-labelledby="benefitsTitle">
+    <div class="wrap">
+      <div class="benefits-head">
+        <div>
+          <p class="eyebrow"><span class="eyebrow-white">Responsabilidade</span> em cada escolha</p>
+          <h2 class="section-title" id="benefitsTitle">Ferramentas com IA para tomar decisões melhores.</h2>
+        </div>
+      </div>
+      <div class="benefit-grid">
+        <article class="benefit"><h3>Controle Financeiro</h3><p>Acompanhe ganhos, perdas e evolução da sua banca.</p></article>
+        <article class="benefit"><h3>Histórico Completo</h3><p>Consulte todas as suas apostas de forma organizada.</p></article>
+        <article class="benefit"><h3>Estatísticas Inteligentes</h3><p>Entenda seus hábitos antes de tomar novas decisões.</p></article>
+        <article class="benefit"><h3>Alertas Responsáveis</h3><p>Receba lembretes para manter seus limites e evitar decisões impulsivas.</p></article>
+        <article class="benefit"><h3>Organização</h3><p>Suas bancas em um só lugar, com menos ícones, saldo geral consolidado e diversos relatórios.</p></article>
+        <article class="benefit"><h3>Controle Emocional</h3><p>Acompanhe sua jornada com muito mais consciência.</p></article>
+        <article class="benefit"><h3>Somente Bets Autorizadas</h3><p>O app permite acesso apenas a plataformas autorizadas, mas sem nenhuma parceria.</p></article>
+        <article class="benefit"><h3>Alertas Esportivos</h3><p>Receba notificações sobre notícias, eventos e informações importantes enquanto acontecem.</p></article>
+        <article class="benefit"><h3>E muito mais...</h3><p>Recursos que evoluem continuamente para ampliar controle, informação e consciência.</p></article>
+      </div>
+    </div>
   </section>
 
-  <footer class="tt-site-footer">
-    <small>&copy; 2026 Turbo Tiger</small>
-  </footer>
+  <section class="statement" aria-label="Mensagem de posicionamento">
+    <div class="wrap"><p>Quem aposta precisa de <span>muito controle.</span></p></div>
+  </section>
+
+  <section class="mission" aria-labelledby="missionTitle">
+    <div class="wrap mission-grid">
+      <div>
+        <p class="eyebrow">Nossa Missão</p>
+        <h2 id="missionTitle">Todos falam sobre ganhar.</h2>
+      </div>
+      <div class="mission-copy">
+        <p>Nós acreditamos que o mais importante é manter o controle.</p>
+        <p>Criamos o Turbo Tiger para ajudar pessoas que já apostam a desenvolver uma relação mais consciente com suas decisões, seu dinheiro e seu tempo.</p>
+        <p class="mission-close">Porque responsabilidade sempre vem antes de qualquer resultado.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="commitment" aria-labelledby="commitmentTitle">
+    <div class="wrap commitment-grid">
+      <div><p class="eyebrow">Nosso compromisso</p><h2 class="section-title" id="commitmentTitle">Controle primeiro.<br><span class="commitment-title-accent">Sempre.</span></h2></div>
+      <div class="commitment-lines">
+        <div class="commitment-promises">
+          <p>O Turbo Tiger não é casa de apostas.</p>
+          <p>Não tem parceria com nenhuma bet.</p>
+          <p>Não recebe apostas.</p>
+          <p>Não intermedia apostas em bets.</p>
+          <p>Não garante lucros.</p>
+          <p>Não promete resultados.</p>
+        </div>
+        <p class="commitment-final">É uma ferramenta criada para organização, controle financeiro e incentivo ao jogo responsável.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="beta" aria-labelledby="mainTitle">
+    <div class="wrap beta-card">
+      <div>
+        <p class="eyebrow">Acesso βeta</p>
+        <h2 id="mainTitle">Evolua essa experiência com a gente.</h2>
+        <p id="mainDescription">O Turbo Tiger está em fase βeta. O acesso é realizado exclusivamente por convite de um membro αlpha. Essa etapa permite validar recursos, receber feedbacks e evoluir continuamente a experiência antes do lançamento oficial.</p>
+      </div>
+      <div class="beta-actions" id="ctaArea">
+        <a id="btnShare" class="btn btn-primary" href="turbotiger://convite?acao=gerar_convite" hidden>Compartilhar convite</a>
+        <a id="btnWaitlist" class="btn btn-primary" href="/espera/">Entre agora na lista de espera</a>
+        <span class="beta-note" id="inviteInfo"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="referral" id="referralHow" hidden>
+    <div class="wrap">
+      <div class="referral-card">
+        <h3>Como funciona o convite</h3>
+        <p class="section-copy">Compartilhe pelo app usando a tela nativa do Android.</p>
+        <ol>
+          <li>Seu amigo recebe um link seguro de convite.</li>
+          <li>O link direciona para a página correta de acesso.</li>
+          <li>Depois de instalar, o mesmo link abre o Turbo Tiger com o convite.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="compatibility" aria-labelledby="compatTitle">
+    <div class="wrap compat-grid">
+      <div>
+        <p class="eyebrow">Compatibilidade</p>
+        <h2 class="section-title" id="compatTitle">Feito para acompanhar você.</h2>
+        <p class="section-copy">Uma experiência pensada para funcionar com clareza, segurança e simplicidade.</p>
+      </div>
+      <div class="device-list">
+        <article class="device">
+          <span class="device-icon" aria-hidden="true">✓</span>
+          <div><h3>Android 64 bits</h3><p><span>Disponível na fase βeta.</span><span>Aparelhos 32 bits não são compatíveis.</span></p></div>
+        </article>
+        <article class="device pending">
+          <span class="device-icon" aria-hidden="true">✓</span>
+          <div><h3>iPhone (iOS)</h3><p>Em breve.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
 </main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner tt-site-footer">
+    <small><a href="/sobre-nos.html">Sobre</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/politicaetermos.html">Privacidade &amp; Termos de uso</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&copy; 2026 Turbo Tiger</small>
+  </div>
+</footer>
 <a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden>
   <img src="assets/icone-whatsapp-96x96.webp" alt="WhatsApp">
 </a>
@@ -147,9 +469,7 @@
 function turboTigerShareInvite(event) {
   try {
     if (window.TurboTigerHistoricoBridge && typeof window.TurboTigerHistoricoBridge.post === "function") {
-      if (event && typeof event.preventDefault === "function") {
-        event.preventDefault();
-      }
+      if (event && typeof event.preventDefault === "function") event.preventDefault();
       window.TurboTigerHistoricoBridge.post("TURBO_SHARE_INVITE");
       return false;
     }
@@ -158,6 +478,7 @@ function turboTigerShareInvite(event) {
 }
 
 const shareButton = document.getElementById("btnShare");
+const waitlistButton = document.getElementById("btnWaitlist");
 const inviteInfo = document.getElementById("inviteInfo");
 const mainTitle = document.getElementById("mainTitle");
 const mainDescription = document.getElementById("mainDescription");
@@ -166,10 +487,11 @@ const isTurboTigerApp = window.TurboTigerHistoricoBridge &&
   typeof window.TurboTigerHistoricoBridge.post === "function";
 
 if (isTurboTigerApp) {
-  mainTitle.textContent = "Convide seus amigos";
-  mainDescription.textContent = "Compartilhe o Turbo Tiger com seus amigos, acompanhe quem você indicou e ganhe benefícios.";
-  inviteInfo.textContent = "A página de download é aberta somente pelo link seguro do convite.";
+  mainTitle.textContent = "Convide com responsabilidade.";
+  mainDescription.textContent = "Compartilhe o Turbo Tiger com quem já aposta e busca mais organização, consciência e controle.";
+  inviteInfo.textContent = "O acesso é aberto somente pelo link seguro do convite.";
   shareButton.hidden = false;
+  waitlistButton.hidden = true;
   referralHow.hidden = false;
 }
 

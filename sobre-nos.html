@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sobre - Turbo Tiger</title>
+<meta name="description" content="Conheça o propósito e a história do Turbo Tiger: tecnologia para organização, controle e jogo responsável.">
+<link rel="canonical" href="https://turbotiger.com.br/sobre-nos.html">
+<link rel="icon" href="assets/icone-turbotiger-raio.ico">
+<style>
+  :root{--gold:#f4b400;--gold-soft:#ffd76a;--ink:#fff;--muted:#d4d6dc;--line:rgba(255,255,255,.22)}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+  html body[data-tt-background]{min-height:100vh;background-color:#0b0d11!important;background-image:linear-gradient(to bottom,rgba(255,255,255,.10) 0,rgba(255,255,255,0) 120px),var(--tt-site-background-url)!important;background-position:center top,center top!important;background-size:100% 120px,cover!important;background-repeat:no-repeat,no-repeat!important;background-attachment:scroll,fixed!important;padding-bottom:0!important}
+  a{color:inherit}
+  img{max-width:100%}
+  h1,h2,h3,p{margin-top:0}
+  h1,h2,h3{letter-spacing:-.035em}
+  .wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
+  .site-header{padding:28px 0 0}
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .brand{display:flex;align-items:center;gap:15px}
+  .brand img{width:90px;height:90px;object-fit:contain;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .brand-copy{align-self:center;width:219px;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:20px;font-weight:700;line-height:1.25;letter-spacing:normal;opacity:.95}
+  .brand-copy strong{display:block;font-size:inherit;font-weight:700;white-space:nowrap}
+  .brand-age{display:inline-flex;align-items:start;justify-content:center;min-height:34px;padding:7px 11px;border:1px solid rgba(255,255,255,.35);border-radius:999px;background:rgba(0,0,0,.34);color:#fff;font:inherit;font-weight:800;line-height:normal;cursor:pointer}
+  .brand-age:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .hero-socials{position:absolute;top:23px;right:18px;left:auto;display:flex;align-items:center;gap:0}
+  .tt-social-link,.tt-social-link:hover{background:transparent!important;border:0!important;box-shadow:none!important;opacity:1!important;filter:none!important;transform:none!important;transition:none!important}
+  .tt-social-link[data-tt-contact="x"]{width:27px;height:27px}
+  .tt-social-link[data-tt-contact="x"] img{width:24px;height:24px}
+  main{padding:2px 0 110px}
+  .eyebrow{display:inline-flex;margin:0 0 24px;color:var(--gold-soft);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 2px 5px rgba(0,0,0,.42)}
+  .about-hero{padding:54px 0 120px}
+  .about-hero h1{max-width:940px;margin-bottom:34px;font-size:clamp(47px,7.2vw,90px);font-weight:750;line-height:.92;letter-spacing:-.06em;text-shadow:0 2px 6px rgba(0,0,0,.60)}
+  .about-hero h1 span{color:var(--gold)}
+  .lead{max-width:790px;margin:0;color:var(--muted);font-size:clamp(19px,2.1vw,25px);line-height:1.55;text-shadow:0 2px 6px rgba(0,0,0,.38)}
+  .about-copy{display:grid;grid-template-columns:.7fr 1.3fr;gap:90px;padding:44px 0 20px;border-top:1px solid var(--line)}
+  .about-copy h2{margin:0;font-size:clamp(34px,4.5vw,62px);line-height:1}
+  .about-copy-text p{margin:0 0 24px;color:#eef0f4;font-size:clamp(18px,2vw,22px);line-height:1.72}
+  .about-copy-text p:last-child{margin-bottom:0}
+  .history{display:grid;grid-template-columns:.7fr 1.3fr;gap:90px;padding:135px 0 70px}
+  .history h2{margin:0;font-size:clamp(46px,6.5vw,86px);line-height:.95;text-shadow:0 2px 6px rgba(0,0,0,.60)}
+  .history-copy{padding-left:24px;border-left:2px solid var(--gold)}
+  .history-copy p{margin:0 0 24px;color:#eef0f4;font-size:clamp(18px,2vw,22px);line-height:1.72}
+  .history-copy p:last-child{margin-bottom:0;color:#fff;font-weight:750}
+  .site-footer{padding:30px 0 50px;color:#fff}
+  .footer-inner{display:flex;justify-content:center;padding-top:26px;border-top:1px solid rgba(255,255,255,.2);text-align:center}
+  .footer-inner small{opacity:1!important;color:#fff!important;text-shadow:none!important}
+  .footer-inner a{color:#fff;font-size:13px;text-decoration:none}
+  .footer-inner a:hover{text-decoration:underline}
+  .tt-site-footer{position:static!important;transform:none!important;display:block!important;width:auto!important;margin:0!important;pointer-events:auto!important}
+  @media(max-width:760px){
+    html body[data-tt-background]{background-image:linear-gradient(to bottom,rgba(255,255,255,.10) 0,rgba(255,255,255,0) 94px),var(--tt-site-background-url)!important;background-size:100% 94px,cover!important}
+    .wrap{width:min(100% - 32px,1180px)}
+    .site-header{padding:18px 0 0}
+    .brand{gap:12px}
+    .brand img{width:56px;height:56px}
+    .brand-copy{width:175px;font-size:16px}
+    .hero-socials{top:13px;right:14px}
+    main{padding:62px 0 80px}
+    .about-hero{padding:36px 0 85px}
+    .about-hero h1{font-size:52px}
+    .about-copy{grid-template-columns:1fr;gap:28px;padding-top:34px}
+    .history{grid-template-columns:1fr;gap:38px;padding-top:95px}
+    .history h2{font-size:52px}
+  }
+</style>
+<link rel="stylesheet" href="assets/turbotiger-site-ui.css" />
+</head>
+<body data-tt-background="fundo_geral" style="--tt-site-background-url:url('assets/bg-900x900.webp')">
+<header class="site-header">
+  <div class="wrap nav">
+    <div class="brand">
+      <img data-tt-image="logo_geral" src="assets/logo-300x300.webp" alt="Turbo Tiger">
+      <span class="brand-copy"><strong>App &amp; Comunidade</strong><strong>para Jogo Responsável</strong></span>
+      <button class="brand-age" type="button" data-tt-age-notice aria-label="Informações sobre o acesso para maiores de 18 anos">18+</button>
+    </div>
+    <div class="hero-socials" aria-label="Redes sociais Turbo Tiger">
+      <a class="tt-social-link" data-tt-contact="instagram" href="https://www.instagram.com/turbotiger.com.br" target="_blank" rel="noopener" aria-label="Instagram Turbo Tiger" hidden><img src="assets/icone-instagram-96x96.webp" alt="Instagram"></a>
+      <a class="tt-social-link" data-tt-contact="facebook" href="https://www.facebook.com/turbotiger.com.br" target="_blank" rel="noopener" aria-label="Facebook Turbo Tiger" hidden><img src="assets/icone-facebook-96x96.webp" alt="Facebook"></a>
+      <a class="tt-social-link" data-tt-contact="x" href="#" target="_blank" rel="noopener" aria-label="X Turbo Tiger" hidden><img src="assets/icone-rede_x-96x96.webp" alt="X"></a>
+      <a class="tt-social-link" data-tt-contact="telegram" href="#" target="_blank" rel="noopener" aria-label="Telegram Turbo Tiger" hidden><img src="assets/icone-telegram-96x96.webp" alt="Telegram"></a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="about-hero" aria-labelledby="aboutTitle">
+    <p class="eyebrow">Sobre nós</p>
+    <h1 id="aboutTitle">Um projeto de tecnologia com os olhos no <span>futuro, para o bem estar social.</span></h1>
+    <p class="lead">Somos uma plataforma brasileira construída para transformar uma experiência fragmentada em algo simples, inteligente e compreensível.</p>
+  </section>
+
+  <section class="about-copy" aria-label="Quem somos">
+    <h2>Construído para aprender.</h2>
+    <div class="about-copy-text">
+      <p>O Turbo Tiger combina desenvolvimento mobile, dados, automações e inteligência artificial em um produto que evolui continuamente.</p>
+      <p>Cada teste, cada feedback e cada desafio ajudam a tornar a plataforma mais clara, confiável e preparada para crescer.</p>
+    </div>
+  </section>
+
+  <section class="history" aria-labelledby="historyTitle">
+    <div>
+      <p class="eyebrow">História</p>
+      <h2 id="historyTitle">Uma ideia que aprendeu a evoluir.</h2>
+    </div>
+    <div class="history-copy">
+      <p>Antes de ser aplicativo, o Turbo Tiger passou anos observando dados, testando hipóteses e aprendendo em uma grande planilha.</p>
+      <p>Em 2025, ganhou suas primeiras linhas de código. Em 2026, deu os primeiros passos no Android, enfrentou testes αlpha, amadureceu sua tecnologia e cresceu com IA, estatísticas, alertas e uma estrutura preparada para evoluir.</p>
+      <p>Quando saiu da planilha e chegou à tela do celular, descobriu que uma boa ideia precisava ser também simples, rápida e confiável. Cada novo teste revelou algo que ainda podia melhorar.</p>
+      <p>Pelo caminho, precisou reorganizar sua própria base, aprender a acompanhar informações em tempo real e conectar diferentes tecnologias sem perder sua identidade.</p>
+      <p>Também aprendeu a respeitar o tempo. Algumas etapas demoraram mais do que o previsto, porque crescer com consistência sempre foi mais importante do que crescer com pressa.</p>
+      <p>Hoje, em fase βeta, o Turbo Tiger continua aprendendo — sempre com o mesmo propósito: tornar cada jornada mais organizada, consciente e responsável.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer tt-site-footer">
+  <div class="wrap footer-inner">
+    <small><a href="/politicaetermos.html">Privacidade &amp; Termos de uso</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&copy; 2026 Turbo Tiger</small>
+  </div>
+</footer>
+<a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden><img src="assets/icone-whatsapp-96x96.webp" alt="WhatsApp"></a>
+<script src="assets/turbotiger-site-ui.js"></script>
+</body>
+</html>
