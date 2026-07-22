@@ -952,17 +952,18 @@ th {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 760px) {
   .sb-footer-links,
   .sb-footer-copyright {
-    display: block;
+    display: block !important;
+    width: 100%;
   }
 
   .sb-footer-copyright {
-    margin-top: 5px;
+    margin-top: 5px !important;
   }
 
   .sb-footer-desktop-separator {
-    display: none;
+    display: none !important;
   }
 }

@@ -258,19 +258,6 @@ body.tt-age-modal-open {
     text-align: center;
   }
 
-  .tt-footer-links,
-  .tt-footer-copyright {
-    display: block;
-  }
-
-  .tt-footer-copyright {
-    margin-top: 5px;
-  }
-
-  .tt-footer-desktop-separator {
-    display: none;
-  }
-
   .tt-whatsapp-float {
     right: 14px;
     bottom: 14px;
@@ -281,6 +268,22 @@ body.tt-age-modal-open {
   .tt-whatsapp-float img {
     width: 28px;
     height: 28px;
+  }
+}
+
+@media (max-width: 760px) {
+  .tt-footer-links,
+  .tt-footer-copyright {
+    display: block !important;
+    width: 100%;
+  }
+
+  .tt-footer-copyright {
+    margin-top: 5px !important;
+  }
+
+  .tt-footer-desktop-separator {
+    display: none !important;
   }
 }
 
