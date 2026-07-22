@@ -53,6 +53,11 @@ body[data-tt-background] {
   text-decoration: underline;
 }
 
+.tt-footer-links,
+.tt-footer-copyright {
+  display: inline;
+}
+
 body.tt-site-footer-end .tt-site-footer small {
   opacity: 1;
 }
@@ -251,6 +256,19 @@ body.tt-age-modal-open {
   .tt-site-footer small {
     white-space: normal;
     text-align: center;
+  }
+
+  .tt-footer-links,
+  .tt-footer-copyright {
+    display: block;
+  }
+
+  .tt-footer-copyright {
+    margin-top: 5px;
+  }
+
+  .tt-footer-desktop-separator {
+    display: none;
   }
 
   .tt-whatsapp-float {

@@ -951,3 +951,18 @@ th {
     background: #fff;
   }
 }
+
+@media (max-width: 640px) {
+  .sb-footer-links,
+  .sb-footer-copyright {
+    display: block;
+  }
+
+  .sb-footer-copyright {
+    margin-top: 5px;
+  }
+
+  .sb-footer-desktop-separator {
+    display: none;
+  }
+}
