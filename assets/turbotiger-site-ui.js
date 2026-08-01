@@ -121,6 +121,10 @@
   }
 
   function isInsideTurboTigerApp() {
+    var surface = document.body ? document.body.getAttribute("data-tt-surface") : "";
+    if (surface === "app") return true;
+    if (surface === "site") return false;
+
     if (
       hasTurboTigerBridge("TurboTigerHistoricoBridge") ||
       hasTurboTigerBridge("TurboTigerBridge") ||

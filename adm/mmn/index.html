@@ -24,8 +24,15 @@
 <meta name="twitter:title" content="MMN - Turbo Tiger Admin">
 <meta name="twitter:description" content="Painel MMN Turbo Tiger.">
 <meta name="twitter:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
+<script>
+try {
+  if (window.TurboTigerHistoricoBridge && typeof window.TurboTigerHistoricoBridge.post === "function") {
+    document.documentElement.classList.add("mmn-app-webview");
+  }
+} catch (error) {}
+</script>
 <link rel="stylesheet" href="../assets/admin.css?v=20260720-mmn-01" />
-<link rel="stylesheet" href="mmn.css?v=20260720-mmn-01" />
+<link rel="stylesheet" href="mmn.css?v=20260731-mmn-02" />
 </head>
 <body data-admin-page="mmn">
   <div class="admin-shell mmn-shell">
@@ -33,19 +40,19 @@
       <div class="admin-brand">
         <img src="../../assets/logo-300x300.webp" alt="Turbo Tiger">
         <div>
-          <h1>Admin</h1>
+          <h1 id="adminBrandTitle"><span class="mmn-brand-admin">Admin</span><span class="mmn-brand-user">Acompanhar</span></h1>
           <span id="adminIdentity">Turbo Tiger</span>
         </div>
       </div>
 
       <nav class="admin-nav" aria-label="Areas administrativas">
-        <a class="nav-link" href="../admin/">Administra&ccedil;&atilde;o</a>
-        <a class="nav-link" href="../push/">Notifica&ccedil;&otilde;es</a>
+        <a class="nav-link mmn-admin-only" href="../admin/">Administra&ccedil;&atilde;o</a>
+        <a class="nav-link mmn-admin-only" href="../push/">Notifica&ccedil;&otilde;es</a>
         <a class="nav-link is-active" href="./">MMN</a>
-        <a class="nav-link" href="../../sobolao/?role=admin">S&oacute; Bol&atilde;o</a>
+        <a class="nav-link mmn-admin-only" href="../../sobolao/?role=admin">S&oacute; Bol&atilde;o</a>
       </nav>
 
-      <div class="sidebar-footer">
+      <div class="sidebar-footer mmn-admin-only">
         <button class="btn btn-ghost" id="switchAccountButton" type="button">
           <span class="mmn-ico" aria-hidden="true">&#8635;</span>
           <span>Trocar conta</span>
@@ -60,11 +67,11 @@
     <main class="admin-main">
       <div class="admin-topbar">
         <div class="admin-title">
-          <h1>MMN</h1>
+          <h1 id="pageTitle"><span class="mmn-brand-admin">MMN</span><span class="mmn-brand-user">Minha rede</span></h1>
           <span id="pageStatus" class="status-line">Carregando</span>
         </div>
         <div class="mmn-top-actions">
-          <div class="mmn-role-switch" role="tablist" aria-label="Perfil de acesso">
+          <div class="mmn-role-switch mmn-admin-only" role="tablist" aria-label="Perfil de acesso">
             <button class="mmn-role is-active" type="button" data-role="admin">Admin</button>
             <button class="mmn-role" type="button" data-role="suporte">Suporte</button>
             <button class="mmn-role" type="button" data-role="usuario">Usu&aacute;rio</button>
@@ -173,7 +180,7 @@
           </div>
           <div class="panel-body">
             <form class="inline-grid mmn-filter-form" id="userFilterForm">
-              <label class="field">
+              <label class="field" id="networkUserField">
                 <span>Buscar</span>
                 <input id="userSearch" autocomplete="off" placeholder="login, c&oacute;digo ou nome">
               </label>
@@ -372,6 +379,6 @@
     </main>
   </div>
 
-  <script src="mmn.js?v=20260720-mmn-01"></script>
+  <script src="mmn.js?v=20260731-mmn-02"></script>
 </body>
 </html>

@@ -7,6 +7,36 @@
   --mmn-gold-soft: #fff7d8;
 }
 
+html.mmn-app-webview .mmn-admin-only,
+html.mmn-app-webview #mmnLoginPanel,
+html.mmn-app-webview #networkUserField {
+  display: none !important;
+}
+
+.mmn-brand-user {
+  display: none;
+}
+
+html.mmn-app-webview .mmn-brand-admin {
+  display: none;
+}
+
+html.mmn-app-webview .mmn-brand-user {
+  display: inline;
+}
+
+html.mmn-app-webview .admin-sidebar {
+  min-height: 100dvh;
+}
+
+html.mmn-app-webview .admin-nav {
+  pointer-events: none;
+}
+
+html.mmn-app-webview .admin-nav .nav-link.is-active {
+  cursor: default;
+}
+
 .mmn-top-actions,
 .mmn-network-toolbar,
 .mmn-payout-strip {

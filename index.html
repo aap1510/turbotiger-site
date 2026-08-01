@@ -58,7 +58,6 @@
   .btn:hover{transform:translateY(-2px)}
   .btn-primary{background:var(--gold);color:#17130a;box-shadow:0 12px 30px rgba(244,180,0,.24)}
   .btn-primary:hover{background:var(--gold-soft);box-shadow:0 16px 36px rgba(244,180,0,.3)}
-  .btn-ghost{border-color:var(--line);background:rgba(255,255,255,.7);color:var(--ink)}
 
   .site-header{position:absolute;inset:0 0 auto;z-index:10;padding:24px 0}
   .nav{display:flex;align-items:center;justify-content:space-between;gap:24px}
@@ -136,15 +135,6 @@
   .beta-actions{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
   .beta .btn-primary{background:var(--ink);color:#fff;box-shadow:0 18px 40px rgba(17,19,24,.22)}
   .beta .btn-primary:hover{background:var(--gold-soft);color:#17130a}
-  .beta .btn-ghost{border-color:rgba(17,19,24,.22);background:transparent}
-  .beta-note{color:#4b3300;font-size:13px;font-weight:650}
-
-  .referral{padding:80px 0;background:#fff}
-  .referral-card{padding:42px;border:1px solid var(--line);border-radius:26px}
-  .referral h3{font-size:28px}
-  .referral ol{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin:28px 0 0;padding:0;counter-reset:steps;list-style:none}
-  .referral li{color:var(--muted);counter-increment:steps}
-  .referral li::before{content:"0" counter(steps);display:block;margin-bottom:12px;color:var(--gold-deep);font-size:12px;font-weight:800;letter-spacing:.14em}
 
   .commitment{padding:130px 0 90px;background:#0b0d11;color:#fff}
   .commitment-grid{display:grid;grid-template-columns:.7fr 1.3fr;gap:90px}
@@ -198,9 +188,6 @@
     .beta h2{font-size:56px}
     .beta-actions{align-items:stretch}
     .beta-actions .btn{width:100%;text-align:center}
-    .referral{padding:60px 0}
-    .referral-card{padding:28px}
-    .referral ol{grid-template-columns:1fr}
     .commitment-lines p{font-size:26px}
     .footer-inner{align-items:flex-start;flex-direction:column}
   }
@@ -218,7 +205,7 @@
   body *{text-shadow:none}
   .eyebrow,.eyebrow>span{text-shadow:0 2px 5px rgba(0,0,0,.42)}
   .eyebrow .eyebrow-white{ text-shadow:none }
-  .hero,.intro,.benefits,.statement,.compatibility,.mission,.beta,.referral,.commitment,.site-footer{background:transparent!important}
+  .hero,.intro,.benefits,.statement,.compatibility,.mission,.beta,.commitment,.site-footer{background:transparent!important}
   .hero::after{display:none}
   .site-header{padding:28px 0 0}
   .nav{width:min(1180px,calc(100% - 48px));max-width:none}
@@ -249,7 +236,7 @@
   .hero-tiger{top:-40px;right:-80px;bottom:auto;width:122.27%;opacity:1;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 calc(40% - 10px),rgba(0,0,0,.92) calc(48% - 10px),rgba(0,0,0,.55) calc(68% - 10px),transparent calc(96% - 10px));mask-image:linear-gradient(to bottom,#000 0%,#000 calc(40% - 10px),rgba(0,0,0,.92) calc(48% - 10px),rgba(0,0,0,.55) calc(68% - 10px),transparent calc(96% - 10px))}
   .intro{padding:45px 0 110px}
   .benefits,.statement,.compatibility,.mission,.beta,.commitment{color:#fff}
-  .intro p,.benefits-phrase,.benefit p,.section-copy,.mission-copy p,.beta p,.beta-note,.commitment-lines .commitment-final{color:#eef0f4}
+  .intro p,.benefits-phrase,.benefit p,.section-copy,.mission-copy p,.beta p,.commitment-lines .commitment-final{color:#eef0f4}
   .benefit-number{display:none}
   .benefit{min-height:110px;padding:22px;background:transparent;border-color:rgba(255,255,255,.32)}
   .benefit:hover{background:rgba(255,255,255,.08)}
@@ -260,10 +247,9 @@
   .device{box-shadow:none}
   .device.pending{box-shadow:none}
   .mission{background:transparent!important}
-  .beta .eyebrow,.beta-note{color:var(--gold-soft)}
+  .beta .eyebrow{color:var(--gold-soft)}
   .beta .eyebrow::before{background:var(--gold)}
   .beta .btn-primary{background:var(--gold);color:#17130a}
-  .beta .btn-ghost{color:#fff;border-color:rgba(255,255,255,.6);background:transparent}
   .commitment-lines{padding-left:0;border-left:0}
   .commitment-promises{padding-left:24px;border-left:2px solid var(--gold)}
   .commitment-lines p{padding:0;border:0;font-size:clamp(18px,2vw,22px);font-weight:750;line-height:1.7}
@@ -300,7 +286,7 @@
 </style>
 <link rel="stylesheet" href="assets/turbotiger-site-ui.css?v=20260722-02" />
 </head>
-<body data-tt-background="fundo_geral" style="--tt-site-background-url:url('assets/bg-900x900.webp')">
+<body data-tt-surface="site" data-tt-background="fundo_geral" style="--tt-site-background-url:url('assets/bg-900x900.webp')">
 <header class="site-header">
   <div class="wrap nav">
     <div class="brand">
@@ -415,24 +401,8 @@
         <h2 id="mainTitle">Evolua essa experiência com a gente.</h2>
         <p id="mainDescription">O Turbo Tiger está em fase βeta. O acesso é realizado exclusivamente por convite de um membro αlpha. Essa etapa permite validar recursos, receber feedbacks e evoluir continuamente a experiência antes do lançamento oficial.</p>
       </div>
-      <div class="beta-actions" id="ctaArea">
-        <a id="btnShare" class="btn btn-primary" href="turbotiger://convite?acao=gerar_convite" hidden>Compartilhar convite</a>
-        <a id="btnWaitlist" class="btn btn-primary" href="/espera/">Entre agora na lista de espera</a>
-        <span class="beta-note" id="inviteInfo"></span>
-      </div>
-    </div>
-  </section>
-
-  <section class="referral" id="referralHow" hidden>
-    <div class="wrap">
-      <div class="referral-card">
-        <h3>Como funciona o convite</h3>
-        <p class="section-copy">Compartilhe pelo app usando a tela nativa do Android.</p>
-        <ol>
-          <li>Seu amigo recebe um link seguro de convite.</li>
-          <li>O link direciona para a página correta de acesso.</li>
-          <li>Depois de instalar, o mesmo link abre o Turbo Tiger com o convite.</li>
-        </ol>
+      <div class="beta-actions">
+        <a class="btn btn-primary" href="/espera/">Entre agora na lista de espera</a>
       </div>
     </div>
   </section>
@@ -466,38 +436,6 @@
 <a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden>
   <img src="assets/icone-whatsapp-96x96.webp" alt="WhatsApp">
 </a>
-<script>
-function turboTigerShareInvite(event) {
-  try {
-    if (window.TurboTigerHistoricoBridge && typeof window.TurboTigerHistoricoBridge.post === "function") {
-      if (event && typeof event.preventDefault === "function") event.preventDefault();
-      window.TurboTigerHistoricoBridge.post("TURBO_SHARE_INVITE");
-      return false;
-    }
-  } catch(e) {}
-  return true;
-}
-
-const shareButton = document.getElementById("btnShare");
-const waitlistButton = document.getElementById("btnWaitlist");
-const inviteInfo = document.getElementById("inviteInfo");
-const mainTitle = document.getElementById("mainTitle");
-const mainDescription = document.getElementById("mainDescription");
-const referralHow = document.getElementById("referralHow");
-const isTurboTigerApp = window.TurboTigerHistoricoBridge &&
-  typeof window.TurboTigerHistoricoBridge.post === "function";
-
-if (isTurboTigerApp) {
-  mainTitle.textContent = "Convide com responsabilidade.";
-  mainDescription.textContent = "Compartilhe o Turbo Tiger com quem já aposta e busca mais organização, consciência e controle.";
-  inviteInfo.textContent = "O acesso é aberto somente pelo link seguro do convite.";
-  shareButton.hidden = false;
-  waitlistButton.hidden = true;
-  referralHow.hidden = false;
-}
-
-shareButton.addEventListener("click", turboTigerShareInvite);
-</script>
 <script src="assets/turbotiger-site-ui.js"></script>
 </body>
 </html>

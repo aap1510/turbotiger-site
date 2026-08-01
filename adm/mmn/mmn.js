@@ -29,6 +29,11 @@
     session: null,
     contexto: null,
     role: "admin",
+    appUserMode: false,
+    appSessionPromise: null,
+    appSessionResolve: null,
+    appSessionReject: null,
+    appSessionTimer: null,
     demo: false,
     data: null,
     selectedNetworkUser: null
@@ -97,6 +102,8 @@
       "invalid_grant": "E-mail ou senha invalidos.",
       "missing_authorization": "Sessao expirada. Entre novamente.",
       "nao_autenticado": "Entre para continuar.",
+      "app_session_unavailable": "Nao foi possivel validar sua sessao pelo app.",
+      "app_session_timeout": "O app demorou para validar sua sessao. Toque em Atualizar.",
       "sem_permissao_admin": "Sem permissao administrativa.",
       "sem_permissao_mmn": "Sem permissao para acessar o MMN.",
       "sessao_expirada": "Sessao expirada. Entre novamente."
@@ -115,7 +122,104 @@
     if (button) button.disabled = !!busy;
   }
 
+  function hasNativeBridge() {
+    try {
+      return !!(window.TurboTigerHistoricoBridge &&
+        typeof window.TurboTigerHistoricoBridge.post === "function");
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function configureAppMode() {
+    state.appUserMode = hasNativeBridge();
+    document.documentElement.classList.toggle("mmn-app-webview", state.appUserMode);
+    if (document.body) document.body.classList.toggle("mmn-app-user", state.appUserMode);
+    if (!state.appUserMode) return;
+
+    state.role = "usuario";
+    document.title = "Acompanhar - Turbo Tiger";
+    if (qs("adminBrandTitle")) qs("adminBrandTitle").textContent = "Acompanhar";
+    if (qs("pageTitle")) qs("pageTitle").textContent = "Minha rede";
+  }
+
+  function jwtExpiresAt(token) {
+    try {
+      var part = String(token || "").split(".")[1] || "";
+      part = part.replace(/-/g, "+").replace(/_/g, "/");
+      while (part.length % 4) part += "=";
+      var payload = JSON.parse(atob(part));
+      return Number(payload.exp || 0) * 1000;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  function normalizeAppSession(payload) {
+    var session = payload && payload.session ? payload.session : payload;
+    var token = String(session && session.access_token || "").trim();
+    if (!token) throw new Error("app_session_unavailable");
+    return {
+      access_token: token,
+      token_type: "bearer",
+      expires_at: jwtExpiresAt(token),
+      user: session.user || null
+    };
+  }
+
+  function finishAppSessionRequest(error, session) {
+    if (state.appSessionTimer) window.clearTimeout(state.appSessionTimer);
+    state.appSessionTimer = null;
+    var resolve = state.appSessionResolve;
+    var reject = state.appSessionReject;
+    state.appSessionPromise = null;
+    state.appSessionResolve = null;
+    state.appSessionReject = null;
+    if (error) {
+      if (reject) reject(error);
+    } else if (resolve) {
+      resolve(session);
+    }
+  }
+
+  function receiveAppSession(payload) {
+    try {
+      if (!payload || payload.ok !== true) {
+        throw new Error((payload && payload.error) || "app_session_unavailable");
+      }
+      var session = normalizeAppSession(payload);
+      state.session = session;
+      finishAppSessionRequest(null, session);
+    } catch (error) {
+      finishAppSessionRequest(error);
+    }
+  }
+
+  window.TurboTigerMmnReceiveSession = receiveAppSession;
+
+  function requestAppSession() {
+    if (!state.appUserMode || !hasNativeBridge()) {
+      return Promise.reject(new Error("app_session_unavailable"));
+    }
+    if (state.appSessionPromise) return state.appSessionPromise;
+
+    state.appSessionPromise = new Promise(function (resolve, reject) {
+      state.appSessionResolve = resolve;
+      state.appSessionReject = reject;
+      state.appSessionTimer = window.setTimeout(function () {
+        finishAppSessionRequest(new Error("app_session_timeout"));
+      }, 15000);
+      try {
+        window.TurboTigerHistoricoBridge.post("TURBO_MMN_SESSION_REQUEST");
+      } catch (error) {
+        finishAppSessionRequest(new Error("app_session_unavailable"));
+      }
+    });
+    return state.appSessionPromise;
+  }
+
   function readSession() {
+    if (state.appUserMode) return state.session;
     try {
       var raw = localStorage.getItem(CONFIG.sessionKey);
       return raw ? JSON.parse(raw) : null;
@@ -126,13 +230,13 @@
 
   function saveSession(session) {
     state.session = session;
-    localStorage.setItem(CONFIG.sessionKey, JSON.stringify(session));
+    if (!state.appUserMode) localStorage.setItem(CONFIG.sessionKey, JSON.stringify(session));
   }
 
   function clearSession() {
     state.session = null;
     state.contexto = null;
-    localStorage.removeItem(CONFIG.sessionKey);
+    if (!state.appUserMode) localStorage.removeItem(CONFIG.sessionKey);
   }
 
   function authHeaders(token) {
@@ -189,6 +293,14 @@
   }
 
   async function refreshSessionIfNeeded() {
+    if (state.appUserMode) {
+      if (state.session && state.session.access_token &&
+          state.session.expires_at > Date.now() + 60000) {
+        return state.session;
+      }
+      return requestAppSession();
+    }
+
     if (!state.session) state.session = readSession();
     if (!state.session || !state.session.access_token) return null;
     if (state.session.expires_at && state.session.expires_at > Date.now() + 60000) {
@@ -232,12 +344,14 @@
     try {
       return await rpc(name, payload);
     } catch (error) {
+      if (state.appUserMode) throw error;
       state.demo = true;
       return null;
     }
   }
 
   function readSavedRole() {
+    if (state.appUserMode) return "usuario";
     try {
       return localStorage.getItem(CONFIG.modeKey) || "admin";
     } catch (error) {
@@ -246,13 +360,18 @@
   }
 
   function saveRole(role) {
-    state.role = role || "admin";
+    state.role = state.appUserMode ? "usuario" : (role || "admin");
+    if (state.appUserMode) return;
     try {
       localStorage.setItem(CONFIG.modeKey, state.role);
     } catch (error) {}
   }
 
   async function loadContext() {
+    if (state.appUserMode) {
+      state.contexto = null;
+      return null;
+    }
     try {
       var contexto = await rpc("adm_contexto_rpc", {});
       if (contexto && contexto.ok === true) {
@@ -278,7 +397,7 @@
   }
 
   function showLogin(show) {
-    qs("mmnLoginPanel").hidden = !show;
+    qs("mmnLoginPanel").hidden = state.appUserMode || !show;
     qs("mmnApp").hidden = !!show;
   }
 
@@ -508,7 +627,8 @@
   function renderNetworkSelect() {
     var select = qs("networkUserSelect");
     if (!select) return;
-    var users = state.data.usuarios || [];
+    var users = state.appUserMode && state.data.rede && state.data.rede.usuario ?
+      [state.data.rede.usuario] : (state.data.usuarios || []);
     select.innerHTML = users.map(function (user) {
       return "<option value=\"" + escapeHtml(user.cod_usuario) + "\">" + escapeHtml(user.login || user.nome) + " (#" + escapeHtml(user.cod_usuario) + ")</option>";
     }).join("");
@@ -645,9 +765,20 @@
 
   async function boot() {
     setStatus(qs("pageStatus"), "Carregando", "");
-    state.session = readSession();
+    configureAppMode();
     state.role = readSavedRole();
     applyRoleButtons();
+    if (state.appUserMode && (!state.session || !state.session.access_token)) {
+      showLogin(true);
+      try {
+        state.session = await requestAppSession();
+      } catch (error) {
+        setStatus(qs("pageStatus"), error.message || String(error), "error");
+        return;
+      }
+    } else if (!state.appUserMode) {
+      state.session = readSession();
+    }
     if (!state.session || !state.session.access_token) {
       showLogin(true);
       setStatus(qs("pageStatus"), "Entre para continuar", "");
@@ -660,6 +791,7 @@
         throw new Error("sem_permissao_mmn");
       }
       var nome = (state.contexto && state.contexto.usuario && (state.contexto.usuario.nome || state.contexto.usuario.email)) ||
+        (state.session.user && (state.session.user.name || state.session.user.nome)) ||
         (state.session.user && state.session.user.email) ||
         "Turbo Tiger";
       qs("adminIdentity").textContent = nome;
@@ -676,6 +808,7 @@
 
   async function submitLogin(event) {
     event.preventDefault();
+    if (state.appUserMode) return;
     var button = qs("loginButton");
     setBusy(button, true);
     setStatus(qs("loginStatus"), "Entrando", "");
@@ -693,6 +826,7 @@
   }
 
   async function changeRole(role) {
+    if (state.appUserMode) return;
     saveRole(role);
     applyRoleButtons();
     await boot();
