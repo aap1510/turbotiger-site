@@ -632,6 +632,16 @@ h3 {
     left: 0;
   }
 
+  .tt-social-link img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .tt-social-link[data-tt-contact="x"] img {
+    width: 22px;
+    height: 22px;
+  }
+
   .brand {
     gap: 12px;
   }
@@ -643,13 +653,14 @@ h3 {
 
   .brand-copy {
     width: 175px;
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .brand-age {
     position: absolute;
     top: 0;
     right: 0;
+    font-size: 14px;
     transform: scale(.7);
     transform-origin: top right;
   }
@@ -676,7 +687,7 @@ h3 {
   .hero-title {
     width: 140px;
     margin-bottom: 26px;
-    font-size: 28px;
+    font-size: 26px;
   }
 
   .hero-title span {
@@ -708,12 +719,48 @@ h3 {
     width: calc(100vw - 32px);
   }
 
+  .hero-lead {
+    font-size: 16px;
+  }
+
+  .hero-impact {
+    font-size: 12px;
+  }
+
   .share-intro {
     padding: 40px 0 90px;
   }
 
   .share-intro h2 {
-    font-size: 40px;
+    font-size: 26px;
+  }
+
+  .section-title {
+    font-size: 26px;
+  }
+
+  .section-copy,
+  .benefit p,
+  .step p {
+    font-size: 16px;
+  }
+
+  .benefit h3 {
+    font-size: 20px;
+  }
+
+  .device h3 {
+    font-size: 18px;
+  }
+
+  .device p,
+  .btn {
+    font-size: 14px;
+  }
+
+  .share-index,
+  .footer-inner a {
+    font-size: 12px;
   }
 
   .benefits,
