@@ -627,8 +627,9 @@ h3 {
   }
 
   .hero-socials {
-    top: 13px;
-    right: 14px;
+    top: 76px;
+    right: auto;
+    left: 0;
   }
 
   .brand {
@@ -646,8 +647,11 @@ h3 {
   }
 
   .brand-age {
-    position: relative;
-    top: 20px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: scale(.7);
+    transform-origin: top right;
   }
 
   .hero {
@@ -655,7 +659,7 @@ h3 {
   }
 
   .hero-inner {
-    padding: 142px 0 60px;
+    padding: 162px 0 60px;
   }
 
   .hero-copy {
@@ -681,6 +685,7 @@ h3 {
 
   .hero-title .hero-title-second {
     margin-top: 14px;
+    white-space: nowrap;
   }
 
   .hero-title-break {
@@ -688,7 +693,7 @@ h3 {
   }
 
   .hero-visual {
-    top: 112px;
+    top: 140px;
     width: min(329px, 84vw);
   }
 
