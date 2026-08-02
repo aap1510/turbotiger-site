@@ -6,6 +6,7 @@
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
     adminSessionKey: "tt_admin_session_v1",
     requestTimeoutMs: 30000,
+    addressRequestTimeoutMs: 4500,
     appSessionTimeoutMs: 15000,
     pageSize: 30,
     rpcs: {
@@ -16,6 +17,8 @@
       userProfileSave: "mmn_usuario_perfil_pagamento_salvar_rpc",
       userDispute: "mmn_usuario_contestar_rpc",
       userEventRead: "mmn_usuario_evento_marcar_lido_rpc",
+      userPlacementNetwork: "mmn_usuario_rede_posicionamento_rpc",
+      locationCities: "espera_cidades_uf_rpc",
       adminDashboard: "adm_mmn_painel_rpc",
       adminUserDetail: "adm_mmn_usuario_detalhe_rpc",
       adminConfigGet: "adm_mmn_config_obter_rpc",
@@ -24,8 +27,8 @@
       adminConfigPublish: "adm_mmn_config_publicar_rpc",
       adminConfigProgress: "adm_mmn_config_publicacao_progresso_rpc",
       adminConfigApproverSave: "adm_mmn_config_aprovador_salvar_rpc",
-      adminDocumentSave: "adm_mmn_documento_salvar_rpc",
-      adminConfigDocumentLink: "adm_mmn_config_documento_vincular_rpc",
+      adminRegulationDraftSave: "adm_mmn_regulamento_rascunho_salvar_rpc",
+      adminRegulationPreview: "adm_mmn_regulamento_previsualizar_rpc",
       adminSimulator: "adm_mmn_simular_rpc",
       adminSimulatorReplay: "adm_mmn_simular_historico_rpc",
       adminSimulationsList: "adm_mmn_simulacoes_listar_rpc",
@@ -81,6 +84,11 @@
     bootSequence: 0
   };
 
+  var addressState = {
+    contexts: {},
+    postalCodeCache: {}
+  };
+
   var FRIENDLY_MESSAGES = {
     "Email not confirmed": "Confirme seu e-mail antes de entrar.",
     "Failed to fetch": "Falha de conexão. Verifique sua internet e tente novamente.",
@@ -99,7 +107,15 @@
     usuario_nao_encontrado_no_app: "Usuário do app não encontrado.",
     pix_titular_invalido: "A chave PIX deve pertencer ao mesmo CPF do cadastro.",
     regulamento_nao_aceito: "É necessário aceitar o regulamento vigente.",
-    configuracao_fiscal_nao_homologada: "Os pagamentos reais permanecem bloqueados até a homologação fiscal."
+    configuracao_fiscal_nao_homologada: "Os pagamentos reais permanecem bloqueados até a homologação fiscal.",
+    quantidade_niveis_deve_ser_inteiro_de_1_a_10: "A quantidade de níveis deve ser um inteiro de 1 a 10.",
+    largura_deve_ser_zero_ou_inteiro_maior_ou_igual_a_2: "A largura deve ser 0 para ilimitada ou um inteiro a partir de 2.",
+    dez_faixas_de_nivel_devem_ser_preservadas_na_configuracao: "As dez faixas de nível precisam permanecer preservadas na configuração.",
+    regulamento_rascunho_nao_encontrado: "Gere primeiro o rascunho do regulamento para esta configuração.",
+    regulamento_somente_para_configuracao_rascunho: "O regulamento só pode ser gerado para uma configuração em rascunho.",
+    modelo_de_regulamento_nao_permitido: "O modelo jurídico solicitado não é permitido.",
+    versao_de_regulamento_ja_existe: "Essa versão do regulamento já existe.",
+    regulamento_desatualizado_salvar_novamente_e_refazer_simulacao: "As regras mudaram. Gere novamente o regulamento e refaça a simulação antes de publicar."
   };
 
   function qs(id) {
@@ -363,7 +379,8 @@
       state.session = {
         access_token: token,
         expires_at: jwtExpiresAt(token),
-        user: value.user || null
+        user: value.user || null,
+        endereco_sugerido: payload.endereco_sugerido || value.endereco_sugerido || null
       };
       finishAppSession(null, state.session);
     } catch (error) {
@@ -396,9 +413,9 @@
       try { data = JSON.parse(text); } catch (error) { data = { raw: text }; }
     }
     if (!response.ok) {
-      throw new Error((data && (data.error_description || data.message || data.error || data.details)) || "Falha HTTP " + response.status + ".");
+      throw new Error((data && (data.error_description || data.message || data.error || data.erro || data.details)) || "Falha HTTP " + response.status + ".");
     }
-    if (data && data.ok === false) throw new Error(data.error || data.message || "Não foi possível concluir a operação.");
+    if (data && data.ok === false) throw new Error(data.error || data.erro || data.message || "Não foi possível concluir a operação.");
     return data == null ? {} : data;
   }
 
@@ -473,6 +490,573 @@
     });
   }
 
+  function cleanText(value) {
+    return String(value == null ? "" : value).trim();
+  }
+
+  function digitsOnly(value) {
+    return cleanText(value).replace(/\D/g, "");
+  }
+
+  function formatPostalCode(value) {
+    var digits = digitsOnly(value).slice(0, 8);
+    return digits.length > 5 ? digits.slice(0, 5) + "-" + digits.slice(5) : digits;
+  }
+
+  function normalizeSearchText(value) {
+    return cleanText(value).toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function addressContext(prefix) {
+    if (!addressState.contexts[prefix]) {
+      addressState.contexts[prefix] = {
+        prefix: prefix,
+        states: staticAddressStates(prefix),
+        cities: [],
+        selectedState: null,
+        selectedCity: null,
+        stateTimer: null,
+        cityTimer: null,
+        postalCodeTimer: null,
+        postalLookupRequest: 0,
+        reversePostalCodeTimer: null,
+        reverseRequest: 0,
+        resolvedPostalCode: "",
+        resolvedAddressKey: "",
+        postalCodeConsistent: false,
+        stateRequest: 0,
+        cityRequest: 0,
+        reverseResults: []
+      };
+    }
+    return addressState.contexts[prefix];
+  }
+
+  function staticAddressStates(prefix) {
+    var field = qs(prefix + "State");
+    if (!field || !field.options) return [];
+    return Array.prototype.slice.call(field.options).filter(function (option) {
+      return /^[A-Z]{2}$/.test(cleanText(option.value).toUpperCase());
+    }).map(function (option) {
+      var uf = cleanText(option.value).toUpperCase();
+      var label = cleanText(option.textContent);
+      return normalizeStateRow({ uf: uf, nome: cleanText(label.replace(new RegExp("^" + uf + "\\s*-\\s*", "i"), "")) || uf });
+    });
+  }
+
+  function findStaticAddressState(prefix, value) {
+    var search = normalizeSearchText(value);
+    if (!search) return null;
+    return addressContext(prefix).states.find(function (row) {
+      return normalizeSearchText(row.uf) === search || normalizeSearchText(row.nome) === search;
+    }) || null;
+  }
+
+  function normalizeStateRow(raw) {
+    var row = raw || {};
+    return Object.assign({}, row, {
+      cod_estado: firstDefined([row.cod_estado, row.id_estado, row.id], null),
+      uf: cleanText(firstDefined([row.uf, row.sigla], "")).toUpperCase(),
+      nome: cleanText(firstDefined([row.nome, row.estado, row.nome_estado], ""))
+    });
+  }
+
+  function normalizeCityRow(raw, fallbackUf) {
+    var row = raw || {};
+    return Object.assign({}, row, {
+      cod_cidade: firstDefined([row.cod_cidade, row.id_cidade, row.id], null),
+      cod_estado: firstDefined([row.cod_estado, row.id_estado], null),
+      ibge: cleanText(firstDefined([row.ibge, row.codigo_ibge, row.cidade_ibge], "")),
+      uf: cleanText(firstDefined([row.uf, row.estado_uf, fallbackUf], "")).toUpperCase(),
+      nome: cleanText(firstDefined([row.nome, row.cidade, row.nome_cidade], ""))
+    });
+  }
+
+  function setAddressStatus(prefix, text, kind) {
+    var element = qs(prefix + "PostalCodeStatus");
+    if (!element) return;
+    element.textContent = text || "";
+    element.classList.remove("is-error", "is-ok", "is-warn");
+    if (kind) element.classList.add("is-" + kind);
+  }
+
+  function currentAddressKey(prefix) {
+    return [
+      cleanText(qs(prefix + "State").value).toUpperCase(),
+      normalizeSearchText(qs(prefix + "City").value),
+      normalizeSearchText(qs(prefix + "Address").value)
+    ].join("|");
+  }
+
+  function addressHasReverseLookupKey(prefix) {
+    return /^[A-Z]{2}$/.test(cleanText(qs(prefix + "State").value).toUpperCase()) && cleanText(qs(prefix + "City").value).length >= 3 && cleanText(qs(prefix + "Address").value).length >= 3;
+  }
+
+  function markAddressResolved(prefix) {
+    var context = addressContext(prefix);
+    var cep = digitsOnly(qs(prefix + "PostalCode").value);
+    context.resolvedPostalCode = cep.length === 8 ? cep : "";
+    context.resolvedAddressKey = currentAddressKey(prefix);
+    context.postalCodeConsistent = !!context.resolvedPostalCode && addressHasReverseLookupKey(prefix);
+  }
+
+  function markAddressPending(prefix, scheduleLookup, delay) {
+    var context = addressContext(prefix);
+    var cep = digitsOnly(qs(prefix + "PostalCode").value);
+    var unchanged = cep.length === 8 && cep === context.resolvedPostalCode && currentAddressKey(prefix) === context.resolvedAddressKey;
+    if (unchanged) {
+      context.postalCodeConsistent = true;
+      return;
+    }
+    context.postalCodeConsistent = false;
+    context.postalLookupRequest += 1;
+    window.clearTimeout(context.reversePostalCodeTimer);
+    if (!addressHasReverseLookupKey(prefix)) {
+      setAddressStatus(prefix, "Endereço alterado. Complete UF, cidade e logradouro ou digite um CEP válido.", "warn");
+      return;
+    }
+    setAddressStatus(prefix, "Endereço alterado. Conferindo o CEP correspondente...", "warn");
+    if (scheduleLookup !== false) {
+      context.reversePostalCodeTimer = window.setTimeout(function () {
+        findPostalCodeByAddress(prefix, true);
+      }, delay == null ? 700 : delay);
+    }
+  }
+
+  function hideAddressOptions(prefix, kind) {
+    var list = qs(prefix + (kind === "state" ? "StateList" : "CityList"));
+    if (!list) return;
+    list.hidden = true;
+    list.innerHTML = "";
+  }
+
+  function addressOptionHtml(label, index) {
+    return "<button class=\"mmn-address-option\" type=\"button\" role=\"option\" data-address-index=\"" + escapeHtml(index) + "\">" + escapeHtml(label) + "</button>";
+  }
+
+  function renderStateOptions(prefix, rows) {
+    var list = qs(prefix + "StateList");
+    if (!list) return;
+    list.innerHTML = rows.length ? rows.map(function (row, index) {
+      return addressOptionHtml(row.uf + " - " + row.nome, index);
+    }).join("") : "<div class=\"mmn-address-option\" role=\"option\">Nenhum estado encontrado.</div>";
+    list.hidden = false;
+  }
+
+  function renderCityOptions(prefix, rows) {
+    var list = qs(prefix + "CityList");
+    if (!list) return;
+    list.innerHTML = rows.length ? rows.map(function (row, index) {
+      return addressOptionHtml(row.nome + " - " + row.uf, index);
+    }).join("") : "";
+    list.hidden = !rows.length;
+  }
+
+  async function loadAddressStates(prefix, search, showOptions) {
+    var context = addressContext(prefix);
+    context.states = staticAddressStates(prefix);
+    var selected = findStaticAddressState(prefix, search);
+    if (selected) context.selectedState = selected;
+    if (showOptions !== false && !qs(prefix + "State").options) renderStateOptions(prefix, context.states);
+    return context.states;
+  }
+
+  async function loadAddressCities(prefix, search, showOptions) {
+    var context = addressContext(prefix);
+    var stateInput = qs(prefix + "State");
+    var cityInput = qs(prefix + "City");
+    var uf = context.selectedState ? context.selectedState.uf : cleanText(stateInput && stateInput.value).toUpperCase();
+    if (!/^[A-Z]{2}$/.test(uf) || !cityInput || cityInput.disabled) {
+      context.cities = [];
+      renderCityOptions(prefix, []);
+      return;
+    }
+    var request = ++context.cityRequest;
+    try {
+      var data = await rpc(CONFIG.rpcs.locationCities, {
+        p_uf: uf,
+        p_busca: cleanText(search),
+        p_limite: 40
+      });
+      if (request !== context.cityRequest) return;
+      context.cities = listFrom(data, ["cidades", "itens"]).map(function (row) {
+        return normalizeCityRow(row, uf);
+      }).filter(function (row) {
+        return row.nome && row.uf === uf;
+      });
+      if (showOptions !== false) renderCityOptions(prefix, context.cities);
+    } catch (error) {
+      if (request !== context.cityRequest) return;
+      context.cities = [];
+      renderCityOptions(prefix, []);
+      setAddressStatus(prefix, "Não foi possível carregar as cidades agora.", "error");
+    }
+  }
+
+  function selectAddressState(prefix, row, preserveCity) {
+    var context = addressContext(prefix);
+    var normalized = normalizeStateRow(row);
+    if (!/^[A-Z]{2}$/.test(normalized.uf)) return;
+    context.selectedState = normalized;
+    qs(prefix + "State").value = normalized.uf;
+    hideAddressOptions(prefix, "state");
+    var cityInput = qs(prefix + "City");
+    cityInput.disabled = false;
+    cityInput.placeholder = "Digite e selecione a cidade";
+    if (!preserveCity) {
+      context.selectedCity = null;
+      cityInput.value = "";
+    }
+  }
+
+  function selectAddressCity(prefix, row) {
+    var context = addressContext(prefix);
+    var normalized = normalizeCityRow(row, context.selectedState && context.selectedState.uf);
+    if (!normalized.nome) return;
+    context.selectedCity = normalized;
+    qs(prefix + "City").value = normalized.nome;
+    hideAddressOptions(prefix, "city");
+  }
+
+  function selectTypedAddressState(prefix, allowSingleMatch, preserveCity) {
+    var context = addressContext(prefix);
+    var search = normalizeSearchText(qs(prefix + "State").value);
+    if (!search) return false;
+    var exact = context.states.find(function (row) {
+      return normalizeSearchText(row.uf) === search || normalizeSearchText(row.nome) === search;
+    });
+    var matches = context.states.filter(function (row) {
+      return normalizeSearchText(row.uf).indexOf(search) >= 0 || normalizeSearchText(row.nome).indexOf(search) >= 0;
+    });
+    var selected = exact || (allowSingleMatch && matches.length === 1 ? matches[0] : null);
+    if (!selected) return false;
+    selectAddressState(prefix, selected, !!preserveCity);
+    loadAddressCities(prefix, preserveCity ? qs(prefix + "City").value : "", preserveCity ? false : true);
+    return true;
+  }
+
+  function selectTypedAddressCity(prefix) {
+    var context = addressContext(prefix);
+    var search = normalizeSearchText(qs(prefix + "City").value);
+    var selected = context.cities.find(function (row) { return normalizeSearchText(row.nome) === search; });
+    if (!selected) return false;
+    selectAddressCity(prefix, selected);
+    return true;
+  }
+
+  async function fetchAddressJson(url) {
+    var controller = typeof AbortController === "function" ? new AbortController() : null;
+    var timer = controller ? window.setTimeout(function () { controller.abort(); }, CONFIG.addressRequestTimeoutMs) : null;
+    try {
+      var response = await fetch(url, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        signal: controller ? controller.signal : undefined
+      });
+      if (!response.ok) throw new Error("Falha HTTP " + response.status + ".");
+      return await response.json();
+    } finally {
+      if (timer) window.clearTimeout(timer);
+    }
+  }
+
+  function normalizeViaCep(raw) {
+    var row = raw || {};
+    return {
+      cep: digitsOnly(row.cep),
+      logradouro: cleanText(row.logradouro),
+      complemento: cleanText(row.complemento),
+      bairro: cleanText(row.bairro),
+      cidade: cleanText(row.localidade),
+      uf: cleanText(row.uf).toUpperCase(),
+      ibge: cleanText(row.ibge)
+    };
+  }
+
+  function normalizeBrasilApi(raw) {
+    var row = raw || {};
+    return {
+      cep: digitsOnly(row.cep),
+      logradouro: cleanText(row.street),
+      complemento: "",
+      bairro: cleanText(row.neighborhood),
+      cidade: cleanText(row.city),
+      uf: cleanText(row.state).toUpperCase(),
+      ibge: cleanText(row.city_ibge)
+    };
+  }
+
+  async function findAddressByPostalCode(postalCode) {
+    var cep = digitsOnly(postalCode);
+    if (addressState.postalCodeCache[cep]) return addressState.postalCodeCache[cep];
+    var viaCepError = null;
+    try {
+      var viaCep = await fetchAddressJson("https://viacep.com.br/ws/" + encodeURIComponent(cep) + "/json/");
+      if (!viaCep.erro) {
+        var normalizedViaCep = normalizeViaCep(viaCep);
+        addressState.postalCodeCache[cep] = normalizedViaCep;
+        return normalizedViaCep;
+      }
+      viaCepError = new Error("CEP não encontrado.");
+    } catch (error) {
+      viaCepError = error;
+    }
+    try {
+      var brasilApi = await fetchAddressJson("https://brasilapi.com.br/api/cep/v2/" + encodeURIComponent(cep));
+      var normalizedBrasilApi = normalizeBrasilApi(brasilApi);
+      addressState.postalCodeCache[cep] = normalizedBrasilApi;
+      return normalizedBrasilApi;
+    } catch (error) {
+      if (window.console && console.warn) console.warn("Falha nas consultas de CEP.", viaCepError, error);
+      throw new Error("Não foi possível localizar esse CEP.");
+    }
+  }
+
+  function setAddressSelectionFromLookup(prefix, address) {
+    var context = addressContext(prefix);
+    var stateRow = context.states.find(function (row) { return row.uf === address.uf; }) || { uf: address.uf, nome: address.uf };
+    selectAddressState(prefix, stateRow, true);
+    var cityRow = context.cities.find(function (row) {
+      return row.uf === address.uf && normalizeSearchText(row.nome) === normalizeSearchText(address.cidade);
+    }) || { nome: address.cidade, uf: address.uf, ibge: address.ibge };
+    selectAddressCity(prefix, cityRow);
+  }
+
+  function fillAddressFromLookup(prefix, address, focusNumber) {
+    qs(prefix + "PostalCode").value = formatPostalCode(address.cep);
+    qs(prefix + "Address").value = address.logradouro || "";
+    qs(prefix + "District").value = address.bairro || "";
+    qs(prefix + "City").value = address.cidade || "";
+    qs(prefix + "State").value = address.uf || "";
+    setAddressSelectionFromLookup(prefix, address);
+    var resolvedKey = currentAddressKey(prefix);
+    loadAddressCities(prefix, address.cidade, false).then(function () {
+      if (currentAddressKey(prefix) !== resolvedKey) return;
+      selectTypedAddressCity(prefix);
+      hideAddressOptions(prefix, "city");
+      markAddressResolved(prefix);
+    }).catch(function () {});
+    markAddressResolved(prefix);
+    if (focusNumber) qs(prefix + "AddressNumber").focus();
+  }
+
+  async function lookupAddressByPostalCode(prefix, postalCode, focusNumber) {
+    var context = addressContext(prefix);
+    var cep = digitsOnly(postalCode);
+    if (cep.length !== 8) return;
+    var request = ++context.postalLookupRequest;
+    setAddressStatus(prefix, "Consultando o CEP...", null);
+    var expectedCep = cep;
+    try {
+      var address = await findAddressByPostalCode(cep);
+      if (request !== context.postalLookupRequest || digitsOnly(qs(prefix + "PostalCode").value) !== expectedCep) return;
+      fillAddressFromLookup(prefix, address, focusNumber);
+      setAddressStatus(prefix, "Endereço encontrado.", "ok");
+    } catch (error) {
+      if (request !== context.postalLookupRequest || digitsOnly(qs(prefix + "PostalCode").value) !== expectedCep) return;
+      setAddressStatus(prefix, error.message || "Não foi possível consultar o CEP.", "error");
+    }
+  }
+
+  function resetReversePostalCodeResults(prefix) {
+    var context = addressContext(prefix);
+    context.reverseResults = [];
+    var container = qs(prefix + "PostalCodeResults");
+    var select = qs(prefix + "PostalCodeSelect");
+    container.hidden = true;
+    select.innerHTML = "<option value=\"\">Selecione</option>";
+  }
+
+  async function findPostalCodeByAddress(prefix, automatic) {
+    var context = addressContext(prefix);
+    var uf = cleanText(qs(prefix + "State").value).toUpperCase();
+    var city = cleanText(qs(prefix + "City").value);
+    var street = cleanText(qs(prefix + "Address").value);
+    var expectedKey = currentAddressKey(prefix);
+    var request = ++context.reverseRequest;
+    resetReversePostalCodeResults(prefix);
+    if (!/^[A-Z]{2}$/.test(uf)) {
+      setAddressStatus(prefix, "Selecione uma UF válida.", "error");
+      qs(prefix + "State").focus();
+      return;
+    }
+    if (city.length < 3) {
+      setAddressStatus(prefix, "Informe uma cidade com pelo menos 3 caracteres.", "error");
+      qs(prefix + "City").focus();
+      return;
+    }
+    if (street.length < 3) {
+      setAddressStatus(prefix, "Informe uma rua ou avenida com pelo menos 3 caracteres.", "error");
+      qs(prefix + "Address").focus();
+      return;
+    }
+    setAddressStatus(prefix, "Procurando o CEP do endereço...", null);
+    var url = [
+      "https://viacep.com.br/ws",
+      encodeURIComponent(uf),
+      encodeURIComponent(city),
+      encodeURIComponent(street),
+      "json/"
+    ].join("/");
+    try {
+      var data = await fetchAddressJson(url);
+      if (request !== context.reverseRequest || currentAddressKey(prefix) !== expectedKey) return;
+      var unique = {};
+      (Array.isArray(data) ? data : []).forEach(function (item) {
+        var normalized = normalizeViaCep(item);
+        if (normalized.cep.length === 8 && !unique[normalized.cep]) unique[normalized.cep] = normalized;
+      });
+      var rows = Object.keys(unique).map(function (key) { return unique[key]; });
+      var district = normalizeSearchText(qs(prefix + "District").value);
+      if (district && rows.length > 1) {
+        var districtMatches = rows.filter(function (row) { return normalizeSearchText(row.bairro) === district; });
+        if (districtMatches.length) rows = districtMatches;
+      }
+      if (!rows.length) throw new Error("Corrija o endereço ou digite um CEP válido.");
+      if (rows.length === 1) {
+        fillAddressFromLookup(prefix, rows[0], true);
+        setAddressStatus(prefix, "CEP encontrado.", "ok");
+        return;
+      }
+      context.reverseResults = rows;
+      context.postalCodeConsistent = false;
+      var select = qs(prefix + "PostalCodeSelect");
+      select.innerHTML = "<option value=\"\">Selecione um dos " + rows.length + " endereços encontrados</option>" + rows.map(function (row, index) {
+        var label = [formatPostalCode(row.cep), row.logradouro, row.bairro, row.cidade + "/" + row.uf].filter(Boolean).join(" - ");
+        return "<option value=\"" + index + "\">" + escapeHtml(label) + "</option>";
+      }).join("");
+      qs(prefix + "PostalCodeResults").hidden = false;
+      setAddressStatus(prefix, "Foram encontrados vários CEPs. Selecione o endereço correto para confirmar.", "warn");
+    } catch (error) {
+      if (request !== context.reverseRequest || currentAddressKey(prefix) !== expectedKey) return;
+      context.postalCodeConsistent = false;
+      var message = error.message || "Corrija o endereço ou digite um CEP válido.";
+      if (automatic && /^Não foi possível/i.test(message)) message = "Corrija o endereço ou digite um CEP válido.";
+      setAddressStatus(prefix, message, "error");
+    }
+  }
+
+  function setupAddressForm(prefix) {
+    var context = addressContext(prefix);
+    var postalCode = qs(prefix + "PostalCode");
+    var stateInput = qs(prefix + "State");
+    var cityInput = qs(prefix + "City");
+    if (!postalCode || !stateInput || !cityInput) return;
+
+    postalCode.addEventListener("input", function () {
+      window.clearTimeout(context.postalCodeTimer);
+      window.clearTimeout(context.reversePostalCodeTimer);
+      context.reverseRequest += 1;
+      context.postalLookupRequest += 1;
+      context.postalCodeConsistent = false;
+      var cep = digitsOnly(postalCode.value).slice(0, 8);
+      postalCode.value = formatPostalCode(cep);
+      resetReversePostalCodeResults(prefix);
+      if (cep.length !== 8) {
+        setAddressStatus(prefix, "", null);
+        return;
+      }
+      context.postalCodeTimer = window.setTimeout(function () {
+        lookupAddressByPostalCode(prefix, cep, true);
+      }, 300);
+    });
+
+    stateInput.addEventListener("change", function () {
+      context.selectedState = null;
+      context.selectedCity = null;
+      cityInput.value = "";
+      hideAddressOptions(prefix, "city");
+      if (!selectTypedAddressState(prefix, true)) {
+        cityInput.disabled = true;
+        cityInput.placeholder = "Selecione o estado primeiro";
+        markAddressPending(prefix, false);
+        return;
+      }
+      markAddressPending(prefix, false);
+    });
+
+    cityInput.addEventListener("focus", function () {
+      if (!cityInput.disabled) loadAddressCities(prefix, cityInput.value);
+    });
+    cityInput.addEventListener("input", function () {
+      window.clearTimeout(context.cityTimer);
+      context.selectedCity = null;
+      context.cityTimer = window.setTimeout(function () { loadAddressCities(prefix, cityInput.value); }, 180);
+      markAddressPending(prefix, true, 850);
+    });
+    cityInput.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") hideAddressOptions(prefix, "city");
+    });
+    cityInput.addEventListener("blur", function () {
+      window.setTimeout(function () {
+        if (!context.selectedCity) selectTypedAddressCity(prefix);
+        hideAddressOptions(prefix, "city");
+        markAddressPending(prefix, true, 120);
+      }, 140);
+    });
+
+    qs(prefix + "Address").addEventListener("input", function () { markAddressPending(prefix, true, 850); });
+    qs(prefix + "Address").addEventListener("blur", function () { markAddressPending(prefix, true, 120); });
+    qs(prefix + "District").addEventListener("change", function () {
+      if (!context.postalCodeConsistent) markAddressPending(prefix, true, 120);
+    });
+
+    var stateList = qs(prefix + "StateList");
+    if (stateList) {
+      stateList.addEventListener("mousedown", function (event) { event.preventDefault(); });
+      stateList.addEventListener("click", function (event) {
+        var button = event.target.closest("[data-address-index]");
+        if (!button) return;
+        var selected = context.states[integerValue(button.dataset.addressIndex)];
+        if (!selected) return;
+        selectAddressState(prefix, selected, false);
+        loadAddressCities(prefix, "");
+      });
+    }
+    qs(prefix + "CityList").addEventListener("mousedown", function (event) { event.preventDefault(); });
+    qs(prefix + "CityList").addEventListener("click", function (event) {
+      var button = event.target.closest("[data-address-index]");
+      if (!button) return;
+      var selected = context.cities[integerValue(button.dataset.addressIndex)];
+      if (selected) {
+        selectAddressCity(prefix, selected);
+        markAddressPending(prefix, true, 120);
+      }
+    });
+    qs(prefix + "FindPostalCode").addEventListener("click", function () { findPostalCodeByAddress(prefix, false); });
+    qs(prefix + "PostalCodeSelect").addEventListener("change", function () {
+      var index = integerValue(qs(prefix + "PostalCodeSelect").value, -1);
+      var selected = context.reverseResults[index];
+      if (!selected) return;
+      fillAddressFromLookup(prefix, selected, true);
+      resetReversePostalCodeResults(prefix);
+      setAddressStatus(prefix, "CEP selecionado com sucesso.", "ok");
+    });
+  }
+
+  function setupAddressForms() {
+    ["enrollment", "profile"].forEach(setupAddressForm);
+  }
+
+  function validateAddressForSubmission(prefix, required) {
+    var context = addressContext(prefix);
+    var cep = digitsOnly(qs(prefix + "PostalCode").value);
+    var street = cleanText(qs(prefix + "Address").value);
+    var number = cleanText(qs(prefix + "AddressNumber").value);
+    var district = cleanText(qs(prefix + "District").value);
+    var city = cleanText(qs(prefix + "City").value);
+    var uf = cleanText(qs(prefix + "State").value).toUpperCase();
+    var hasAddress = !!(cep || street || number || district || city || uf);
+    if ((required || cep) && cep.length !== 8) throw new Error("Informe um CEP válido com 8 dígitos.");
+    if ((required || uf) && !/^[A-Z]{2}$/.test(uf)) throw new Error("Selecione uma UF válida.");
+    if (required && (!street || !number || !district || !city)) throw new Error("Complete o endereço para os dados do RPA.");
+    if (!required && hasAddress && city && !uf) throw new Error("Selecione a UF do endereço.");
+    if (hasAddress && (!context.postalCodeConsistent || context.resolvedPostalCode !== cep || context.resolvedAddressKey !== currentAddressKey(prefix))) {
+      throw new Error("O CEP e o endereço ainda não foram confirmados. Corrija o endereço, selecione um dos CEPs encontrados ou digite um CEP válido.");
+    }
+    return true;
+  }
+
   function normalizeCapabilities(context) {
     var result = { acessar: false, suporte: false, configurar: false, fechar: false, pagar: false, financeiro: false, fiscal: false, auditar: false, superadmin: false };
     var profile = objectFrom(context, ["perfil"]);
@@ -521,6 +1105,55 @@
     return Object.assign({}, objectFrom(profile, ["dados_rpa"]), profile);
   }
 
+  function normalizeAddressProfile(raw) {
+    var source = raw || {};
+    return {
+      cep: firstDefined([source.cep, source.codigo_postal, source.postal_code], ""),
+      logradouro: firstDefined([source.logradouro, source.endereco, source.rua, source.address], ""),
+      numero: firstDefined([source.numero, source.numero_endereco, source.address_number], ""),
+      complemento: firstDefined([source.complemento, source.address_extra], ""),
+      bairro: firstDefined([source.bairro, source.distrito, source.neighborhood], ""),
+      cidade: firstDefined([source.cidade, source.cidade_nome, source.localidade, source.city], ""),
+      uf: firstDefined([source.uf, source.estado_uf, source.estado, source.state], ""),
+      cod_estado: firstDefined([source.cod_estado, source.id_estado], null),
+      cod_cidade: firstDefined([source.cod_cidade, source.id_cidade], null),
+      cidade_ibge: firstDefined([source.cidade_ibge, source.ibge, source.codigo_ibge], "")
+    };
+  }
+
+  function addressSuggestionFromDashboard(data) {
+    var user = objectFrom(data, ["usuario"]);
+    var sessionUser = state.session && state.session.user ? state.session.user : {};
+    var candidates = [
+      objectFrom(data, ["endereco_sugerido", "endereco_app", "endereco_usuario", "localizacao"]),
+      state.session && state.session.endereco_sugerido ? state.session.endereco_sugerido : {},
+      objectFrom(user, ["endereco", "localizacao"]),
+      user,
+      objectFrom(sessionUser, ["endereco", "localizacao"]),
+      sessionUser
+    ];
+    var result = {};
+    candidates.forEach(function (candidate) {
+      var normalized = normalizeAddressProfile(candidate);
+      Object.keys(normalized).forEach(function (key) {
+        if ((result[key] === undefined || result[key] === null || result[key] === "") && normalized[key] !== undefined && normalized[key] !== null && normalized[key] !== "") {
+          result[key] = normalized[key];
+        }
+      });
+    });
+    return result;
+  }
+
+  function mergeProfileAddress(profile, suggestion) {
+    var result = Object.assign({}, suggestion || {}, profile || {});
+    var stored = normalizeAddressProfile(profile);
+    var suggested = normalizeAddressProfile(suggestion);
+    Object.keys(stored).forEach(function (key) {
+      result[key] = stored[key] !== undefined && stored[key] !== null && stored[key] !== "" ? stored[key] : suggested[key];
+    });
+    return result;
+  }
+
   function renderEnrollment(data) {
     var participation = userParticipation(data);
     var regulation = objectFrom(data, ["regulamento", "termos"]);
@@ -547,22 +1180,28 @@
     qs("enrollmentRuleSummary").innerHTML = summaries.map(function (item) {
       return "<div>" + escapeHtml(typeof item === "string" ? item : (item.texto || item.descricao || "")) + "</div>";
     }).join("");
-    if (regulation.url) qs("regulationLink").href = regulation.url;
-    var profile = userProfile(data);
+    var regulationUrl = regulation.url || regulation.url_documento || "";
+    var regulationVersion = regulation.versao || regulation.documento_versao || "";
+    if (!regulationUrl && regulationVersion) regulationUrl = "../../regulamento-mmn.html?versao=" + encodeURIComponent(regulationVersion);
+    if (regulationUrl) qs("regulationLink").href = regulationUrl;
+    var profile = mergeProfileAddress(userProfile(data), addressSuggestionFromDashboard(data));
     fillUserProfileFields(profile, "enrollment");
   }
 
   function fillUserProfileFields(profile, prefix) {
+    var context = addressContext(prefix);
+    var rawState = firstDefined([profile.uf, profile.estado_uf, profile.estado, profile.state], "");
+    var staticState = findStaticAddressState(prefix, rawState);
     var map = {
       PixType: profile.pix_tipo || profile.tipo || profile.tipo_chave_pix || "cpf",
       PixKey: prefix === "profile" && profile.pix_mascarado ? "" : (profile.pix_chave || profile.chave_pix || ""),
-      PostalCode: profile.cep || "",
+      PostalCode: formatPostalCode(profile.cep || ""),
       Address: profile.logradouro || profile.endereco || "",
       AddressNumber: profile.numero || "",
       AddressExtra: profile.complemento || "",
       District: profile.bairro || "",
-      City: profile.cidade || "",
-      State: profile.uf || "",
+      City: profile.cidade || profile.cidade_nome || "",
+      State: staticState ? staticState.uf : cleanText(rawState).toUpperCase(),
       Nit: profile.nit || profile.pis_pasep || ""
     };
     Object.keys(map).forEach(function (suffix) {
@@ -573,6 +1212,46 @@
     if (ownership) ownership.checked = booleanValue(profile.titularidade_declarada, false);
     if (prefix === "profile") {
       setText("profilePixMasked", profile.pix_mascarado ? "Chave atual: " + profile.pix_mascarado : "Nenhuma chave cadastrada.");
+    }
+    var uf = cleanText(map.State).toUpperCase();
+    var city = cleanText(map.City);
+    context.selectedState = /^[A-Z]{2}$/.test(uf) ? normalizeStateRow({
+      cod_estado: firstDefined([profile.cod_estado, profile.id_estado], null),
+      uf: uf,
+      nome: profile.estado_nome || (staticState && staticState.nome) || uf
+    }) : null;
+    context.selectedCity = city ? normalizeCityRow({
+      cod_cidade: firstDefined([profile.cod_cidade, profile.id_cidade], null),
+      cod_estado: firstDefined([profile.cod_estado, profile.id_estado], null),
+      ibge: firstDefined([profile.cidade_ibge, profile.ibge], ""),
+      uf: uf,
+      nome: city
+    }, uf) : null;
+    var cityInput = qs(prefix + "City");
+    if (cityInput) {
+      cityInput.disabled = !context.selectedState;
+      cityInput.placeholder = context.selectedState ? "Digite e selecione a cidade" : "Selecione o estado primeiro";
+    }
+    var expectedState = cleanText(map.State);
+    var expectedCity = cleanText(map.City);
+    if (digitsOnly(map.PostalCode).length === 8 && addressHasReverseLookupKey(prefix)) markAddressResolved(prefix);
+    else if (digitsOnly(map.PostalCode).length === 8) lookupAddressByPostalCode(prefix, digitsOnly(map.PostalCode), false);
+    if (expectedState) {
+      loadAddressStates(prefix, expectedState, false).then(function () {
+        if (cleanText(qs(prefix + "State").value) !== expectedState || cleanText(qs(prefix + "City").value) !== expectedCity) return null;
+        var search = normalizeSearchText(expectedState);
+        var matchedState = context.states.find(function (row) {
+          return normalizeSearchText(row.uf) === search || normalizeSearchText(row.nome) === search;
+        }) || null;
+        if (!matchedState) return null;
+        selectAddressState(prefix, matchedState, true);
+        return loadAddressCities(prefix, expectedCity, false);
+      }).then(function () {
+        if (expectedCity && cleanText(qs(prefix + "City").value) === expectedCity) selectTypedAddressCity(prefix);
+        if (digitsOnly(qs(prefix + "PostalCode").value).length === 8 && addressHasReverseLookupKey(prefix)) markAddressResolved(prefix);
+        hideAddressOptions(prefix, "state");
+        hideAddressOptions(prefix, "city");
+      }).catch(function () {});
     }
   }
 
@@ -682,7 +1361,7 @@
     renderUserQualification(data);
     renderMonthlyChart(data);
     renderUserNotifications(data);
-    fillUserProfileFields(userProfile(data), "profile");
+    fillUserProfileFields(mergeProfileAddress(userProfile(data), addressSuggestionFromDashboard(data)), "profile");
     var network = objectFrom(data, ["rede_resumo", "rede"]);
     var publicConfig = objectFrom(data, ["regras", "configuracao_publica"]);
     var dashboardLevels = listFrom(data, ["niveis"]);
@@ -692,7 +1371,16 @@
       var rule = ruleLevels.find(function (item) { return String(item.nivel) === String(level.nivel); }) || {};
       return Object.assign({}, rule, level);
     });
-    if (dashboardLevels.length || Array.isArray(network.diretos)) renderUserNetwork({ niveis: dashboardLevels, diretos: network.diretos || [] }, false);
+    if (dashboardLevels.length || Array.isArray(network.diretos) || Object.keys(network).length) {
+      renderUserNetwork(Object.assign({}, network, {
+        niveis: dashboardLevels,
+        diretos: network.diretos || [],
+        regras: publicConfig,
+        patrocinio: objectFrom(data, ["patrocinio", "arvore_patrocinio"]),
+        posicionamento: objectFrom(data, ["posicionamento", "arvore_posicionamento", "posicao"]),
+        participante: objectFrom(data, ["participante", "usuario_mmn"])
+      }), false);
+    }
     var ranks = listFrom(data, ["ranks"]);
     if (!ranks.length) ranks = listFrom(publicConfig, ["ranks"]);
     var bonuses = listFrom(data, ["bonificacoes", "bonus"]);
@@ -700,9 +1388,64 @@
     if (ranks.length || bonuses.length) renderUserBonuses({ ranks: ranks, bonificacoes: bonuses, qualificacao: objectFrom(data, ["qualificacao_atual", "qualificacao"]), extrato: listFrom(data, ["extrato"]) });
   }
 
+  function configuredNetworkParameters(data) {
+    var source = data || {};
+    var direct = objectFrom(source, ["parametros"]);
+    var rules = objectFrom(source, ["regras", "configuracao_publica", "configuracao"]);
+    var nested = objectFrom(rules, ["parametros"]);
+    var dashboard = state.user.dashboard || {};
+    var dashboardRules = objectFrom(dashboard, ["regras", "configuracao_publica"]);
+    var dashboardParameters = objectFrom(dashboardRules, ["parametros"]);
+    return Object.assign({}, dashboardRules, dashboardParameters, rules, nested, direct);
+  }
+
+  function configuredNetworkDepth(data) {
+    return Math.max(1, Math.min(10, integerValue(firstDefined([
+      configuredNetworkParameters(data).quantidade_niveis,
+      data && data.quantidade_niveis
+    ], 6), 6)));
+  }
+
+  function configuredPlacementWidth(data) {
+    return Math.max(0, integerValue(firstDefined([
+      configuredNetworkParameters(data).largura_maxima_posicionamento,
+      data && data.largura_maxima_posicionamento
+    ], 0), 0));
+  }
+
+  function relationPersonLabel(person, fallback) {
+    if (person == null || person === "") return fallback || "Raiz";
+    if (typeof person !== "object") return "#" + person;
+    var id = firstDefined([person.usuario_id, person.id_usuario, person.cod_usuario, person.id], null);
+    var name = person.nome || person.codinome || person.login || "";
+    return [name, id != null ? "#" + id : ""].filter(Boolean).join(" · ") || fallback || "—";
+  }
+
+  function renderUserGenealogy(data) {
+    var participant = objectFrom(data, ["participante", "usuario_mmn"]);
+    var sponsorship = objectFrom(data, ["patrocinio", "arvore_patrocinio"]);
+    var placement = objectFrom(data, ["posicionamento", "arvore_posicionamento", "posicao"]);
+    var sponsor = objectFrom(sponsorship, ["patrocinador", "pai"]);
+    var parent = objectFrom(placement, ["pai", "pai_posicionamento"]);
+    var sponsorId = firstDefined([sponsor.usuario_id, sponsor.id_usuario, sponsor.cod_usuario, sponsor.id, sponsorship.patrocinador_id, participant.patrocinador_id, data.patrocinador_id], null);
+    var parentId = firstDefined([parent.usuario_id, parent.id_usuario, parent.cod_usuario, parent.id, placement.pai_posicionamento_id, participant.pai_posicionamento_id, data.pai_posicionamento_id], null);
+    var slot = firstDefined([placement.slot_posicionamento, placement.slot, participant.slot_posicionamento, data.slot_posicionamento], null);
+    var width = Math.max(0, integerValue(firstDefined([placement.largura_aplicada, configuredPlacementWidth(data)], 0), 0));
+    var spillover = booleanValue(firstDefined([placement.spillover, placement.foi_spillover, participant.foi_spillover, data.foi_spillover], sponsorId != null && parentId != null && String(sponsorId) !== String(parentId)), false);
+    setText("userSponsorRelation", Object.keys(sponsor).length ? relationPersonLabel(sponsor, "Raiz") : relationPersonLabel(sponsorId, "Raiz"));
+    setText("userPlacementParent", Object.keys(parent).length ? relationPersonLabel(parent, "Raiz estrutural") : relationPersonLabel(parentId, "Raiz estrutural"));
+    setText("userPlacementSlot", slot == null || slot === "" ? "Sem vaga atribuída" : "Vaga " + slot);
+    setText("userPlacementWidth", width === 0 ? "Ilimitada" : formatInteger(width) + " vagas por participante");
+    setText("userPlacementSpillover", spillover ? "Posicionado por spillover; seu patrocinador permanece o mesmo." : "Posicionamento direto, sem spillover nesta entrada.");
+  }
+
   function renderUserNetwork(data, append) {
-    var levels = listFrom(data, ["por_nivel", "niveis", "levels"]);
+    var depth = configuredNetworkDepth(data);
+    var levels = listFrom(data, ["por_nivel", "niveis", "levels"]).filter(function (level) {
+      return integerValue(level.nivel) >= 1 && integerValue(level.nivel) <= depth;
+    });
     var directs = listFrom(data, ["diretos", "participantes"]);
+    renderUserGenealogy(data);
     if (levels.length) {
       qs("userLevelGrid").innerHTML = levels.map(function (level) {
         var unlocked = firstDefined([level.liberado, level.qualificado], true);
@@ -712,7 +1455,8 @@
       qs("userLevelGrid").innerHTML = emptyHtml("A distribuição por nível ainda não está disponível.");
     }
     var html = directs.map(function (person) {
-      return "<div class=\"mmn-list-row\"><div class=\"mmn-row-main\"><strong>" + escapeHtml(person.nome || person.codinome || person.login || ("Participante #" + (person.id || person.cod_usuario || ""))) + "</strong><small>Indicação direta · #" + escapeHtml(person.id || person.cod_usuario || "") + "</small></div><span>" + escapeHtml(formatDate(person.desde || person.criado_em || person.indicado_em, false)) + "</span><span>" + escapeHtml(person.rank_nome || person.rank || "—") + "</span>" + pillHtml(person.status || (person.ativo ? "ativo" : "pendente")) + "</div>";
+      var personId = person.id_usuario || person.usuario_id || person.id || person.cod_usuario || "";
+      return "<div class=\"mmn-list-row\"><div class=\"mmn-row-main\"><strong>" + escapeHtml(person.nome || person.codinome || person.login || ("Participante #" + personId)) + "</strong><small>Indicação direta · #" + escapeHtml(personId) + "</small></div><span>" + escapeHtml(formatDate(person.desde || person.criado_em || person.indicado_em, false)) + "</span><span>" + escapeHtml(person.rank_nome || person.rank || "—") + "</span>" + pillHtml(person.status || (person.ativo ? "ativo" : "pendente")) + "</div>";
     }).join("");
     if (append) qs("userDirectList").insertAdjacentHTML("beforeend", html);
     else qs("userDirectList").innerHTML = html || emptyHtml("Você ainda não possui indicados diretos.");
@@ -859,7 +1603,31 @@
         var network = objectFrom(dashboard, ["rede"]);
         var levels = listFrom(dashboard, ["niveis"]);
         if (!levels.length) levels = listFrom(network, ["por_nivel", "niveis", "total_por_nivel"]);
-        renderUserNetwork({ niveis: levels, diretos: network.diretos || [] }, false);
+        try {
+          var placementNetwork = await rpc(CONFIG.rpcs.userPlacementNetwork, { p_limite: 250 });
+          var placementPayload = objectFrom(placementNetwork, ["rede", "dados"]);
+          if (!Object.keys(placementPayload).length) placementPayload = placementNetwork;
+          var positionedRows = listFrom(placementPayload, ["rede"]);
+          var placementLevels = listFrom(placementPayload, ["por_nivel", "niveis", "levels"]);
+          if (!placementLevels.length && positionedRows.length) {
+            var grouped = {};
+            positionedRows.forEach(function (row) {
+              var level = integerValue(row.nivel);
+              if (!grouped[level]) grouped[level] = { nivel: level, total: 0, ativos: null };
+              grouped[level].total += 1;
+            });
+            placementLevels = Object.keys(grouped).map(function (key) { return grouped[key]; }).sort(function (a, b) { return a.nivel - b.nivel; });
+          }
+          var placementDirects = listFrom(placementPayload, ["patrocinio", "diretos", "indicados_diretos"]);
+          renderUserNetwork(Object.assign({}, network, placementPayload, {
+            niveis: placementLevels.length ? placementLevels : levels,
+            diretos: placementDirects.length ? placementDirects : (network.diretos || []),
+            regras: objectFrom(dashboard, ["regras", "configuracao_publica"]),
+            participante: objectFrom(dashboard, ["participante", "usuario_mmn"])
+          }), false);
+        } catch (networkError) {
+          renderUserNetwork(Object.assign({}, network, { niveis: levels, diretos: network.diretos || [], regras: objectFrom(dashboard, ["regras", "configuracao_publica"]) }), false);
+        }
       } else if (tab === "extrato") {
         var selectedPeriod = qs("userLedgerPeriod").value;
         var entries = listFrom(dashboard, ["historico_mensal", "extrato"]).filter(function (row) {
@@ -906,6 +1674,8 @@
     setText("adminMetricPending", formatInteger(firstDefined([summary.pendencias, summary.total_pendencias], numberValue(summary.espera_pendente) + numberValue(summary.ocorrencias_abertas) + numberValue(summary.pendentes_regulamento))));
     var levels = listFrom(data, ["niveis", "levels"]);
     if (!levels.length) levels = listFrom(objectFrom(data, ["regras"]), ["niveis", "levels"]);
+    var adminDepth = configuredNetworkDepth(data);
+    levels = levels.filter(function (row) { return integerValue(row.nivel) >= 1 && integerValue(row.nivel) <= adminDepth; });
     var max = Math.max.apply(null, levels.map(function (row) { return numberValue(row.percentual); }).concat([1]));
     qs("adminLevelBars").innerHTML = levels.length ? levels.map(function (row) {
       return "<div class=\"mmn-level-bar\"><strong>Nível " + escapeHtml(row.nivel) + "</strong><span class=\"mmn-level-bar-track\"><span style=\"width:" + Math.max(0, Math.min(100, numberValue(row.percentual) / max * 100)) + "%\"></span></span><span>" + escapeHtml(formatPercent(row.percentual)) + "</span></div>";
@@ -950,11 +1720,16 @@
     var html = rows.map(function (row) {
       var id = row.usuario_id || row.id_usuario || row.cod_usuario;
       var eligibility = objectFrom(row, ["elegibilidade"]);
+      var placement = objectFrom(row, ["posicionamento", "posicao"]);
+      var placementParent = firstDefined([placement.pai_posicionamento_id, row.pai_posicionamento_id], null);
+      var placementSlot = firstDefined([placement.slot_posicionamento, placement.slot, row.slot_posicionamento], null);
+      var placementText = placementParent == null ? "Raiz estrutural" : ("Pai #" + placementParent + (placementSlot == null ? "" : " · vaga " + placementSlot));
+      var spillover = booleanValue(firstDefined([placement.spillover, placement.foi_spillover, row.foi_spillover], false), false);
       var permanent = row.status === "inelegivel_permanente" || booleanValue(row.inelegibilidade_permanente, false);
-      return "<tr><td><strong>" + escapeHtml(row.nome || row.codinome || row.login || "") + "</strong><br><small>#" + escapeHtml(id) + "</small></td><td>#" + escapeHtml(row.patrocinador_id || "Raiz") + "</td><td>" + escapeHtml(row.grupo || row.grupo_chave || "—") + "</td><td>" + pillHtml(eligibility.premium_vigente ? "ativo" : "pendente", eligibility.premium_vigente ? "Em dia" : "Inativo") + "</td><td>" + pillHtml(permanent ? "permanente" : (eligibility.elegivel_receber ? "ativo" : row.status), permanent ? "Permanente" : (eligibility.elegivel_receber ? "Elegível" : row.status)) + "</td><td>" + escapeHtml(row.rank_nome || row.rank || "—") + "</td><td><button class=\"btn btn-ghost btn-small\" type=\"button\" data-participant-edit=\"" + escapeHtml(id) + "\">Gerenciar</button></td></tr>";
+      return "<tr><td><strong>" + escapeHtml(row.nome || row.codinome || row.login || "") + "</strong><br><small>#" + escapeHtml(id) + "</small></td><td>#" + escapeHtml(row.patrocinador_id || "Raiz") + "<br><small>Indicação direta</small></td><td>" + escapeHtml(placementText) + "<br><small>" + escapeHtml(spillover ? "Spillover" : "Posição direta") + "</small></td><td>" + escapeHtml(row.grupo || row.grupo_chave || "—") + "</td><td>" + pillHtml(eligibility.premium_vigente ? "ativo" : "pendente", eligibility.premium_vigente ? "Em dia" : "Inativo") + "</td><td>" + pillHtml(permanent ? "permanente" : (eligibility.elegivel_receber ? "ativo" : row.status), permanent ? "Permanente" : (eligibility.elegivel_receber ? "Elegível" : row.status)) + "</td><td>" + escapeHtml(row.rank_nome || row.rank || "—") + "</td><td><button class=\"btn btn-ghost btn-small\" type=\"button\" data-participant-edit=\"" + escapeHtml(id) + "\">Gerenciar</button></td></tr>";
     }).join("");
     if (append) qs("adminParticipantsBody").insertAdjacentHTML("beforeend", html);
-    else qs("adminParticipantsBody").innerHTML = html || emptyTableHtml(7, "Nenhum participante encontrado.");
+    else qs("adminParticipantsBody").innerHTML = html || emptyTableHtml(8, "Nenhum participante encontrado.");
     state.admin.participants = append ? (state.admin.participants || []).concat(rows) : rows;
     state.admin.cursors.participants = data.next_cursor || data.proximo_cursor || null;
     qs("adminParticipantsMore").hidden = data.has_more === false || !state.admin.cursors.participants;
@@ -978,16 +1753,24 @@
     var network = data.rede || data;
     var base = objectFrom(network, ["usuario", "base"]);
     var participant = objectFrom(network, ["participante"]);
-    var levels = listFrom(network, ["rede_por_nivel", "niveis", "levels"]);
+    var sponsorship = objectFrom(network, ["patrocinio", "arvore_patrocinio"]);
+    var placement = objectFrom(network, ["posicionamento", "arvore_posicionamento"]);
+    var depth = configuredNetworkDepth(network);
+    var width = configuredPlacementWidth(network);
+    var levels = listFrom(network, ["rede_por_nivel", "niveis", "levels"]).filter(function (level) { return integerValue(level.nivel) >= 1 && integerValue(level.nivel) <= depth; });
     var directs = listFrom(network, ["diretos"]);
+    if (!directs.length) directs = listFrom(sponsorship, ["diretos", "filhos"]);
+    var positioned = listFrom(placement, ["filhos", "posicoes", "participantes"]);
     var html = "";
     if (base.id || base.cod_usuario || base.id_usuario) {
-      html += "<article class=\"mmn-feature-panel\"><div class=\"mmn-panel-title\"><div><h3>" + escapeHtml(base.nome || base.codinome || base.login || "Usuário") + "</h3><p>#" + escapeHtml(base.id || base.cod_usuario || base.id_usuario) + " · indicador #" + escapeHtml(participant.id_patrocinador || "Raiz") + "</p></div>" + pillHtml(participant.status || (base.mmn_ativo ? "ativo" : "suspenso")) + "</div></article>";
+      html += "<article class=\"mmn-feature-panel\"><div class=\"mmn-panel-title\"><div><h3>" + escapeHtml(base.nome || base.codinome || base.login || "Usuário") + "</h3><p>#" + escapeHtml(base.id || base.cod_usuario || base.id_usuario) + " · patrocinador #" + escapeHtml(participant.id_patrocinador || participant.patrocinador_id || "Raiz") + "</p></div>" + pillHtml(participant.status || (base.mmn_ativo ? "ativo" : "suspenso")) + "</div><div class=\"mmn-genealogy-summary\"><div><span>Patrocínio</span><strong>" + escapeHtml(relationPersonLabel(objectFrom(sponsorship, ["patrocinador", "pai"]), relationPersonLabel(participant.patrocinador_id || participant.id_patrocinador, "Raiz"))) + "</strong><small>Origem da comissão direta.</small></div><div><span>Pai de posicionamento</span><strong>" + escapeHtml(relationPersonLabel(objectFrom(placement, ["pai", "pai_posicionamento"]), relationPersonLabel(placement.pai_posicionamento_id || participant.pai_posicionamento_id, "Raiz estrutural"))) + "</strong><small>Origem dos níveis residuais.</small></div><div><span>Vaga</span><strong>" + escapeHtml(firstDefined([placement.slot_posicionamento, participant.slot_posicionamento], "—")) + "</strong><small>Slot estrutural registrado.</small></div><div><span>Regra</span><strong>" + escapeHtml(width === 0 ? "Largura ilimitada" : (width + " vagas por nó")) + "</strong><small>Profundidade remunerada: " + escapeHtml(depth) + " nível(is).</small></div></div></article>";
     }
+    html += "<div class=\"mmn-tree-explanation\"><strong>Duas genealogias independentes</strong><span>Patrocínio preserva quem convidou. Posicionamento organiza as vagas e o spillover. A comissão direta prevalece e o mesmo beneficiário não recebe duas vezes sobre a mesma assinatura.</span></div>";
     html += levels.map(function (level) {
       return "<div class=\"mmn-tree-level\"><strong>Nível " + escapeHtml(level.nivel) + "</strong><div class=\"mmn-tree-people\"><div class=\"mmn-tree-person\"><strong>" + escapeHtml(formatInteger(level.ativos)) + " ativos</strong><span>de " + escapeHtml(formatInteger(level.total)) + " participantes</span></div></div></div>";
     }).join("");
-    if (directs.length) html += "<div class=\"mmn-tree-level\"><strong>Diretos</strong><div class=\"mmn-tree-people\">" + directs.map(function (person) { return "<div class=\"mmn-tree-person\"><strong>" + escapeHtml(person.nome || ("#" + person.id)) + "</strong><span>#" + escapeHtml(person.id) + "</span>" + pillHtml(person.status || (person.ativo ? "ativo" : "suspenso")) + "</div>"; }).join("") + "</div></div>";
+    if (directs.length) html += "<div class=\"mmn-tree-level\"><strong>Patrocínio · indicados diretos</strong><div class=\"mmn-tree-people\">" + directs.map(function (person) { return "<div class=\"mmn-tree-person\"><strong>" + escapeHtml(person.nome || ("#" + (person.id || person.cod_usuario))) + "</strong><span>#" + escapeHtml(person.id || person.cod_usuario) + " · vínculo permanente de indicação</span>" + pillHtml(person.status || (person.ativo ? "ativo" : "suspenso")) + "</div>"; }).join("") + "</div></div>";
+    if (positioned.length) html += "<div class=\"mmn-tree-level\"><strong>Posicionamento · vagas abaixo</strong><div class=\"mmn-tree-people\">" + positioned.map(function (person) { return "<div class=\"mmn-tree-person\"><strong>" + escapeHtml(person.nome || ("#" + (person.id || person.cod_usuario))) + "</strong><span>Vaga " + escapeHtml(firstDefined([person.slot_posicionamento, person.slot], "—")) + (booleanValue(firstDefined([person.spillover, person.foi_spillover], false), false) ? " · spillover" : " · posição direta") + "</span>" + pillHtml(person.status || (person.ativo ? "ativo" : "suspenso")) + "</div>"; }).join("") + "</div></div>";
     qs("adminNetworkTree").innerHTML = html || emptyHtml("Nenhuma genealogia encontrada para esse usuário.");
   }
 
@@ -1031,11 +1814,112 @@
     return normalized;
   }
 
+  function calculateNetworkCapacity(width, depth) {
+    width = integerValue(width, 0);
+    depth = Math.max(1, Math.min(10, integerValue(depth, 6)));
+    if (width === 0) return { unlimited: true, levels: [], total: null, perLeg: null };
+    var levels = [];
+    var total = 0;
+    var perLeg = 0;
+    for (var level = 1; level <= depth; level += 1) {
+      var capacity = Math.pow(width, level);
+      levels.push(capacity);
+      total += capacity;
+      perLeg += Math.pow(width, level - 1);
+    }
+    return { unlimited: false, levels: levels, total: total, perLeg: perLeg };
+  }
+
+  function formatCapacity(value) {
+    if (value == null) return "Ilimitada";
+    if (!Number.isFinite(value) || value > Number.MAX_SAFE_INTEGER) return "Acima do limite numérico de exibição";
+    return formatInteger(value);
+  }
+
+  function updateConfigNetworkStructure() {
+    var depth = Math.max(1, Math.min(10, integerValue(qs("adminConfigLevelCount").value, 6)));
+    var width = integerValue(qs("adminConfigPlacementWidth").value, 0);
+    qsa("[data-level-row]").forEach(function (row) {
+      var outside = integerValue(row.dataset.levelNumber) > depth;
+      row.classList.toggle("is-outside-depth", outside);
+      row.setAttribute("aria-disabled", outside ? "true" : "false");
+      qsa("[data-level-field]", row).forEach(function (field) { field.disabled = outside; });
+    });
+    var capacity = calculateNetworkCapacity(width, depth);
+    var summary = qs("adminNetworkCapacity");
+    if (summary) {
+      if (width === 0) {
+        summary.innerHTML = "<strong>Largura ilimitada</strong><span>Não há limite estrutural horizontal. A profundidade remunerada permanece em " + escapeHtml(depth) + " nível(is).</span>";
+      } else if (width >= 2) {
+        var levelSummary = capacity.levels.map(function (value, index) { return "N" + (index + 1) + ": " + formatCapacity(value); }).join(" · ");
+        summary.innerHTML = "<strong>Capacidade teórica da matriz</strong><span>Por nível (W<sup>d</sup>): " + escapeHtml(levelSummary) + "</span><span>Rede até o nível " + escapeHtml(depth) + ": " + escapeHtml(formatCapacity(capacity.total)) + " posições</span><span>Capacidade por perna: " + escapeHtml(formatCapacity(capacity.perLeg)) + " posições</span>";
+      } else {
+        summary.innerHTML = "<strong>Configuração inválida</strong><span>Use 0 para ilimitada ou um inteiro a partir de 2.</span>";
+      }
+    }
+  }
+
+  function validateConfigNetworkStructure(showStatus) {
+    var fields = [qs("adminConfigLevelCount"), qs("adminConfigPlacementWidth")].concat(qsa("[data-level-field], [data-rank-field]"));
+    fields.forEach(function (field) { if (field && typeof field.setCustomValidity === "function") field.setCustomValidity(""); });
+    var depthValue = Number(qs("adminConfigLevelCount").value);
+    var widthValue = Number(qs("adminConfigPlacementWidth").value);
+    var message = "";
+    var invalidField = null;
+    function invalidate(field, text) {
+      if (message) return;
+      message = text;
+      invalidField = field;
+      if (field && typeof field.setCustomValidity === "function") field.setCustomValidity(text);
+    }
+    if (!Number.isInteger(depthValue) || depthValue < 1 || depthValue > 10) invalidate(qs("adminConfigLevelCount"), "A quantidade de níveis deve ser um inteiro de 1 a 10.");
+    if (!Number.isInteger(widthValue) || widthValue < 0 || widthValue === 1 || widthValue > 2147483647) invalidate(qs("adminConfigPlacementWidth"), "A largura deve ser 0 para ilimitada ou um inteiro de 2 a 2.147.483.647.");
+    var depth = Number.isInteger(depthValue) ? depthValue : 6;
+    var width = Number.isInteger(widthValue) ? widthValue : 0;
+    var capacity = calculateNetworkCapacity(width, depth);
+    if (!message && width >= 2) {
+      qsa("[data-level-row]").some(function (row) {
+        var level = integerValue(row.dataset.levelNumber);
+        if (level > depth) return false;
+        var activeField = row.querySelector("[data-level-field=\"ativo\"]");
+        if (activeField && activeField.value !== "true") return false;
+        var directs = row.querySelector("[data-level-field=\"min_diretos_ativos\"]");
+        var legs = row.querySelector("[data-level-field=\"min_pernas_qualificadas\"]");
+        var perLeg = row.querySelector("[data-level-field=\"min_ativos_por_perna\"]");
+        if (numberValue(directs.value) > width) invalidate(directs, "No nível " + level + ", diretos ativos mínimos não pode superar a largura atual de " + width + ".");
+        else if (numberValue(legs.value) > width) invalidate(legs, "No nível " + level + ", pernas qualificadas não pode superar a largura atual de " + width + ".");
+        else if (Number.isFinite(capacity.perLeg) && numberValue(perLeg.value) > capacity.perLeg) invalidate(perLeg, "No nível " + level + ", ativos mínimos por perna supera a capacidade teórica de " + formatCapacity(capacity.perLeg) + ".");
+        else if (Number.isFinite(capacity.total) && numberValue(legs.value) * numberValue(perLeg.value) > capacity.total) invalidate(perLeg, "No nível " + level + ", a combinação de pernas e ativos por perna supera a capacidade total de " + formatCapacity(capacity.total) + ".");
+        return !!message;
+      });
+      if (!message) qsa("[data-rank-row]").some(function (row) {
+        var activeField = row.querySelector("[data-rank-field=\"ativo\"]");
+        if (activeField && activeField.value !== "true") return false;
+        var name = (row.querySelector("[data-rank-field=\"nome\"]") || {}).value || "rank";
+        var directs = row.querySelector("[data-rank-field=\"min_diretos_ativos\"]");
+        var network = row.querySelector("[data-rank-field=\"min_rede_ativa\"]");
+        var concentration = row.querySelector("[data-rank-field=\"max_percentual_maior_perna\"]");
+        if (numberValue(directs.value) > width) invalidate(directs, "No rank " + name + ", diretos ativos mínimos não pode superar a largura atual de " + width + ".");
+        else if (Number.isFinite(capacity.total) && numberValue(network.value) > capacity.total) invalidate(network, "No rank " + name + ", a rede ativa mínima supera a capacidade teórica de " + formatCapacity(capacity.total) + ".");
+        else if (numberValue(network.value) > 0 && numberValue(concentration.value) < 100 / width) invalidate(concentration, "No rank " + name + ", a maior perna não pode ter limite inferior ao mínimo teórico de " + formatPercent(100 / width) + " para largura " + width + ".");
+        return !!message;
+      });
+    }
+    if (showStatus && message) setStatus("adminConfigStatus", message, "error");
+    return { valid: !message, message: message, field: invalidField };
+  }
+
   function renderConfigRows(config) {
-    var levels = listFrom(config, ["niveis", "percentuais_nivel"]);
+    var existingLevels = listFrom(config, ["niveis", "percentuais_nivel"]);
+    var depth = Math.max(1, Math.min(10, integerValue(firstDefined([config.quantidade_niveis, objectFrom(config, ["parametros"]).quantidade_niveis], 6), 6)));
+    var levels = [];
+    for (var level = 1; level <= 10; level += 1) {
+      var existing = existingLevels.find(function (row) { return integerValue(row.nivel) === level; });
+      levels.push(Object.assign({ nivel: level, percentual: 0, min_diretos_ativos: 0, min_pernas_qualificadas: 0, min_ativos_por_perna: 0, ativo: level <= depth }, existing || {}));
+    }
     qs("adminLevelConfig").innerHTML = levels.map(function (row) {
-      return "<div class=\"mmn-config-row\" data-level-row data-level-number=\"" + escapeHtml(row.nivel) + "\"><strong>Nível " + escapeHtml(row.nivel) + "</strong><label class=\"field\"><span>Percentual (%)</span><input type=\"number\" min=\"0\" max=\"100\" step=\"0.001\" data-level-field=\"percentual\" value=\"" + escapeHtml(row.percentual || 0) + "\"></label><label class=\"field\"><span>Diretos ativos mínimos</span><input type=\"number\" min=\"0\" data-level-field=\"min_diretos_ativos\" value=\"" + escapeHtml(row.min_diretos_ativos || 0) + "\"></label><label class=\"field\"><span>Pernas qualificadas mínimas</span><input type=\"number\" min=\"0\" data-level-field=\"min_pernas_qualificadas\" value=\"" + escapeHtml(row.min_pernas_qualificadas || 0) + "\"></label><label class=\"field\"><span>Ativos mínimos por perna</span><input type=\"number\" min=\"0\" data-level-field=\"min_ativos_por_perna\" value=\"" + escapeHtml(row.min_ativos_por_perna || 0) + "\"></label><label class=\"field\"><span>Ativo</span><select data-level-field=\"ativo\"><option value=\"true\" " + (booleanValue(row.ativo, true) ? "selected" : "") + ">Sim</option><option value=\"false\" " + (!booleanValue(row.ativo, true) ? "selected" : "") + ">Não</option></select></label></div>";
-    }).join("") || emptyHtml("Nenhum nível configurado.");
+      return "<div class=\"mmn-config-row\" data-level-row data-level-number=\"" + escapeHtml(row.nivel) + "\"><strong>Nível " + escapeHtml(row.nivel) + "</strong><label class=\"field\"><span>Percentual (%)</span><input type=\"number\" min=\"0\" max=\"100\" step=\"0.001\" data-level-field=\"percentual\" value=\"" + escapeHtml(firstDefined([row.percentual], 0)) + "\"></label><label class=\"field\"><span>Diretos ativos mínimos</span><input type=\"number\" min=\"0\" data-level-field=\"min_diretos_ativos\" value=\"" + escapeHtml(firstDefined([row.min_diretos_ativos], 0)) + "\"></label><label class=\"field\"><span>Pernas qualificadas mínimas</span><input type=\"number\" min=\"0\" data-level-field=\"min_pernas_qualificadas\" value=\"" + escapeHtml(firstDefined([row.min_pernas_qualificadas], 0)) + "\"></label><label class=\"field\"><span>Ativos mínimos por perna</span><input type=\"number\" min=\"0\" data-level-field=\"min_ativos_por_perna\" value=\"" + escapeHtml(firstDefined([row.min_ativos_por_perna], 0)) + "\"></label><label class=\"field\"><span>Ativo</span><select data-level-field=\"ativo\"><option value=\"true\" " + (booleanValue(row.ativo, true) ? "selected" : "") + ">Sim</option><option value=\"false\" " + (!booleanValue(row.ativo, true) ? "selected" : "") + ">Não</option></select></label></div>";
+    }).join("");
     var ranks = listFrom(config, ["ranks"]);
     qs("adminRankConfig").innerHTML = ranks.map(rankRowHtml).join("") || emptyHtml("Nenhum rank configurado.");
     var groups = listFrom(config, ["grupos_isentos", "grupos"]);
@@ -1048,6 +1932,8 @@
       var identity = row.uid_admin ? ("UID " + row.uid_admin) : ("Perfil " + (row.perfil_chave || "—"));
       return "<div class=\"mmn-config-row\"><div class=\"mmn-row-main\"><strong>" + escapeHtml(identity) + "</strong><small>" + escapeHtml(actionNames[row.acao] || row.acao || "Pagamento") + "</small></div>" + pillHtml(row.ativo ? "ativo" : "bloqueado", row.ativo ? "Ativo" : "Inativo") + "</div>";
     }).join("") : emptyHtml("Nenhum aprovador adicional configurado.");
+    updateConfigNetworkStructure();
+    validateConfigNetworkStructure(false);
   }
 
   function rankRowHtml(row) {
@@ -1064,6 +1950,54 @@
     return "<div class=\"mmn-tax-row\" data-tax-row data-tax-id=\"" + escapeHtml(row.cod_mmn_config_retencao || row.id || "") + "\"><label class=\"field\"><span>Chave</span><input data-tax-field=\"chave\" value=\"" + escapeHtml(row.chave || "") + "\"></label><label class=\"field\"><span>Nome</span><input data-tax-field=\"nome\" value=\"" + escapeHtml(row.nome || "") + "\"></label><label class=\"field\"><span>Tipo</span><select data-tax-field=\"tipo\"><option value=\"percentual\" " + (type === "percentual" ? "selected" : "") + ">Percentual</option><option value=\"valor_fixo\" " + (type === "valor_fixo" ? "selected" : "") + ">Valor fixo</option><option value=\"faixas\" " + (type === "faixas" ? "selected" : "") + ">Faixas</option></select></label><label class=\"field\"><span>Reter</span><select data-tax-field=\"reter\"><option value=\"true\" " + (booleanValue(row.reter, false) ? "selected" : "") + ">Sim</option><option value=\"false\" " + (!booleanValue(row.reter, false) ? "selected" : "") + ">Não</option></select></label><label class=\"field\"><span>Alíquota (%)</span><input type=\"number\" min=\"0\" max=\"100\" step=\"0.001\" data-tax-field=\"aliquota\" value=\"" + escapeHtml(row.aliquota || 0) + "\"></label><label class=\"field\"><span>Base mínima (R$)</span><input type=\"number\" min=\"0\" step=\"0.01\" data-tax-field=\"base_minima_reais\" value=\"" + escapeHtml(numberValue(row.base_minima_centavos) / 100) + "\"></label><label class=\"field\"><span>Teto (R$)</span><input type=\"number\" min=\"0\" step=\"0.01\" data-tax-field=\"teto_reais\" value=\"" + escapeHtml(row.teto_centavos == null ? "" : numberValue(row.teto_centavos) / 100) + "\"></label><label class=\"field\"><span>Município</span><input data-tax-field=\"municipio\" value=\"" + escapeHtml(row.municipio || "") + "\"></label><label class=\"field\"><span>Estado</span><input data-tax-field=\"estado\" maxlength=\"2\" value=\"" + escapeHtml(row.estado || "") + "\"></label><label class=\"field wide\"><span>Parâmetros por faixa (JSON)</span><textarea rows=\"5\" data-json-field=\"parametros\">" + escapeHtml(parameters) + "</textarea><small>Use JSON válido para faixas, limites e regras adicionais.</small></label><button class=\"btn btn-ghost\" type=\"button\" data-remove-row>Remover</button></div>";
   }
 
+  function renderAdminRegulationMetadata(regulation) {
+    regulation = regulation || {};
+    var container = qs("adminRegulationMetadata");
+    if (!container) return;
+    var version = regulation.versao || regulation.documento_versao || "";
+    if (!version && !(regulation.cod_mmn_documento || regulation.id)) {
+      container.innerHTML = emptyHtml("Nenhum regulamento foi gerado para esta versão.");
+      return;
+    }
+    var publicUrl = "../../regulamento-mmn.html" + (version ? "?versao=" + encodeURIComponent(version) : "");
+    container.innerHTML = "<div><span>Versão</span><strong>" + escapeHtml(version || "—") + "</strong></div><div><span>Status</span><strong>" + escapeHtml(regulation.status || "rascunho") + "</strong></div><div><span>Atualização</span><strong>" + escapeHtml(formatDate(regulation.atualizado_em || regulation.criado_em, true)) + "</strong></div><div><span>Publicação</span><strong>" + escapeHtml(formatDate(regulation.publicado_em, true)) + "</strong></div><div><span>Vigência</span><strong>" + escapeHtml(formatDate(regulation.vigencia_inicio || regulation.vigente_desde, false)) + "</strong></div><a class=\"btn btn-ghost btn-small\" href=\"" + escapeHtml(publicUrl) + "\" target=\"_blank\" rel=\"noopener\">Abrir versão/histórico</a>";
+  }
+
+  function renderAdminRegulationPreview(data) {
+    var container = qs("adminRegulationPreview");
+    if (!container) return;
+    var source = data || {};
+    var documentRow = objectFrom(source, ["documento", "regulamento"]);
+    var snapshot = objectFrom(source, ["snapshot", "conteudo_snapshot", "configuracao", "regras"]);
+    if (!Object.keys(snapshot).length) snapshot = objectFrom(documentRow, ["snapshot", "conteudo_snapshot"]);
+    if (!Object.keys(documentRow).length) documentRow = objectFrom(snapshot, ["documento"]);
+    var htmlDocument = firstDefined([source.conteudo_html, source.html, documentRow.conteudo_html], "");
+    if (htmlDocument) {
+      container.innerHTML = "";
+      var iframe = document.createElement("iframe");
+      iframe.className = "mmn-regulation-frame";
+      iframe.setAttribute("sandbox", "");
+      iframe.setAttribute("title", "Pré-visualização do regulamento");
+      iframe.srcdoc = String(htmlDocument);
+      container.appendChild(iframe);
+      return;
+    }
+    var parameters = Object.assign({},
+      objectFrom(snapshot, ["estrutura"]),
+      objectFrom(snapshot, ["financeiro"]),
+      objectFrom(snapshot, ["pagamentos"]),
+      objectFrom(snapshot, ["operacional"]),
+      objectFrom(snapshot, ["parametros"]),
+      snapshot
+    );
+    var levels = listFrom(snapshot, ["niveis", "percentuais_nivel"]);
+    var ranks = listFrom(snapshot, ["ranks"]);
+    var depth = Math.max(1, Math.min(10, integerValue(firstDefined([parameters.quantidade_niveis], 6), 6)));
+    levels = levels.filter(function (row) { return integerValue(row.nivel) <= depth; });
+    var title = documentRow.titulo || source.titulo || "Regulamento de Indicações e Benefícios";
+    container.innerHTML = "<article><h4>" + escapeHtml(title) + "</h4><p>Versão " + escapeHtml(documentRow.versao || source.versao || "—") + " · modelo jurídico Regulamento MMN v1.</p><div class=\"mmn-regulation-preview-grid\"><span><strong>" + escapeHtml(depth) + "</strong> níveis</span><span><strong>" + escapeHtml(integerValue(parameters.largura_maxima_posicionamento, 0) === 0 ? "Ilimitada" : formatInteger(parameters.largura_maxima_posicionamento)) + "</strong> largura</span><span><strong>" + escapeHtml(formatPercent(parameters.payout_teto_percentual)) + "</strong> teto</span><span><strong>" + escapeHtml(formatMoneyCents(parameters.pagamento_minimo_centavos)) + "</strong> mínimo</span></div>" + (levels.length ? "<div class=\"table-wrap\"><table><thead><tr><th>Nível</th><th>Percentual</th><th>Diretos</th><th>Pernas</th><th>Ativos/perna</th></tr></thead><tbody>" + levels.map(function (row) { return "<tr><td>" + escapeHtml(row.nivel) + "</td><td>" + escapeHtml(formatPercent(row.percentual)) + "</td><td>" + escapeHtml(formatInteger(row.min_diretos_ativos)) + "</td><td>" + escapeHtml(formatInteger(row.min_pernas_qualificadas)) + "</td><td>" + escapeHtml(formatInteger(row.min_ativos_por_perna)) + "</td></tr>"; }).join("") + "</tbody></table></div>" : "") + (ranks.length ? "<p><strong>Ranks:</strong> " + ranks.map(function (rank) { return escapeHtml(rank.nome || rank.chave); }).join(" · ") + "</p>" : "") + "</article>";
+  }
+
   function fillConfigForm(config) {
     config = normalizeConfigResponse(config || {});
     state.admin.selectedConfig = config;
@@ -1076,6 +2010,8 @@
       adminConfigHoldDays: firstDefined([config.carencia_estorno_dias, config.prazo_seguranca_dias], 15),
       adminConfigMinimumPayment: numberValue(firstDefined([config.pagamento_minimo_centavos], 5000)) / 100,
       adminConfigWaitlistDays: firstDefined([config.prazo_conversao_espera_dias, config.lista_espera_prazo_dias], 90),
+      adminConfigLevelCount: firstDefined([config.quantidade_niveis], 6),
+      adminConfigPlacementWidth: firstDefined([config.largura_maxima_posicionamento], 0),
       adminConfigPaymentsEnabled: String(!booleanValue(firstDefined([config.pagamento_real_bloqueado], !booleanValue(config.pagamentos_reais_liberados, false)), true)),
       adminConfigPaymentMode: config.pagamento_modo || "manual",
       adminConfigApprovalsPublication: firstDefined([config.aprovacoes_publicacao], 1),
@@ -1112,13 +2048,12 @@
       adminRegulationId: regulation.cod_mmn_documento || regulation.id || "",
       adminRegulationVersion: regulation.versao || "",
       adminRegulationTitle: regulation.titulo || "",
-      adminRegulationUrl: regulation.url_documento || regulation.url || "",
-      adminRegulationHash: regulation.hash_documento || regulation.hash || "",
       adminRegulationSummary: regulation.conteudo_resumo || "",
-      adminRegulationRequireAcceptance: String(booleanValue(firstDefined([regulation.exige_novo_aceite], true), true)),
       adminRegulationReason: ""
     };
     Object.keys(regulationValues).forEach(function (id) { if (qs(id)) qs(id).value = regulationValues[id]; });
+    renderAdminRegulationMetadata(regulation);
+    qs("adminRegulationPreview").innerHTML = emptyHtml(regulation.cod_mmn_documento || regulation.id ? "Use Pré-visualizar para conferir o snapshot desta versão." : "Gere o regulamento depois de salvar as regras.");
     renderConfigRows(config);
     qsa(".mmn-version-button").forEach(function (button) { button.classList.toggle("is-active", String(button.dataset.configId) === String(values.adminConfigVersionId)); });
     loadPublicationProgress(integerValue(values.adminConfigVersionId));
@@ -1154,7 +2089,7 @@
     var approvalsReady = numberValue(data.aprovacoes_recebidas) >= numberValue(data.aprovacoes_necessarias, 1);
     var steps = [
       { label: "Rascunho salvo", detail: "Configuração #" + data.config_id, ready: true },
-      { label: "Regulamento vinculado", detail: documentReady ? (objectFrom(data, ["documento_regulamento"]).titulo || "Documento #" + data.documento_regulamento_id) : "Documento compatível obrigatório", ready: documentReady },
+      { label: "Regulamento gerado", detail: documentReady ? (objectFrom(data, ["documento_regulamento"]).titulo || "Snapshot #" + data.documento_regulamento_id) : "Gere o snapshot no servidor", ready: documentReady },
       { label: "Simulação V2 válida", detail: simulationReady ? "Simulação #" + data.simulacao_id + " no hash atual" : "Execute novamente após qualquer alteração", ready: simulationReady },
       { label: "Quórum de publicação", detail: formatInteger(data.aprovacoes_recebidas) + " de " + formatInteger(data.aprovacoes_necessarias), ready: approvalsReady }
     ];
@@ -1374,16 +2309,27 @@
   }
 
   function collectProfile(prefix) {
+    var address = addressContext(prefix);
+    var selectedState = address.selectedState || {};
+    var selectedCity = address.selectedCity || {};
+    var cityName = cleanText(qs(prefix + "City").value);
+    var uf = cleanText(firstDefined([selectedState.uf, qs(prefix + "State").value], "")).toUpperCase();
     return {
       pix_tipo: qs(prefix + "PixType").value,
       pix_chave: qs(prefix + "PixKey").value.trim(),
-      cep: qs(prefix + "PostalCode").value.trim(),
+      cep: digitsOnly(qs(prefix + "PostalCode").value).slice(0, 8),
       logradouro: qs(prefix + "Address").value.trim(),
       numero: qs(prefix + "AddressNumber").value.trim(),
       complemento: qs(prefix + "AddressExtra").value.trim(),
       bairro: qs(prefix + "District").value.trim(),
-      cidade: qs(prefix + "City").value.trim(),
-      uf: qs(prefix + "State").value.trim().toUpperCase(),
+      cidade: cityName,
+      cidade_nome: cityName,
+      cidade_ibge: cleanText(selectedCity.ibge),
+      id_cidade: firstDefined([selectedCity.cod_cidade, selectedCity.id_cidade], null),
+      cod_cidade: firstDefined([selectedCity.cod_cidade, selectedCity.id_cidade], null),
+      uf: uf,
+      id_estado: firstDefined([selectedState.cod_estado, selectedState.id_estado, selectedCity.cod_estado, selectedCity.id_estado], null),
+      cod_estado: firstDefined([selectedState.cod_estado, selectedState.id_estado, selectedCity.cod_estado, selectedCity.id_estado], null),
       nit: qs(prefix + "Nit").value.trim(),
       pix_mesmo_cpf: qs(prefix + "PixOwnership").checked
     };
@@ -1447,6 +2393,8 @@
     parameters.carencia_estorno_dias = integerValue(qs("adminConfigHoldDays").value);
     parameters.pagamento_minimo_centavos = Math.round(numberValue(qs("adminConfigMinimumPayment").value) * 100);
     parameters.prazo_conversao_espera_dias = integerValue(qs("adminConfigWaitlistDays").value);
+    parameters.quantidade_niveis = integerValue(qs("adminConfigLevelCount").value, 6);
+    parameters.largura_maxima_posicionamento = integerValue(qs("adminConfigPlacementWidth").value, 0);
     parameters.pagamento_real_bloqueado = qs("adminConfigPaymentsEnabled").value !== "true";
     parameters.pagamento_modo = qs("adminConfigPaymentMode").value;
     parameters.pagamento_provedor = qs("adminConfigProvider").value.trim();
@@ -1691,6 +2639,7 @@
       setBusy("enrollmentSubmit", true, "Salvando adesão...");
       setStatus("enrollmentStatus", "", null);
       try {
+        validateAddressForSubmission("enrollment", true);
         var payload = collectProfile("enrollment");
         var regulation = objectFrom(state.user.dashboard, ["regulamento", "termos"]);
         await rpc(CONFIG.rpcs.userEnrollmentSave, {
@@ -1713,6 +2662,7 @@
       event.preventDefault();
       setBusy("profileSubmit", true, "Salvando...");
       try {
+        validateAddressForSubmission("profile", true);
         var profile = collectProfile("profile");
         var result = await rpc(CONFIG.rpcs.userProfileSave, {
           p_pix_tipo: profile.pix_tipo,
@@ -1940,6 +2890,70 @@
         await loadAdminTab("pagamentos", false);
       } catch (error) { setGlobalError(error); }
     });
+    on("adminRpaBody", "click", async function (event) {
+      var button = event.target.closest("[data-rpa-detail]");
+      if (!button) return;
+      setBusy(button, true, "Abrindo...");
+      try {
+        var beneficiaryId = integerValue(button.dataset.rpaDetail);
+        if (!beneficiaryId) throw new Error("Beneficiário do lote inválido.");
+        renderAdminRpaDetail(await rpc(CONFIG.rpcs.adminRpaGet, {
+          p_lote_beneficiario_id: beneficiaryId
+        }));
+      } catch (error) { setGlobalError(error); }
+      finally { setBusy(button, false); }
+    });
+    on("adminRpaRegister", "click", async function () {
+      if (!(hasCapability("financeiro") || hasCapability("pagar"))) return setGlobalError(new Error("acesso_financeiro_negado"));
+      var beneficiaryId = integerValue(qs("adminRpaBeneficiaryId").value);
+      var reason = qs("adminRpaReason").value.trim();
+      if (!beneficiaryId) return setStatus("adminRpaStatusText", "Selecione um beneficiário.", "error");
+      if (!reason) return setStatus("adminRpaStatusText", "Informe o motivo do registro.", "error");
+      var confirmation = await confirmAction("Registrar rascunho do RPA", "Os dados fiscais e os valores do beneficiário serão validados pelo servidor.", false);
+      if (confirmation === null) return;
+      setBusy("adminRpaRegister", true, "Registrando...");
+      try {
+        await rpc(CONFIG.rpcs.adminRpaRegister, {
+          p_lote_beneficiario_id: beneficiaryId,
+          p_numero: qs("adminRpaNumber").value.trim() || null,
+          p_motivo: reason
+        });
+        await loadAdminTab("pagamentos", false);
+        renderAdminRpaDetail(await rpc(CONFIG.rpcs.adminRpaGet, {
+          p_lote_beneficiario_id: beneficiaryId
+        }));
+        setStatus("adminRpaStatusText", "Rascunho do RPA registrado.", "ok");
+      } catch (error) { setStatus("adminRpaStatusText", error.message || error, "error"); }
+      finally { setBusy("adminRpaRegister", false); }
+    });
+    on("adminRpaEmit", "click", async function () {
+      if (!(hasCapability("financeiro") || hasCapability("pagar"))) return setGlobalError(new Error("acesso_financeiro_negado"));
+      var beneficiaryId = integerValue(qs("adminRpaBeneficiaryId").value);
+      var documentRef = qs("adminRpaDocumentRef").value.trim();
+      var documentHash = qs("adminRpaDocumentHash").value.trim();
+      var reason = qs("adminRpaReason").value.trim();
+      if (!beneficiaryId) return setStatus("adminRpaStatusText", "Selecione um beneficiário.", "error");
+      if (!documentRef) return setStatus("adminRpaStatusText", "Informe a referência do documento fiscal.", "error");
+      if (documentHash && !/^[0-9a-f]{64}$/i.test(documentHash)) return setStatus("adminRpaStatusText", "Informe um hash SHA-256 válido com 64 caracteres hexadecimais.", "error");
+      if (!reason) return setStatus("adminRpaStatusText", "Informe o motivo da emissão.", "error");
+      var confirmation = await confirmAction("Emitir RPA", "A emissão será auditada e poderá liberar a próxima etapa do pagamento.", false);
+      if (confirmation === null) return;
+      setBusy("adminRpaEmit", true, "Emitindo...");
+      try {
+        await rpc(CONFIG.rpcs.adminRpaIssue, {
+          p_lote_beneficiario_id: beneficiaryId,
+          p_documento_ref: documentRef,
+          p_motivo: reason,
+          p_documento_hash: documentHash || null
+        });
+        await loadAdminTab("pagamentos", false);
+        renderAdminRpaDetail(await rpc(CONFIG.rpcs.adminRpaGet, {
+          p_lote_beneficiario_id: beneficiaryId
+        }));
+        setStatus("adminRpaStatusText", "RPA emitido com sucesso.", "ok");
+      } catch (error) { setStatus("adminRpaStatusText", error.message || error, "error"); }
+      finally { setBusy("adminRpaEmit", false); }
+    });
     on("adminSupportList", "click", async function (event) {
       var button = event.target.closest("[data-support-action]");
       if (!button) return;
@@ -1954,6 +2968,16 @@
   }
 
   function setupConfigEvents() {
+    function revalidateNetworkStructure() {
+      updateConfigNetworkStructure();
+      validateConfigNetworkStructure(false);
+    }
+    on("adminConfigLevelCount", "input", revalidateNetworkStructure);
+    on("adminConfigPlacementWidth", "input", revalidateNetworkStructure);
+    on("adminLevelConfig", "input", function () { validateConfigNetworkStructure(false); });
+    on("adminLevelConfig", "change", function () { validateConfigNetworkStructure(false); });
+    on("adminRankConfig", "input", function () { validateConfigNetworkStructure(false); });
+    on("adminRankConfig", "change", function () { validateConfigNetworkStructure(false); });
     on("adminConfigVersions", "click", async function (event) {
       var button = event.target.closest("[data-config-id]");
       if (!button || !state.admin.config) return;
@@ -2009,37 +3033,49 @@
       finally { setBusy("adminApproverSave", false); }
     });
     on("adminRegulationSaveLink", "click", async function () {
-      if (!hasCapability("superadmin")) return setStatus("adminRegulationStatus", "Somente o superadmin pode salvar o regulamento.", "error");
+      if (!hasCapability("superadmin")) return setStatus("adminRegulationStatus", "Somente o superadmin pode gerar o regulamento.", "error");
       var configId = integerValue(qs("adminConfigVersionId").value);
       var version = qs("adminRegulationVersion").value.trim();
       var title = qs("adminRegulationTitle").value.trim();
-      var hash = qs("adminRegulationHash").value.trim().toLowerCase();
       var reason = qs("adminRegulationReason").value.trim();
       if (!configId) return setStatus("adminRegulationStatus", "Salve primeiro a versão em rascunho.", "error");
-      if (!version || !title || !/^[0-9a-f]{64}$/.test(hash) || !reason) return setStatus("adminRegulationStatus", "Informe versão, título, hash SHA-256 válido e motivo.", "error");
-      setBusy("adminRegulationSaveLink", true, "Salvando...");
+      if (!version || !title || !reason) return setStatus("adminRegulationStatus", "Informe versão, título e motivo da geração.", "error");
+      setBusy("adminRegulationSaveLink", true, "Gerando...");
       try {
-        var saved = await rpc(CONFIG.rpcs.adminDocumentSave, {
-          p_documento_id: integerValue(qs("adminRegulationId").value) || null,
-          p_tipo: "regulamento",
+        var saved = await rpc(CONFIG.rpcs.adminRegulationDraftSave, {
+          p_config_id: configId,
           p_versao: version,
           p_titulo: title,
+          p_conteudo_modelo: "regulamento_mmn_v1",
           p_conteudo_resumo: qs("adminRegulationSummary").value.trim() || null,
-          p_url_documento: qs("adminRegulationUrl").value.trim() || null,
-          p_hash_documento: hash,
-          p_exige_novo_aceite: qs("adminRegulationRequireAcceptance").value === "true",
           p_motivo: reason
         });
         var documentRow = objectFrom(saved, ["documento"]);
-        var documentId = integerValue(documentRow.cod_mmn_documento || documentRow.id);
-        await rpc(CONFIG.rpcs.adminConfigDocumentLink, { p_config_id: configId, p_documento_id: documentId, p_motivo: reason });
-        qs("adminRegulationId").value = documentId;
-        setStatus("adminRegulationStatus", "Regulamento salvo e vinculado ao hash atual das regras.", "ok");
+        if (!Object.keys(documentRow).length) documentRow = Object.assign({}, objectFrom(objectFrom(saved, ["snapshot"]), ["documento"]), { id: saved.documento_id, versao: saved.versao });
+        qs("adminRegulationId").value = documentRow.cod_mmn_documento || documentRow.id || saved.documento_id || "";
+        renderAdminRegulationMetadata(documentRow);
+        setStatus("adminRegulationStatus", "Snapshot do regulamento gerado e vinculado à configuração atual.", "ok");
         var detail = await rpc(CONFIG.rpcs.adminConfigGet, { p_config_id: configId });
         detail.versoes = configVersions(state.admin.config || {});
         renderAdminConfig(detail);
+        var preview = await rpc(CONFIG.rpcs.adminRegulationPreview, { p_config_id: configId });
+        renderAdminRegulationPreview(preview);
       } catch (error) { setStatus("adminRegulationStatus", error.message || error, "error"); }
       finally { setBusy("adminRegulationSaveLink", false); }
+    });
+    on("adminRegulationPreviewButton", "click", async function () {
+      var configId = integerValue(qs("adminConfigVersionId").value);
+      if (!configId) return setStatus("adminRegulationStatus", "Salve primeiro a versão em rascunho.", "error");
+      setBusy("adminRegulationPreviewButton", true, "Carregando...");
+      try {
+        var preview = await rpc(CONFIG.rpcs.adminRegulationPreview, { p_config_id: configId });
+        renderAdminRegulationPreview(preview);
+        var previewDocument = objectFrom(preview, ["documento", "regulamento"]);
+        if (!Object.keys(previewDocument).length) previewDocument = objectFrom(objectFrom(preview, ["snapshot"]), ["documento"]);
+        renderAdminRegulationMetadata(previewDocument);
+        setStatus("adminRegulationStatus", "Pré-visualização carregada a partir do snapshot do servidor.", "ok");
+      } catch (error) { setStatus("adminRegulationStatus", error.message || error, "error"); }
+      finally { setBusy("adminRegulationPreviewButton", false); }
     });
     on("adminPublicationRefresh", "click", function () { loadPublicationProgress(integerValue(qs("adminConfigVersionId").value)); });
     on("adminConfigOpenSimulator", "click", function () {
@@ -2049,7 +3085,7 @@
       activateSimulatorTab("sintetico");
       if (qs("adminSimName")) qs("adminSimName").focus();
     });
-    on("adminAddRank", "click", function () { qs("adminRankConfig").insertAdjacentHTML("beforeend", rankRowHtml({})); });
+    on("adminAddRank", "click", function () { qs("adminRankConfig").insertAdjacentHTML("beforeend", rankRowHtml({})); validateConfigNetworkStructure(false); });
     on("adminAddGroup", "click", function () { qs("adminGroupConfig").insertAdjacentHTML("beforeend", groupRowHtml({ ativo: true, isento_premium: true })); });
     on("adminAddTax", "click", function () { qs("adminTaxConfig").insertAdjacentHTML("beforeend", taxRowHtml({ tipo: "percentual", reter: false, parametros: {} })); });
     on("adminConfigForm", "click", function (event) { var button = event.target.closest("[data-remove-row]"); if (button) button.closest("[data-rank-row],[data-group-row],[data-tax-row]").remove(); });
@@ -2057,9 +3093,14 @@
       event.preventDefault();
       setBusy("adminConfigSave", true, "Salvando...");
       try {
+        var structuralValidation = validateConfigNetworkStructure(true);
+        if (!structuralValidation.valid) {
+          qs("adminConfigForm").reportValidity();
+          throw new Error(structuralValidation.message);
+        }
         var config = collectConfig();
         var result = await rpc(CONFIG.rpcs.adminConfigSave, configSavePayload(config));
-        setStatus("adminConfigStatus", "Rascunho salvo. Regulamento e simulação devem corresponder ao novo hash.", "ok");
+        setStatus("adminConfigStatus", "Rascunho salvo. Gere novamente o regulamento e valide a simulação para estas regras.", "ok");
         state.admin.loaded.configuracoes = false;
         await loadAdminTab("configuracoes", false);
         return result;
@@ -2069,10 +3110,15 @@
     on("adminConfigActivate", "click", async function () {
       try {
         if (!qs("adminConfigForm").reportValidity()) return;
+        var structuralValidation = validateConfigNetworkStructure(true);
+        if (!structuralValidation.valid) {
+          qs("adminConfigForm").reportValidity();
+          throw new Error(structuralValidation.message);
+        }
         var config = collectConfig();
         if (!config.cod_mmn_config) throw new Error("Salve primeiro a versão em rascunho.");
         var progress = await loadPublicationProgress(config.cod_mmn_config);
-        if (!progress || !progress.documento_regulamento_id || !progress.simulacao_id || progress.simulacao_hash !== progress.config_hash) throw new Error("Vincule o regulamento e execute uma simulação V2 válida no hash atual antes de publicar.");
+        if (!progress || !progress.documento_regulamento_id || !progress.simulacao_id || progress.simulacao_hash !== progress.config_hash) throw new Error("Gere o regulamento no servidor e execute uma simulação V2 válida para as regras atuais antes de publicar.");
         var reason = await confirmAction("Aprovar publicação", "Sua aprovação será registrada no quórum desta versão. Ao completar o quórum, ela será agendada para a vigência informada sem recalcular competências fechadas.", true);
         if (reason === null) return;
         var publication = await rpc(CONFIG.rpcs.adminConfigPublish, { p_config_id: config.cod_mmn_config, p_vigencia_inicio: config.vigencia_inicio, p_motivo: reason });
@@ -2344,6 +3390,7 @@
     setupInitialValues();
     setupTabs();
     setupAuthEvents();
+    setupAddressForms();
     setupUserEvents();
     setupAdminFilters();
     setupAdminActions();

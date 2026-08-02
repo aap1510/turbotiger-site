@@ -20,7 +20,7 @@
   }());
   </script>
   <link rel="stylesheet" href="../assets/admin.css?v=20260720-mmn-01">
-  <link rel="stylesheet" href="mmn.css?v=20260801-mmn-05">
+  <link rel="stylesheet" href="mmn.css?v=20260802-mmn-06">
 </head>
 <body data-admin-page="mmn">
   <div class="admin-shell mmn-shell">
@@ -144,15 +144,15 @@
               <div class="form-grid">
                 <label class="field">
                   <span>CEP</span>
-                  <input id="enrollmentPostalCode" inputmode="numeric" maxlength="9" required>
+                  <input id="enrollmentPostalCode" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000" pattern="[0-9]{5}-?[0-9]{3}" required>
                 </label>
                 <label class="field">
-                  <span>Endereço</span>
-                  <input id="enrollmentAddress" maxlength="180" required>
+                  <span>Rua / Avenida</span>
+                  <input id="enrollmentAddress" maxlength="180" autocomplete="address-line1" required>
                 </label>
                 <label class="field">
                   <span>Número</span>
-                  <input id="enrollmentAddressNumber" maxlength="20" required>
+                  <input id="enrollmentAddressNumber" maxlength="20" autocomplete="address-line2" required>
                 </label>
                 <label class="field">
                   <span>Complemento</span>
@@ -163,17 +163,28 @@
                   <input id="enrollmentDistrict" maxlength="100" required>
                 </label>
                 <label class="field">
-                  <span>Cidade</span>
-                  <input id="enrollmentCity" maxlength="100" required>
-                </label>
-                <label class="field">
                   <span>UF</span>
-                  <input id="enrollmentState" maxlength="2" autocapitalize="characters" required>
+                  <select id="enrollmentState" autocomplete="address-level1" required>
+                    <option value="">Selecione</option><option value="AC">AC - Acre</option><option value="AL">AL - Alagoas</option><option value="AP">AP - Amapá</option><option value="AM">AM - Amazonas</option><option value="BA">BA - Bahia</option><option value="CE">CE - Ceará</option><option value="DF">DF - Distrito Federal</option><option value="ES">ES - Espírito Santo</option><option value="GO">GO - Goiás</option><option value="MA">MA - Maranhão</option><option value="MT">MT - Mato Grosso</option><option value="MS">MS - Mato Grosso do Sul</option><option value="MG">MG - Minas Gerais</option><option value="PA">PA - Pará</option><option value="PB">PB - Paraíba</option><option value="PR">PR - Paraná</option><option value="PE">PE - Pernambuco</option><option value="PI">PI - Piauí</option><option value="RJ">RJ - Rio de Janeiro</option><option value="RN">RN - Rio Grande do Norte</option><option value="RS">RS - Rio Grande do Sul</option><option value="RO">RO - Rondônia</option><option value="RR">RR - Roraima</option><option value="SC">SC - Santa Catarina</option><option value="SP">SP - São Paulo</option><option value="SE">SE - Sergipe</option><option value="TO">TO - Tocantins</option>
+                  </select>
+                </label>
+                <label class="field mmn-address-autocomplete">
+                  <span>Cidade</span>
+                  <input id="enrollmentCity" maxlength="100" autocomplete="address-level2" placeholder="Selecione o estado primeiro" disabled required>
+                  <div class="mmn-address-options" id="enrollmentCityList" role="listbox" hidden></div>
                 </label>
                 <label class="field">
                   <span>NIT/PIS/PASEP, se possuir</span>
                   <input id="enrollmentNit" inputmode="numeric" maxlength="14">
                 </label>
+                <div class="field wide mmn-address-search">
+                  <button class="btn btn-ghost" id="enrollmentFindPostalCode" type="button">Encontrar CEP pelo endereço</button>
+                  <div id="enrollmentPostalCodeResults" hidden>
+                    <label for="enrollmentPostalCodeSelect">Selecione o endereço correto</label>
+                    <select id="enrollmentPostalCodeSelect"><option value="">Selecione</option></select>
+                  </div>
+                  <div class="mmn-address-status" id="enrollmentPostalCodeStatus" role="status" aria-live="polite"></div>
+                </div>
               </div>
             </div>
             <label class="mmn-check">
@@ -247,6 +258,16 @@
 
           <section data-user-panel="rede" hidden>
             <div class="mmn-section-heading"><div><h2>Minha rede</h2><p>Acompanhe totais por nível sem alterar a genealogia original.</p></div><button class="btn btn-primary" id="networkShareButton" type="button">Compartilhar</button></div>
+            <article class="mmn-feature-panel mmn-genealogy-panel">
+              <div class="mmn-panel-title"><div><h3>Seus vínculos na rede</h3><p>Patrocínio registra quem indicou você. Posicionamento define sua vaga estrutural e os níveis residuais.</p></div></div>
+              <div class="mmn-genealogy-summary">
+                <div><span>Patrocinador</span><strong id="userSponsorRelation">—</strong><small>A comissão direta segue este vínculo.</small></div>
+                <div><span>Pai de posicionamento</span><strong id="userPlacementParent">—</strong><small>Não altera quem fez a indicação.</small></div>
+                <div><span>Vaga</span><strong id="userPlacementSlot">—</strong><small>Posição ocupada sob o pai estrutural.</small></div>
+                <div><span>Largura aplicada</span><strong id="userPlacementWidth">—</strong><small id="userPlacementSpillover">Carregando regra estrutural...</small></div>
+              </div>
+              <p class="mmn-genealogy-rule">A comissão direta tem prioridade. As residuais começam no nível 2 da árvore de posicionamento e o mesmo beneficiário não recebe duas vezes sobre a mesma assinatura.</p>
+            </article>
             <div class="mmn-level-grid" id="userLevelGrid"></div>
             <article class="mmn-feature-panel">
               <div class="mmn-panel-title"><div><h3>Indicados diretos</h3><p>São exibidos apenas dados necessários para acompanhar sua rede.</p></div></div>
@@ -296,14 +317,15 @@
               <div class="form-grid">
                 <label class="field"><span>Tipo de chave PIX</span><select id="profilePixType"><option value="cpf">CPF</option><option value="email">E-mail</option><option value="celular">Celular</option><option value="aleatoria">Chave aleatória</option></select></label>
                 <label class="field"><span>Chave PIX</span><small id="profilePixMasked" class="mmn-field-current">Nenhuma chave cadastrada.</small><input id="profilePixKey" maxlength="180" placeholder="Deixe vazio para manter a chave atual"><small>Preencha somente se quiser substituir a chave cadastrada.</small></label>
-                <label class="field"><span>CEP</span><input id="profilePostalCode" maxlength="9"></label>
-                <label class="field"><span>Endereço</span><input id="profileAddress" maxlength="180"></label>
-                <label class="field"><span>Número</span><input id="profileAddressNumber" maxlength="20"></label>
+                <label class="field"><span>CEP</span><input id="profilePostalCode" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000" pattern="[0-9]{5}-?[0-9]{3}" required></label>
+                <label class="field"><span>Rua / Avenida</span><input id="profileAddress" maxlength="180" autocomplete="address-line1" required></label>
+                <label class="field"><span>Número</span><input id="profileAddressNumber" maxlength="20" autocomplete="address-line2" required></label>
                 <label class="field"><span>Complemento</span><input id="profileAddressExtra" maxlength="100"></label>
-                <label class="field"><span>Bairro</span><input id="profileDistrict" maxlength="100"></label>
-                <label class="field"><span>Cidade</span><input id="profileCity" maxlength="100"></label>
-                <label class="field"><span>UF</span><input id="profileState" maxlength="2"></label>
+                <label class="field"><span>Bairro</span><input id="profileDistrict" maxlength="100" required></label>
+                <label class="field"><span>UF</span><select id="profileState" autocomplete="address-level1" required><option value="">Selecione</option><option value="AC">AC - Acre</option><option value="AL">AL - Alagoas</option><option value="AP">AP - Amapá</option><option value="AM">AM - Amazonas</option><option value="BA">BA - Bahia</option><option value="CE">CE - Ceará</option><option value="DF">DF - Distrito Federal</option><option value="ES">ES - Espírito Santo</option><option value="GO">GO - Goiás</option><option value="MA">MA - Maranhão</option><option value="MT">MT - Mato Grosso</option><option value="MS">MS - Mato Grosso do Sul</option><option value="MG">MG - Minas Gerais</option><option value="PA">PA - Pará</option><option value="PB">PB - Paraíba</option><option value="PR">PR - Paraná</option><option value="PE">PE - Pernambuco</option><option value="PI">PI - Piauí</option><option value="RJ">RJ - Rio de Janeiro</option><option value="RN">RN - Rio Grande do Norte</option><option value="RS">RS - Rio Grande do Sul</option><option value="RO">RO - Rondônia</option><option value="RR">RR - Roraima</option><option value="SC">SC - Santa Catarina</option><option value="SP">SP - São Paulo</option><option value="SE">SE - Sergipe</option><option value="TO">TO - Tocantins</option></select></label>
+                <label class="field mmn-address-autocomplete"><span>Cidade</span><input id="profileCity" maxlength="100" autocomplete="address-level2" placeholder="Selecione o estado primeiro" disabled required><div class="mmn-address-options" id="profileCityList" role="listbox" hidden></div></label>
                 <label class="field"><span>NIT/PIS/PASEP</span><input id="profileNit" maxlength="14"></label>
+                <div class="field wide mmn-address-search"><button class="btn btn-ghost" id="profileFindPostalCode" type="button">Encontrar CEP pelo endereço</button><div id="profilePostalCodeResults" hidden><label for="profilePostalCodeSelect">Selecione o endereço correto</label><select id="profilePostalCodeSelect"><option value="">Selecione</option></select></div><div class="mmn-address-status" id="profilePostalCodeStatus" role="status" aria-live="polite"></div></div>
               </div>
               <label class="mmn-check"><input id="profilePixOwnership" type="checkbox" required><span>Confirmo que a chave PIX pertence ao mesmo CPF do cadastro.</span></label>
               <div class="mmn-form-feedback" id="profileStatus" role="status" aria-live="polite"></div>
@@ -357,7 +379,7 @@
             <label class="field"><span>Status</span><select id="adminParticipantEligibility"><option value="">Todos</option><option value="pendente_regulamento">Pendente de regulamento</option><option value="ativo">Ativo</option><option value="suspenso">Suspenso</option><option value="inelegivel_permanente">Inelegível permanente</option><option value="encerrado">Encerrado</option></select></label>
             <div class="btn-row"><button class="btn btn-primary" type="submit">Filtrar</button></div>
           </form>
-          <div class="table-wrap"><table><thead><tr><th>Participante</th><th>Indicador</th><th>Grupo</th><th>Premium</th><th>MMN</th><th>Rank</th><th>Ações</th></tr></thead><tbody id="adminParticipantsBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Participante</th><th>Patrocinador</th><th>Posicionamento</th><th>Grupo</th><th>Premium</th><th>MMN</th><th>Rank</th><th>Ações</th></tr></thead><tbody id="adminParticipantsBody"></tbody></table></div>
           <button class="btn btn-ghost mmn-load-more" id="adminParticipantsMore" type="button" hidden>Carregar mais</button>
           <form id="adminParticipantEditor" class="mmn-inline-editor" hidden>
             <input id="adminParticipantId" type="hidden">
@@ -408,6 +430,8 @@
                 <label class="field"><span>Prazo de segurança (dias)</span><input id="adminConfigHoldDays" type="number" min="0" max="365" required></label>
                 <label class="field"><span>Pagamento mínimo (R$)</span><input id="adminConfigMinimumPayment" type="number" min="0" step="0.01" required></label>
                 <label class="field"><span>Prazo lista de espera (dias)</span><input id="adminConfigWaitlistDays" type="number" min="1" max="3650" required></label>
+                <label class="field"><span>Quantidade de níveis</span><input id="adminConfigLevelCount" type="number" min="1" max="10" step="1" required><small>De 1 a 10; inicialmente 6.</small></label>
+                <label class="field"><span>Largura de posicionamento</span><input id="adminConfigPlacementWidth" type="number" min="0" max="2147483647" step="1" required><small>0 = ilimitada; ou qualquer inteiro a partir de 2.</small></label>
                 <label class="field"><span>Pagamentos reais</span><select id="adminConfigPaymentsEnabled"><option value="false">Bloqueados para homologação</option><option value="true">Liberados</option></select></label>
                 <label class="field"><span>Modo de pagamento</span><select id="adminConfigPaymentMode"><option value="manual">Manual</option><option value="automatico">PIX automático</option></select></label>
                 <label class="field"><span>Provedor configurado</span><input id="adminConfigProvider" placeholder="Ex.: asaas"></label>
@@ -421,26 +445,26 @@
               <div class="mmn-config-section" data-capability="superadmin"><div class="mmn-config-section-head"><div><h3>Dados da empresa</h3><p>Informações institucionais e fiscais usadas pelo regulamento e pelos documentos do programa.</p></div></div><div class="form-grid"><label class="field"><span>Razão social</span><input id="adminCompanyLegalName"></label><label class="field"><span>CNPJ</span><input id="adminCompanyCnpj"></label><label class="field wide"><span>Endereço</span><input id="adminCompanyAddress"></label><label class="field"><span>Representante</span><input id="adminCompanyRepresentative"></label><label class="field"><span>Telefone</span><input id="adminCompanyPhone" type="tel"></label><label class="field"><span>WhatsApp</span><input id="adminCompanyWhatsapp" type="tel"></label><label class="field"><span>E-mail financeiro</span><input id="adminCompanyFinanceEmail" type="email"></label><label class="field"><span>E-mail de privacidade</span><input id="adminCompanyPrivacyEmail" type="email"></label></div></div>
               <div class="mmn-config-section" data-capability="superadmin"><div class="mmn-config-section-head"><div><h3>Aprovadores</h3><p>Defina quem pode confirmar publicação, fechamento, pagamento ou reabertura.</p></div></div><div id="adminApproverList" class="mmn-config-rows"></div><div class="form-grid"><label class="field"><span>UID do administrador</span><input id="adminApproverUid" placeholder="UUID"></label><label class="field"><span>Ou perfil</span><input id="adminApproverProfile" placeholder="Ex.: super_admin"></label><label class="field"><span>Ação</span><select id="adminApproverAction"><option value="publicacao">Publicação</option><option value="fechamento">Fechamento</option><option value="pagamento" selected>Pagamento</option><option value="reabertura">Reabertura</option></select></label><label class="field"><span>Ativo</span><select id="adminApproverActive"><option value="true">Sim</option><option value="false">Não</option></select></label><label class="field wide"><span>Motivo</span><textarea id="adminApproverReason" rows="2"></textarea></label></div><div class="mmn-form-feedback" id="adminApproverStatus"></div><button class="btn btn-ghost" id="adminApproverSave" type="button">Salvar aprovador</button></div>
               <div class="mmn-config-section" data-capability="superadmin">
-                <div class="mmn-config-section-head"><div><h3>Regulamento vinculado</h3><p>Cada versão financeira exige um regulamento próprio, identificado pelo hash SHA-256 do documento completo.</p></div></div>
+                <div class="mmn-config-section-head"><div><h3>Regulamento vinculado</h3><p>O servidor gera um snapshot imutável das regras desta versão. Nenhum hash ou endereço é digitado manualmente.</p></div></div>
                 <input id="adminRegulationId" type="hidden">
                 <div class="form-grid">
                   <label class="field"><span>Versão do documento</span><input id="adminRegulationVersion" maxlength="40" placeholder="Ex.: 1.0"></label>
                   <label class="field wide"><span>Título</span><input id="adminRegulationTitle" maxlength="180"></label>
-                  <label class="field wide"><span>URL do regulamento</span><input id="adminRegulationUrl" type="url" maxlength="500" placeholder="https://..."></label>
-                  <label class="field wide"><span>Hash SHA-256</span><input id="adminRegulationHash" minlength="64" maxlength="64" pattern="[0-9a-fA-F]{64}" autocomplete="off"><small>Use o hash do arquivo ou conteúdo integral que será disponibilizado ao usuário.</small></label>
+                  <label class="field"><span>Modelo jurídico</span><input id="adminRegulationTemplate" value="Regulamento MMN v1" readonly></label>
                   <label class="field wide"><span>Resumo apresentado</span><textarea id="adminRegulationSummary" rows="5"></textarea></label>
-                  <label class="field"><span>Exigir novo aceite</span><select id="adminRegulationRequireAcceptance"><option value="true">Sim</option><option value="false">Não</option></select></label>
-                  <label class="field wide"><span>Motivo do documento e vínculo</span><textarea id="adminRegulationReason" rows="3"></textarea></label>
+                  <label class="field wide"><span>Motivo da geração</span><textarea id="adminRegulationReason" rows="3"></textarea></label>
                 </div>
+                <div class="mmn-regulation-meta" id="adminRegulationMetadata"><div class="mmn-empty">Gere ou carregue um regulamento para ver versão, datas e histórico.</div></div>
+                <div class="mmn-regulation-preview" id="adminRegulationPreview"><div class="mmn-empty">A pré-visualização segura será exibida aqui.</div></div>
                 <div class="mmn-form-feedback" id="adminRegulationStatus" role="status" aria-live="polite"></div>
-                <button class="btn btn-ghost" id="adminRegulationSaveLink" type="button">Salvar e vincular regulamento</button>
+                <div class="btn-row"><button class="btn btn-ghost" id="adminRegulationSaveLink" type="button">Gerar rascunho no servidor</button><button class="btn btn-ghost" id="adminRegulationPreviewButton" type="button">Pré-visualizar</button></div>
               </div>
-              <div class="mmn-config-section"><div class="mmn-config-section-head"><div><h3>Regras por nível</h3><p>Percentuais e requisitos participam da qualificação e do controle de payout.</p></div></div><div class="mmn-config-rows" id="adminLevelConfig"></div></div>
+              <div class="mmn-config-section"><div class="mmn-config-section-head"><div><h3>Regras por nível</h3><p>As dez linhas são preservadas. Níveis acima da profundidade vigente ficam inativos visualmente, sem perder valores.</p></div></div><div class="mmn-capacity-summary" id="adminNetworkCapacity"></div><div class="mmn-config-rows" id="adminLevelConfig"></div></div>
               <div class="mmn-config-section"><div class="mmn-config-section-head"><div><h3>Ranks e liderança</h3><p>Critérios, coeficientes e participação podem ser zerados.</p></div><button class="btn btn-ghost" id="adminAddRank" type="button">Adicionar rank</button></div><div id="adminRankConfig" class="mmn-config-rows"></div></div>
               <div class="mmn-config-section"><div class="mmn-config-section-head"><div><h3>Grupos isentos</h3><p>Grupos autorizados podem participar sem mensalidade ativa.</p></div><button class="btn btn-ghost" id="adminAddGroup" type="button">Adicionar grupo</button></div><div id="adminGroupConfig" class="mmn-config-rows"></div></div>
               <div class="mmn-config-section"><div class="mmn-config-section-head"><div><h3>RPA e retenções</h3><p>Parâmetros devem ser homologados pela contabilidade antes de liberar pagamentos.</p></div><button class="btn btn-ghost" id="adminAddTax" type="button">Adicionar retenção</button></div><div class="mmn-tax-grid" id="adminTaxConfig"></div></div>
               <div class="mmn-config-section mmn-governance-section">
-                <div class="mmn-config-section-head"><div><h3>Publicação governada</h3><p>O rascunho precisa estar salvo, vinculado ao regulamento do mesmo hash e validado pelo simulador V2 antes de receber as aprovações.</p></div><button class="btn btn-ghost" id="adminPublicationRefresh" type="button">Atualizar progresso</button></div>
+                <div class="mmn-config-section-head"><div><h3>Publicação governada</h3><p>O rascunho precisa estar salvo, ter regulamento gerado pelo servidor e ser validado pelo simulador V2 antes de receber as aprovações.</p></div><button class="btn btn-ghost" id="adminPublicationRefresh" type="button">Atualizar progresso</button></div>
                 <div class="mmn-governance-progress" id="adminPublicationProgress"><div class="mmn-empty">Salve o rascunho para consultar o progresso.</div></div>
                 <div class="btn-row"><button class="btn btn-ghost" id="adminConfigOpenSimulator" type="button">Validar no simulador</button></div>
               </div>
@@ -577,6 +601,6 @@
     </form>
   </dialog>
 
-  <script src="mmn.js?v=20260801-mmn-05"></script>
+  <script src="mmn.js?v=20260802-mmn-07"></script>
 </body>
 </html>

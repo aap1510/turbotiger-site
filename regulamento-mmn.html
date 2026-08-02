@@ -1,906 +1,236 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="description" content="Regulamento do Programa de Indicações e Benefícios Turbo Tiger."/>
-    <title>Regulamento do Programa de Indicações e Benefícios — Turbo Tiger</title>
-    <link rel="canonical" href="https://turbotiger.com.br/regulamento-mmn.html">
-    <link rel="icon" href="https://turbotiger.com.br/assets/icone-turbotiger-raio.ico">
-    <link rel="apple-touch-icon" href="https://turbotiger.com.br/assets/logo-300x300.webp">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Regulamento do Programa de Indicações e Benefícios — Turbo Tiger">
-    <meta property="og:description" content="Regras de participação, qualificação, cálculo, fechamento e pagamento do Programa de Indicações e Benefícios Turbo Tiger.">
-    <meta property="og:url" content="https://turbotiger.com.br/regulamento-mmn.html">
-    <meta property="og:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
-    <meta property="og:site_name" content="Turbo Tiger">
-    <meta property="og:locale" content="pt_BR">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Regulamento do Programa de Indicações e Benefícios — Turbo Tiger">
-    <meta name="twitter:description" content="Regras do Programa de Indicações e Benefícios Turbo Tiger.">
-    <meta name="twitter:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
-    <style>
-        :root {
-            --azul: #0b5ed7;
-            --azul-escuro: #063d8c;
-            --texto: #222;
-            --muted: #666;
-            --borda: #e9ecef;
-            --alerta-bg: #fff8e1;
-            --alerta-borda: #f1c40f;
-            --info-bg: #eef6ff;
-            --info-borda: #7ab7ff;
-            --ok-bg: #edf9f1;
-            --ok-borda: #43a867;
-        }
-
-        * { box-sizing: border-box; }
-
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 16px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.48));
-            color: #fff;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 24px auto;
-            background: #fff;
-            padding: 32px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.24);
-            color: var(--texto);
-        }
-
-        h1, h2, h3 {
-            color: var(--azul);
-            line-height: 1.25;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: clamp(1.75rem, 4vw, 2.55rem);
-        }
-
-        h2 {
-            margin-top: 34px;
-            padding-top: 6px;
-            border-top: 1px solid var(--borda);
-        }
-
-        h3 { margin-top: 24px; }
-
-        p, li, td, th {
-            line-height: 1.62;
-            color: #333;
-        }
-
-        ul, ol { margin-left: 18px; padding-left: 10px; }
-        li { margin-bottom: 8px; }
-
-        a {
-            color: var(--azul);
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        a:hover, a:focus { text-decoration: underline; }
-
-        code {
-            overflow-wrap: anywhere;
-            color: var(--azul-escuro);
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: #f8f9fa;
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 28px;
-        }
-
-        .nav-logo {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 56px;
-            height: 56px;
-            flex: 0 0 auto;
-        }
-
-        .nav-logo img {
-            width: 56px;
-            height: 56px;
-            object-fit: contain;
-            border-radius: 10px;
-        }
-
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-
-        .eyebrow {
-            margin: 0 0 8px;
-            color: var(--azul);
-            font-size: 0.78rem;
-            font-weight: 800;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-        }
-
-        .subtitle {
-            max-width: 760px;
-            margin: 12px 0 0;
-            color: var(--muted);
-            font-size: 1.05rem;
-        }
-
-        .metadata {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-            margin: 24px 0;
-        }
-
-        .metadata div {
-            padding: 12px;
-            border: 1px solid var(--borda);
-            border-radius: 8px;
-            background: #fafbfc;
-        }
-
-        .metadata strong,
-        .metadata span { display: block; }
-
-        .metadata strong {
-            margin-bottom: 4px;
-            color: var(--muted);
-            font-size: 0.73rem;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-
-        .metadata span { color: var(--texto); font-weight: 700; }
-
-        .box,
-        .warning,
-        .success {
-            padding: 14px 16px;
-            border-radius: 8px;
-            margin: 18px 0;
-        }
-
-        .box {
-            border-left: 4px solid var(--info-borda);
-            background: var(--info-bg);
-        }
-
-        .warning {
-            border-left: 4px solid var(--alerta-borda);
-            background: var(--alerta-bg);
-        }
-
-        .success {
-            border-left: 4px solid var(--ok-borda);
-            background: var(--ok-bg);
-        }
-
-        .box p,
-        .warning p,
-        .success p { margin: 0; }
-
-        .toc {
-            columns: 2;
-            column-gap: 32px;
-            margin: 16px 0 0;
-        }
-
-        .toc li { break-inside: avoid; }
-
-        .table-wrap {
-            width: 100%;
-            overflow-x: auto;
-            margin: 16px 0 22px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 560px;
-        }
-
-        th, td {
-            padding: 10px 12px;
-            border: 1px solid var(--borda);
-            text-align: left;
-            vertical-align: top;
-        }
-
-        th {
-            background: #f4f7fb;
-            color: var(--azul-escuro);
-        }
-
-        .formula {
-            padding: 12px 14px;
-            border: 1px solid #cfe1fa;
-            border-radius: 8px;
-            background: #f7fbff;
-            color: var(--azul-escuro);
-            font-weight: 700;
-            overflow-wrap: anywhere;
-        }
-
-        .small {
-            font-size: 13px;
-            color: var(--muted);
-        }
-
-        footer {
-            color: #eee;
-            text-align: center;
-            margin: 28px 0 8px;
-        }
-
-        @media (max-width: 760px) {
-            body { padding: 8px; }
-
-            .container {
-                margin: 12px auto;
-                padding: 20px;
-                border-radius: 10px;
-            }
-
-            .nav-links {
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .nav-menu { gap: 10px; }
-            .metadata { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .toc { columns: 1; }
-        }
-
-        @media (max-width: 420px) {
-            .metadata { grid-template-columns: 1fr; }
-        }
-
-        @media print {
-            body {
-                background: #fff;
-                color: #000;
-                padding: 0;
-            }
-
-            .container {
-                box-shadow: none;
-                max-width: 100%;
-                margin: 0;
-                border-radius: 0;
-            }
-
-            .nav-links, footer, .tt-whatsapp-float { display: none !important; }
-            h2 { break-after: avoid; }
-            table, .box, .warning, .success { break-inside: avoid; }
-        }
-    </style>
-    <link rel="stylesheet" href="assets/turbotiger-site-ui.css?v=20260722-02"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Regulamento vigente e histórico do Programa de Indicações e Benefícios Turbo Tiger.">
+  <title>Regulamento do Programa de Indicações e Benefícios — Turbo Tiger</title>
+  <link rel="canonical" href="https://turbotiger.com.br/regulamento-mmn.html">
+  <link rel="icon" href="assets/icone-turbotiger-raio.ico">
+  <link rel="apple-touch-icon" href="assets/logo-300x300.webp">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Regulamento do Programa de Indicações e Benefícios — Turbo Tiger">
+  <meta property="og:description" content="Regras versionadas de participação, qualificação, cálculo, fechamento e pagamento.">
+  <meta property="og:url" content="https://turbotiger.com.br/regulamento-mmn.html">
+  <meta property="og:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
+  <style>
+    :root{--navy:#071728;--blue:#0b5ed7;--blue-dark:#063d8c;--ink:#17202a;--muted:#5d6a78;--line:#dfe7ef;--paper:#fff;--soft:#f5f8fb;--gold:#f4b942;--warn:#fff7df;--warn-line:#e2ad2f;--ok:#eaf8ef;--ok-line:#42a767;--danger:#fff0f0;--danger-line:#c94747}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:radial-gradient(circle at 20% -10%,#184873 0,transparent 35%),linear-gradient(145deg,#06111e,#0b2339 60%,#071728);color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+    a{color:var(--blue);font-weight:650;text-decoration:none}
+    a:hover,a:focus{text-decoration:underline}
+    .shell{width:min(1080px,calc(100% - 28px));margin:24px auto 54px}
+    .document{background:var(--paper);color:var(--ink);border-radius:22px;box-shadow:0 28px 90px rgba(0,0,0,.34);overflow:hidden}
+    .topbar{display:flex;align-items:center;gap:18px;padding:20px 28px;border-bottom:1px solid rgba(255,255,255,.12);background:rgba(4,16,29,.72);backdrop-filter:blur(14px);border-radius:18px;margin-bottom:16px}
+    .topbar img{width:52px;height:52px;object-fit:contain}
+    .topbar nav{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto}
+    .topbar a{color:#e8f2fb;font-size:.94rem}
+    .hero{padding:48px 48px 34px;background:linear-gradient(140deg,#f8fbff,#edf5fc);border-bottom:1px solid var(--line)}
+    .eyebrow{display:block;color:var(--blue);font-size:.76rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
+    h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.03;max-width:850px;margin:0;color:#0c2a45;letter-spacing:-.035em}
+    .hero>p{font-size:1.08rem;color:var(--muted);max-width:780px;line-height:1.7;margin:18px 0 0}
+    .metadata{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:28px}
+    .metadata div,.summary-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0}
+    .metadata span,.summary-card span{display:block;color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.06em}
+    .metadata strong,.summary-card strong{display:block;color:#123451;margin-top:5px;overflow-wrap:anywhere}
+    .state{padding:26px 48px}
+    .state-card{border:1px solid var(--line);border-radius:14px;background:var(--soft);padding:18px 20px;color:var(--muted);line-height:1.55}
+    .state-card.is-error{background:var(--danger);border-color:var(--danger-line);color:#8b2424}
+    .state-card button{margin-top:12px;border:0;border-radius:999px;background:var(--blue);color:#fff;padding:10px 18px;font:inherit;font-weight:700;cursor:pointer}
+    .content{padding:10px 48px 52px}
+    .summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0 30px}
+    .callout{border-left:5px solid var(--warn-line);background:var(--warn);border-radius:12px;padding:18px 20px;margin:24px 0;line-height:1.6}
+    .callout.is-info{border-color:#5a9de4;background:#eef6ff}.callout.is-ok{border-color:var(--ok-line);background:var(--ok)}
+    .canonical-document{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid var(--line);border-radius:14px;background:#fff;padding:24px;color:#263542;font:inherit;line-height:1.72}
+    section{padding:26px 0;border-top:1px solid var(--line)}
+    section:first-of-type{border-top:0}
+    h2{margin:0 0 14px;color:#0c4f91;font-size:clamp(1.35rem,3vw,1.9rem);letter-spacing:-.015em}
+    h3{color:#143d61;margin:24px 0 10px}
+    p,li,td,th{color:#2d3945;line-height:1.68}
+    ul,ol{padding-left:22px}li{margin:7px 0}
+    .two-columns{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+    .relation{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--soft)}
+    .relation strong{display:block;color:#0d4f8b;font-size:1.05rem;margin-bottom:6px}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;margin:18px 0}
+    table{width:100%;border-collapse:collapse;min-width:720px;background:#fff}
+    th{background:#eef4f9;color:#153d60;text-align:left;font-size:.78rem;text-transform:uppercase;letter-spacing:.045em}
+    th,td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+    tr:last-child td{border-bottom:0}
+    .history{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+    .history a{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fff}
+    .definition{display:grid;grid-template-columns:190px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+    .definition strong{color:#153d60}.definition span{color:#42515f;line-height:1.55}
+    .small{font-size:.88rem;color:var(--muted)}
+    footer{padding:24px 48px;border-top:1px solid var(--line);background:#f7fafc;color:var(--muted);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    [hidden]{display:none!important}
+    @media(max-width:760px){.shell{width:min(100% - 18px,1080px);margin-top:9px}.topbar{padding:14px 16px}.topbar nav{gap:10px}.hero,.state,.content,footer{padding-left:22px;padding-right:22px}.metadata,.summary-grid,.two-columns{grid-template-columns:1fr 1fr}.definition{grid-template-columns:1fr;gap:3px}}
+    @media(max-width:480px){.topbar{align-items:flex-start}.topbar img{width:44px;height:44px}.metadata,.summary-grid,.two-columns{grid-template-columns:1fr}.hero{padding-top:34px}table{min-width:640px}}
+    @media print{body{background:#fff}.shell{width:100%;margin:0}.topbar{display:none}.document{box-shadow:none;border-radius:0}.hero,.content{padding-left:26px;padding-right:26px}.state{display:none}}
+  </style>
 </head>
-<body data-tt-background="fundo_geral" style="--tt-site-background-url:url('assets/bg-900x900.webp')">
-
-<main class="container">
-    <div class="nav-links">
-        <a class="nav-logo" href="/" aria-label="Página principal Turbo Tiger">
-            <img data-tt-image="logo_geral" src="assets/logo-300x300.webp" alt="Turbo Tiger">
-        </a>
-        <nav class="nav-menu" aria-label="Menu principal">
-            <a href="/">Home</a>
-            <a href="politicaetermos.html">Privacidade e Termos</a>
-            <a href="#regras-financeiras">Regras financeiras</a>
-            <a href="#contato">Contato</a>
-        </nav>
-    </div>
-
-    <header>
-        <p class="eyebrow">Programa Beta · Brasil</p>
-        <h1>Regulamento do Programa de Indicações e Benefícios Turbo Tiger</h1>
-        <p class="subtitle">
-            Regras de participação, formação da rede, qualificação, cálculo, fechamento, contestação e pagamento.
-        </p>
-
-        <div class="metadata" aria-label="Informações da versão">
-            <div><strong>Versão</strong><span>Minuta operacional 1.0</span></div>
-            <div><strong>Território</strong><span>Brasil</span></div>
-            <div><strong>Moeda</strong><span>Real brasileiro (BRL)</span></div>
-            <div><strong>Vigência</strong><span>Após publicação e aceite</span></div>
-        </div>
-
-        <div class="warning">
-            <p>
-                <strong>Pagamentos reais permanecem bloqueados</strong> até a homologação das configurações empresariais,
-                contábeis, fiscais e de retenções. Durante esse período, o sistema pode calcular, demonstrar e simular
-                resultados, mas não autoriza transferências aos participantes.
-            </p>
-        </div>
-
-        <div class="box">
-            <p>
-                O Programa remunera exclusivamente indicações relacionadas a assinaturas Turbo Tiger efetivamente pagas.
-                Não existe comissão sobre apostas, depósitos, saques, ganhos, perdas, saldo, volume apostado ou qualquer
-                operação realizada em plataforma de terceiros. Participação, rank e simulações não garantem renda.
-            </p>
-        </div>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a href="/" aria-label="Turbo Tiger"><img src="assets/logo-300x300.webp" alt="Turbo Tiger"></a>
+      <nav aria-label="Navegação jurídica"><a href="politicaetermos.html">Política e Termos</a><a href="#historico">Histórico</a><a href="#contato">Contato</a></nav>
     </header>
 
-    <section aria-labelledby="sumario">
-        <h2 id="sumario">Sumário</h2>
-        <ol class="toc">
-            <li><a href="#objeto">Objeto e natureza</a></li>
-            <li><a href="#definicoes">Definições</a></li>
-            <li><a href="#participacao">Participação e elegibilidade</a></li>
-            <li><a href="#receita">Receita elegível</a></li>
-            <li><a href="#convite">Convite e patrocinador</a></li>
-            <li><a href="#espera">Lista de espera</a></li>
-            <li><a href="#genealogia">Genealogia e inatividade</a></li>
-            <li><a href="#niveis">Níveis e qualificação</a></li>
-            <li><a href="#percentuais">Percentuais e teto</a></li>
-            <li><a href="#ranks">Ranks e liderança</a></li>
-            <li><a href="#pool">Pool Global</a></li>
-            <li><a href="#competencia">Competência e fechamento</a></li>
-            <li><a href="#estornos">Estornos e saldo negativo</a></li>
-            <li><a href="#pagamentos">Pagamentos e Pix</a></li>
-            <li><a href="#fiscal">RPA e retenções</a></li>
-            <li><a href="#governanca">Governança e versões</a></li>
-            <li><a href="#simuladores">Simuladores</a></li>
-            <li><a href="#privacidade">Privacidade e transparência</a></li>
-            <li><a href="#condutas">Condutas proibidas</a></li>
-            <li><a href="#contestacao">Suspensão e contestação</a></li>
-            <li><a href="#encerramento">Alteração e encerramento</a></li>
-            <li><a href="#contato">Contato e disposições finais</a></li>
-        </ol>
-    </section>
-
-    <section id="objeto">
-        <h2>1. Objeto e natureza do Programa</h2>
-        <p>
-            O <strong>Programa de Indicações e Benefícios Turbo Tiger</strong>, denominado internamente Turbo Tiger MMN,
-            é um programa Beta de fidelização e indicação disponível no Brasil para pessoas físicas elegíveis.
-        </p>
-        <p>
-            O Programa converte parte da receita real de assinaturas em benefícios variáveis para participantes que
-            indiquem novos usuários e cumpram as regras da versão vigente. Não há taxa adicional de adesão ao Programa,
-            investimento, aquisição de estoque ou compra de pacote. Para receber benefícios, porém, o participante deve
-            manter assinatura Premium paga e vigente ou pertencer a grupo de isenção configurado, além de cumprir as
-            demais condições do item 3. A assinatura corresponde ao acesso à plataforma e não a investimento no Programa.
-            Nenhum requisito envolve movimentação financeira ligada a apostas.
-        </p>
-        <p>
-            O Turbo Tiger é uma plataforma de tecnologia voltada a controle, organização, histórico, estatísticas,
-            alertas e uso responsável. Não é casa de apostas, não aceita nem intermedeia apostas e não promete lucros
-            ou resultados. O Programa não altera essa natureza.
-        </p>
-        <p>
-            O participante acessa sua área do Programa exclusivamente pelo WebView institucional autenticado do aplicativo.
-            Superadmin, Financeiro, Suporte e Auditor podem acessar suas áreas autorizadas pelo navegador, de acordo com
-            as permissões atribuídas.
-        </p>
-    </section>
-
-    <section id="definicoes">
-        <h2>2. Definições</h2>
-        <ul>
-            <li><strong>Participante:</strong> pessoa física cadastrada no Turbo Tiger e vinculada ao Programa.</li>
-            <li><strong>Indicador ou patrocinador:</strong> participante cujo convite originou o cadastro de outro usuário.</li>
-            <li><strong>Indicado direto:</strong> usuário cadastrado diretamente pelo convite do participante.</li>
-            <li><strong>Rede ou genealogia:</strong> sequência histórica de vínculos de indicação, limitada a seis níveis para cálculo.</li>
-            <li><strong>Perna:</strong> conjunto formado por um indicado direto e sua rede descendente.</li>
-            <li><strong>Receita elegível:</strong> parcela reconhecida de assinatura efetivamente cobrada, recebida e não estornada.</li>
-            <li><strong>Competência:</strong> período mensal usado para reconhecer receitas, qualificar participantes e calcular benefícios.</li>
-            <li><strong>Comissão-base:</strong> soma dos valores calculados pelos níveis liberados do participante.</li>
-            <li><strong>Rank financeiro:</strong> rank confirmado para uma competência e usado no cálculo daquele mês.</li>
-            <li><strong>Saldo pendente:</strong> valor calculado ainda sujeito a prazo de segurança, fechamento ou validação.</li>
-            <li><strong>Saldo confirmado:</strong> valor aprovado no fechamento, antes das retenções e condições de pagamento.</li>
-            <li><strong>Saldo disponível:</strong> valor confirmado que já cumpriu prazo de segurança e demais bloqueios aplicáveis.</li>
-            <li><strong>Versão de regras:</strong> conjunto imutável de parâmetros publicado com data de vigência.</li>
-        </ul>
-    </section>
-
-    <section id="participacao">
-        <h2>3. Participação, aceite e elegibilidade</h2>
-        <p>Para aderir ao Programa e manter o vínculo de indicação, o participante deve:</p>
-        <ul>
-            <li>ser pessoa física, maior de 18 anos, com CPF válido e uma única conta Turbo Tiger;</li>
-            <li>fornecer dados verdadeiros, manter a conta regular e aceitar expressamente este Regulamento;</li>
-            <li>concluir o cadastro financeiro exigido, inclusive chave Pix de sua própria titularidade;</li>
-            <li>não ser conta técnica, artificial, fictícia ou criada exclusivamente para teste.</li>
-        </ul>
-        <p>Para receber benefícios em determinada competência, também deve:</p>
-        <ul>
-            <li>estar com a participação no Programa habilitada em sua conta; e</li>
-            <li>manter assinatura Premium paga e vigente ou pertencer a grupo de isenção expressamente configurado, como Alpha, Nexus, Vital ou outro grupo que venha a ser criado.</li>
-        </ul>
-        <p>
-            Administradores, funcionários, suporte, sócios e demais pessoas relacionadas ao projeto podem participar nas
-            mesmas condições objetivas, desde que sejam pessoas físicas reais, cadastradas e elegíveis. Pertencer a um
-            grupo de isenção pode dispensar a assinatura própria para receber, mas não cria receita sobre acesso gratuito.
-        </p>
-        <p>
-            Participante inelegível pode compartilhar seu convite e preservar ou formar sua rede, mas recebe zero na
-            competência em que não cumprir todas as condições de elegibilidade. O valor não distribuído não acumula em
-            seu favor, não é pago retroativamente e permanece na reserva do Programa.
-        </p>
-        <div class="warning">
-            <p>
-                Contas técnicas, fictícias ou de teste nunca geram nem recebem valores financeiros, mesmo que estejam
-                associadas a um grupo com acesso gratuito.
-            </p>
+    <main class="document">
+      <div class="hero">
+        <span class="eyebrow">Documento oficial versionado</span>
+        <h1 id="documentTitle">Regulamento do Programa de Indicações e Benefícios</h1>
+        <p>O texto oficial exibido nesta página é carregado exatamente do documento publicado no banco de dados. Os quadros de referência usam o snapshot imutável da mesma versão.</p>
+        <div class="metadata" aria-label="Identificação do documento">
+          <div><span>Versão</span><strong id="documentVersion">Carregando...</strong></div>
+          <div><span>Atualização</span><strong id="documentUpdated">—</strong></div>
+          <div><span>Publicação</span><strong id="documentPublished">—</strong></div>
+          <div><span>Vigência</span><strong id="documentEffective">—</strong></div>
         </div>
-    </section>
+      </div>
 
-    <section id="receita">
-        <h2>4. Receita elegível e reconhecimento mensal</h2>
-        <p>
-            A base de cálculo é o <strong>valor real da assinatura efetivamente cobrado e recebido</strong>, depois de
-            desconto ou cupom e antes das taxas do provedor de pagamento e dos tributos da empresa. Se o preço de tabela
-            for R$ 19,90 e o assinante pagar R$ 14,90, a base será R$ 14,90.
-        </p>
-        <p>Geram receita elegível:</p>
-        <ul>
-            <li>primeira assinatura e renovações efetivamente liquidadas;</li>
-            <li>parcelas mensais reconhecidas de planos mensais, trimestrais, semestrais, anuais ou futuros planos configurados; e</li>
-            <li>pagamentos recebidos por meio direto, loja de aplicativo ou outro provedor habilitado, observada a mesma regra econômica.</li>
-        </ul>
-        <p>Não geram receita elegível:</p>
-        <ul>
-            <li>trial, plano gratuito, cortesia, acesso de grupo isento ou assinatura não cobrada;</li>
-            <li>pagamento pendente, recusado, cancelado, não liquidado, reembolsado ou objeto de chargeback; e</li>
-            <li>aposta, depósito, saque, ganho, perda, saldo, bônus de bet, volume apostado ou operação de plataforma de terceiros.</li>
-        </ul>
-        <p>
-            Planos antecipados são reconhecidos proporcionalmente em suas competências: três meses no trimestral, seis
-            no semestral e doze no anual. Eventual diferença de centavos decorrente do rateio é ajustada na última parcela,
-            sem fazer a soma superar o valor efetivamente pago. Cancelamento ou reembolso interrompe parcelas futuras e
-            produz os ajustes das parcelas já reconhecidas, quando aplicável.
-        </p>
-    </section>
+      <div class="state" id="loadingState"><div class="state-card">Consultando a versão publicada do regulamento...</div></div>
+      <div class="state" id="errorState" hidden><div class="state-card is-error"><strong id="errorTitle">Regulamento indisponível</strong><div id="errorMessage">Não foi possível carregar o documento.</div><button id="retryButton" type="button">Tentar novamente</button></div></div>
 
-    <section id="convite">
-        <h2>5. Convite, patrocinador e vínculo definitivo</h2>
-        <ul>
-            <li>O convite usado no cadastro define o patrocinador do novo participante.</li>
-            <li>O convite pessoal pode ser compartilhado e usado por várias pessoas, sem garantia de conversão.</li>
-            <li>Autoindicação, duplicidade por CPF, conta artificial e uso de dados de terceiros são proibidos.</li>
-            <li>Depois do cadastro, o patrocinador é definitivo e a rede não sofre compressão.</li>
-            <li>Correção excepcional somente pode ser feita pelo Superadmin antes do primeiro fechamento financeiro do vínculo, mediante motivo registrado e auditoria.</li>
-        </ul>
-        <p>
-            Participante já cadastrado sem indicador não pode ser vinculado retroativamente, salvo correção objetiva do
-            processo de cadastro dentro das condições acima. Nenhuma correção produz comissão retroativa sobre competência fechada.
-        </p>
-    </section>
-
-    <section id="espera">
-        <h2>6. Lista de espera</h2>
-        <p>
-            A lista de espera usa código de convite próprio, com sequência separada iniciada em 1001, e não reserva nem
-            altera o código interno definitivo de usuário. No cadastro definitivo, o usuário recebe seu código normal na plataforma.
-        </p>
-        <ul>
-            <li>O indicador e os vínculos formados na lista são preservados para futura conversão.</li>
-            <li>Pontos ou posições da lista não são convertidos em dinheiro nem geram benefício duplicado.</li>
-            <li>Não existe comissão retroativa por período anterior ao cadastro e à elegibilidade do indicador.</li>
-            <li>O prazo inicial de conversão é de 90 dias, mas pode ser alterado em versão futura das regras.</li>
-            <li>Depois do prazo, a rede permanece registrada e a vinculação exige decisão administrativa justificada e auditada.</li>
-        </ul>
-    </section>
-
-    <section id="genealogia">
-        <h2>7. Genealogia, inatividade e nó permanente</h2>
-        <p>
-            A genealogia é histórica. A inatividade de um participante não reposiciona, promove ou comprime os membros
-            abaixo dele. Cada relação conserva sua distância original para fins de nível.
-        </p>
-        <ul>
-            <li>Participante temporariamente inelegível não recebe na competência, mas sua rede permanece intacta.</li>
-            <li>Não existe comissão sobre a própria assinatura não paga, pois não houve receita.</li>
-            <li>Os superiores continuam podendo receber sobre receitas confirmadas da rede abaixo, nos níveis originais, se forem elegíveis.</li>
-            <li>Comissão não recebida pelo participante inelegível não sobe para outro membro.</li>
-        </ul>
-        <p>
-            Em caso de banimento definitivo, fraude comprovada, falecimento ou exclusão, o participante permanece apenas
-            como nó histórico permanentemente inelegível: não recebe, não gera comissão por sua própria conta, ninguém
-            ocupa seu lugar e a rede abaixo mantém os níveis originais. Saldo já confirmado será tratado conforme as
-            regras de encerramento, a documentação apresentada e a legislação aplicável.
-        </p>
-    </section>
-
-    <section id="regras-financeiras" aria-labelledby="niveis">
-        <h2 id="niveis">8. Seis níveis e controle de qualificação</h2>
-        <p>
-            O Programa calcula no máximo seis níveis. A liberação de cada nível é verificada no fechamento da competência
-            e usa somente assinantes ativos, pagos e elegíveis dentro da profundidade configurada.
-        </p>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr><th>Nível</th><th>Requisito inicial</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>1</td><td>Participante elegível.</td></tr>
-                    <tr><td>2</td><td>2 diretos ativos elegíveis.</td></tr>
-                    <tr><td>3</td><td>3 diretos ativos elegíveis.</td></tr>
-                    <tr><td>4</td><td>3 diretos ativos e 1 perna com pelo menos 10 ativos.</td></tr>
-                    <tr><td>5</td><td>3 diretos ativos e 2 pernas com pelo menos 10 ativos em cada.</td></tr>
-                    <tr><td>6</td><td>5 diretos ativos e 3 pernas com pelo menos 25 ativos em cada.</td></tr>
-                </tbody>
-            </table>
+      <div class="content" id="regulationContent" hidden>
+        <div class="summary-grid" aria-label="Resumo das regras">
+          <div class="summary-card"><span>Profundidade</span><strong id="summaryLevels">—</strong></div>
+          <div class="summary-card"><span>Largura</span><strong id="summaryWidth">—</strong></div>
+          <div class="summary-card"><span>Teto de payout</span><strong id="summaryPayout">—</strong></div>
+          <div class="summary-card"><span>Pagamento mínimo</span><strong id="summaryMinimum">—</strong></div>
         </div>
-        <p>
-            Direto ativo é o indicado direto com assinatura paga e vigente no fechamento. Ativo na perna é o assinante
-            pago situado dentro dos seis níveis do participante. Se o requisito for atingido até o fechamento, o nível
-            vale para a competência. A tela deve mostrar antecipadamente o que falta para cada liberação.
-        </p>
-        <p>
-            Para receber uma comissão, o indicador deve estar elegível tanto na data do reconhecimento da receita quanto
-            no fechamento mensal. Pagar ou regularizar a conta apenas no último dia não cria direito relativo ao período
-            em que a condição não foi atendida.
-        </p>
-    </section>
 
-    <section id="percentuais">
-        <h2>9. Percentuais iniciais, payout e reserva</h2>
-        <p>Os percentuais da primeira versão publicada são:</p>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr><th>Componente</th><th>Percentual inicial</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>Nível 1</td><td>9,25%</td></tr>
-                    <tr><td>Nível 2</td><td>6,90%</td></tr>
-                    <tr><td>Nível 3</td><td>6,55%</td></tr>
-                    <tr><td>Nível 4</td><td>3,25%</td></tr>
-                    <tr><td>Nível 5</td><td>1,70%</td></tr>
-                    <tr><td>Nível 6</td><td>0,85%</td></tr>
-                    <tr><th>Total dos níveis</th><th>28,50%</th></tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr><th>Limite</th><th>Valor inicial</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>Comissões dos níveis</td><td>28,50%</td></tr>
-                    <tr><td>Bônus de rank máximo sobre a comissão-base</td><td>equivalente a até 2,28% da receita</td></tr>
-                    <tr><td>Pool Global</td><td>até 2,00%</td></tr>
-                    <tr><td>Reserva técnica dentro do teto</td><td>0,22%</td></tr>
-                    <tr><td>Máximo efetivo inicial</td><td>32,78%</td></tr>
-                    <tr><th>Teto inicial</th><th>33,00%</th></tr>
-                </tbody>
-            </table>
-        </div>
-        <p class="formula">Soma dos níveis × (1 + maior bônus de rank) + Pool Global ≤ teto publicado</p>
-        <p>
-            O teto começa em 33%, mas pode ser configurado pelo Superadmin entre 0% e 100% somente em nova versão com
-            vigência futura. A publicação é recusada se os parâmetros ultrapassarem o teto escolhido. Reduzir o teto
-            exige ajustar previamente os demais parâmetros; comissão-base já adquirida não é reduzida retroativamente.
-        </p>
-        <p>
-            Em eventual diferença exclusivamente causada por arredondamento, reduz-se primeiro o Pool Global e depois o
-            bônus de rank. A comissão-base já adquirida não é reduzida. Valores não distribuídos permanecem na reserva do Programa.
-        </p>
-    </section>
+        <section aria-labelledby="canonicalTitle">
+          <h2 id="canonicalTitle">Texto oficial publicado</h2>
+          <p class="small">O conteúdo abaixo é reproduzido exatamente como foi publicado e protegido pelo hash desta versão.</p>
+          <pre class="canonical-document" id="canonicalContent"></pre>
+        </section>
 
-    <section id="ranks">
-        <h2>10. Rank e bônus de liderança</h2>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr><th>Rank</th><th>Rede ativa inicial</th><th>Bônus sobre a comissão-base</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>Executivo</td><td>1.000</td><td>2%</td></tr>
-                    <tr><td>Sênior</td><td>5.000</td><td>4%</td></tr>
-                    <tr><td>Master</td><td>10.000</td><td>6%</td></tr>
-                    <tr><td>Elite</td><td>50.000</td><td>8%</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <ul>
-            <li>São contados somente os seis níveis e exige-se o mínimo inicial de três diretos ativos.</li>
-            <li>No máximo 60% da qualificação pode vir da maior perna.</li>
-            <li>O maior rank histórico permanece como conquista visual.</li>
-            <li>O rank financeiro é recalculado mensalmente, sem período de graça, e pode ser diferente do histórico.</li>
-            <li>Somente o maior rank financeiro confirmado na competência é aplicado; bônus não são acumulados.</li>
-            <li>Cancelamentos antes do fechamento podem alterar o rank; chargeback posterior gera ajuste sem apagar a conquista histórica.</li>
-        </ul>
-        <p class="formula">Bônus de liderança = comissão-base confirmada do participante × percentual do seu rank financeiro</p>
-        <p>
-            O bônus nunca incide sobre faturamento total, Pool Global, outro bônus ou rendimento de terceiros. Requisitos,
-            percentuais e limites podem mudar apenas por nova versão futura.
-        </p>
-    </section>
+        <section aria-labelledby="snapshotTitle">
+          <h2 id="snapshotTitle">Quadros de referência do snapshot</h2>
+          <p>Os quadros abaixo facilitam a consulta dos parâmetros estruturados da mesma versão. Em caso de dúvida, prevalece o texto oficial publicado acima.</p>
+          <h3>Níveis e qualificação</h3>
+          <div class="table-wrap"><table><thead><tr><th>Nível</th><th>Percentual</th><th>Diretos ativos mínimos</th><th>Pernas qualificadas</th><th>Ativos por perna</th><th>Status</th></tr></thead><tbody id="levelsBody"></tbody></table></div>
+          <p class="small" id="levelsNote"></p>
+          <h3>Ranks, liderança e Pool Global</h3>
+          <div class="table-wrap"><table><thead><tr><th>Rank</th><th>Rede ativa mínima</th><th>Diretos ativos</th><th>Maior perna</th><th>Bônus liderança</th><th>Coeficiente do pool</th><th>Status</th></tr></thead><tbody id="ranksBody"></tbody></table></div>
+          <p>Percentual do Pool Global nesta versão: <strong id="poolPercent">—</strong>. Um rank com percentual ou coeficiente igual a zero não participa daquele componente.</p>
+          <h3>Retenções configuradas</h3>
+          <div class="table-wrap"><table><thead><tr><th>Retenção</th><th>Tipo</th><th>Alíquota</th><th>Aplicação</th><th>Localidade</th></tr></thead><tbody id="taxesBody"></tbody></table></div>
+          <div class="definition"><strong>Vinculação da lista de espera</strong><span id="waitlistDays">—</span></div>
+        </section>
 
-    <section id="pool">
-        <h2>11. Pool Global</h2>
-        <p>
-            O Pool Global inicial corresponde a até 2% da receita elegível da competência. A distribuição usa pontos
-            derivados da comissão-base e do coeficiente do rank financeiro:
-        </p>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr><th>Rank</th><th>Coeficiente inicial</th></tr>
-                </thead>
-                <tbody>
-                    <tr><td>Executivo</td><td>0 — não participa inicialmente</td></tr>
-                    <tr><td>Sênior</td><td>1</td></tr>
-                    <tr><td>Master</td><td>2</td></tr>
-                    <tr><td>Elite</td><td>4</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <p class="formula">Pontos pessoais = comissão-base confirmada × coeficiente do rank</p>
-        <p class="formula">Parcela do participante = valor do Pool × pontos pessoais ÷ total de pontos elegíveis</p>
-        <p>
-            Coeficiente zero impede a participação daquele rank e pode ser alterado em versão futura. O Pool não acumula
-            para o mês seguinte. Valor não distribuído permanece com a empresa. O painel informa base, pontos pessoais,
-            total de pontos elegíveis, proporção e memória de cálculo.
-        </p>
-    </section>
+        <section id="historico">
+          <h2>Versões, vigência e histórico</h2>
+          <p>Este documento é um snapshot imutável das regras publicadas. A versão indicada no topo prevalece durante sua vigência. Nova versão pode alterar parâmetros futuros e exigir novo aceite, sem modificar competências já fechadas.</p>
+          <div class="history" id="historyLinks"><span class="small">Carregando histórico...</span></div>
+        </section>
 
-    <section id="competencia">
-        <h2>12. Competência, prazo de segurança e fechamento</h2>
-        <ul>
-            <li>Competência mensal no fuso <code>America/Sao_Paulo</code>.</li>
-            <li>Corte no último dia do mês, às 23:59:59.</li>
-            <li>Prévia atualizada diariamente, sujeita a alterações até o fechamento.</li>
-            <li>Apuração entre os dias 1 e 10; fechamento definitivo no dia 10.</li>
-            <li>Pagamento programado até o dia 20 ou próximo dia útil, somente para saldo disponível.</li>
-            <li>Prazo inicial de segurança de 15 dias a partir da confirmação do pagamento da assinatura.</li>
-        </ul>
-        <p>
-            Durante o prazo de segurança, a comissão permanece pendente. Se o prazo terminar depois do calendário do lote,
-            o valor fica para o próximo pagamento, sem perda do saldo. Webhook atrasado recebido antes do fechamento entra
-            normalmente; evento recebido depois do fechamento entra como ajuste na competência seguinte. Datas, prazo de
-            segurança e calendário podem mudar somente por versão futura, com comunicação ao participante.
-        </p>
-        <p>
-            Competência fechada não é recalculada automaticamente. Reabertura é excepcional, exclusiva do Superadmin e
-            exige justificativa e auditoria. O participante dispõe de cinco dias úteis após a divulgação do fechamento
-            para contestar o cálculo.
-        </p>
-    </section>
+        <section id="contato">
+          <h2>Contato e documentos relacionados</h2>
+          <p>Consulte também os <a href="politicaetermos.html">Termos de Uso e a Política de Privacidade</a>.</p>
+          <p><strong>Contato oficial:</strong> <a id="privacyEmail" href="mailto:comunidade@turbotiger.com.br">comunidade@turbotiger.com.br</a></p>
+        </section>
+      </div>
 
-    <section id="estornos">
-        <h2>13. Cancelamentos, reembolsos, chargebacks e saldo negativo</h2>
-        <ul>
-            <li>Reembolso anterior ao pagamento do participante cancela ou reverte o benefício relacionado.</li>
-            <li>O lançamento original nunca é apagado; cria-se ajuste vinculado e visível no extrato.</li>
-            <li>Chargeback posterior ao pagamento gera saldo negativo compensável em benefícios futuros.</li>
-            <li>Saldo negativo não é ocultado e apresenta origem, competência, evento e memória de cálculo.</li>
-            <li>Fraude comprovada pode causar perda de elegibilidade e cobrança de valores pagos indevidamente, observado o direito de contestação.</li>
-        </ul>
-    </section>
+      <footer><span>Turbo Tiger · Programa de Indicações e Benefícios</span><span id="footerVersion">Versão —</span></footer>
+    </main>
+  </div>
 
-    <section id="pagamentos">
-        <h2>14. Pagamentos, mínimo e chave Pix</h2>
-        <p>
-            O modelo inicial é de apuração pelo sistema e transferência Pix manual, com comprovante. A automação poderá
-            ser ativada futuramente por provedor de pagamento configurado, sem dependência de fornecedor único.
-        </p>
-        <ul>
-            <li>O pagamento ocorre pelo calendário do Programa, sem pedido de saque.</li>
-            <li>O mínimo inicial é R$ 50,00 e pode ser alterado em versão futura.</li>
-            <li>Saldo inferior ao mínimo acumula sem expirar.</li>
-            <li>No encerramento definitivo, saldo confirmado pode ser liquidado abaixo do mínimo após validação.</li>
-            <li>A chave Pix deve pertencer ao mesmo CPF do participante.</li>
-            <li>Alteração de chave exige nova validação e pode gerar prazo de segurança configurável.</li>
-            <li>Pagamento devolvido volta ao estado pendente até correção.</li>
-            <li>O participante visualiza status e comprovante; a chave completa não é exibida ao Suporte.</li>
-        </ul>
-        <p>
-            O fluxo de pagamento registra, no mínimo, os estados calculado, revisado, aprovado, em fila, enviado, pago,
-            falhou e cancelado, mantendo datas, responsáveis, provedor, motivo e auditoria.
-        </p>
-    </section>
+  <script>
+  (function(){
+    "use strict";
+    var SUPABASE_URL="https://jzqgudmvquokizvgehow.supabase.co";
+    var API_KEY="sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU";
+    var RPC="mmn_regulamento_publico_rpc";
+    var requestedVersion=new URLSearchParams(window.location.search).get("versao");
 
-    <section id="fiscal">
-        <h2>15. RPA, retenções e bloqueio fiscal</h2>
-        <p>
-            O Programa admite apenas beneficiário pessoa física. Quando aplicável, o pagamento será documentado por RPA
-            ou documento equivalente e poderá sofrer retenções legais. O extrato demonstrará valor bruto, cada retenção
-            e valor líquido.
-        </p>
-        <p>
-            Alíquotas, incidências, faixas, limites, município, estado, documentos, obrigações acessórias e regras de
-            retenção serão configurados e versionados após validação da contabilidade. Os valores iniciais são parâmetros
-            de preparação e simulação, não autorização fiscal.
-        </p>
-        <div class="warning">
-            <p>
-                Nenhum lote real pode ser pago enquanto a configuração fiscal estiver marcada como não homologada.
-                A homologação deve identificar responsável, data, versão e evidência da validação contábil.
-            </p>
-        </div>
-        <p>
-            O participante é responsável por informações e obrigações que legalmente lhe competirem. Informações exibidas
-            no painel não substituem orientação contábil ou tributária individual.
-        </p>
-    </section>
+    function byId(id){return document.getElementById(id)}
+    function text(id,value){var el=byId(id);if(el)el.textContent=value==null||value===""?"—":String(value)}
+    function number(value,fallback){var result=Number(value);return Number.isFinite(result)?result:(fallback==null?0:fallback)}
+    function integer(value,fallback){return Math.trunc(number(value,fallback))}
+    function bool(value,fallback){if(typeof value==="boolean")return value;if(value==="true"||value===1||value==="1")return true;if(value==="false"||value===0||value==="0")return false;return!!fallback}
+    function first(values,fallback){for(var i=0;i<values.length;i+=1){if(values[i]!==undefined&&values[i]!==null)return values[i]}return fallback}
+    function object(source,keys){source=source||{};for(var i=0;i<keys.length;i+=1){var value=source[keys[i]];if(value&&typeof value==="object"&&!Array.isArray(value))return value}return{}}
+    function list(source,keys){source=source||{};for(var i=0;i<keys.length;i+=1){if(Array.isArray(source[keys[i]]))return source[keys[i]]}return[]}
+    function escapeHtml(value){return String(value==null?"":value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#39;")}
+    function percent(value){return value==null||value===""?"—":number(value).toLocaleString("pt-BR",{minimumFractionDigits:0,maximumFractionDigits:3})+"%"}
+    function moneyCents(value){return value==null||value===""?"—":(number(value)/100).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+    function count(value){return value==null||value===""?"—":number(value).toLocaleString("pt-BR",{maximumFractionDigits:0})}
+    function date(value,withTime){if(!value)return"—";var parsed=new Date(value);if(Number.isNaN(parsed.getTime()))return String(value);return parsed.toLocaleString("pt-BR",withTime?{dateStyle:"short",timeStyle:"short"}:{dateStyle:"short"})}
+    function errorMessage(error){var message=error&&error.message?error.message:String(error||"");if(/Failed to fetch|NetworkError/i.test(message))return"Não foi possível conectar ao servidor. Verifique a internet e tente novamente.";if(message==="regulamento_publicado_nao_encontrado")return requestedVersion?"A versão solicitada não está publicada ou não existe.":"Nenhuma versão vigente do regulamento está publicada.";return message||"Não foi possível carregar o regulamento."}
 
-    <section id="governanca">
-        <h2>16. Governança, permissões, auditoria e versões</h2>
-        <p>O módulo pode operar com os seguintes perfis:</p>
-        <ul>
-            <li><strong>Superadmin:</strong> regras, publicação, exceções justificadas e configuração de aprovações.</li>
-            <li><strong>Financeiro:</strong> apuração, revisão, estorno e pagamento conforme permissão.</li>
-            <li><strong>Suporte:</strong> consulta limitada e registro de ocorrências, sem exposição de dados financeiros completos.</li>
-            <li><strong>Auditor:</strong> consulta aos registros e trilhas de auditoria.</li>
-            <li><strong>Usuário:</strong> acesso exclusivo aos próprios dados e aos agregados permitidos de sua rede.</li>
-        </ul>
-        <p>
-            Inicialmente, um Superadmin pode publicar regras e aprovar lotes. O número de aprovações, usuários e perfis
-            autorizados é configurável. Toda ação financeira ou alteração sensível exige identidade do responsável,
-            data, motivo e registro de auditoria.
-        </p>
-        <ul>
-            <li>Alterações são feitas apenas em rascunho.</li>
-            <li>Simulação e validação do teto são obrigatórias antes da publicação.</li>
-            <li>A versão publicada recebe data de vigência futura.</li>
-            <li>A competência aberta usa uma versão congelada.</li>
-            <li>Competência fechada nunca é recalculada automaticamente por regra nova.</li>
-            <li>Mudança financeira relevante exige novo aceite do participante.</li>
-            <li>Versões podem ser duplicadas e comparadas, sem sobrescrever o histórico.</li>
-        </ul>
-        <p>
-            Auditoria, idempotência dos eventos, proteção contra edição retroativa e vínculo entre ajuste e lançamento
-            original são salvaguardas técnicas permanentes. Nenhuma configuração pode apagar a trilha histórica.
-        </p>
-    </section>
+    function normalize(data){
+      var root=data||{};
+      if(root.dados&&typeof root.dados==="object")root=Object.assign({},root.dados,root);
+      var documentRow=object(root,["documento","regulamento","versao_publicada"]);
+      var snapshot=object(root,["snapshot","conteudo_snapshot","configuracao","regras"]);
+      if(!Object.keys(snapshot).length)snapshot=object(documentRow,["snapshot","conteudo_snapshot","configuracao"]);
+      var config=object(snapshot,["configuracao","config"]);
+      var params=Object.assign({},object(config,["parametros"]),object(snapshot,["estrutura"]),object(snapshot,["financeiro"]),object(snapshot,["pagamentos"]),object(snapshot,["operacional"]),object(snapshot,["elegibilidade"]),object(snapshot,["lista_espera"]),object(snapshot,["empresa"]),object(snapshot,["parametros"]),config,snapshot);
+      var levels=list(snapshot,["niveis","percentuais_nivel"]);if(!levels.length)levels=list(config,["niveis","percentuais_nivel"]);if(!levels.length)levels=list(root,["niveis"]);
+      var ranks=list(snapshot,["ranks"]);if(!ranks.length)ranks=list(config,["ranks"]);if(!ranks.length)ranks=list(root,["ranks"]);
+      var groups=list(snapshot,["grupos_isentos","grupos"]);if(!groups.length)groups=list(config,["grupos_isentos","grupos"]);
+      var taxes=list(snapshot,["retencoes","taxas"]);if(!taxes.length)taxes=list(config,["retencoes","taxas"]);
+      var history=list(root,["historico","versoes","documentos"]);
+      return{root:root,document:documentRow,snapshot:snapshot,params:params,levels:levels,ranks:ranks,groups:groups,taxes:taxes,history:history};
+    }
 
-    <section id="simuladores">
-        <h2>17. Simuladores e ausência de garantia</h2>
-        <p>
-            O simulador administrativo pode comparar cenários de preço, descontos, receita, custos, churn, retenção,
-            conversão, maturação, expansão, continuidade, seis níveis, qualificação, ranks, concentração por perna,
-            bônus, Pool Global, chargeback, estornos, impostos, taxas de gateway, payout e margem. Deve permitir cenários
-            conservador, base, agressivo e personalizado; horizontes de 12, 24, 36 e 60 meses; dados sintéticos ou
-            repetição histórica autorizada; comparação entre versões; exportação; e alerta de premissas incompatíveis.
-        </p>
-        <p>
-            O simulador do usuário pode usar sua rede real como ponto de partida e permitir projeções de 1 a 24 meses,
-            novos diretos por mês, média de indicações por direto, continuidade e cenários conservador, provável e
-            otimista, apresentando resultado bruto estimado e valor líquido aproximado quando houver parâmetros fiscais homologados.
-        </p>
-        <div class="warning">
-            <p>
-                Toda projeção é estimativa baseada em premissas. Não constitui promessa, oferta de rendimento, garantia de
-                renda, salário, investimento ou previsão de resultado. Valores reais dependem de assinaturas efetivamente
-                pagas, elegibilidade, retenção, estornos e regras vigentes.
-            </p>
-        </div>
-    </section>
+    function renderTableBody(id,rows,emptyMessage,columnCount){var body=byId(id);body.innerHTML=rows.length?rows.join(""):"<tr><td colspan=\""+escapeHtml(columnCount||7)+"\">"+escapeHtml(emptyMessage)+"</td></tr>"}
 
-    <section id="privacidade">
-        <h2>18. Privacidade, extrato e transparência</h2>
-        <p>
-            O tratamento de dados segue a <a href="politicaetermos.html#privacidade">Política de Privacidade</a>. Para
-            operar o Programa, podem ser tratados vínculo de indicação, posição na genealogia, elegibilidade, assinatura,
-            receitas, cálculos, rank, qualificação, dados Pix, RPA, retenções, comprovantes, contestações e auditoria.
-        </p>
-        <ul>
-            <li>O participante vê a identidade apenas dos indicados diretos quando necessária ao acompanhamento.</li>
-            <li>Os níveis 2 a 6 aparecem de forma agregada.</li>
-            <li>CPF, e-mail, telefone, chave Pix, documentos e dados sensíveis não são exibidos entre participantes.</li>
-            <li>Não existe ranking público de pessoas ou rendimentos.</li>
-            <li>O painel informa saldo pendente, confirmado, disponível, pago, retido, estornado e negativo.</li>
-            <li>Cada cálculo deve permitir identificar competência, regra aplicada e origem do lançamento.</li>
-        </ul>
-        <p>
-            O participante poderá receber comunicações operacionais sobre novo cadastro, mudança de elegibilidade,
-            qualificação, rank, fechamento, ajuste, contestação e pagamento, conforme as permissões do dispositivo e os
-            canais cadastrados.
-        </p>
-        <p>
-            Dados fiscais, financeiros e de auditoria podem ser mantidos pelo prazo necessário ao cumprimento de obrigações
-            legais, prevenção de fraude e exercício regular de direitos, inclusive depois da exclusão da conta.
-        </p>
-    </section>
+    function render(data){
+      var normalized=normalize(data);
+      var doc=normalized.document;
+      if(!Object.keys(doc).length||data&&data.ok===false)throw new Error(first([data&&data.mensagem,data&&data.erro,data&&data.error],requestedVersion?"A versão solicitada não está publicada ou não existe.":"Nenhuma versão publicada está disponível."));
+      var p=normalized.params;
+      var version=first([doc.versao,doc.documento_versao,p.versao],requestedVersion||"");
+      var titleValue=first([doc.titulo,p.programa_nome],"Regulamento do Programa de Indicações e Benefícios Turbo Tiger");
+      var canonicalContent=first([doc.conteudo,doc.conteudo_publicado],"");
+      if(typeof canonicalContent!=="string"||!canonicalContent.trim())throw new Error("O texto oficial desta versão não foi disponibilizado pelo servidor.");
+      var depth=Math.max(1,Math.min(10,integer(first([p.quantidade_niveis],6),6)));
+      var width=Math.max(0,integer(first([p.largura_maxima_posicionamento],0),0));
+      var payout=first([p.payout_teto_percentual,p.teto_payout_percentual],33);
+      var minimum=first([p.pagamento_minimo_centavos],5000);
+      document.title=titleValue+" — Turbo Tiger";
+      text("documentTitle",titleValue);text("documentVersion",version||"—");text("documentUpdated",date(first([doc.atualizado_em,doc.criado_em]),true));text("documentPublished",date(doc.publicado_em,true));text("documentEffective",date(first([doc.vigencia_inicio,doc.vigente_desde,p.vigencia_inicio]),false));text("footerVersion","Versão "+(version||"—"));
+      byId("canonicalContent").textContent=canonicalContent;
+      text("summaryLevels",depth+" nível(is)");text("summaryWidth",width===0?"Ilimitada":width+" vaga(s) por nó");text("summaryPayout",percent(payout));text("summaryMinimum",moneyCents(minimum));
+      text("programIdentity","Este Regulamento disciplina a participação voluntária no "+(p.programa_nome||"Programa de Indicações e Benefícios Turbo Tiger")+", no território "+(p.territorio||"BR")+", em "+(p.moeda||"BRL")+".");
+      text("premiumRule",bool(first([p.premium_obrigatorio],true),true)?"A assinatura Premium precisa estar ativa na data da receita e no fechamento, salvo grupo isento publicado.":"A versão publicada não exige assinatura Premium própria, sem afastar os demais requisitos de elegibilidade.");
+      var activeGroups=normalized.groups.filter(function(row){return bool(first([row.ativo],true),true)}).map(function(row){return row.nome||row.grupo_chave||row.chave}).filter(Boolean);text("exemptGroups",activeGroups.length?activeGroups.join(", "):"Nenhum grupo isento publicado.");
+      text("holdDays",count(first([p.carencia_estorno_dias,p.prazo_seguranca_dias],15))+" dia(s)");
+      text("placementRule",width===0?"A largura de posicionamento é ilimitada nesta versão; novas indicações permanecem diretamente vinculadas ao patrocinador na estrutura vigente.":"Cada participante pode ocupar até "+width+" vaga(s) imediatamente abaixo do mesmo pai de posicionamento. A indicação seguinte entra por spillover automático, sem alterar o patrocinador pessoal.");
+      text("residualRule",depth===1?"Esta versão remunera somente o nível 1, reservado à comissão direta; não há nível residual ativo.":"As comissões residuais seguem a árvore de posicionamento do nível 2 ao nível "+depth+", conforme percentuais e qualificações publicados.");
+      var levels=normalized.levels.filter(function(row){var level=integer(row.nivel);return level>=1&&level<=depth}).sort(function(a,b){return integer(a.nivel)-integer(b.nivel)});
+      renderTableBody("levelsBody",levels.map(function(row){return"<tr><td>"+escapeHtml(row.nivel)+"</td><td>"+escapeHtml(percent(row.percentual))+"</td><td>"+escapeHtml(count(row.min_diretos_ativos))+"</td><td>"+escapeHtml(count(row.min_pernas_qualificadas))+"</td><td>"+escapeHtml(count(row.min_ativos_por_perna))+"</td><td>"+escapeHtml(bool(first([row.ativo],true),true)?"Ativo":"Inativo")+"</td></tr>"}),"Nenhum nível foi publicado para esta versão.",6);
+      text("levelsNote","Profundidade publicada: "+depth+" nível(is). Linhas acima dessa profundidade permanecem preservadas no histórico administrativo, mas não geram comissão nesta versão.");
+      var ranks=normalized.ranks.slice().sort(function(a,b){return integer(a.ordem)-integer(b.ordem)});
+      renderTableBody("ranksBody",ranks.map(function(row){return"<tr><td>"+escapeHtml(row.nome||row.chave||"—")+"</td><td>"+escapeHtml(count(row.min_rede_ativa))+"</td><td>"+escapeHtml(count(row.min_diretos_ativos))+"</td><td>"+escapeHtml(percent(row.max_percentual_maior_perna))+"</td><td>"+escapeHtml(percent(row.bonus_percentual))+"</td><td>"+escapeHtml(count(row.pool_coeficiente))+"</td><td>"+escapeHtml(bool(first([row.ativo],true),true)?"Ativo":"Inativo")+"</td></tr>"}),"Nenhum rank foi publicado para esta versão.");
+      text("poolPercent",percent(first([p.pool_global_percentual],0)));text("payoutCapText",percent(payout));
+      var closingDay=first([p.fechamento_dia],null);var paymentDay=first([p.pagamento_dia],null);
+      text("closingRule",closingDay==null?"O dia de fechamento não foi informado neste snapshot; prevalece o calendário operacional comunicado no painel.":"Competência mensal com fechamento previsto para o dia "+count(closingDay)+", sujeito ao calendário operacional e às aprovações configuradas.");
+      text("paymentRule",(paymentDay==null?"O dia de pagamento não foi informado neste snapshot":"Pagamento previsto para o dia "+count(paymentDay))+", no modo "+(p.pagamento_modo||p.modo_inicial||"manual")+(p.pagamento_provedor?", pelo provedor configurado "+p.pagamento_provedor:"")+".");
+      text("minimumRule","Saldo mínimo de "+moneyCents(minimum)+". Valores inferiores permanecem acumulados para competência futura, sujeitos às regras vigentes.");var pixHold=first([p.alteracao_pix_carencia_dias],null);text("pixHoldDays",pixHold==null?"prazo informado no painel":count(pixHold)+" dia(s)");
+      text("paymentAvailability",bool(first([p.pagamento_real_bloqueado,p.pagamento_real_bloqueado_ate_homologacao_fiscal],true),true)?"Pagamentos reais estão bloqueados nesta versão até a homologação fiscal e a liberação administrativa.":"Pagamentos reais estão administrativamente habilitados, sem afastar validações, quórum e controles do provedor.");
+      renderTableBody("taxesBody",normalized.taxes.map(function(row){var locality=[row.municipio,row.estado].filter(Boolean).join("/")||"Regra geral";return"<tr><td>"+escapeHtml(row.nome||row.chave||"—")+"</td><td>"+escapeHtml(row.tipo||"—")+"</td><td>"+escapeHtml(percent(row.aliquota))+"</td><td>"+escapeHtml(bool(row.reter,false)?"Reter":"Somente parametrizada")+"</td><td>"+escapeHtml(locality)+"</td></tr>"}),"Nenhuma retenção publicada; a homologação contábil continua obrigatória antes do primeiro pagamento real.",5);
+      var waitlist=first([p.prazo_conversao_dias,p.prazo_conversao_espera_dias,p.lista_espera_prazo_dias],null);var dispute=first([p.contestacao_dias_uteis],null);text("waitlistDays",waitlist==null?"Prazo não informado neste snapshot.":count(waitlist)+" dia(s)");text("disputeDays",dispute==null?"prazo publicado no painel":count(dispute)+" dia(s) útil(eis)");
+      var company=object(p,["dados_empresa"]);var email=company.email_privacidade||"comunidade@turbotiger.com.br";text("privacyEmail",email);byId("privacyEmail").href="mailto:"+email;
+      var history=normalized.history.filter(function(row){return row.versao||row.documento_versao});
+      if(!history.length&&version)history=[doc];
+      byId("historyLinks").innerHTML=history.length?history.map(function(row){var itemVersion=row.versao||row.documento_versao;var current=String(itemVersion)===String(version);return"<a href=\"regulamento-mmn.html?versao="+encodeURIComponent(itemVersion)+"\""+(current?" aria-current=\"page\"":"")+">Versão "+escapeHtml(itemVersion)+(current?" · exibida":"")+"</a>"}).join(""):"<span class=\"small\">O histórico ainda não foi disponibilizado pelo servidor.</span>";
+      byId("loadingState").hidden=true;byId("errorState").hidden=true;byId("regulationContent").hidden=false;
+    }
 
-    <section id="condutas">
-        <h2>19. Divulgação responsável e condutas proibidas</h2>
-        <p>É proibido:</p>
-        <ul>
-            <li>praticar spam, assédio, compra de cadastro ou envio de convite sem consentimento;</li>
-            <li>prometer renda, lucro, retorno garantido, enriquecimento ou resultado certo;</li>
-            <li>apresentar simulação como ganho real ou ocultar condições de elegibilidade;</li>
-            <li>vincular o Programa a apostas, depósitos, volume de jogo, ganhos, perdas ou recuperação de prejuízo;</li>
-            <li>usar conta falsa, CPF de terceiro, autoindicação, cadastro duplicado, automação ou manipulação de genealogia;</li>
-            <li>adulterar pagamento, reembolso, chargeback, assinatura, rank, qualificação, comprovante ou informação fiscal; e</li>
-            <li>usar marca, material ou identidade Turbo Tiger fora das diretrizes oficiais.</li>
-        </ul>
-        <p>
-            A comunicação correta deve informar que o benefício depende de receita real de assinaturas, regras vigentes,
-            elegibilidade e possibilidade de estornos, sem incentivo a apostas ou comportamento financeiro irresponsável.
-        </p>
-    </section>
-
-    <section id="contestacao">
-        <h2>20. Bloqueio preventivo, fraude e contestação</h2>
-        <p>
-            Indício de fraude, risco de segurança ou inconsistência pode causar bloqueio preventivo de valores e acesso ao
-            Programa. Bloqueio preventivo não equivale a decisão definitiva.
-        </p>
-        <p>
-            O participante deve receber motivo compreensível, respeitados os limites necessários à investigação e à
-            segurança, e poderá apresentar contestação pelos canais oficiais. Decisão definitiva, desbloqueio, estorno,
-            inelegibilidade ou banimento deve ser motivado e auditado.
-        </p>
-        <p>
-            Divergência de fechamento pode ser contestada em até cinco dias úteis após sua disponibilização. O atendimento
-            registra protocolo, evidências, responsável, decisão e data, sem apagar lançamentos originais.
-        </p>
-    </section>
-
-    <section id="encerramento">
-        <h2>21. Alterações, suspensão e encerramento do Programa</h2>
-        <p>
-            Regras econômicas podem ser alteradas somente por nova versão, com data de vigência futura e comunicação aos
-            participantes. Mudanças relevantes exigem novo aceite. A nova versão não recalcula competências fechadas.
-        </p>
-        <p>
-            O Programa pode ser suspenso ou encerrado por decisão operacional, econômica, legal ou regulatória. A decisão
-            deve definir data de corte, tratamento de competências abertas, contestações e liquidação de saldos confirmados,
-            preservando auditoria, estornos posteriores e obrigações legais.
-        </p>
-        <p>
-            A versão efetivamente aplicada a cada competência permanece disponível no histórico. Em caso de diferença
-            entre esta página e a configuração publicada no sistema, prevalece para o cálculo a versão expressamente aceita
-            e congelada na competência, desde que não reduza retroativamente direito já confirmado.
-        </p>
-    </section>
-
-    <section id="contato">
-        <h2>22. Contato e disposições finais</h2>
-        <p>
-            Este Regulamento integra os <a href="politicaetermos.html#termos">Termos de Uso</a>. Nos assuntos específicos
-            do Programa, aplica-se a versão deste Regulamento aceita pelo participante; nos demais assuntos, permanecem
-            aplicáveis os Termos de Uso e a Política de Privacidade.
-        </p>
-        <p>
-            O Programa é regido pelas leis da República Federativa do Brasil. Eventuais controvérsias observarão o foro
-            legalmente competente, inclusive o foro do domicílio do consumidor quando aplicável.
-        </p>
-        <p>
-            <strong>Contato oficial:</strong>
-            <a href="mailto:comunidade@turbotiger.com.br">comunidade@turbotiger.com.br</a>
-        </p>
-        <p class="small">
-            A identificação empresarial completa, a data de início e os parâmetros fiscais devem constar da versão
-            publicada e homologada antes da liberação de qualquer pagamento real.
-        </p>
-    </section>
-</main>
-
-<footer class="tt-site-footer">
-    <small><span class="tt-footer-links"><a href="/">Home</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/politicaetermos.html">Privacidade &amp; Termos de uso</a></span><span class="tt-footer-copyright"><span class="tt-footer-desktop-separator">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>&copy; 2026 Turbo Tiger</span></small>
-</footer>
-<a class="tt-whatsapp-float" data-tt-contact="whatsapp" href="#" target="_blank" rel="noopener" aria-label="Chamar atendimento no WhatsApp" hidden>
-    <img src="assets/icone-whatsapp-96x96.webp" alt="WhatsApp">
-</a>
-<script src="assets/turbotiger-site-ui.js"></script>
-
+    async function load(){
+      byId("loadingState").hidden=false;byId("errorState").hidden=true;byId("regulationContent").hidden=true;
+      try{
+        var controller=typeof AbortController==="function"?new AbortController():null;var timer=controller?setTimeout(function(){controller.abort()},15000):null;
+        var response=await fetch(SUPABASE_URL+"/rest/v1/rpc/"+RPC,{method:"POST",headers:{apikey:API_KEY,Authorization:"Bearer "+API_KEY,"Content-Type":"application/json; charset=utf-8",Accept:"application/json"},body:JSON.stringify({p_versao:requestedVersion||null}),signal:controller?controller.signal:undefined});
+        if(timer)clearTimeout(timer);var payload=await response.json().catch(function(){return null});if(!response.ok)throw new Error(first([payload&&payload.message,payload&&payload.error],"Falha HTTP "+response.status+"."));render(payload||{});
+      }catch(error){byId("loadingState").hidden=true;byId("regulationContent").hidden=true;byId("errorState").hidden=false;text("errorTitle",requestedVersion?"Versão não disponível":"Regulamento indisponível");text("errorMessage",errorMessage(error));}
+    }
+    byId("retryButton").addEventListener("click",load);load();
+  }());
+  </script>
 </body>
 </html>
