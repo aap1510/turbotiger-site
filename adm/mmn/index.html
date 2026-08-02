@@ -20,7 +20,7 @@
   }());
   </script>
   <link rel="stylesheet" href="../assets/admin.css?v=20260720-mmn-01">
-  <link rel="stylesheet" href="mmn.css?v=20260802-mmn-06">
+  <link rel="stylesheet" href="mmn.css?v=20260802-mmn-11">
 </head>
 <body data-admin-page="mmn">
   <div class="admin-shell mmn-shell">
@@ -28,7 +28,7 @@
       <div class="admin-brand mmn-brand">
         <img src="../../assets/logo-300x300.webp" alt="Turbo Tiger">
         <div>
-          <h1 id="brandTitle">Indicações</h1>
+          <h1 id="brandTitle">Indicações e Benefícios</h1>
           <span id="adminIdentity">Turbo Tiger</span>
         </div>
       </div>
@@ -39,11 +39,6 @@
         <a class="nav-link is-active" href="./" aria-current="page">MMN</a>
         <a class="nav-link" href="../../sobolao/?role=admin">Só Bolão</a>
       </nav>
-
-      <div class="mmn-user-brand-copy mmn-user-only">
-        <strong>Minha rede</strong>
-        <span>Acompanhe sua jornada com clareza.</span>
-      </div>
 
       <div class="sidebar-footer mmn-admin-only">
         <button class="btn btn-ghost" id="logoutButton" type="button">Sair</button>
@@ -100,16 +95,17 @@
       <div id="userApp" class="mmn-user-app mmn-user-only" hidden>
         <section class="mmn-user-hero">
           <div class="mmn-user-hero-copy">
-            <h2 id="userGreeting">Sua rede, com transparência.</h2>
-            <p id="userHeroText">Acompanhe indicações, qualificações e valores reconhecidos pelo programa.</p>
+            <h2 id="userGreeting">Olá. Acompanhe sua jornada.</h2>
+            <p id="userHeroText">Indicações, qualificações e valores.</p>
             <div class="mmn-status-row">
               <span class="mmn-status" id="userEligibility">Verificando elegibilidade</span>
               <span class="mmn-rank-mark" id="userRank">Rank Base</span>
             </div>
           </div>
           <div class="mmn-hero-actions">
-            <button class="btn mmn-share-button" id="userShareButton" type="button">Compartilhar convite</button>
+            <button class="btn mmn-share-button" id="userShareButton" type="button">Compartilhar</button>
             <button class="btn mmn-copy-button" id="userCopyInviteButton" type="button">Copiar link</button>
+            <span class="mmn-copy-toast" id="userCopyInviteToast" role="status" aria-live="polite" hidden>Link seguro de convite copiado</span>
           </div>
         </section>
 
@@ -126,7 +122,7 @@
               <div class="form-grid">
                 <label class="field">
                   <span>Tipo de chave</span>
-                  <select id="enrollmentPixType" required>
+                  <select id="enrollmentPixType" aria-describedby="enrollmentPixStatus" required>
                     <option value="cpf">CPF</option>
                     <option value="email">E-mail</option>
                     <option value="celular">Celular</option>
@@ -135,8 +131,39 @@
                 </label>
                 <label class="field">
                   <span>Chave PIX</span>
-                  <input id="enrollmentPixKey" autocomplete="off" maxlength="180" required>
+                  <input id="enrollmentPixKey" autocomplete="off" maxlength="180" aria-describedby="enrollmentPixFieldStatus enrollmentPixStatus" required>
+                  <small class="mmn-pix-field-status" id="enrollmentPixFieldStatus" role="status" aria-live="polite" aria-atomic="true"></small>
                 </label>
+              </div>
+              <div class="mmn-pix-validation" id="enrollmentPixValidation">
+                <div class="mmn-pix-toolbar">
+                  <button class="btn btn-ghost" id="enrollmentPixVerify" type="button">Verificar chave Pix</button>
+                  <div class="mmn-pix-status" id="enrollmentPixStatus" role="status" aria-live="polite">Informe o tipo e a chave, depois toque em verificar.</div>
+                </div>
+                <section class="mmn-pix-result" id="enrollmentPixResult" aria-labelledby="enrollmentPixResultTitle" hidden>
+                  <div class="mmn-pix-result-head">
+                    <div>
+                      <strong id="enrollmentPixResultTitle">Confira os dados encontrados</strong>
+                      <small>Confirme somente se os dados pertencem ao titular do cadastro Turbo Tiger.</small>
+                    </div>
+                  </div>
+                  <dl class="mmn-pix-details">
+                    <div><dt>Tipo</dt><dd id="enrollmentPixResultType">—</dd></div>
+                    <div><dt>Chave</dt><dd id="enrollmentPixResultKey">—</dd></div>
+                    <div><dt>Nome completo do titular</dt><dd id="enrollmentPixResultHolderName">—</dd></div>
+                    <div><dt>CPF do titular</dt><dd id="enrollmentPixResultHolderCpf">—</dd></div>
+                    <div><dt>Código do banco</dt><dd id="enrollmentPixResultBankCode">—</dd></div>
+                    <div><dt>Banco</dt><dd id="enrollmentPixResultBankName">—</dd></div>
+                  </dl>
+                  <div class="mmn-pix-result-actions">
+                    <button class="btn btn-primary" id="enrollmentPixConfirm" type="button" disabled>Confirmar e cadastrar</button>
+                    <button class="btn btn-ghost" id="enrollmentPixCorrect" type="button">Corrigir chave</button>
+                  </div>
+                </section>
+                <div class="mmn-pix-confirmed" id="enrollmentPixConfirmed" role="status" aria-live="polite" hidden>
+                  <strong>Chave Pix confirmada.</strong>
+                  <span>Você pode continuar a adesão. Se alterar o tipo ou a chave, será necessário verificar novamente.</span>
+                </div>
               </div>
             </div>
             <div class="mmn-form-section">
@@ -188,26 +215,22 @@
               </div>
             </div>
             <label class="mmn-check">
-              <input id="enrollmentPixOwnership" type="checkbox" required>
-              <span>Confirmo que a chave PIX pertence ao mesmo CPF do meu cadastro.</span>
-            </label>
-            <label class="mmn-check">
               <input id="enrollmentTerms" type="checkbox" required>
-              <span>Li e aceito o <a id="regulationLink" href="../../regulamento-mmn.html" target="_blank" rel="noopener">Regulamento de Indicações e Benefícios</a> vigente.</span>
+              <span>Li e aceito o <a id="regulationLink" href="../../regulamento-mmn.html">Regulamento de Indicações e Benefícios</a> vigente.</span>
             </label>
             <div class="mmn-form-feedback" id="enrollmentStatus" role="status" aria-live="polite"></div>
-            <button class="btn btn-primary" id="enrollmentSubmit" type="submit">Aceitar e concluir adesão</button>
+            <button class="btn btn-primary" id="enrollmentSubmit" type="submit" disabled aria-disabled="true">Aceitar e concluir adesão</button>
           </form>
         </section>
 
         <div id="userDashboard" hidden>
           <nav class="mmn-user-tabs" aria-label="Áreas do seu painel">
-            <button class="is-active" type="button" data-user-tab="inicio">Início</button>
+            <button class="is-active" type="button" data-user-tab="inicio">Dashboard</button>
             <button type="button" data-user-tab="rede">Minha rede</button>
-            <button type="button" data-user-tab="extrato">Extrato</button>
             <button type="button" data-user-tab="beneficios">Ranks e bônus</button>
             <button type="button" data-user-tab="simulador">Simulador</button>
             <button type="button" data-user-tab="pagamentos">Pagamentos</button>
+            <button type="button" data-user-tab="extrato">Extrato</button>
             <button type="button" data-user-tab="perfil">Meus dados</button>
           </nav>
 
@@ -222,8 +245,16 @@
             <div class="mmn-user-overview">
               <article class="mmn-feature-panel mmn-rank-progress">
                 <div class="mmn-panel-title">
-                  <div><h3>Sua evolução</h3><p id="userRankDescription">Carregando qualificação...</p></div>
-                  <strong id="userNextRank">—</strong>
+                  <div>
+                    <h3>Sua evolução</h3>
+                    <p class="mmn-rank-description" id="userRankDescription"><span>Rank atual: <strong id="userCurrentRank">Base</strong></span><small id="userRankCriteria">Os critérios são avaliados a cada competência.</small></p>
+                  </div>
+                  <div class="mmn-next-rank">
+                    <button class="mmn-evolution-chart-trigger" id="userEvolutionChartOpen" type="button" aria-label="Ver gráfico da sua evolução" title="Ver gráfico da sua evolução">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16M7 15l4-4 3 2 5-6"/></svg>
+                    </button>
+                    <strong id="userNextRank">—</strong>
+                  </div>
                 </div>
                 <div class="mmn-progress" aria-hidden="true"><span id="userRankProgressBar"></span></div>
                 <div class="mmn-progress-labels"><span id="userRankProgressCurrent">—</span><span id="userRankProgressTarget">—</span></div>
@@ -257,7 +288,7 @@
           </section>
 
           <section data-user-panel="rede" hidden>
-            <div class="mmn-section-heading"><div><h2>Minha rede</h2><p>Acompanhe totais por nível sem alterar a genealogia original.</p></div><button class="btn btn-primary" id="networkShareButton" type="button">Compartilhar</button></div>
+            <div class="mmn-section-heading"><div><p>Analise totais por nível e a genealogia.</p></div></div>
             <article class="mmn-feature-panel mmn-genealogy-panel">
               <div class="mmn-panel-title"><div><h3>Seus vínculos na rede</h3><p>Patrocínio registra quem indicou você. Posicionamento define sua vaga estrutural e os níveis residuais.</p></div></div>
               <div class="mmn-genealogy-summary">
@@ -266,30 +297,30 @@
                 <div><span>Vaga</span><strong id="userPlacementSlot">—</strong><small>Posição ocupada sob o pai estrutural.</small></div>
                 <div><span>Largura aplicada</span><strong id="userPlacementWidth">—</strong><small id="userPlacementSpillover">Carregando regra estrutural...</small></div>
               </div>
-              <p class="mmn-genealogy-rule">A comissão direta tem prioridade. As residuais começam no nível 2 da árvore de posicionamento e o mesmo beneficiário não recebe duas vezes sobre a mesma assinatura.</p>
+              <p class="mmn-genealogy-rule" id="userGenealogyRule">A comissão direta tem prioridade. As residuais começam no nível 2 da árvore de posicionamento e o mesmo beneficiário não recebe duas vezes sobre a mesma assinatura.</p>
             </article>
             <div class="mmn-level-grid" id="userLevelGrid"></div>
             <article class="mmn-feature-panel">
-              <div class="mmn-panel-title"><div><h3>Indicados diretos</h3><p>São exibidos apenas dados necessários para acompanhar sua rede.</p></div></div>
+              <div class="mmn-panel-title"><div><h3>Indicados diretos</h3><p>Toque em um indicado para acompanhar as ramificações da rede.</p></div><button class="btn btn-ghost btn-small" id="userNetworkDiagramOpen" type="button">Ver diagrama</button></div>
               <div class="mmn-list" id="userDirectList"></div>
               <button class="btn btn-ghost mmn-load-more" id="userNetworkMore" type="button" hidden>Carregar mais</button>
             </article>
           </section>
 
           <section data-user-panel="extrato" hidden>
-            <div class="mmn-section-heading"><div><h2>Extrato</h2><p>Cada crédito, retenção, ajuste e estorno permanece visível.</p></div><label class="field mmn-period-filter"><span>Competência</span><input id="userLedgerPeriod" type="month"></label></div>
+            <div class="mmn-section-heading"><div><p>Cada crédito, retenção, ajuste e estorno permanece visível.</p></div><label class="field mmn-period-filter"><span>Competência</span><input id="userLedgerPeriod" type="month"></label></div>
             <div class="mmn-ledger" id="userLedgerList"></div>
             <button class="btn btn-ghost mmn-load-more" id="userLedgerMore" type="button" hidden>Carregar mais</button>
           </section>
 
           <section data-user-panel="beneficios" hidden>
-            <div class="mmn-section-heading"><div><h2>Ranks e bônus</h2><p>Veja critérios, progresso e qualificações com clareza.</p></div></div>
+            <div class="mmn-section-heading"><div><p>Veja critérios, progresso e qualificações com clareza.</p></div></div>
             <div class="mmn-rank-ladder" id="userRankLadder"></div>
             <div class="mmn-bonus-grid" id="userBonusGrid"></div>
           </section>
 
           <section data-user-panel="simulador" hidden>
-            <div class="mmn-section-heading"><div><h2>Simule sua evolução</h2><p>Uma projeção educativa baseada na sua rede atual e nas regras vigentes.</p></div></div>
+            <div class="mmn-section-heading"><div><p>Uma projeção educativa baseada na sua rede atual e nas regras vigentes.</p></div></div>
             <div class="mmn-simulator-layout">
               <form id="userSimulatorForm" class="mmn-simulator-form">
                 <label class="field"><span>Novos diretos por mês</span><input id="userSimDirects" type="number" min="0" max="100" value="2" required></label>
@@ -301,22 +332,51 @@
               </form>
               <div class="mmn-simulator-results" id="userSimulatorResults"><div class="mmn-empty">Preencha os dados e toque em Simular.</div></div>
             </div>
-            <p class="mmn-disclaimer">Simulação meramente estimativa. Não constitui promessa ou garantia de renda, pagamento ou resultado.</p>
           </section>
 
           <section data-user-panel="pagamentos" hidden>
-            <div class="mmn-section-heading"><div><h2>Pagamentos e RPA</h2><p>Acompanhe aprovações, retenções e comprovantes.</p></div></div>
+            <div class="mmn-section-heading"><div><p>Acompanhe aprovações, retenções e comprovantes.</p></div></div>
             <div class="mmn-payment-summary" id="userPaymentSummary"></div>
             <div class="mmn-ledger" id="userPaymentList"></div>
             <button class="btn btn-ghost mmn-load-more" id="userPaymentsMore" type="button" hidden>Carregar mais</button>
           </section>
 
           <section data-user-panel="perfil" hidden>
-            <div class="mmn-section-heading"><div><h2>Meus dados do programa</h2><p>Atualize dados de pagamento sem alterar sua identidade no app.</p></div></div>
+            <div class="mmn-section-heading"><div><p>Atualize seus dados e forma de recebimento.</p></div></div>
             <form id="userProfileForm" class="mmn-profile-form">
               <div class="form-grid">
-                <label class="field"><span>Tipo de chave PIX</span><select id="profilePixType"><option value="cpf">CPF</option><option value="email">E-mail</option><option value="celular">Celular</option><option value="aleatoria">Chave aleatória</option></select></label>
-                <label class="field"><span>Chave PIX</span><small id="profilePixMasked" class="mmn-field-current">Nenhuma chave cadastrada.</small><input id="profilePixKey" maxlength="180" placeholder="Deixe vazio para manter a chave atual"><small>Preencha somente se quiser substituir a chave cadastrada.</small></label>
+                <label class="field"><span>Tipo de chave PIX</span><select id="profilePixType" aria-describedby="profilePixStatus"><option value="cpf">CPF</option><option value="email">E-mail</option><option value="celular">Celular</option><option value="aleatoria">Chave aleatória</option></select></label>
+                <label class="field"><span>Chave PIX</span><small id="profilePixMasked" class="mmn-field-current">Nenhuma chave cadastrada.</small><input id="profilePixKey" maxlength="180" autocomplete="off" aria-describedby="profilePixFieldStatus profilePixStatus" placeholder="Deixe vazio para manter a chave atual"><small class="mmn-pix-field-status" id="profilePixFieldStatus" role="status" aria-live="polite" aria-atomic="true"></small><small>Preencha somente se quiser substituir a chave cadastrada.</small></label>
+                <div class="field wide mmn-pix-validation" id="profilePixValidation">
+                  <div class="mmn-pix-toolbar">
+                    <button class="btn btn-ghost" id="profilePixVerify" type="button">Verificar chave Pix</button>
+                    <div class="mmn-pix-status" id="profilePixStatus" role="status" aria-live="polite">A chave atual será mantida enquanto este campo ficar vazio.</div>
+                  </div>
+                  <section class="mmn-pix-result" id="profilePixResult" aria-labelledby="profilePixResultTitle" hidden>
+                    <div class="mmn-pix-result-head">
+                      <div>
+                        <strong id="profilePixResultTitle">Confira os dados encontrados</strong>
+                        <small>Confirme somente se os dados pertencem ao titular do cadastro Turbo Tiger.</small>
+                      </div>
+                    </div>
+                    <dl class="mmn-pix-details">
+                      <div><dt>Tipo</dt><dd id="profilePixResultType">—</dd></div>
+                      <div><dt>Chave</dt><dd id="profilePixResultKey">—</dd></div>
+                      <div><dt>Nome completo do titular</dt><dd id="profilePixResultHolderName">—</dd></div>
+                      <div><dt>CPF do titular</dt><dd id="profilePixResultHolderCpf">—</dd></div>
+                      <div><dt>Código do banco</dt><dd id="profilePixResultBankCode">—</dd></div>
+                      <div><dt>Banco</dt><dd id="profilePixResultBankName">—</dd></div>
+                    </dl>
+                    <div class="mmn-pix-result-actions">
+                      <button class="btn btn-primary" id="profilePixConfirm" type="button" disabled>Confirmar e cadastrar</button>
+                      <button class="btn btn-ghost" id="profilePixCorrect" type="button">Corrigir chave</button>
+                    </div>
+                  </section>
+                  <div class="mmn-pix-confirmed" id="profilePixConfirmed" role="status" aria-live="polite" hidden>
+                    <strong>Chave Pix confirmada.</strong>
+                    <span>Ela será mantida enquanto você não informar uma nova chave.</span>
+                  </div>
+                </div>
                 <label class="field"><span>CEP</span><input id="profilePostalCode" inputmode="numeric" maxlength="9" autocomplete="postal-code" placeholder="00000-000" pattern="[0-9]{5}-?[0-9]{3}" required></label>
                 <label class="field"><span>Rua / Avenida</span><input id="profileAddress" maxlength="180" autocomplete="address-line1" required></label>
                 <label class="field"><span>Número</span><input id="profileAddressNumber" maxlength="20" autocomplete="address-line2" required></label>
@@ -327,10 +387,18 @@
                 <label class="field"><span>NIT/PIS/PASEP</span><input id="profileNit" maxlength="14"></label>
                 <div class="field wide mmn-address-search"><button class="btn btn-ghost" id="profileFindPostalCode" type="button">Encontrar CEP pelo endereço</button><div id="profilePostalCodeResults" hidden><label for="profilePostalCodeSelect">Selecione o endereço correto</label><select id="profilePostalCodeSelect"><option value="">Selecione</option></select></div><div class="mmn-address-status" id="profilePostalCodeStatus" role="status" aria-live="polite"></div></div>
               </div>
-              <label class="mmn-check"><input id="profilePixOwnership" type="checkbox" required><span>Confirmo que a chave PIX pertence ao mesmo CPF do cadastro.</span></label>
               <div class="mmn-form-feedback" id="profileStatus" role="status" aria-live="polite"></div>
               <button class="btn btn-primary" id="profileSubmit" type="submit">Salvar dados</button>
             </form>
+
+            <article class="mmn-program-exit" aria-labelledby="programExitTitle">
+              <div>
+                <h3 id="programExitTitle">Participação no programa</h3>
+                <p>Você pode sair voluntariamente quando quiser. Para participar novamente, será necessário realizar uma nova adesão e aceitar o regulamento vigente.</p>
+                <div class="mmn-form-feedback" id="programExitStatus" role="status" aria-live="polite"></div>
+              </div>
+              <button class="btn btn-danger" id="programExitOpen" type="button">Sair do programa</button>
+            </article>
           </section>
         </div>
       </div>
@@ -592,6 +660,73 @@
     </main>
   </div>
 
+  <section class="mmn-detail-overlay" id="networkExplorerOverlay" role="dialog" aria-modal="true" aria-labelledby="networkExplorerTitle" hidden>
+    <div class="mmn-detail-frame">
+      <header class="mmn-detail-head">
+        <button class="btn btn-ghost btn-small" id="networkExplorerBack" type="button" hidden>Voltar</button>
+        <div>
+          <span>Ramificação da rede</span>
+          <h2 id="networkExplorerTitle">Indicados</h2>
+          <p id="networkExplorerSubtitle"></p>
+        </div>
+        <button class="mmn-detail-close" id="networkExplorerClose" type="button" aria-label="Fechar">×</button>
+      </header>
+      <div class="mmn-detail-content" id="networkExplorerContent"></div>
+      <button class="btn btn-ghost mmn-overlay-load-more" id="networkExplorerMore" type="button" hidden>Carregar mais indicados</button>
+    </div>
+  </section>
+
+  <section class="mmn-detail-overlay mmn-diagram-overlay" id="networkDiagramOverlay" role="dialog" aria-modal="true" aria-labelledby="networkDiagramTitle" hidden>
+    <div class="mmn-detail-frame is-wide">
+      <header class="mmn-detail-head">
+        <div>
+          <span>Visão da rede</span>
+          <h2 id="networkDiagramTitle">Diagrama da sua rede</h2>
+          <p>Patrocínio e ramificações preservados na ordem da indicação.</p>
+        </div>
+        <div class="mmn-detail-actions">
+          <button class="btn btn-primary btn-small" id="networkDiagramPrint" type="button">Exportar PDF</button>
+          <button class="mmn-detail-close" id="networkDiagramClose" type="button" aria-label="Fechar">×</button>
+        </div>
+      </header>
+      <div class="mmn-diagram-print-head"><strong>Turbo Tiger · Indicações e Benefícios</strong><span>Diagrama da rede</span></div>
+      <div class="mmn-detail-content mmn-network-diagram" id="networkDiagramContent"></div>
+    </div>
+  </section>
+
+  <section class="mmn-detail-overlay" id="rankQualifiedOverlay" role="dialog" aria-modal="true" aria-labelledby="rankQualifiedTitle" hidden>
+    <div class="mmn-detail-frame">
+      <header class="mmn-detail-head">
+        <div>
+          <span>Qualificação</span>
+          <h2 id="rankQualifiedTitle">Participantes qualificados</h2>
+          <p id="rankQualifiedSubtitle"></p>
+        </div>
+        <button class="mmn-detail-close" id="rankQualifiedClose" type="button" aria-label="Fechar">×</button>
+      </header>
+      <div class="mmn-detail-content" id="rankQualifiedContent"></div>
+      <button class="btn btn-ghost mmn-overlay-load-more" id="rankQualifiedMore" type="button" hidden>Carregar mais participantes</button>
+    </div>
+  </section>
+
+  <section class="mmn-detail-overlay" id="evolutionChartOverlay" role="dialog" aria-modal="true" aria-labelledby="evolutionChartTitle" hidden>
+    <div class="mmn-detail-frame is-wide">
+      <header class="mmn-detail-head">
+        <div>
+          <span>Sua evolução</span>
+          <h2 id="evolutionChartTitle">Evolução da rede por competência</h2>
+          <p>Dados reais reconhecidos no seu painel.</p>
+        </div>
+        <button class="mmn-detail-close" id="evolutionChartClose" type="button" aria-label="Fechar">×</button>
+      </header>
+      <div class="mmn-detail-content" id="evolutionChartContent"></div>
+    </div>
+  </section>
+
+  <section class="mmn-regulation-overlay" id="regulationOverlay" aria-label="Regulamento de Indicações e Benefícios" hidden>
+    <iframe id="regulationOverlayFrame" title="Regulamento de Indicações e Benefícios"></iframe>
+  </section>
+
   <dialog class="mmn-dialog" id="actionDialog">
     <form method="dialog" id="actionDialogForm">
       <div class="mmn-dialog-head"><h2 id="actionDialogTitle">Confirmar ação</h2><button class="mmn-dialog-close" value="cancel" aria-label="Fechar" type="submit">×</button></div>
@@ -601,6 +736,28 @@
     </form>
   </dialog>
 
-  <script src="mmn.js?v=20260802-mmn-07"></script>
+  <dialog class="mmn-dialog mmn-program-exit-dialog" id="programExitDialog" aria-labelledby="programExitDialogTitle" aria-describedby="programExitDialogText">
+    <form method="dialog" id="programExitDialogForm">
+      <div class="mmn-dialog-head">
+        <h2 id="programExitDialogTitle">Confirmar saída do programa</h2>
+        <button class="mmn-dialog-close" id="programExitClose" aria-label="Fechar" type="button">×</button>
+      </div>
+      <div class="mmn-program-exit-warning">
+        <strong>Leia antes de continuar</strong>
+        <p id="programExitDialogText">Sua participação atual será encerrada. Você deixará de receber novos benefícios enquanto estiver fora do programa, e uma futura reentrada dependerá de nova adesão ao regulamento vigente.</p>
+      </div>
+      <label class="mmn-check mmn-program-exit-confirmation">
+        <input id="programExitConfirmCheck" type="checkbox">
+        <span>Entendo as consequências e confirmo que quero sair voluntariamente do programa.</span>
+      </label>
+      <div class="mmn-form-feedback" id="programExitDialogStatus" role="status" aria-live="polite"></div>
+      <div class="mmn-dialog-actions">
+        <button class="btn btn-ghost" id="programExitCancel" type="button">Cancelar</button>
+        <button class="btn btn-danger" id="programExitConfirm" type="submit" disabled>Confirmar saída</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="mmn.js?v=20260802-mmn-13"></script>
 </body>
 </html>
