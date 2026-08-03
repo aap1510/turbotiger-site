@@ -20,7 +20,7 @@
   }());
   </script>
   <link rel="stylesheet" href="../assets/admin.css?v=20260720-mmn-01">
-  <link rel="stylesheet" href="mmn.css?v=20260802-mmn-11">
+  <link rel="stylesheet" href="mmn.css?v=20260803-mmn-14">
 </head>
 <body data-admin-page="mmn">
   <div class="admin-shell mmn-shell">
@@ -131,13 +131,12 @@
                 </label>
                 <label class="field">
                   <span>Chave PIX</span>
-                  <input id="enrollmentPixKey" autocomplete="off" maxlength="180" aria-describedby="enrollmentPixFieldStatus enrollmentPixStatus" required>
-                  <small class="mmn-pix-field-status" id="enrollmentPixFieldStatus" role="status" aria-live="polite" aria-atomic="true"></small>
+                  <input id="enrollmentPixKey" autocomplete="off" maxlength="180" aria-describedby="enrollmentPixStatus" required>
                 </label>
               </div>
               <div class="mmn-pix-validation" id="enrollmentPixValidation">
                 <div class="mmn-pix-toolbar">
-                  <button class="btn btn-ghost" id="enrollmentPixVerify" type="button">Verificar chave Pix</button>
+                  <button class="btn btn-ghost" id="enrollmentPixVerify" type="button">Verificar chave PIX</button>
                   <div class="mmn-pix-status" id="enrollmentPixStatus" role="status" aria-live="polite">Informe o tipo e a chave, depois toque em verificar.</div>
                 </div>
                 <section class="mmn-pix-result" id="enrollmentPixResult" aria-labelledby="enrollmentPixResultTitle" hidden>
@@ -148,21 +147,18 @@
                     </div>
                   </div>
                   <dl class="mmn-pix-details">
-                    <div><dt>Tipo</dt><dd id="enrollmentPixResultType">—</dd></div>
-                    <div><dt>Chave</dt><dd id="enrollmentPixResultKey">—</dd></div>
-                    <div><dt>Nome completo do titular</dt><dd id="enrollmentPixResultHolderName">—</dd></div>
-                    <div><dt>CPF do titular</dt><dd id="enrollmentPixResultHolderCpf">—</dd></div>
-                    <div><dt>Código do banco</dt><dd id="enrollmentPixResultBankCode">—</dd></div>
+                    <div><dt>Nome completo</dt><dd id="enrollmentPixResultHolderName">—</dd></div>
+                    <div><dt>CPF</dt><dd id="enrollmentPixResultHolderCpf">—</dd></div>
                     <div><dt>Banco</dt><dd id="enrollmentPixResultBankName">—</dd></div>
                   </dl>
                   <div class="mmn-pix-result-actions">
-                    <button class="btn btn-primary" id="enrollmentPixConfirm" type="button" disabled>Confirmar e cadastrar</button>
-                    <button class="btn btn-ghost" id="enrollmentPixCorrect" type="button">Corrigir chave</button>
+                    <button class="btn btn-primary" id="enrollmentPixConfirm" type="button" disabled>Confirmar</button>
+                    <button class="btn btn-ghost" id="enrollmentPixCorrect" type="button">Corrigir chave PIX</button>
                   </div>
                 </section>
                 <div class="mmn-pix-confirmed" id="enrollmentPixConfirmed" role="status" aria-live="polite" hidden>
                   <strong>Chave Pix confirmada.</strong>
-                  <span>Você pode continuar a adesão. Se alterar o tipo ou a chave, será necessário verificar novamente.</span>
+                  <span>A confirmação foi registrada. Se alterar o tipo ou a chave, será necessário verificar novamente.</span>
                 </div>
               </div>
             </div>
@@ -346,10 +342,10 @@
             <form id="userProfileForm" class="mmn-profile-form">
               <div class="form-grid">
                 <label class="field"><span>Tipo de chave PIX</span><select id="profilePixType" aria-describedby="profilePixStatus"><option value="cpf">CPF</option><option value="email">E-mail</option><option value="celular">Celular</option><option value="aleatoria">Chave aleatória</option></select></label>
-                <label class="field"><span>Chave PIX</span><small id="profilePixMasked" class="mmn-field-current">Nenhuma chave cadastrada.</small><input id="profilePixKey" maxlength="180" autocomplete="off" aria-describedby="profilePixFieldStatus profilePixStatus" placeholder="Deixe vazio para manter a chave atual"><small class="mmn-pix-field-status" id="profilePixFieldStatus" role="status" aria-live="polite" aria-atomic="true"></small><small>Preencha somente se quiser substituir a chave cadastrada.</small></label>
+                <label class="field"><span>Chave PIX</span><small id="profilePixMasked" class="mmn-field-current">Nenhuma chave cadastrada.</small><input id="profilePixKey" maxlength="180" autocomplete="off" aria-describedby="profilePixStatus" placeholder="Deixe vazio para manter a chave atual"><small>Preencha somente se quiser substituir a chave cadastrada.</small></label>
                 <div class="field wide mmn-pix-validation" id="profilePixValidation">
                   <div class="mmn-pix-toolbar">
-                    <button class="btn btn-ghost" id="profilePixVerify" type="button">Verificar chave Pix</button>
+                    <button class="btn btn-ghost" id="profilePixVerify" type="button">Verificar chave PIX</button>
                     <div class="mmn-pix-status" id="profilePixStatus" role="status" aria-live="polite">A chave atual será mantida enquanto este campo ficar vazio.</div>
                   </div>
                   <section class="mmn-pix-result" id="profilePixResult" aria-labelledby="profilePixResultTitle" hidden>
@@ -360,16 +356,13 @@
                       </div>
                     </div>
                     <dl class="mmn-pix-details">
-                      <div><dt>Tipo</dt><dd id="profilePixResultType">—</dd></div>
-                      <div><dt>Chave</dt><dd id="profilePixResultKey">—</dd></div>
-                      <div><dt>Nome completo do titular</dt><dd id="profilePixResultHolderName">—</dd></div>
-                      <div><dt>CPF do titular</dt><dd id="profilePixResultHolderCpf">—</dd></div>
-                      <div><dt>Código do banco</dt><dd id="profilePixResultBankCode">—</dd></div>
+                      <div><dt>Nome completo</dt><dd id="profilePixResultHolderName">—</dd></div>
+                      <div><dt>CPF</dt><dd id="profilePixResultHolderCpf">—</dd></div>
                       <div><dt>Banco</dt><dd id="profilePixResultBankName">—</dd></div>
                     </dl>
                     <div class="mmn-pix-result-actions">
-                      <button class="btn btn-primary" id="profilePixConfirm" type="button" disabled>Confirmar e cadastrar</button>
-                      <button class="btn btn-ghost" id="profilePixCorrect" type="button">Corrigir chave</button>
+                      <button class="btn btn-primary" id="profilePixConfirm" type="button" disabled>Confirmar</button>
+                      <button class="btn btn-ghost" id="profilePixCorrect" type="button">Corrigir chave PIX</button>
                     </div>
                   </section>
                   <div class="mmn-pix-confirmed" id="profilePixConfirmed" role="status" aria-live="polite" hidden>
@@ -758,6 +751,6 @@
     </form>
   </dialog>
 
-  <script src="mmn.js?v=20260802-mmn-13"></script>
+  <script src="mmn.js?v=20260803-mmn-14"></script>
 </body>
 </html>

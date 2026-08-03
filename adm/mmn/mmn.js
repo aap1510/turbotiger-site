@@ -780,7 +780,6 @@
   }
 
   function setPixFieldStatus(prefix, text, kind) {
-    setStatus(prefix + "PixFieldStatus", text, kind);
     var key = qs(prefix + "PixKey");
     if (!key) return;
     if (kind === "error") key.setAttribute("aria-invalid", "true");
@@ -805,7 +804,7 @@
   function clearPixResult(prefix) {
     var result = qs(prefix + "PixResult");
     if (result) result.hidden = true;
-    ["Type", "Key", "HolderName", "HolderCpf", "BankCode", "BankName"].forEach(function (field) {
+    ["HolderName", "HolderCpf", "BankName"].forEach(function (field) {
       setText(prefix + "PixResult" + field, "—");
     });
     var checkbox = qs(prefix + "PixConfirmCheck");
@@ -822,7 +821,7 @@
     clearPixResult(prefix);
     if (prefix === "profile" && !profilePixChangeRequested() && flow.storedConfirmed) {
       setPixConfirmedPanel(prefix, true, "Ela será mantida enquanto você não informar uma nova chave.");
-      setStatus(prefix + "PixStatus", "A chave Pix atual está confirmada.", "ok");
+      setStatus(prefix + "PixStatus", "", null);
       setPixFieldStatus(prefix, "Chave Pix confirmada.", "ok");
       return;
     }
@@ -875,17 +874,23 @@
     var verify = qs(prefix + "PixVerify");
     var confirm = qs(prefix + "PixConfirm");
     var correct = qs(prefix + "PixCorrect");
-    if (verify) verify.disabled = flow.validating || flow.confirming || rateLimited || !minimumFormat.valid || currentPixIsPersisted(prefix);
+    if (verify) {
+      verify.hidden = flow.verified || currentPixIsPersisted(prefix);
+      verify.disabled = flow.validating || flow.confirming || rateLimited || !minimumFormat.valid || currentPixIsPersisted(prefix);
+    }
     if (confirm) {
       confirm.disabled = flow.validating || flow.confirming || !flow.verified || pixValidationExpired(flow) ||
         !samePixSnapshot(prefix, flow.validationType, flow.validationKeyFingerprint);
     }
     if (correct) correct.disabled = flow.confirming;
-    var submit = qs(prefix === "enrollment" ? "enrollmentSubmit" : "profileSubmit");
-    var submissionBlocked = !currentPixIsPersisted(prefix);
-    if (submit && !submit.dataset.busy) {
-      submit.disabled = submissionBlocked;
-      submit.setAttribute("aria-disabled", submissionBlocked ? "true" : "false");
+    if (prefix === "enrollment") updateEnrollmentSubmitState();
+    else {
+      var submit = qs("profileSubmit");
+      var submissionBlocked = !currentPixIsPersisted(prefix);
+      if (submit && !submit.dataset.busy) {
+        submit.disabled = submissionBlocked;
+        submit.setAttribute("aria-disabled", submissionBlocked ? "true" : "false");
+      }
     }
   }
 
@@ -1099,12 +1104,9 @@
   }
 
   function renderPixValidationResult(prefix, details) {
-    setText(prefix + "PixResultType", PIX_TYPE_LABELS[details.type] || details.type);
-    setText(prefix + "PixResultKey", details.key);
     setText(prefix + "PixResultHolderName", details.holderName);
     setText(prefix + "PixResultHolderCpf", details.holderCpf);
-    setText(prefix + "PixResultBankCode", details.bankCode);
-    setText(prefix + "PixResultBankName", details.bankName);
+    setText(prefix + "PixResultBankName", [details.bankCode, details.bankName].filter(Boolean).join(" "));
     qs(prefix + "PixResult").hidden = false;
     setPixConfirmedPanel(prefix, false);
   }
@@ -1208,7 +1210,7 @@
       clearPixExpiry(flow);
       clearPixResult(prefix);
       setPixConfirmedPanel(prefix, true, "A confirmação foi registrada. Se alterar o tipo ou a chave, será necessário verificar novamente.");
-      setPixWorkflowStatus(prefix, "Chave Pix confirmada e cadastrada com segurança.", "ok");
+      setPixWorkflowStatus(prefix, "", null);
       return true;
     } catch (error) {
       if (requestSequence !== flow.requestSequence) return false;
@@ -1275,7 +1277,7 @@
       if (!verified) return false;
     }
     if (!currentPixIsPersisted(prefix)) {
-      setPixWorkflowStatus(prefix, "Confira os dados encontrados e toque em Confirmar e cadastrar.", "warn");
+      setPixWorkflowStatus(prefix, "Confira os dados encontrados e toque em Confirmar.", "warn");
       updatePixActions(prefix);
       return false;
     }
@@ -1287,8 +1289,8 @@
     var pixRelated = isPixRelatedError(error);
     var codedError = !!cleanText(error && error.code) || /^[A-Z0-9_]+$/i.test(raw);
     var message = pixRelated && codedError ? pixErrorMessage(error, false) : friendlyMessage(raw);
-    if (pixRelated) setPixFieldStatus(prefix, message, "error");
-    setStatus(statusId, message, "error");
+    if (pixRelated) setPixWorkflowStatus(prefix, message, "error");
+    else setStatus(statusId, message, "error");
   }
 
   function setupPixValidationForms() {
@@ -1425,6 +1427,7 @@
     context.resolvedAddressKey = currentAddressKey(prefix);
     context.postalCodeConsistent = !!context.resolvedPostalCode && addressHasReverseLookupKey(prefix);
     updatePostalCodeSearchButton(prefix);
+    if (prefix === "enrollment") updateEnrollmentSubmitState();
   }
 
   function markAddressPending(prefix, scheduleLookup, delay) {
@@ -1434,10 +1437,12 @@
     if (unchanged) {
       context.postalCodeConsistent = true;
       updatePostalCodeSearchButton(prefix);
+      if (prefix === "enrollment") updateEnrollmentSubmitState();
       return;
     }
     context.postalCodeConsistent = false;
     updatePostalCodeSearchButton(prefix);
+    if (prefix === "enrollment") updateEnrollmentSubmitState();
     context.postalLookupRequest += 1;
     window.clearTimeout(context.reversePostalCodeTimer);
     if (!addressHasReverseLookupKey(prefix)) {
@@ -1887,6 +1892,70 @@
     if (hasAddress && (!context.postalCodeConsistent || context.resolvedPostalCode !== cep || context.resolvedAddressKey !== currentAddressKey(prefix))) {
       throw new Error("O CEP e o endereço ainda não foram confirmados. Corrija o endereço, selecione um dos CEPs encontrados ou digite um CEP válido.");
     }
+    return true;
+  }
+
+  function enrollmentCompletionIssue() {
+    if (!currentPixIsPersisted("enrollment")) {
+      return {
+        scope: "pix",
+        message: "Verifique, confira e confirme a chave Pix antes de concluir a adesão.",
+        element: qs("enrollmentPixKey")
+      };
+    }
+
+    var requiredFields = [
+      ["enrollmentPostalCode", "Informe um CEP válido com 8 dígitos."],
+      ["enrollmentAddress", "Informe a rua ou avenida."],
+      ["enrollmentAddressNumber", "Informe o número do endereço."],
+      ["enrollmentDistrict", "Informe o bairro."],
+      ["enrollmentState", "Selecione a UF do endereço."],
+      ["enrollmentCity", "Informe e selecione a cidade."]
+    ];
+    for (var index = 0; index < requiredFields.length; index += 1) {
+      var field = qs(requiredFields[index][0]);
+      if (!field || !cleanText(field.value)) {
+        return { scope: "form", message: requiredFields[index][1], element: field };
+      }
+    }
+    if (digitsOnly(qs("enrollmentPostalCode").value).length !== 8) {
+      return { scope: "form", message: "Informe um CEP válido com 8 dígitos.", element: qs("enrollmentPostalCode") };
+    }
+    var address = addressContext("enrollment");
+    if (!address.postalCodeConsistent ||
+        address.resolvedPostalCode !== digitsOnly(qs("enrollmentPostalCode").value) ||
+        address.resolvedAddressKey !== currentAddressKey("enrollment")) {
+      return {
+        scope: "form",
+        message: "Confirme o CEP e o endereço antes de concluir a adesão.",
+        element: qs("enrollmentPostalCode")
+      };
+    }
+    if (!qs("enrollmentTerms").checked) {
+      return {
+        scope: "form",
+        message: "Leia e aceite o regulamento vigente para concluir a adesão.",
+        element: qs("enrollmentTerms")
+      };
+    }
+    return null;
+  }
+
+  function updateEnrollmentSubmitState() {
+    var button = qs("enrollmentSubmit");
+    if (!button || button.dataset.busy) return;
+    var blocked = !!enrollmentCompletionIssue();
+    button.disabled = false;
+    button.classList.toggle("is-inactive", blocked);
+    button.dataset.inactive = blocked ? "true" : "false";
+    button.removeAttribute("aria-disabled");
+  }
+
+  function showEnrollmentCompletionIssue(issue) {
+    if (!issue) return false;
+    if (issue.scope === "pix") setPixWorkflowStatus("enrollment", issue.message, "error");
+    else setStatus("enrollmentStatus", issue.message, "error");
+    if (issue.element && typeof issue.element.focus === "function") issue.element.focus();
     return true;
   }
 
@@ -4185,10 +4254,26 @@
         setGlobalError(new Error("Não foi possível copiar o link neste dispositivo."));
       }
     });
+    var enrollmentForm = qs("enrollmentForm");
+    if (enrollmentForm) {
+      ["input", "change"].forEach(function (eventName) {
+        enrollmentForm.addEventListener(eventName, function () {
+          setStatus("enrollmentStatus", "", null);
+          updateEnrollmentSubmitState();
+        });
+      });
+    }
+    on("enrollmentSubmit", "click", function (event) {
+      var issue = enrollmentCompletionIssue();
+      if (showEnrollmentCompletionIssue(issue)) event.preventDefault();
+    });
     on("enrollmentForm", "submit", async function (event) {
       event.preventDefault();
+      if (showEnrollmentCompletionIssue(enrollmentCompletionIssue())) {
+        updateEnrollmentSubmitState();
+        return;
+      }
       if (!(await ensurePixReadyForSubmission("enrollment"))) {
-        setStatus("enrollmentStatus", "Verifique, confira e confirme a chave Pix antes de concluir a adesão.", "error");
         updatePixActions("enrollment");
         return;
       }

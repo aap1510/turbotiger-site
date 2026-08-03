@@ -1364,6 +1364,11 @@ button.mmn-rank-card:focus-visible {
   color: var(--mmn-green);
 }
 
+.btn.is-inactive {
+  cursor: not-allowed;
+  opacity: .64;
+}
+
 .mmn-pix-field-status {
   min-height: 17px;
   color: var(--mmn-muted);
