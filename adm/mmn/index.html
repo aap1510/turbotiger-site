@@ -20,18 +20,18 @@
   }());
   </script>
   <link rel="stylesheet" href="../assets/admin.css?v=20260720-mmn-01">
-  <link rel="stylesheet" href="mmn.css?v=20260803-mmn-14">
+  <link rel="stylesheet" href="mmn.css?v=20260803-mmn-16">
 </head>
 <body data-admin-page="mmn">
   <div class="admin-shell mmn-shell">
     <aside class="admin-sidebar" aria-label="Navegação principal">
-      <div class="admin-brand mmn-brand">
+      <a class="admin-brand mmn-brand" href="https://turbotiger.com.br/" aria-label="Voltar para a página inicial do Turbo Tiger">
         <img src="../../assets/logo-300x300.webp" alt="Turbo Tiger">
         <div>
           <h1 id="brandTitle">Indicações e Benefícios</h1>
           <span id="adminIdentity">Turbo Tiger</span>
         </div>
-      </div>
+      </a>
 
       <nav class="admin-nav mmn-admin-only" aria-label="Áreas administrativas">
         <a class="nav-link" href="../admin/">Administração</a>
@@ -682,6 +682,7 @@
           <button class="mmn-detail-close" id="networkDiagramClose" type="button" aria-label="Fechar">×</button>
         </div>
       </header>
+      <div class="mmn-pdf-status" id="networkDiagramPrintStatus" role="status" aria-live="polite" hidden></div>
       <div class="mmn-diagram-print-head"><strong>Turbo Tiger · Indicações e Benefícios</strong><span>Diagrama da rede</span></div>
       <div class="mmn-detail-content mmn-network-diagram" id="networkDiagramContent"></div>
     </div>
@@ -751,6 +752,6 @@
     </form>
   </dialog>
 
-  <script src="mmn.js?v=20260803-mmn-14"></script>
+  <script src="mmn.js?v=20260803-mmn-15"></script>
 </body>
 </html>

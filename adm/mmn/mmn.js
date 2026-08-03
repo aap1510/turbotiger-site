@@ -328,6 +328,43 @@
     if (qs("loadingPanel")) qs("loadingPanel").hidden = !show;
   }
 
+  var DETAIL_OVERLAY_IDS = [
+    "networkExplorerOverlay",
+    "networkDiagramOverlay",
+    "rankQualifiedOverlay",
+    "evolutionChartOverlay"
+  ];
+
+  function overlayIsOpen(id) {
+    var overlay = qs(id);
+    return !!(overlay && !overlay.hidden);
+  }
+
+  function syncPageScrollLock() {
+    if (!document.body) return;
+    document.body.classList.toggle("mmn-detail-open", DETAIL_OVERLAY_IDS.some(overlayIsOpen));
+    document.body.classList.toggle("mmn-regulation-open", overlayIsOpen("regulationOverlay"));
+  }
+
+  function setupScrollLockRecovery() {
+    var overlays = DETAIL_OVERLAY_IDS.concat(["regulationOverlay"]).map(qs).filter(Boolean);
+    if (typeof MutationObserver === "function") {
+      var observer = new MutationObserver(syncPageScrollLock);
+      overlays.forEach(function (overlay) {
+        observer.observe(overlay, { attributes: true, attributeFilter: ["hidden"] });
+      });
+    }
+    window.addEventListener("pageshow", syncPageScrollLock);
+    window.addEventListener("focus", syncPageScrollLock);
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) {
+        document.body.classList.remove("mmn-network-printing");
+        syncPageScrollLock();
+      }
+    });
+    syncPageScrollLock();
+  }
+
   function hasNativeBridge() {
     try {
       return !!(window.TurboTigerHistoricoBridge &&
@@ -2314,7 +2351,7 @@
 
   async function openEvolutionChart() {
     qs("evolutionChartOverlay").hidden = false;
-    document.body.classList.add("mmn-detail-open");
+    syncPageScrollLock();
     if (!realEvolutionSourceRows().length && !state.user.evolution.loaded && !state.user.evolution.loading) {
       state.user.evolution.loading = true;
       state.user.evolution.error = "";
@@ -2336,7 +2373,7 @@
 
   function closeEvolutionChart() {
     qs("evolutionChartOverlay").hidden = true;
-    if (qs("networkExplorerOverlay").hidden && qs("networkDiagramOverlay").hidden && qs("rankQualifiedOverlay").hidden) document.body.classList.remove("mmn-detail-open");
+    syncPageScrollLock();
   }
 
   function renderUserNotifications(data) {
@@ -2787,14 +2824,14 @@
     state.user.network.stack = [id];
     renderNetworkExplorer();
     qs("networkExplorerOverlay").hidden = false;
-    document.body.classList.add("mmn-detail-open");
+    syncPageScrollLock();
     await loadNetworkNode(id, false);
   }
 
   function closeNetworkExplorer() {
     qs("networkExplorerOverlay").hidden = true;
     state.user.network.stack = [];
-    if (qs("networkDiagramOverlay").hidden && qs("rankQualifiedOverlay").hidden && qs("evolutionChartOverlay").hidden) document.body.classList.remove("mmn-detail-open");
+    syncPageScrollLock();
   }
 
   function diagramNodeHtml(person, visited) {
@@ -2803,11 +2840,11 @@
     visited[id] = true;
     var directFromRoot = networkPersonSponsorId(person) === state.user.network.rootId;
     var children = networkDiagramChildren(id);
-    var slot = networkPersonPlacementSlot(person);
+    var position = networkPersonPosition(person);
     var nested = children.map(function (child) {
       return diagramNodeHtml(child, visited);
     }).filter(Boolean).join("");
-    return "<li><article class=\"mmn-diagram-node\"><strong>" + escapeHtml(networkPersonDisplayName(person, directFromRoot)) + "</strong><small>" + escapeHtml(networkRegistrationLabel(person)) + "</small><span>" + escapeHtml((slot == null ? "Vaga estrutural não informada" : "Vaga estrutural #" + formatInteger(slot)) + " · " + (networkPersonActive(person) ? "Ativo" : "Inativo")) + "</span></article>" + (nested ? "<ul>" + nested + "</ul>" : "") + "</li>";
+    return "<li><article class=\"mmn-diagram-node\"><strong>" + escapeHtml(networkPersonDisplayName(person, directFromRoot)) + "</strong><small>" + escapeHtml(networkRegistrationLabel(person)) + "</small><span>" + escapeHtml((position == null ? "Vaga da indicação não informada" : "Vaga #" + formatInteger(position)) + " · " + (networkPersonActive(person) ? "Ativo" : "Inativo")) + "</span></article>" + (nested ? "<ul>" + nested + "</ul>" : "") + "</li>";
   }
 
   function renderNetworkDiagram() {
@@ -2826,7 +2863,7 @@
 
   async function openNetworkDiagram() {
     qs("networkDiagramOverlay").hidden = false;
-    document.body.classList.add("mmn-detail-open");
+    syncPageScrollLock();
     qs("networkDiagramContent").innerHTML = emptyHtml("Carregando o diagrama completo da rede...");
     try {
       var response = await rpc(CONFIG.rpcs.userNetworkDiagram, { p_limite: 10000 });
@@ -2850,7 +2887,7 @@
   function closeNetworkDiagram() {
     qs("networkDiagramOverlay").hidden = true;
     document.body.classList.remove("mmn-network-printing");
-    if (qs("networkExplorerOverlay").hidden && qs("rankQualifiedOverlay").hidden && qs("evolutionChartOverlay").hidden) document.body.classList.remove("mmn-detail-open");
+    syncPageScrollLock();
   }
 
   function renderUserNetwork(data, append) {
@@ -3018,7 +3055,7 @@
     if (!rank) return;
     state.user.rankQualified = { rank: rank, rows: qualifiedRowsForRank(rank), cursor: null, hasMore: false };
     qs("rankQualifiedOverlay").hidden = false;
-    document.body.classList.add("mmn-detail-open");
+    syncPageScrollLock();
     renderRankQualified(true, "");
     await loadRankQualified(false);
   }
@@ -3026,7 +3063,7 @@
   function closeRankQualified() {
     qs("rankQualifiedOverlay").hidden = true;
     state.user.rankQualified = { rank: null, rows: [], cursor: null, hasMore: false };
-    if (qs("networkExplorerOverlay").hidden && qs("networkDiagramOverlay").hidden && qs("evolutionChartOverlay").hidden) document.body.classList.remove("mmn-detail-open");
+    syncPageScrollLock();
   }
 
   function renderUserPayments(data, append) {
@@ -3066,11 +3103,35 @@
       return;
     }
     var summary = objectFrom(data, ["resumo", "resultado"]);
-    var metrics = listFrom(data, ["metricas"]);
+    var metrics = listFrom(data, ["metricas"]).slice();
+    var monthly = listFrom(data, ["serie", "projecao_mensal", "meses"]);
     if (!metrics.length) {
       Object.keys(summary).forEach(function (key) {
         var value = summary[key];
         if (typeof value !== "object") metrics.push({ chave: key, nome: key.replace(/_/g, " "), valor: value });
+      });
+    }
+    if (data.tipo === "usuario_pessoal" && monthly.length) {
+      var grossSum = monthly.reduce(function (total, row) { return total + numberValue(row.ganho_bruto_centavos); }, 0);
+      var netSum = monthly.reduce(function (total, row) { return total + numberValue(row.liquido_estimado_centavos); }, 0);
+      var lastMonth = monthly[monthly.length - 1] || {};
+      var projectedMonths = monthly.length;
+      metrics.forEach(function (metric) {
+        if (["bruto_total", "liquido_total"].indexOf(cleanText(metric.chave)) >= 0 && !metric.descricao) {
+          metric.descricao = "Total projetado para " + projectedMonths + (projectedMonths === 1 ? " mês." : " meses.");
+        }
+      });
+      metrics.push({
+        chave: "media_mensal_liquida",
+        nome: "Média mensal estimada",
+        valor_centavos: Math.round(netSum / projectedMonths),
+        descricao: "Bruto médio mensal: " + formatMoneyCents(Math.round(grossSum / projectedMonths)) + "."
+      });
+      metrics.push({
+        chave: "ultimo_mes_liquido",
+        nome: "Valor mensal no último mês",
+        valor_centavos: numberValue(lastMonth.liquido_estimado_centavos),
+        descricao: "Bruto no último mês: " + formatMoneyCents(lastMonth.ganho_bruto_centavos) + "."
       });
     }
     var html = metrics.map(function (metric) {
@@ -3087,7 +3148,6 @@
     if (data.id_simulacao || data.simulacao_id) {
       html += "<div class=\"mmn-simulation-meta\"><span>Simulação #" + escapeHtml(data.id_simulacao || data.simulacao_id) + "</span>" + pillHtml(data.apta_publicacao ? "ok" : "pendente", data.apta_publicacao ? "Apta para publicação" : "Somente análise") + "<span>Motor " + escapeHtml(data.motor_versao || "V2") + "</span></div>";
     }
-    var monthly = listFrom(data, ["serie", "projecao_mensal", "meses"]);
     if (monthly.length) {
       var personal = data.tipo === "usuario_pessoal";
       var replay = data.tipo === "admin_historica";
@@ -3099,8 +3159,22 @@
         return "<tr><td>" + escapeHtml(row.competencia || row.mes || "") + "</td><td>" + escapeHtml(formatInteger(firstDefined([row.rede_ativa, row.usuarios_ativos, row.ativos], null))) + "</td><td>" + escapeHtml(formatMoneyCents(centsFrom(row, ["receita_centavos"]))) + "</td><td>" + escapeHtml(formatMoneyCents(fourth)) + "</td><td>" + escapeHtml(formatMoneyCents(fifth)) + "</td><td>" + escapeHtml(formatPercent(row.payout_percentual)) + "</td></tr>";
       }).join("") + "</tbody></table></div>";
     }
-    var alerts = listFrom(data, ["alertas"]);
-    if (alerts.length) html += "<div class=\"mmn-simulation-alerts\"><strong>Avisos da simulação</strong>" + alerts.map(function (alert) { return "<span>" + escapeHtml(String(alert).replace(/_/g, " ")) + "</span>"; }).join("") + "</div>";
+    var alertMessages = {
+      projecao_futura_por_coortes_estatisticas: "Projeção futura calculada por coortes estatísticas.",
+      pool_global_sem_base_historica_estimado_como_indisponivel: "Pool global indisponível nesta estimativa por falta de base histórica.",
+      estrutura_parametrizada_e_deduplicacao_direta_prioritaria: "A projeção aplica a estrutura vigente e prioriza a comissão direta sem duplicidade.",
+      indicacao_pessoal_separada_do_posicionamento: "Indicação pessoal e posicionamento são calculados separadamente.",
+      spillover_futuro_estimado_por_capacidade: "O spillover futuro é estimado conforme a capacidade da estrutura.",
+      deduplicacao_apresentada_como_intervalo_sem_garantia: "A deduplicação futura é apresentada como intervalo estimado."
+    };
+    var alerts = listFrom(data, ["alertas"]).map(function (alert) {
+      var key = cleanText(alert).toLowerCase();
+      if (["estimativa_sem_garantia_de_renda", "simulacao_estimativa_sem_garantia_de_renda"].indexOf(key) >= 0) return "";
+      if (alertMessages[key]) return alertMessages[key];
+      var message = String(alert).replace(/_/g, " ").trim();
+      return message ? message.charAt(0).toUpperCase() + message.slice(1) + (/[.!?]$/.test(message) ? "" : ".") : "";
+    }).filter(Boolean);
+    if (alerts.length) html += "<div class=\"mmn-simulation-alerts\"><strong>Avisos da simulação</strong>" + alerts.map(function (alert) { return "<span>" + escapeHtml(alert) + "</span>"; }).join("") + "</div>";
     html += "<p class=\"mmn-disclaimer\">Simulação estimativa, sem promessa ou garantia de renda, pagamento ou resultado.</p>";
     container.innerHTML = html || emptyHtml("O servidor não retornou resultados para esta simulação.");
   }
@@ -4233,14 +4307,15 @@
     frame.src = regulationOverlayUrl(rawUrl);
     overlay.hidden = false;
     document.body.classList.add("mmn-regulation-open");
+    syncPageScrollLock();
   }
 
   function closeRegulationOverlay() {
     var overlay = qs("regulationOverlay");
     var frame = qs("regulationOverlayFrame");
-    if (!overlay || overlay.hidden) return;
+    if (!overlay) return;
     overlay.hidden = true;
-    document.body.classList.remove("mmn-regulation-open");
+    syncPageScrollLock();
     if (frame) frame.src = "about:blank";
     var link = qs("regulationLink");
     if (link) link.focus();
@@ -4456,12 +4531,37 @@
       await openNetworkDiagram();
     });
     on("networkDiagramClose", "click", closeNetworkDiagram);
+    function setNetworkDiagramPrintStatus(message, tone) {
+      var status = qs("networkDiagramPrintStatus");
+      if (!status) return;
+      status.textContent = message || "";
+      status.hidden = !message;
+      status.classList.toggle("is-success", tone === "success");
+      status.classList.toggle("is-error", tone === "error");
+    }
     on("networkDiagramPrint", "click", function () {
       document.body.classList.add("mmn-network-printing");
+      setNetworkDiagramPrintStatus("Preparando o diagrama para gerar o PDF...", null);
+      if (hasNativeBridge()) {
+        try {
+          window.TurboTigerHistoricoBridge.post("TURBO_MMN_EXPORT_NETWORK_PDF");
+          return;
+        } catch (error) {
+          document.body.classList.remove("mmn-network-printing");
+          setNetworkDiagramPrintStatus("Não foi possível abrir a geração do PDF no aplicativo.", "error");
+          return;
+        }
+      }
       window.setTimeout(function () { window.print(); }, 0);
+    });
+    window.addEventListener("TURBO_MMN_PDF_STATUS", function (event) {
+      var detail = event.detail || {};
+      setNetworkDiagramPrintStatus(detail.message || (detail.ok ? "Escolha Salvar como PDF na tela aberta pelo dispositivo." : "Não foi possível gerar o PDF."), detail.ok ? "success" : "error");
+      if (!detail.ok) document.body.classList.remove("mmn-network-printing");
     });
     window.addEventListener("afterprint", function () {
       document.body.classList.remove("mmn-network-printing");
+      setNetworkDiagramPrintStatus("A geração do PDF foi concluída ou cancelada.", "success");
     });
     on("userRankLadder", "click", async function (event) {
       var card = event.target.closest("[data-rank-qualified-index]");
@@ -5214,6 +5314,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     configureMode();
+    setupScrollLockRecovery();
     setupInitialValues();
     setupTabs();
     setupAuthEvents();
