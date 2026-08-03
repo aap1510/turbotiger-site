@@ -4,6 +4,7 @@
   var CONFIG = {
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
+    siteHomeUrl: "https://turbotiger.com.br/",
     adminSessionKey: "tt_admin_session_v1",
     requestTimeoutMs: 30000,
     addressRequestTimeoutMs: 4500,
@@ -386,6 +387,58 @@
       setText("brandTitle", "Admin MMN");
       setText("pageTitle", "Painel MMN");
     }
+  }
+
+  var brandHomeUrlRequest = null;
+
+  async function publicConfigValue(category, type) {
+    var data = await fetchJson(CONFIG.supabaseUrl + "/rest/v1/rpc/app_config_buscar_rpc", {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        apikey: CONFIG.apiKey,
+        Authorization: "Bearer " + CONFIG.apiKey,
+        "Content-Type": "application/json; charset=utf-8"
+      },
+      body: JSON.stringify({ p_categoria: category, p_tipo: type })
+    });
+    if (data && typeof data === "object") {
+      return cleanText(firstDefined([data.valor, data.value], ""));
+    }
+    return cleanText(data);
+  }
+
+  function safeBrandHomeUrl(value) {
+    try {
+      var normalized = cleanText(value);
+      if (!normalized) return CONFIG.siteHomeUrl;
+      var parsed = new URL(normalized, window.location.origin);
+      return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.toString() : CONFIG.siteHomeUrl;
+    } catch (error) {
+      return CONFIG.siteHomeUrl;
+    }
+  }
+
+  function loadBrandHomeUrl() {
+    if (state.mode !== "user") return Promise.resolve(CONFIG.siteHomeUrl);
+    if (!brandHomeUrlRequest) {
+      brandHomeUrlRequest = publicConfigValue("turbotiger_urls", "index_app")
+        .then(safeBrandHomeUrl)
+        .catch(function () { return CONFIG.siteHomeUrl; });
+    }
+    return brandHomeUrlRequest;
+  }
+
+  function configureBrandHomeLink() {
+    var link = qs("brandHomeLink");
+    if (!link) return;
+    link.href = CONFIG.siteHomeUrl;
+    if (state.mode !== "user") return;
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      loadBrandHomeUrl().then(function (url) { window.location.assign(url); });
+    });
+    loadBrandHomeUrl().then(function (url) { link.href = url; });
   }
 
   function readAdminSession() {
@@ -5321,6 +5374,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     configureMode();
+    configureBrandHomeLink();
     setupScrollLockRecovery();
     setupInitialValues();
     setupTabs();
