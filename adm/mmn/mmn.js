@@ -2704,6 +2704,13 @@
       var placementParent = networkPersonPlacementParentId(person);
       return placementParent ? placementParent === expected : networkPersonSponsorId(person) === expected;
     }).sort(function (left, right) {
+      var leftPosition = networkPersonPosition(left);
+      var rightPosition = networkPersonPosition(right);
+      if (leftPosition != null || rightPosition != null) {
+        if (leftPosition == null) return 1;
+        if (rightPosition == null) return -1;
+        if (leftPosition !== rightPosition) return leftPosition - rightPosition;
+      }
       var leftSlot = networkPersonPlacementSlot(left);
       var rightSlot = networkPersonPlacementSlot(right);
       if (leftSlot != null && rightSlot != null && leftSlot !== rightSlot) return leftSlot - rightSlot;
@@ -4561,7 +4568,7 @@
     });
     window.addEventListener("afterprint", function () {
       document.body.classList.remove("mmn-network-printing");
-      setNetworkDiagramPrintStatus("A geração do PDF foi concluída ou cancelada.", "success");
+      setNetworkDiagramPrintStatus("", null);
     });
     on("userRankLadder", "click", async function (event) {
       var card = event.target.closest("[data-rank-qualified-index]");
