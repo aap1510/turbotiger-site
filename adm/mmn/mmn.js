@@ -819,6 +819,11 @@
   function renderPixBaseline(prefix) {
     var flow = pixState(prefix);
     clearPixResult(prefix);
+    if (flow.rateLimitedUntil > Date.now()) {
+      setPixConfirmedPanel(prefix, false);
+      setPixWorkflowStatus(prefix, "Muitas tentativas em pouco tempo. Aguarde um momento e tente novamente.", "error");
+      return;
+    }
     if (prefix === "profile" && !profilePixChangeRequested() && flow.storedConfirmed) {
       setPixConfirmedPanel(prefix, true, "Ela será mantida enquanto você não informar uma nova chave.");
       setStatus(prefix + "PixStatus", "", null);
@@ -894,6 +899,13 @@
     }
   }
 
+  function clearPixRateLimit(prefix) {
+    var flow = pixState(prefix);
+    if (flow.rateLimitTimer) window.clearTimeout(flow.rateLimitTimer);
+    flow.rateLimitedUntil = 0;
+    flow.rateLimitTimer = null;
+  }
+
   function schedulePixRateLimit(prefix, milliseconds) {
     var flow = pixState(prefix);
     if (flow.rateLimitTimer) window.clearTimeout(flow.rateLimitTimer);
@@ -901,6 +913,9 @@
     flow.rateLimitTimer = window.setTimeout(function () {
       flow.rateLimitedUntil = 0;
       flow.rateLimitTimer = null;
+      if (!flow.validating && !flow.confirming && !flow.verified && !currentPixIsPersisted(prefix)) {
+        renderPixBaseline(prefix);
+      }
       updatePixActions(prefix);
     }, Math.min(2147483647, Math.max(1000, flow.rateLimitedUntil - Date.now() + 50)));
   }
@@ -1138,6 +1153,7 @@
       });
       if (requestSequence !== flow.requestSequence || !samePixSnapshot(prefix, submitted.type, submitted.fingerprint)) return false;
       var details = normalizePixValidationResponse(response, submitted);
+      clearPixRateLimit(prefix);
       flow.validationId = details.validationId;
       flow.validationType = submitted.type;
       flow.validationKeyFingerprint = submitted.fingerprint;
@@ -1200,6 +1216,7 @@
         invalidConfirmation.code = "INVALID_RESPONSE";
         throw invalidConfirmation;
       }
+      clearPixRateLimit(prefix);
       flow.persisted = true;
       flow.persistedType = submitted.type;
       flow.persistedKeyFingerprint = submitted.fingerprint;
@@ -2058,14 +2075,17 @@
 
   function renderEnrollment(data) {
     var participation = userParticipation(data);
+    var eligibility = objectFrom(data, ["elegibilidade"]);
     var regulation = objectFrom(data, ["regulamento", "termos"]);
     var accepted = booleanValue(firstDefined([
       regulation.aceito,
       participation.aceite_vigente,
       participation.regulamento_aceito,
+      eligibility.regulamento_aceito,
       participation.aderiu,
       participation.adesao_ativa,
-      data.adesao_concluida
+      data.adesao_concluida,
+      cleanText(participation.status).toLowerCase() === "participando"
     ], false), false);
     if (participation.status === "saida_voluntaria") accepted = false;
     qs("userEnrollment").hidden = accepted;
