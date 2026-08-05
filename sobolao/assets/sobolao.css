@@ -896,7 +896,7 @@ th {
     align-content: center;
     justify-items: end;
     color: #fff;
-    font-size: calc(clamp(16px, 5.5vw, calc(30px - 4pt)) - 2pt);
+    font-size: calc(clamp(16px, 5.5vw, calc(30px - 4pt)) - 6pt);
     font-weight: 700;
     line-height: 1.12;
     text-align: right;
