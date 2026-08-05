@@ -1034,6 +1034,8 @@ html.sobolao-app-webview body > footer {
 html.sobolao-app-webview .sb-brand {
   display: flex;
   grid-template-columns: none;
+  width: 100%;
+  align-items: flex-start;
   gap: 8px;
 }
 
@@ -1041,17 +1043,34 @@ html.sobolao-app-webview .sb-brand-symbol {
   width: 42px;
   height: 42px;
   flex: 0 0 42px;
-  transform: translateX(-2px) scale(1.25) scaleX(-1);
+  transform: translateX(6px) scale(1.625) scaleX(-1);
+  transform-origin: center top;
 }
 
 html.sobolao-app-webview .sb-brand-wordmark {
   width: 120px;
   height: 48px;
-  transform: translateX(-8px);
+  transform: translateX(-8px) scale(1.25);
+  transform-origin: left top;
 }
 
 html.sobolao-app-webview .sb-brand-product {
-  display: none;
+  display: grid;
+  align-content: center;
+  justify-items: end;
+  width: 140px;
+  height: 48px;
+  margin-left: auto;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: right;
+  white-space: nowrap;
+}
+
+html.sobolao-app-webview .sb-brand-product span {
+  display: block;
 }
 
 html.sobolao-app-webview .sb-main {
