@@ -3,6 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<script>
+  if (/Instagram/i.test(navigator.userAgent)) {
+    document.documentElement.classList.add('tt-instagram');
+  }
+  if (/FBAN|FBAV|FB_IAB/i.test(navigator.userAgent)) {
+    document.documentElement.classList.add('tt-facebook');
+  }
+</script>
 <title>Turbo Tiger - Controle e Jogo Responsável</title>
 <meta name="description" content="Controle financeiro, organização, histórico e estatísticas para quem aposta com mais consciência e responsabilidade.">
 <link rel="canonical" href="https://turbotiger.com.br/">
@@ -282,6 +290,7 @@
     .hero-title-break{display:block}
     .hero-visual{top:140px;width:min(329px,84vw)}
     .hero-tiger{top:-152px;right:-65px;width:95%}
+    .tt-instagram .hero-tiger,.tt-facebook .hero-tiger{top:-202px}
     .hero-lead,.hero-impact{width:calc(100vw - 32px)}
     .intro{padding-top:40px}
   }
