@@ -86,7 +86,7 @@ a {
   height: 52px;
   flex: 0 0 52px;
   object-fit: contain;
-  transform: scale(1.3);
+  transform: translateX(5px) scale(1.43);
   transform-origin: center right;
 }
 
@@ -96,6 +96,7 @@ a {
   min-width: 0;
   object-fit: contain;
   object-position: left center;
+  transform: translateX(-25px);
 }
 
 .sb-brand-product {
