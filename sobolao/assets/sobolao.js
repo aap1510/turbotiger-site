@@ -966,7 +966,19 @@
     return "<div class=\"sb-empty\">" + escapeHtml(text) + "</div>";
   }
 
+  function renderAppGreeting() {
+    var heading = qs("appGreeting");
+    if (!heading || state.mode !== "app") return;
+    var user = state.session && state.session.user ? state.session.user : {};
+    var metadata = user.user_metadata || {};
+    var fullName = String(user.name || metadata.full_name || metadata.name || user.email || "").trim();
+    if (fullName.indexOf("@") >= 0) fullName = fullName.split("@")[0].replace(/[._-]+/g, " ");
+    var firstName = fullName.split(/\s+/)[0];
+    heading.textContent = firstName ? "Olá, " + firstName + "." : "Olá.";
+  }
+
   function renderAll() {
+    renderAppGreeting();
     applyRoleButtons();
     allowedTabsForRole();
     qs("backendNotice").hidden = !state.demo;

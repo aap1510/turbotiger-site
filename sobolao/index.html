@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Só Bolão - Turbo Tiger">
 <meta name="twitter:description" content="Módulo de bolão integrado ao Turbo Tiger.">
 <meta name="twitter:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
-<link rel="stylesheet" href="assets/sobolao.css?v=20260805-06" />
+  <link rel="stylesheet" href="assets/sobolao.css?v=20260805-07" />
   <link rel="stylesheet" href="../assets/turbotiger-app-menu.css?v=20260805-01">
 </head>
 <body data-sobolao-page="app" data-tt-app-menu-page="5">
@@ -122,6 +122,10 @@
       </section>
 
       <div id="sobolaoApp" hidden>
+        <section class="sb-app-hero sb-app-only" aria-labelledby="appGreeting">
+          <h2 id="appGreeting">Olá.</h2>
+        </section>
+
         <section class="sb-notice" id="backendNotice" hidden>
           <strong>Prévia operacional</strong>
           <span>O painel está usando dados locais porque os RPCs ainda não responderam.</span>
@@ -135,6 +139,14 @@
           <article class="sb-metric"><strong id="metricParceiras">0</strong><span>Lotéricas parceiras</span></article>
           <article class="sb-metric"><strong id="metricPendencias">0</strong><span>Pendências</span></article>
         </section>
+
+        <nav class="sb-app-tabs sb-app-only" aria-label="Áreas do Só Bolão">
+          <button class="is-active" type="button" data-tab="visao" data-access="usuario">Visão</button>
+          <button type="button" data-tab="boloes" data-access="usuario">Bolões</button>
+          <button type="button" data-tab="meus" data-access="usuario">Meus bolões</button>
+          <button type="button" data-tab="resultados" data-access="usuario">Resultados</button>
+          <button type="button" data-tab="premios" data-access="usuario">Prêmios</button>
+        </nav>
 
         <section class="sb-panel" data-panel="visao">
           <div class="sb-panel-head">
@@ -163,7 +175,7 @@
         </section>
 
         <section class="sb-panel" data-panel="boloes" hidden>
-          <div class="sb-panel-head">
+          <div class="sb-panel-head sb-panel-head-filter">
             <div>
               <h2>Bolões disponíveis</h2>
               <span class="sb-status" id="boloesStatus"></span>
@@ -463,7 +475,7 @@
     <span class="sb-footer-links"><a href="/" style="color:inherit;text-decoration:none">Home</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/sobre-nos.html" style="color:inherit;text-decoration:none">Sobre</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/politicaetermos.html" style="color:inherit;text-decoration:none">Privacidade &amp; Termos de uso</a></span><span class="sb-footer-copyright"><span class="sb-footer-desktop-separator">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>&copy; 2026 Turbo Tiger</span>
   </footer>
 
-  <script src="assets/sobolao.js?v=20260805-02"></script>
+  <script src="assets/sobolao.js?v=20260805-03"></script>
   <script src="../assets/turbotiger-app-menu.js?v=20260805-01"></script>
 </body>
 </html>

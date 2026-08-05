@@ -1000,3 +1000,165 @@ th {
     display: none !important;
   }
 }
+
+.sb-app-only {
+  display: none;
+}
+
+html.sobolao-app-webview body {
+  background: var(--sb-bg);
+}
+
+html.sobolao-app-webview .sb-shell {
+  display: block;
+}
+
+html.sobolao-app-webview .sb-sidebar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  padding: max(10px, env(safe-area-inset-top)) 16px 10px;
+  border-right: 0;
+}
+
+html.sobolao-app-webview .sb-sidebar .sb-menu,
+html.sobolao-app-webview .sb-sidebar-foot,
+html.sobolao-app-webview .sb-topbar,
+html.sobolao-app-webview body > footer {
+  display: none !important;
+}
+
+html.sobolao-app-webview .sb-brand {
+  display: flex;
+  grid-template-columns: none;
+  gap: 8px;
+}
+
+html.sobolao-app-webview .sb-brand-symbol {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  transform: translateX(-2px) scale(1.25) scaleX(-1);
+}
+
+html.sobolao-app-webview .sb-brand-wordmark {
+  width: 120px;
+  height: 48px;
+  transform: translateX(-8px);
+}
+
+html.sobolao-app-webview .sb-brand-product {
+  display: none;
+}
+
+html.sobolao-app-webview .sb-main {
+  width: 100%;
+  padding: 14px max(14px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+}
+
+html.sobolao-app-webview .sb-app-only {
+  display: flex;
+}
+
+.sb-app-hero {
+  position: relative;
+  overflow: hidden;
+  align-items: flex-end;
+  min-height: 150px;
+  margin-bottom: 14px;
+  padding: 24px;
+  color: #fff;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 82% 20%, rgba(244, 180, 0, .24), transparent 34%),
+    linear-gradient(135deg, #111417 0%, #24292e 100%);
+  box-shadow: 0 15px 34px rgba(15, 18, 20, .18);
+}
+
+.sb-app-hero::after {
+  content: "";
+  position: absolute;
+  right: -42px;
+  bottom: -70px;
+  width: 190px;
+  height: 190px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 50%;
+  box-shadow: 0 0 0 26px rgba(255, 255, 255, .025), 0 0 0 58px rgba(255, 255, 255, .018);
+}
+
+.sb-app-hero h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(29px, 7vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -.03em;
+}
+
+html.sobolao-app-webview .sb-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+html.sobolao-app-webview .sb-app-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  gap: 6px;
+  overflow-x: auto;
+  margin: 0 0 18px;
+  padding: 6px;
+  border: 1px solid var(--sb-line);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, .95);
+  box-shadow: 0 8px 24px rgba(20, 26, 31, .08);
+  scrollbar-width: none;
+}
+
+.sb-app-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.sb-app-tabs button {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 8px 13px;
+  color: var(--sb-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sb-app-tabs button.is-active {
+  color: #111;
+  background: var(--sb-gold);
+}
+
+html.sobolao-app-webview .sb-panel-head {
+  display: none;
+}
+
+html.sobolao-app-webview .sb-panel-head.sb-panel-head-filter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+html.sobolao-app-webview .sb-panel-head-filter > div:first-child {
+  display: none;
+}
+
+@media (max-width: 680px) {
+  html.sobolao-app-webview .sb-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html.sobolao-app-webview .sb-panel-head.sb-panel-head-filter {
+    align-items: stretch;
+  }
+}
