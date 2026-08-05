@@ -1043,14 +1043,14 @@ html.sobolao-app-webview .sb-brand-symbol {
   width: 42px;
   height: 42px;
   flex: 0 0 42px;
-  transform: translateX(6px) scale(2.03125) scaleX(-1);
+  transform: translateX(6px) scale(1.828125) scaleX(-1);
   transform-origin: center top;
 }
 
 html.sobolao-app-webview .sb-brand-wordmark {
   width: 120px;
   height: 48px;
-  transform: translateX(2px) scale(1.375);
+  transform: translate(7px, -5px) scale(1.5125);
   transform-origin: left top;
 }
 
@@ -1062,7 +1062,7 @@ html.sobolao-app-webview .sb-brand-product {
   height: 48px;
   margin-left: auto;
   color: #fff;
-  font-size: 14px;
+  font-size: calc(14px - 2pt);
   font-weight: 700;
   line-height: 1.35;
   text-align: right;
