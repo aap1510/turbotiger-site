@@ -15,7 +15,11 @@
     background: "bg-900x900.webp",
     logo: "logo-300x300.webp",
     tiger: "tiger-500x500.webp",
-    icon: "icone-turbotiger-raio.webp"
+    icon: "icone-turbotiger-raio.webp",
+    menuShare: "menu-compartilhar.webp",
+    menuNetwork: "menu-rede.webp",
+    menuMain: "icone-turbotiger-raio.webp",
+    menuMarketing: "menu-mkt-digital.webp"
   };
 
   function normalizeValue(value) {
@@ -229,6 +233,65 @@
     updateFavicon(localAssetUrl(LOCAL_IMAGE_FILES.icon));
   }
 
+  function updateAppMenuButton(index, iconUrl, targetUrl, fallbackIconUrl) {
+    var button = document.querySelector("[data-tt-menu-button='" + index + "']");
+    if (!button) return;
+
+    var image = button.querySelector("img");
+    if (image) {
+      if (iconUrl) {
+        image.onerror = fallbackIconUrl ? function () {
+          image.onerror = null;
+          image.src = fallbackIconUrl;
+        } : null;
+        image.src = cacheBustUrl(iconUrl);
+        image.hidden = false;
+      } else {
+        image.hidden = true;
+        image.removeAttribute("src");
+      }
+    }
+
+    if (targetUrl) {
+      button.href = targetUrl;
+      button.removeAttribute("aria-disabled");
+    } else {
+      button.href = "#";
+      button.setAttribute("aria-disabled", "true");
+    }
+  }
+
+  async function updateAppMenu() {
+    if (!document.querySelector("[data-tt-app-menu]")) return;
+
+    document.querySelectorAll("[data-tt-menu-button]").forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        if (button.getAttribute("aria-disabled") === "true") {
+          event.preventDefault();
+        }
+      });
+    });
+
+    var values = await Promise.all([
+      fetchConfig("turbotiger_site", "menu_btn1_icone"),
+      fetchConfig("turbotiger_site", "menu_btn1_url"),
+      fetchConfig("turbotiger_site", "menu_btn2_icone"),
+      fetchConfig("turbotiger_site", "menu_btn2_url"),
+      fetchConfig("turbotiger_site", "menu_btn3_icone"),
+      fetchConfig("turbotiger_site", "menu_btn3_url"),
+      fetchConfig("turbotiger_site", "menu_btn4_icone"),
+      fetchConfig("turbotiger_site", "menu_btn4_url"),
+      fetchConfig("turbotiger_site", "menu_btn5_icone"),
+      fetchConfig("turbotiger_site", "menu_btn5_url")
+    ]);
+
+    updateAppMenuButton(1, values[0] || localAssetUrl(LOCAL_IMAGE_FILES.menuShare), values[1] || "turbotiger://convite?acao=gerar_convite", localAssetUrl(LOCAL_IMAGE_FILES.menuShare));
+    updateAppMenuButton(2, values[2] || localAssetUrl(LOCAL_IMAGE_FILES.menuNetwork), values[3] || "https://turbotiger.com.br/adm/mmn/index.html", localAssetUrl(LOCAL_IMAGE_FILES.menuNetwork));
+    updateAppMenuButton(3, values[4] || localAssetUrl(LOCAL_IMAGE_FILES.menuMain), values[5] || "https://turbotiger.com.br/index_app.html", localAssetUrl(LOCAL_IMAGE_FILES.menuMain));
+    updateAppMenuButton(4, values[6] || localAssetUrl(LOCAL_IMAGE_FILES.menuMarketing), values[7], localAssetUrl(LOCAL_IMAGE_FILES.menuMarketing));
+    updateAppMenuButton(5, values[8], values[9] || "https://turbotiger.com.br/sobolao/");
+  }
+
   function setupFixedFooterCopyright() {
     var ticking = false;
 
@@ -352,11 +415,13 @@
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
       updateTurboTigerContacts();
+      updateAppMenu();
       setupFixedFooterCopyright();
       setupAgeNotice();
     });
   } else {
     updateTurboTigerContacts();
+    updateAppMenu();
     setupFixedFooterCopyright();
     setupAgeNotice();
   }

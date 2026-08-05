@@ -1,0 +1,19 @@
+{
+  "connector": "meta_ads",
+  "version": "1",
+  "mode": "read_only",
+  "capabilities": {
+    "accounts.list": true,
+    "campaigns.read": true,
+    "campaigns.create_draft": false,
+    "campaigns.activate": false,
+    "campaigns.pause": false,
+    "creatives.upload": false,
+    "metrics.read": true,
+    "webhooks.receive": false
+  },
+  "limits": {
+    "writes_enabled": false,
+    "max_daily_budget_change_percent": 0
+  }
+}

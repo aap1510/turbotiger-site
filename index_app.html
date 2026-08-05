@@ -41,9 +41,10 @@
 <link rel="icon" href="https://turbotiger.com.br/assets/icone-turbotiger-raio.ico">
 <link rel="apple-touch-icon" href="https://turbotiger.com.br/assets/logo-300x300.webp">
 <link rel="stylesheet" href="assets/turbotiger-index-app.css?v=20260801-01" />
-<link rel="stylesheet" href="assets/turbotiger-site-ui.css?v=20260722-02" />
+<link rel="stylesheet" href="assets/turbotiger-site-ui.css?v=20260805-22" />
+<link rel="stylesheet" href="assets/turbotiger-app-menu.css?v=20260805-01" />
 </head>
-<body data-tt-surface="app" data-tt-background="fundo_geral" style="--tt-site-background-url:url('assets/bg-900x900.webp')">
+<body data-tt-surface="app" data-tt-app-menu-page="3" data-tt-background="fundo_geral" style="--tt-site-background-url:url('assets/bg-900x900.webp')">
 <header class="site-header">
   <div class="wrap nav">
     <div class="brand">
@@ -156,6 +157,24 @@
 
 </main>
 
+<nav class="tt-app-menu" data-tt-app-menu aria-label="Navegação principal do Turbo Tiger">
+  <a class="tt-app-menu-item" id="ttAppMenuBtn1" data-tt-menu-button="1" href="turbotiger://convite?acao=gerar_convite" aria-label="Compartilhar convite">
+    <span class="tt-app-menu-icon"><img src="assets/menu-compartilhar.webp" alt=""></span>
+  </a>
+  <a class="tt-app-menu-item" data-tt-menu-button="2" href="https://turbotiger.com.br/adm/mmn/index.html" aria-label="Acompanhar indicações">
+    <span class="tt-app-menu-icon"><img src="assets/menu-rede.webp" alt=""></span>
+  </a>
+  <a class="tt-app-menu-item tt-app-menu-main is-active" data-tt-menu-button="3" href="https://turbotiger.com.br/index_app.html" aria-current="page" aria-label="Início Turbo Tiger">
+    <span class="tt-app-menu-icon"><img src="assets/icone-turbotiger-raio.webp" alt=""></span>
+  </a>
+  <a class="tt-app-menu-item" data-tt-menu-button="4" href="#" aria-disabled="true" aria-label="MKT Digital em breve">
+    <span class="tt-app-menu-icon"><img src="assets/menu-mkt-digital.webp" alt=""></span>
+  </a>
+  <a class="tt-app-menu-item" data-tt-menu-button="5" href="https://turbotiger.com.br/sobolao/" aria-label="Abrir Só Bolão">
+    <span class="tt-app-menu-icon"><img alt="" hidden></span>
+  </a>
+</nav>
+
 <footer class="site-footer">
   <div class="wrap footer-inner tt-site-footer">
     <small><span class="tt-footer-links"><a href="/sobre-nos.html">Sobre</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/politicaetermos.html">Privacidade &amp; Termos de uso</a></span><span class="tt-footer-copyright"><span class="tt-footer-desktop-separator">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>&copy; 2026 Turbo Tiger</span></small>
@@ -176,7 +195,9 @@ function turboTigerShareInvite(event) {
 }
 
 document.getElementById("btnShare").addEventListener("click", turboTigerShareInvite);
+document.getElementById("ttAppMenuBtn1").addEventListener("click", turboTigerShareInvite);
 </script>
 <script src="assets/turbotiger-site-ui.js"></script>
+<script src="assets/turbotiger-app-menu.js?v=20260805-01"></script>
 </body>
 </html>

@@ -1,0 +1,17 @@
+body.tt-app-menu-visible { padding-bottom: 88px !important; }
+.tt-app-menu { position:fixed; right:0; bottom:0; left:0; z-index:1200; display:none; grid-template-columns:repeat(5,minmax(0,1fr)); align-items:end; height:42px; padding:4px 5px max(4px,env(safe-area-inset-bottom)); border:0; border-radius:20px 20px 0 0; background:radial-gradient(ellipse at 50% -35%,rgba(255,255,255,.1),rgba(255,255,255,0) 58%),linear-gradient(180deg,#1c1c1c 0%,#090909 48%,#000 100%); box-shadow:0 11px 34px rgba(0,0,0,.74),inset 0 1px 0 rgba(255,255,255,.065); }
+body.tt-app-menu-visible .tt-app-menu { display:grid; }
+.tt-app-menu-item { position:relative; display:flex; min-width:0; height:32px; align-items:center; justify-content:center; flex-direction:column; border-radius:11px; color:rgba(241,243,248,.72); text-decoration:none; -webkit-tap-highlight-color:transparent; }
+.tt-app-menu-item::before { content:""; position:absolute; bottom:2px; left:50%; width:32px; height:8px; z-index:0; border-radius:999px; background:rgba(255,255,255,.384); filter:blur(7px); opacity:0; transform:translateX(-50%) scale(.72); transition:opacity .2s ease,transform .2s ease; }
+.tt-app-menu-item.is-active { color:#fff; }
+.tt-app-menu-item.is-active::before { opacity:.84; transform:translateX(-50%) scale(1); }
+.tt-app-menu-item[aria-disabled="true"] { cursor:default; opacity:.5; }
+.tt-app-menu-icon { position:relative; z-index:1; display:grid; place-items:center; width:30px; height:30px; }
+.tt-app-menu-icon img { display:block; width:25px; height:25px; object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,.42)); }
+.tt-app-menu-main { height:32px; }
+.tt-app-menu-main .tt-app-menu-icon { position:absolute; top:-21px; left:50%; width:48px; height:50px; overflow:visible; transform:translateX(-50%); }
+.tt-app-menu-main .tt-app-menu-icon::after { content:""; position:absolute; inset:2px; z-index:2; background:linear-gradient(110deg,transparent 27%,rgba(255,255,255,.98) 44%,#fff 50%,transparent 67%); background-size:240% 100%; background-position:145% 0; -webkit-mask:url("icone-turbotiger-raio.webp") center/contain no-repeat; mask:url("icone-turbotiger-raio.webp") center/contain no-repeat; animation:tt-app-menu-light-sweep 3.6s ease-in-out infinite; pointer-events:none; }
+.tt-app-menu-main .tt-app-menu-icon img { width:42px; height:45px; filter:drop-shadow(0 6px 7px rgba(0,0,0,.48)); }
+@keyframes tt-app-menu-light-sweep { 0%,58%{background-position:145% 0;opacity:0} 64%{opacity:1} 78%{background-position:-145% 0;opacity:1} 84%,100%{background-position:-145% 0;opacity:0} }
+@media (prefers-reduced-motion:reduce) { .tt-app-menu-main .tt-app-menu-icon::after { animation:none; display:none; } }
+@media print { .tt-app-menu { display:none!important; } }

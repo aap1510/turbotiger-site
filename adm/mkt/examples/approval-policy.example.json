@@ -1,0 +1,27 @@
+{
+  "name": "Politica inicial de producao",
+  "rules": [
+    {
+      "action": "campaign.activate",
+      "requires_human_approval": true
+    },
+    {
+      "action": "budget.increase",
+      "requires_human_approval": true,
+      "max_percent": 10,
+      "cooldown_hours": 24
+    },
+    {
+      "action": "celebrity_asset.use_paid",
+      "requires_human_approval": true,
+      "require_contract": true,
+      "require_territory_readback": true
+    },
+    {
+      "action": "message.send_automatic",
+      "requires_human_approval": false,
+      "allowed_topics": ["saudacao", "lista_de_espera", "informacao_basica"],
+      "escalate_unknown": true
+    }
+  ]
+}

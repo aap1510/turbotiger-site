@@ -23,7 +23,7 @@
 
   var LOTTERY_RULES = {
     mega_sena: { min: 1, max: 60, qty: 6, nome: "Mega-Sena" },
-    lotofacil: { min: 1, max: 25, qty: 15, nome: "Lotofacil" },
+    lotofacil: { min: 1, max: 25, qty: 15, nome: "Lotofácil" },
     quina: { min: 1, max: 80, qty: 5, nome: "Quina" }
   };
 
@@ -103,17 +103,17 @@
     var raw = String(value == null ? "" : value).trim();
     var map = {
       "Email not confirmed": "Confirme seu e-mail antes de entrar.",
-      "Failed to fetch": "Falha de conexao. Verifique sua internet e tente novamente.",
-      "Invalid login credentials": "E-mail ou senha invalidos.",
-      "invalid_grant": "E-mail ou senha invalidos.",
-      "missing_authorization": "Sessao expirada. Entre novamente.",
+      "Failed to fetch": "Falha de conexão. Verifique sua internet e tente novamente.",
+      "Invalid login credentials": "E-mail ou senha inválidos.",
+      "invalid_grant": "E-mail ou senha inválidos.",
+      "missing_authorization": "Sessão expirada. Entre novamente.",
       "nao_autenticado": "Entre para continuar.",
-      "sem_permissao_admin": "Sem permissao administrativa.",
-      "sem_permissao_sobolao": "Sem permissao para acessar o So Bolao.",
-      "sessao_expirada": "Sessao expirada. Entre novamente.",
-      "bolao_indisponivel": "Bolao indisponivel para reserva.",
-      "cotas_insuficientes": "Nao ha cotas suficientes nesse bolao.",
-      "dados_obrigatorios": "Preencha os campos obrigatorios.",
+      "sem_permissao_admin": "Sem permissão administrativa.",
+      "sem_permissao_sobolao": "Sem permissão para acessar o Só Bolão.",
+      "sessao_expirada": "Sessão expirada. Entre novamente.",
+      "bolao_indisponivel": "Bolão indisponível para reserva.",
+      "cotas_insuficientes": "Não há cotas suficientes nesse bolão.",
+      "dados_obrigatorios": "Preencha os campos obrigatórios.",
       "palpite_incompleto": "Complete a cartela do palpite antes de reservar."
     };
     return map[raw] || map[raw.toLowerCase()] || raw;
@@ -134,7 +134,11 @@
     var value = String(status || "").toLowerCase();
     var cls = value === "ativo" || value === "ativa" || value === "ok" || value === "aberto" || value === "pago" || value === "confirmado" || value === "apurado" ? "ok" :
       (value === "pendente" || value === "reservado" || value === "fechando" || value === "registrado" || value === "analise" || value === "rascunho" ? "warn" : "bad");
-    return "<span class=\"sb-pill " + cls + "\">" + escapeHtml(status || "pendente") + "</span>";
+    var labels = {
+      analise: "análise",
+      aguardando_comprovante: "aguardando comprovante"
+    };
+    return "<span class=\"sb-pill " + cls + "\">" + escapeHtml(labels[value] || status || "pendente") + "</span>";
   }
 
   function parseNumbers(value) {
@@ -253,10 +257,10 @@
       state.slip.selected = [];
       updateSlipHidden();
       qs("slipMode").textContent = "Escolha manual";
-      qs("slipCounter").textContent = "0/0 numeros";
-      qs("slipHint").textContent = "Selecione um bolao primeiro.";
-      qs("slipSubtitle").textContent = "Selecione um bolao para montar a cartela.";
-      qs("slipSelected").innerHTML = "<span class=\"sb-status\">Nenhum bolao selecionado.</span>";
+      qs("slipCounter").textContent = "0/0 números";
+      qs("slipHint").textContent = "Selecione um bolão primeiro.";
+      qs("slipSubtitle").textContent = "Selecione um bolão para montar a cartela.";
+      qs("slipSelected").innerHTML = "<span class=\"sb-status\">Nenhum bolão selecionado.</span>";
       grid.innerHTML = "";
       return;
     }
@@ -268,12 +272,12 @@
     var full = selected.length >= rule.qty;
     updateSlipHidden();
     qs("slipMode").textContent = rule.nome;
-    qs("slipCounter").textContent = selected.length + "/" + rule.qty + " numeros";
-    qs("slipHint").textContent = full ? "Cartela completa." : "Marque " + (rule.qty - selected.length) + " numero(s).";
-    qs("slipSubtitle").textContent = (bolao.titulo || rule.nome) + " #" + (bolao.concurso || "") + " - marque " + rule.qty + " numeros.";
+    qs("slipCounter").textContent = selected.length + "/" + rule.qty + " números";
+    qs("slipHint").textContent = full ? "Cartela completa." : "Marque " + (rule.qty - selected.length) + " número(s).";
+    qs("slipSubtitle").textContent = (bolao.titulo || rule.nome) + " #" + (bolao.concurso || "") + " - marque " + rule.qty + " números.";
     qs("slipSelected").innerHTML = selected.length ? selected.map(function (num) {
       return "<span class=\"sb-ball\">" + escapeHtml(num) + "</span>";
-    }).join("") : "<span class=\"sb-status\">Nenhum numero marcado.</span>";
+    }).join("") : "<span class=\"sb-status\">Nenhum número marcado.</span>";
 
     var buttons = [];
     for (var i = rule.min; i <= rule.max; i += 1) {
@@ -349,6 +353,30 @@
       throw new Error(message);
     }
     return data;
+  }
+
+  async function publicConfig(category, type) {
+    var response = await fetch(CONFIG.supabaseUrl + "/rest/v1/rpc/app_config_buscar_rpc", {
+      method: "POST",
+      headers: {
+        "apikey": CONFIG.apiKey,
+        "Authorization": "Bearer " + CONFIG.apiKey,
+        "Content-Type": "application/json; charset=utf-8"
+      },
+      body: JSON.stringify({ p_categoria: category, p_tipo: type })
+    });
+    return parseResponse(response);
+  }
+
+  async function loadBrandConfig() {
+    try {
+      var values = await Promise.all([
+        publicConfig("sobolao", "logo_img"),
+        publicConfig("sobolao", "logo_texto")
+      ]);
+      if (values[0]) qs("sobolaoLogoImg").src = values[0];
+      if (values[1]) qs("sobolaoLogoTexto").src = values[1];
+    } catch (error) {}
   }
 
   async function login(email, password) {
@@ -435,7 +463,7 @@
         concurso: 2921,
         data_sorteio: todayPlus(2),
         data_limite: todayPlus(1),
-        loterica: "Loterica Centro TT",
+        loterica: "Lotérica Centro TT",
         qtd_cotas: 180,
         cotas_reservadas: 128,
         valor_aposta_cota_centavos: 600,
@@ -447,13 +475,13 @@
       },
       {
         cod_bolao: 502,
-        titulo: "Lotofacil Disciplina",
-        modalidade: "Lotofacil",
+        titulo: "Lotofácil Disciplina",
+        modalidade: "Lotofácil",
         modalidade_chave: "lotofacil",
         concurso: 3440,
         data_sorteio: todayPlus(1),
         data_limite: todayPlus(1),
-        loterica: "Loterica Premium Sul",
+        loterica: "Lotérica Premium Sul",
         qtd_cotas: 90,
         cotas_reservadas: 82,
         valor_aposta_cota_centavos: 350,
@@ -471,7 +499,7 @@
         concurso: 6788,
         data_sorteio: todayPlus(3),
         data_limite: todayPlus(2),
-        loterica: "Loterica Jardim",
+        loterica: "Lotérica Jardim",
         qtd_cotas: 120,
         cotas_reservadas: 39,
         valor_aposta_cota_centavos: 300,
@@ -498,8 +526,8 @@
       },
       {
         cod_participacao: 9002,
-        bolao: "Lotofacil Disciplina",
-        modalidade: "Lotofacil",
+        bolao: "Lotofácil Disciplina",
+        modalidade: "Lotofácil",
         concurso: 3440,
         cotas: 1,
         valor_total_centavos: 385,
@@ -512,14 +540,14 @@
 
     var resultados = [
       { modalidade: "Mega-Sena", concurso: 2920, data_sorteio: todayPlus(-1), numeros: ["03", "14", "29", "36", "47", "58"], status: "apurado", premio_estimado_centavos: 6500000000 },
-      { modalidade: "Lotofacil", concurso: 3439, data_sorteio: todayPlus(-1), numeros: ["01", "02", "03", "05", "06", "08", "10", "11", "13", "14", "17", "19", "20", "23", "25"], status: "apurado", premio_estimado_centavos: 180000000 },
+      { modalidade: "Lotofácil", concurso: 3439, data_sorteio: todayPlus(-1), numeros: ["01", "02", "03", "05", "06", "08", "10", "11", "13", "14", "17", "19", "20", "23", "25"], status: "apurado", premio_estimado_centavos: 180000000 },
       { modalidade: "Quina", concurso: 6787, data_sorteio: todayPlus(-1), numeros: ["09", "26", "44", "61", "74"], status: "apurado", premio_estimado_centavos: 84000000 }
     ];
 
     var lotericas = [
-      { cod_loterica: 301, nome: "Loterica Centro TT", cnpj: "00000000000191", cidade: "Sao Paulo", uf: "SP", whatsapp: "11999990000", status: "ativa", boloes_ativos: 4, repasse_pendente_centavos: 184500 },
-      { cod_loterica: 302, nome: "Loterica Premium Sul", cnpj: "00000000000272", cidade: "Curitiba", uf: "PR", whatsapp: "41999990000", status: "ativa", boloes_ativos: 2, repasse_pendente_centavos: 73150 },
-      { cod_loterica: 303, nome: "Loterica Jardim", cnpj: "00000000000353", cidade: "Belo Horizonte", uf: "MG", whatsapp: "31999990000", status: "analise", boloes_ativos: 1, repasse_pendente_centavos: 11700 }
+      { cod_loterica: 301, nome: "Lotérica Centro TT", cnpj: "00000000000191", cidade: "São Paulo", uf: "SP", whatsapp: "11999990000", status: "ativa", boloes_ativos: 4, repasse_pendente_centavos: 184500 },
+      { cod_loterica: 302, nome: "Lotérica Premium Sul", cnpj: "00000000000272", cidade: "Curitiba", uf: "PR", whatsapp: "41999990000", status: "ativa", boloes_ativos: 2, repasse_pendente_centavos: 73150 },
+      { cod_loterica: 303, nome: "Lotérica Jardim", cnpj: "00000000000353", cidade: "Belo Horizonte", uf: "MG", whatsapp: "31999990000", status: "analise", boloes_ativos: 1, repasse_pendente_centavos: 11700 }
     ];
 
     return {
@@ -536,15 +564,15 @@
         ticket_oficial_centavos: 600
       },
       fluxo: [
-        { titulo: "Formacao", texto: "Bolao aberto com cotas, modalidade, concurso e limite definidos." },
-        { titulo: "Reserva", texto: "Participante registra cota e pagamento fica rastreavel." },
-        { titulo: "Repasse", texto: "Valor oficial segue para a loterica parceira; taxa fica separada." },
-        { titulo: "Documento", texto: "Comprovante da aposta e auditoria ficam vinculados ao bolao." },
-        { titulo: "Apuracao", texto: "Resultado, premio e rateio proporcional sao registrados." }
+        { titulo: "Formação", texto: "Bolão aberto com cotas, modalidade, concurso e limite definidos." },
+        { titulo: "Reserva", texto: "Participante registra cota e pagamento fica rastreável." },
+        { titulo: "Repasse", texto: "Valor oficial segue para a lotérica parceira; taxa fica separada." },
+        { titulo: "Documento", texto: "Comprovante da aposta e auditoria ficam vinculados ao bolão." },
+        { titulo: "Apuração", texto: "Resultado, prêmio e rateio proporcional são registrados." }
       ],
       modalidades: [
         { chave: "mega_sena", nome: "Mega-Sena" },
-        { chave: "lotofacil", nome: "Lotofacil" },
+        { chave: "lotofacil", nome: "Lotofácil" },
         { chave: "quina", nome: "Quina" }
       ],
       boloes: boloes,
@@ -552,21 +580,21 @@
       resultados: resultados,
       premios: [
         { bolao: "Mega-Sena Virada Controlada", faixa: "Sena", total_centavos: 0, minha_parte_centavos: 0, status: "aguardando" },
-        { bolao: "Lotofacil Disciplina", faixa: "14 acertos", total_centavos: 128000, minha_parte_centavos: 1422, status: "apurando" }
+        { bolao: "Lotofácil Disciplina", faixa: "14 acertos", total_centavos: 128000, minha_parte_centavos: 1422, status: "apurando" }
       ],
       lotericas: lotericas,
       fila_loterica: [
         { bolao: "Mega-Sena Virada Controlada", repasse_centavos: 76800, comprovante_url: "", status: "aguardando_comprovante" },
-        { bolao: "Lotofacil Disciplina", repasse_centavos: 28700, comprovante_url: "", status: "registrado" }
+        { bolao: "Lotofácil Disciplina", repasse_centavos: 28700, comprovante_url: "", status: "registrado" }
       ],
       chamados: [
-        { cod_chamado: 71, assunto: "Conferencia de comprovante", status: "aberto", prioridade: "media", atualizado_em: todayPlus(0) },
-        { cod_chamado: 72, assunto: "Duvida sobre rateio", status: "respondido", prioridade: "baixa", atualizado_em: todayPlus(-1) }
+        { cod_chamado: 71, assunto: "Conferência de comprovante", status: "aberto", prioridade: "média", atualizado_em: todayPlus(0) },
+        { cod_chamado: 72, assunto: "Dúvida sobre rateio", status: "respondido", prioridade: "baixa", atualizado_em: todayPlus(-1) }
       ],
       fila_admin: [
         { id: 1, tipo: "bolao", titulo: "Conferir comprovante Mega-Sena", responsavel: "Admin", valor_centavos: 76800, status: "pendente" },
-        { id: 2, tipo: "loterica", titulo: "Validar Loterica Jardim", responsavel: "Suporte", valor_centavos: 0, status: "analise" },
-        { id: 3, tipo: "premio", titulo: "Rateio Lotofacil Disciplina", responsavel: "Financeiro", valor_centavos: 128000, status: "apurando" }
+        { id: 2, tipo: "loterica", titulo: "Validar Lotérica Jardim", responsavel: "Suporte", valor_centavos: 0, status: "analise" },
+        { id: 3, tipo: "premio", titulo: "Rateio Lotofácil Disciplina", responsavel: "Financeiro", valor_centavos: 128000, status: "apurando" }
       ]
     };
   }
@@ -673,7 +701,7 @@
     qs("metricPendencias").textContent = compactNumber(r.pendencias);
     qs("summaryTaxa").textContent = pct(r.taxa_gestao_percentual);
     qs("summaryConversao").textContent = pct(r.conversao_alvo_percentual);
-    qs("summaryApostasMes").textContent = compactNumber(r.apostas_media_mes) + "/mes";
+    qs("summaryApostasMes").textContent = compactNumber(r.apostas_media_mes) + "/mês";
     qs("summaryTicket").textContent = moneyFromCents(r.ticket_oficial_centavos);
   }
 
@@ -750,12 +778,12 @@
           "<span><b>Cotas</b><strong>" + compactNumber(reserved) + "/" + compactNumber(total) + "</strong></span>" +
           "<span><b>Valor</b><strong>" + moneyFromCents(bolao.valor_total_cota_centavos) + "</strong></span>" +
           "<span><b>Limite</b><strong>" + formatDateTime(bolao.data_limite) + "</strong></span>" +
-          "<span><b>Loterica</b><strong>" + escapeHtml(bolao.loterica || "A definir") + "</strong></span>" +
+          "<span><b>Lotérica</b><strong>" + escapeHtml(bolao.loterica || "A definir") + "</strong></span>" +
         "</div>" +
         "<div class=\"sb-form-actions\"><button class=\"sb-btn sb-btn-primary sb-btn-small\" type=\"button\" data-select-bolao=\"" + escapeHtml(bolao.cod_bolao) + "\">Reservar</button>" + adminButton + "</div>" +
       "</article>";
-    }).join("") : empty("Nenhum bolao encontrado.");
-    setStatus(qs("boloesStatus"), rows.length + " bolao(s)", "ok");
+    }).join("") : empty("Nenhum bolão encontrado.");
+    setStatus(qs("boloesStatus"), rows.length + " bolão(ões)", "ok");
   }
 
   function renderMine() {
@@ -772,8 +800,8 @@
         "<td><span class=\"sb-status\">" + escapeHtml(palpite || "Aguardando") + "</span></td>" +
         "<td>" + doc + "</td>" +
       "</tr>";
-    }).join("") : "<tr><td colspan=\"7\">" + empty("Nenhuma participacao encontrada.") + "</td></tr>";
-    setStatus(qs("myStatus"), rows.length + " participacao(oes)", "ok");
+    }).join("") : "<tr><td colspan=\"7\">" + empty("Nenhuma participação encontrada.") + "</td></tr>";
+    setStatus(qs("myStatus"), rows.length + " participação(ões)", "ok");
   }
 
   function renderResults() {
@@ -781,7 +809,7 @@
     qs("resultsGrid").innerHTML = rows.length ? rows.map(function (row) {
       return "<article class=\"sb-result\">" +
         "<div><h3>" + escapeHtml(row.modalidade) + " #" + escapeHtml(row.concurso) + "</h3>" +
-        "<span class=\"sb-status\">" + formatDate(row.data_sorteio) + " - premio estimado " + moneyFromCents(row.premio_estimado_centavos) + "</span></div>" +
+        "<span class=\"sb-status\">" + formatDate(row.data_sorteio) + " - prêmio estimado " + moneyFromCents(row.premio_estimado_centavos) + "</span></div>" +
         renderBalls(row.numeros) +
       "</article>";
     }).join("") : empty("Nenhum resultado registrado.");
@@ -798,7 +826,7 @@
         "<td><strong>" + moneyFromCents(row.minha_parte_centavos) + "</strong></td>" +
         "<td>" + pill(row.status) + "</td>" +
       "</tr>";
-    }).join("") : "<tr><td colspan=\"5\">" + empty("Nenhum premio apurado.") + "</td></tr>";
+    }).join("") : "<tr><td colspan=\"5\">" + empty("Nenhum prêmio apurado.") + "</td></tr>";
     setStatus(qs("awardsStatus"), rows.length + " lancamento(s)", "ok");
   }
 
@@ -811,12 +839,12 @@
         "<div class=\"sb-card-head\"><div><h3>" + escapeHtml(row.nome) + "</h3><small>" + escapeHtml(row.cidade || "") + "/" + escapeHtml(row.uf || "") + "</small></div>" + pill(row.status) + "</div>" +
         "<div class=\"sb-card-data\">" +
           "<span><b>CNPJ</b><strong>" + escapeHtml(row.cnpj || "") + "</strong></span>" +
-          "<span><b>Boloes</b><strong>" + compactNumber(row.boloes_ativos) + "</strong></span>" +
+          "<span><b>Bolões</b><strong>" + compactNumber(row.boloes_ativos) + "</strong></span>" +
           "<span><b>Repasse</b><strong>" + moneyFromCents(row.repasse_pendente_centavos) + "</strong></span>" +
         "</div>" +
         "<div class=\"sb-form-actions\">" + adminButton + "</div>" +
       "</article>";
-    }).join("") : empty("Nenhuma loterica cadastrada.");
+    }).join("") : empty("Nenhuma lotérica cadastrada.");
 
     qs("partnerQueueBody").innerHTML = (state.data.fila_loterica || []).map(function (row) {
       var doc = row.comprovante_url ? "<a href=\"" + escapeHtml(row.comprovante_url) + "\" target=\"_blank\" rel=\"noopener\">Abrir</a>" : "Pendente";
@@ -828,7 +856,7 @@
   function renderSupport() {
     var rows = state.data.chamados || [];
     qs("ticketsList").innerHTML = rows.length ? rows.map(function (row) {
-      return "<article class=\"sb-ticket\"><strong>#" + escapeHtml(row.cod_chamado) + " - " + escapeHtml(row.assunto) + "</strong><small>" + escapeHtml(row.prioridade || "media") + " - " + formatDateTime(row.atualizado_em) + "</small>" + pill(row.status) + "</article>";
+      return "<article class=\"sb-ticket\"><strong>#" + escapeHtml(row.cod_chamado) + " - " + escapeHtml(row.assunto) + "</strong><small>" + escapeHtml(row.prioridade || "média") + " - " + formatDateTime(row.atualizado_em) + "</small>" + pill(row.status) + "</article>";
     }).join("") : empty("Nenhum chamado aberto.");
     setStatus(qs("supportStatus"), rows.length + " chamado(s)", "ok");
   }
@@ -837,7 +865,7 @@
     var rows = state.data.fila_admin || [];
     qs("adminQueueBody").innerHTML = rows.length ? rows.map(function (row) {
       return "<tr>" +
-        "<td><strong>" + escapeHtml(row.titulo) + "</strong><br><span class=\"sb-status\">" + escapeHtml(row.tipo || "") + "</span></td>" +
+        "<td><strong>" + escapeHtml(row.titulo) + "</strong><br><span class=\"sb-status\">" + escapeHtml(({ bolao: "bolão", loterica: "lotérica", premio: "prêmio" })[row.tipo] || row.tipo || "") + "</span></td>" +
         "<td>" + escapeHtml(row.responsavel || "") + "</td>" +
         "<td>" + moneyFromCents(row.valor_centavos) + "</td>" +
         "<td>" + pill(row.status) + "</td>" +
@@ -883,7 +911,7 @@
       await loadData();
       showLogin(false);
       renderAll();
-      setStatus(qs("pageStatus"), state.demo ? "Previa local" : "Online", state.demo ? "" : "ok");
+      setStatus(qs("pageStatus"), state.demo ? "Prévia local" : "Online", state.demo ? "" : "ok");
     } catch (error) {
       showLogin(true);
       setStatus(qs("pageStatus"), error.message || String(error), "error");
@@ -898,7 +926,7 @@
     state.data = demoData(state.role);
     showLogin(false);
     renderAll();
-    setStatus(qs("pageStatus"), "Previa local", "");
+    setStatus(qs("pageStatus"), "Prévia local", "");
   }
 
   async function submitLogin(event) {
@@ -958,14 +986,14 @@
           documento_url: "",
           data_sorteio: bolao.data_sorteio
         });
-        setStatus(qs("boloesStatus"), "Reserva criada na previa local.", "ok");
+        setStatus(qs("boloesStatus"), "Reserva criada na prévia local.", "ok");
       } else {
         var data = await rpc("sobolao_participar_rpc", {
           p_cod_bolao: bolaoId,
           p_qtd_cotas: cotas,
           p_palpite_numeros: numeros
         });
-        if (!data || data.ok !== true) throw new Error((data && data.error) || "Nao foi possivel reservar.");
+        if (!data || data.ok !== true) throw new Error((data && data.error) || "Não foi possível reservar.");
         setStatus(qs("boloesStatus"), "Reserva criada.", "ok");
         await loadData();
       }
@@ -1014,7 +1042,7 @@
     event.preventDefault();
     var button = qs("adminBolaoButton");
     setBusy(button, true);
-    setStatus(qs("adminStatus"), "Salvando bolao", "");
+    setStatus(qs("adminStatus"), "Salvando bolão", "");
     try {
       var payload = {
         p_cod_bolao: qs("adminBolaoId").value ? Number(qs("adminBolaoId").value) : null,
@@ -1050,12 +1078,12 @@
         if (!existing) state.data.boloes.unshift(row);
       } else {
         var data = await rpc("adm_sobolao_bolao_salvar_rpc", payload);
-        if (!data || data.ok !== true) throw new Error((data && data.error) || "Nao foi possivel salvar o bolao.");
+        if (!data || data.ok !== true) throw new Error((data && data.error) || "Não foi possível salvar o bolão.");
         await loadData();
       }
       resetAdminBolao();
       renderAll();
-      setStatus(qs("adminStatus"), "Bolao salvo.", "ok");
+      setStatus(qs("adminStatus"), "Bolão salvo.", "ok");
     } catch (error) {
       setStatus(qs("adminStatus"), error.message || String(error), "error");
     } finally {
@@ -1088,7 +1116,7 @@
     event.preventDefault();
     var button = qs("partnerButton");
     setBusy(button, true);
-    setStatus(qs("adminStatus"), "Salvando loterica", "");
+    setStatus(qs("adminStatus"), "Salvando lotérica", "");
     try {
       var payload = {
         p_cod_loterica: qs("partnerId").value ? Number(qs("partnerId").value) : null,
@@ -1111,12 +1139,12 @@
         if (!existing) state.data.lotericas.unshift(row);
       } else {
         var data = await rpc("adm_sobolao_loterica_salvar_rpc", payload);
-        if (!data || data.ok !== true) throw new Error((data && data.error) || "Nao foi possivel salvar a loterica.");
+        if (!data || data.ok !== true) throw new Error((data && data.error) || "Não foi possível salvar a lotérica.");
         await loadData();
       }
       resetPartner();
       renderAll();
-      setStatus(qs("adminStatus"), "Loterica salva.", "ok");
+      setStatus(qs("adminStatus"), "Lotérica salva.", "ok");
     } catch (error) {
       setStatus(qs("adminStatus"), error.message || String(error), "error");
     } finally {
@@ -1140,12 +1168,12 @@
           cod_chamado: Date.now(),
           assunto: payload.p_assunto,
           status: "aberto",
-          prioridade: "media",
+          prioridade: "média",
           atualizado_em: new Date().toISOString()
         });
       } else {
         var data = await rpc("sobolao_suporte_chamado_rpc", payload);
-        if (!data || data.ok !== true) throw new Error((data && data.error) || "Nao foi possivel abrir chamado.");
+        if (!data || data.ok !== true) throw new Error((data && data.error) || "Não foi possível abrir chamado.");
         await loadData();
       }
       qs("supportSubject").value = "";
@@ -1171,9 +1199,9 @@
           p_tipo: "fila",
           p_id: Number(id),
           p_status: "ok",
-          p_observacao: "Atualizado pelo painel So Bolao"
+          p_observacao: "Atualizado pelo painel Só Bolão"
         });
-        if (!data || data.ok !== true) throw new Error((data && data.error) || "Nao foi possivel atualizar.");
+        if (!data || data.ok !== true) throw new Error((data && data.error) || "Não foi possível atualizar.");
         await loadData();
       }
       renderAll();
@@ -1190,7 +1218,7 @@
     qs("logoutButton").addEventListener("click", function () {
       clearSession();
       showLogin(true);
-      setStatus(qs("pageStatus"), "Sessao encerrada", "");
+      setStatus(qs("pageStatus"), "Sessão encerrada", "");
     });
     qs("switchAccountButton").addEventListener("click", function () {
       clearSession();
@@ -1252,6 +1280,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    loadBrandConfig();
     setupEvents();
     boot();
   });

@@ -1,0 +1,40 @@
+{
+  "celebrity": {
+    "name": "Cauã Reymond",
+    "status": "active"
+  },
+  "contract": {
+    "external_reference": "PREENCHER_COM_ID_DO_CONTRATO",
+    "valid_from": null,
+    "valid_until": null,
+    "document_path": null,
+    "document_hash": null,
+    "requires_approval": true,
+    "pause_on_expiration": true
+  },
+  "asset_library": {
+    "online_path": "PREENCHER_COM_BUCKET_OU_URL_PRIVADA",
+    "allow_unregistered_files": false
+  },
+  "paid_media": {
+    "allowed": true,
+    "restrict_region": true,
+    "territory_id": "PREENCHER_APOS_VALIDACAO_CONTRATUAL",
+    "lock_region_after_approval": true
+  },
+  "organic_media": {
+    "allowed": true,
+    "restrict_region": false
+  },
+  "editing": {
+    "allow_ai_face_edit": false,
+    "allow_voice_cloning": false,
+    "allow_new_synthetic_speech": false,
+    "allow_crop": null,
+    "allow_text_overlay": null,
+    "allow_color_adjustment": null
+  },
+  "platforms": [],
+  "formats": [],
+  "notes": "Não preencher campos desconhecidos por suposição."
+}
