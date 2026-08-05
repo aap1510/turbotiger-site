@@ -432,13 +432,21 @@
   function configureBrandHomeLink() {
     var link = qs("brandHomeLink");
     if (!link) return;
-    link.href = CONFIG.siteHomeUrl;
-    if (state.mode !== "user") return;
-    link.addEventListener("click", function (event) {
-      event.preventDefault();
-      loadBrandHomeUrl().then(function (url) { window.location.assign(url); });
-    });
-    loadBrandHomeUrl().then(function (url) { link.href = url; });
+    link.href = "./";
+  }
+
+  function configureBrandLogo() {
+    var image = qs("mmnLogoImg");
+    if (!image) return;
+    var fallback = image.src;
+    publicConfigValue("turbotiger_mmn", "logo_img").then(function (value) {
+      if (!value) return;
+      image.onerror = function () {
+        image.onerror = null;
+        image.src = fallback;
+      };
+      image.src = value;
+    }).catch(function () {});
   }
 
   function readAdminSession() {
@@ -5375,6 +5383,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     configureMode();
     configureBrandHomeLink();
+    configureBrandLogo();
     setupScrollLockRecovery();
     setupInitialValues();
     setupTabs();
