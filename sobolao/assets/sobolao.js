@@ -5,12 +5,14 @@
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
     sessionKey: "tt_admin_session_v1",
-    roleKey: "tt_sobolao_role_v1"
+    roleKey: "tt_sobolao_role_v1",
+    appSessionTimeoutMs: 15000
   };
 
   var state = {
     session: null,
     contexto: null,
+    mode: "browser",
     role: "usuario",
     demo: false,
     data: null,
@@ -111,6 +113,8 @@
       "sem_permissao_admin": "Sem permissão administrativa.",
       "sem_permissao_sobolao": "Sem permissão para acessar o Só Bolão.",
       "sessao_expirada": "Sessão expirada. Entre novamente.",
+      "app_session_timeout": "O app demorou para validar sua sessão. Toque em Atualizar.",
+      "app_session_unavailable": "Não foi possível validar sua sessão pelo app.",
       "bolao_indisponivel": "Bolão indisponível para reserva.",
       "cotas_insuficientes": "Não há cotas suficientes nesse bolão.",
       "dados_obrigatorios": "Preencha os campos obrigatórios.",
@@ -309,6 +313,83 @@
     localStorage.removeItem(CONFIG.sessionKey);
   }
 
+  function hasNativeBridge() {
+    try {
+      return !!(window.TurboTigerHistoricoBridge &&
+        typeof window.TurboTigerHistoricoBridge.post === "function");
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function configureMode() {
+    state.mode = hasNativeBridge() ? "app" : "browser";
+    document.documentElement.classList.toggle("sobolao-app-webview", state.mode === "app");
+  }
+
+  function jwtExpiresAt(token) {
+    try {
+      var part = String(token || "").split(".")[1] || "";
+      part = part.replace(/-/g, "+").replace(/_/g, "/");
+      while (part.length % 4) part += "=";
+      return Number(JSON.parse(atob(part)).exp || 0) * 1000;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  var appSessionRequest = null;
+  var appSessionResolve = null;
+  var appSessionReject = null;
+  var appSessionTimer = null;
+
+  function finishAppSession(error, session) {
+    if (appSessionTimer) window.clearTimeout(appSessionTimer);
+    appSessionTimer = null;
+    var resolve = appSessionResolve;
+    var reject = appSessionReject;
+    appSessionRequest = null;
+    appSessionResolve = null;
+    appSessionReject = null;
+    if (error && reject) reject(error);
+    if (!error && resolve) resolve(session);
+  }
+
+  window.TurboTigerSobolaoReceiveSession = function (payload) {
+    try {
+      if (!payload || payload.ok !== true) throw new Error((payload && payload.error) || "app_session_unavailable");
+      var value = payload.session || payload;
+      var token = String(value.access_token || "").trim();
+      if (!token) throw new Error("app_session_unavailable");
+      state.session = {
+        access_token: token,
+        expires_at: jwtExpiresAt(token),
+        user: value.user || null
+      };
+      finishAppSession(null, state.session);
+    } catch (error) {
+      finishAppSession(error);
+    }
+  };
+
+  function requestAppSession() {
+    if (state.mode !== "app" || !hasNativeBridge()) return Promise.reject(new Error("app_session_unavailable"));
+    if (appSessionRequest) return appSessionRequest;
+    appSessionRequest = new Promise(function (resolve, reject) {
+      appSessionResolve = resolve;
+      appSessionReject = reject;
+      appSessionTimer = window.setTimeout(function () {
+        finishAppSession(new Error("app_session_timeout"));
+      }, CONFIG.appSessionTimeoutMs);
+      try {
+        window.TurboTigerHistoricoBridge.post("TURBO_SOBOLAO_SESSION_REQUEST");
+      } catch (error) {
+        finishAppSession(new Error("app_session_unavailable"));
+      }
+    });
+    return appSessionRequest;
+  }
+
   function readRole() {
     try {
       var urlRole = new URLSearchParams(window.location.search).get("role");
@@ -399,6 +480,12 @@
   }
 
   async function refreshSessionIfNeeded() {
+    if (state.mode === "app") {
+      if (state.session && state.session.access_token && state.session.expires_at > Date.now() + 60000) {
+        return state.session;
+      }
+      return requestAppSession();
+    }
     if (!state.session) state.session = readSession();
     if (!state.session || !state.session.access_token) return null;
     if (state.session.expires_at && state.session.expires_at > Date.now() + 60000) {
@@ -896,15 +983,17 @@
 
   async function boot() {
     setStatus(qs("pageStatus"), "Carregando", "");
-    state.session = readSession();
-    state.role = readRole();
+    configureMode();
+    state.session = state.mode === "app" ? null : readSession();
+    state.role = state.mode === "app" ? "usuario" : readRole();
     applyRoleButtons();
-    if (!state.session || !state.session.access_token) {
+    if (state.mode !== "app" && (!state.session || !state.session.access_token)) {
       showLogin(true);
       setStatus(qs("pageStatus"), "Entre para continuar", "");
       return;
     }
     try {
+      if (state.mode === "app") await requestAppSession();
       await refreshSessionIfNeeded();
       await loadContext();
       if (!hasAdminAccess(state.role)) throw new Error("sem_permissao_sobolao");
@@ -1280,6 +1369,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    configureMode();
     loadBrandConfig();
     setupEvents();
     boot();
