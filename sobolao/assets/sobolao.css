@@ -86,8 +86,8 @@ a {
   height: 52px;
   flex: 0 0 52px;
   object-fit: contain;
-  transform: translateX(5px) scale(1.43);
-  transform-origin: center right;
+  transform: translateX(-5px) scale(1.43) scaleX(-1);
+  transform-origin: center center;
 }
 
 .sb-brand-wordmark {
@@ -96,7 +96,7 @@ a {
   min-width: 0;
   object-fit: contain;
   object-position: left center;
-  transform: translateX(-25px);
+  transform: translateX(-20px);
 }
 
 .sb-brand-product {
@@ -889,8 +889,13 @@ th {
     gap: 10px;
   }
 
+  .sb-brand-symbol {
+    transform: translateX(3px) scale(1.716) scaleX(-1);
+  }
+
   .sb-brand-wordmark {
     width: 100%;
+    transform: translateX(-10px);
   }
 
   .sb-brand-product {
