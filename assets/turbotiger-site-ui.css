@@ -342,11 +342,22 @@ body[data-tt-surface="app"] {
   }
 
   .tt-age-modal-card h2 {
-    font-size: 24px;
+    font-size: calc(24px - 4pt);
   }
 
   .tt-age-modal-head {
     gap: 13px;
+  }
+
+  .tt-age-modal-badge {
+    min-height: 27.2px;
+    padding: 5.6px 8.8px;
+    font-size: 80%;
+  }
+
+  .tt-age-modal-card p,
+  .tt-age-modal-close {
+    font-size: calc(16px - 2pt);
   }
 }
 
