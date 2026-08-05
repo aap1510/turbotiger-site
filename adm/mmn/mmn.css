@@ -38,6 +38,12 @@ html.mmn-app-webview .mmn-admin-only {
   text-decoration: none;
 }
 
+#mmnLogoImg {
+  filter:
+    drop-shadow(0 0 1px rgba(255, 255, 255, .96))
+    drop-shadow(0 0 2px rgba(255, 255, 255, .78));
+}
+
 .mmn-brand:focus-visible {
   outline: 2px solid var(--mmn-gold);
   outline-offset: 4px;
