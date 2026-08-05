@@ -185,7 +185,7 @@
     .statement p{font-size:45px}
     .device{padding:22px}
     .mission h2{font-size:48px}
-    .beta h2{font-size:56px}
+    .beta h2{font-size:calc(56px - 4pt)}
     .beta-actions{align-items:stretch}
     .beta-actions .btn{width:100%;text-align:center}
     .commitment-lines p{font-size:26px}
@@ -265,21 +265,23 @@
   @media(max-width:640px){
     html body[data-tt-background]{background-image:linear-gradient(to bottom,rgba(255,255,255,.10) 0,rgba(255,255,255,0) 94px),var(--tt-site-background-url)!important;background-size:100% 94px,cover!important}
     .site-header{padding:18px 0 0}
-    .nav{width:min(100% - 32px,1180px)}
-    .hero-socials{top:13px;right:14px}
+    .nav{position:relative;width:min(100% - 32px,1180px)}
+    .hero-socials{top:76px;right:auto;left:0}
+    .tt-social-link img{width:20px;height:20px}
+    .tt-social-link[data-tt-contact="x"] img{width:22px;height:22px}
     .brand{gap:12px}
     .brand img{width:56px;height:56px}
-    .brand-copy{width:175px;font-size:16px}
-    .brand-age{position:relative;top:20px}
+    .brand-copy{width:175px;font-size:14px}
+    .brand-age{position:absolute;top:0;right:0;font-size:14px;transform:scale(.7);transform-origin:top right}
     .hero{min-height:540px}
-    .hero-inner{padding:142px 0 60px}
+    .hero-inner{padding:162px 0 60px}
     .hero-copy{width:140px;max-width:140px}
     .hero .eyebrow{flex-direction:column;gap:0;margin-bottom:22px}
     .hero-title{width:140px;margin-bottom:26px;font-size:28px}
     .hero-title .hero-title-second{margin-top:14px}
     .hero-title-break{display:block}
-    .hero-visual{top:112px;width:min(329px,84vw)}
-    .hero-tiger{top:-120px;right:-60px;width:95%}
+    .hero-visual{top:140px;width:min(329px,84vw)}
+    .hero-tiger{top:-52px;right:-65px;width:95%}
     .hero-lead,.hero-impact{width:calc(100vw - 32px)}
     .intro{padding-top:40px}
   }
