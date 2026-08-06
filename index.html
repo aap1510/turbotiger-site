@@ -297,6 +297,7 @@
   }
 </style>
 <link rel="stylesheet" href="assets/turbotiger-site-ui.css?v=20260722-02" />
+<link rel="stylesheet" href="assets/turbotiger-spa-listas.css?v=20260806-10" />
 </head>
 <body data-tt-surface="site" data-tt-background="fundo_geral" style="--tt-site-background-url:url('assets/bg-900x900.webp')">
 <header class="site-header">
@@ -438,6 +439,35 @@
       </div>
     </div>
   </section>
+
+  <section class="spa-reference" aria-labelledby="spaReferenceTitle" data-spa-reference>
+    <div class="wrap spa-reference-shell">
+      <div class="spa-reference-summary">
+        <div class="spa-reference-copy">
+          <h2 id="spaReferenceTitle">Consulta de empresas e dom&iacute;nios das bets</h2>
+          <p>Refer&ecirc;ncia informativa baseada nas listas publicadas pelo Governo Federal.</p>
+        </div>
+        <button class="spa-reference-toggle" type="button" data-spa-toggle aria-expanded="false" aria-controls="spaReferencePanel">Consultar lista</button>
+      </div>
+      <div class="spa-reference-panel" id="spaReferencePanel" data-spa-panel hidden>
+        <div class="spa-reference-tools">
+          <input class="spa-reference-search" type="search" inputmode="search" autocomplete="off" maxlength="100" placeholder="Buscar marca, empresa, CNPJ ou dom&iacute;nio" aria-label="Buscar na lista informativa" data-spa-search>
+          <div class="spa-reference-tabs" role="tablist" aria-label="Situa&ccedil;&atilde;o na fonte">
+            <button class="spa-reference-tab" type="button" role="tab" aria-selected="true" data-spa-origin="">Todas</button>
+            <button class="spa-reference-tab" type="button" role="tab" aria-selected="false" data-spa-origin="autorizada">Autorizadas</button>
+            <button class="spa-reference-tab" type="button" role="tab" aria-selected="false" data-spa-origin="judicial">Determina&ccedil;&atilde;o judicial</button>
+          </div>
+        </div>
+        <p class="spa-reference-status" aria-live="polite" data-spa-status></p>
+        <div class="spa-reference-list" data-spa-list></div>
+        <nav class="spa-reference-pagination" aria-label="P&aacute;ginas da consulta" data-spa-pagination></nav>
+        <div class="spa-reference-notes">
+          <p class="spa-reference-source"><strong>Fonte:</strong> Secretaria de Pr&ecirc;mios e Apostas do Minist&eacute;rio da Fazenda. Atualiza&ccedil;&atilde;o das autorizadas em 13/05/2026 e por determina&ccedil;&atilde;o judicial em 04/02/2026. Conte&uacute;do reproduzido apenas para consulta. Dom&iacute;nios exibidos como texto informativo, sem redirecionamento.</p>
+          <p class="spa-reference-warning">Proibido para menores de 18 anos. Jogue com responsabilidade, aposta n&atilde;o &eacute; investimento, pode causar depend&ecirc;ncia e perdas financeiras. &Eacute; proibida a utiliza&ccedil;&atilde;o de recursos de benef&iacute;cios sociais, como Bolsa Fam&iacute;lia e BPC/LOAS, para atividades relacionadas a apostas de quota fixa.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer class="site-footer">
@@ -449,5 +479,6 @@
   <img src="assets/icone-whatsapp-96x96.webp" alt="WhatsApp">
 </a>
 <script src="assets/turbotiger-site-ui.js"></script>
+<script src="assets/turbotiger-spa-listas.js?v=20260806-04"></script>
 </body>
 </html>
