@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Só Bolão - Turbo Tiger">
 <meta name="twitter:description" content="Módulo de bolão integrado ao Turbo Tiger.">
 <meta name="twitter:image" content="https://turbotiger.com.br/assets/preview-turbotiger-1200x630.jpg">
-  <link rel="stylesheet" href="assets/sobolao.css?v=20260805-10" />
+  <link rel="stylesheet" href="assets/sobolao.css?v=20260806-01" />
   <link rel="stylesheet" href="../assets/turbotiger-app-menu.css?v=20260805-01">
 </head>
 <body data-sobolao-page="app" data-tt-app-menu-page="5">
@@ -89,7 +89,12 @@
         </div>
       </header>
 
-      <section class="sb-login-panel" id="loginPanel">
+      <section class="sb-loading" id="loadingPanel" aria-live="polite">
+        <span class="sb-spinner" aria-hidden="true"></span>
+        <strong>Carregando informações seguras...</strong>
+      </section>
+
+      <section class="sb-login-panel" id="loginPanel" hidden>
         <div class="sb-panel-head">
           <div>
             <h2>Acesso Só Bolão</h2>
@@ -475,7 +480,7 @@
     <span class="sb-footer-links"><a href="/" style="color:inherit;text-decoration:none">Home</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/sobre-nos.html" style="color:inherit;text-decoration:none">Sobre</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="/politicaetermos.html" style="color:inherit;text-decoration:none">Privacidade &amp; Termos de uso</a></span><span class="sb-footer-copyright"><span class="sb-footer-desktop-separator">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>&copy; 2026 Turbo Tiger</span>
   </footer>
 
-  <script src="assets/sobolao.js?v=20260805-03"></script>
+  <script src="assets/sobolao.js?v=20260806-01"></script>
   <script src="../assets/turbotiger-app-menu.js?v=20260805-01"></script>
 </body>
 </html>

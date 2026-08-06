@@ -746,6 +746,14 @@
     qs("sobolaoApp").hidden = !!show;
   }
 
+  function showLoading(show) {
+    qs("loadingPanel").hidden = !show;
+    if (show) {
+      qs("loginPanel").hidden = true;
+      qs("sobolaoApp").hidden = true;
+    }
+  }
+
   function applyRoleButtons() {
     qsa("[data-role]").forEach(function (button) {
       button.classList.toggle("is-active", button.getAttribute("data-role") === state.role);
@@ -994,12 +1002,14 @@
   }
 
   async function boot() {
+    showLoading(true);
     setStatus(qs("pageStatus"), "Carregando", "");
     configureMode();
     state.session = state.mode === "app" ? null : readSession();
     state.role = state.mode === "app" ? "usuario" : readRole();
     applyRoleButtons();
     if (state.mode !== "app" && (!state.session || !state.session.access_token)) {
+      showLoading(false);
       showLogin(true);
       setStatus(qs("pageStatus"), "Entre para continuar", "");
       return;
@@ -1010,10 +1020,12 @@
       await loadContext();
       if (!hasAdminAccess(state.role)) throw new Error("sem_permissao_sobolao");
       await loadData();
+      showLoading(false);
       showLogin(false);
       renderAll();
       setStatus(qs("pageStatus"), state.demo ? "Prévia local" : "Online", state.demo ? "" : "ok");
     } catch (error) {
+      showLoading(false);
       showLogin(true);
       setStatus(qs("pageStatus"), error.message || String(error), "error");
       setStatus(qs("loginStatus"), error.message || String(error), "error");

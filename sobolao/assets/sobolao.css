@@ -238,6 +238,28 @@ p {
   width: min(100%, 780px);
 }
 
+.sb-loading {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  color: var(--sb-muted);
+}
+
+.sb-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid #dde1e5;
+  border-top-color: var(--sb-gold);
+  border-radius: 50%;
+  animation: sb-spin .8s linear infinite;
+}
+
+@keyframes sb-spin {
+  to { transform: rotate(360deg); }
+}
+
 .sb-panel {
   overflow: hidden;
 }
