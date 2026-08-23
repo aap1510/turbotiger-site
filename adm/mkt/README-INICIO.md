@@ -5,10 +5,10 @@ Este repositório contém a especificação inicial para construir um painel adm
 ## Decisões oficiais
 
 - Nome do projeto: **MKT Digital**.
-- Diretório oficial: `C:\AAP\BET\ProjetoTurboTiger\TurboTiger Codex\turbotiger-site\adm\mkt`.
+- Diretório oficial: `\TurboTiger\Desenvolvimento\turbotiger-site\adm\mkt`, resolvido a partir da unidade ou compartilhamento atual.
 - Banco: mesmo projeto Supabase já usado pelo aplicativo Turbo Tiger.
 - Schema exclusivo do módulo: `mod_mkt`.
-- CLI Supabase: `C:\AAP\BET\ProjetoTurboTiger\TurboTiger Codex\tools\supabase-cli\supabase.exe`.
+- CLI Supabase: `\TurboTiger\Desenvolvimento\tools\supabase-cli\supabase.exe`, resolvida a partir da unidade ou compartilhamento atual.
 - O MKT Digital não altera o aplicativo Delphi e não duplica a infraestrutura Supabase existente.
 
 ## Como começar

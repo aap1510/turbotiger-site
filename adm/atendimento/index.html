@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Atendimento - Turbo Tiger Admin</title>
+  <meta name="description" content="Central administrativa de atendimento Turbo Tiger.">
+  <link rel="icon" href="../../assets/icone-turbotiger-raio.ico">
+  <link rel="stylesheet" href="../assets/admin.css?v=20260823-atd-01">
+  <link rel="stylesheet" href="atendimento.css?v=20260823-01">
+</head>
+<body data-admin-page="atendimento">
+  <div class="admin-shell atendimento-shell">
+    <aside class="admin-sidebar atendimento-sidebar">
+      <div class="admin-brand">
+        <img src="../../assets/logo-300x300.webp" alt="Turbo Tiger">
+        <div><h1>Atendimento</h1><span id="adminIdentity">Turbo Tiger</span></div>
+      </div>
+      <nav class="admin-nav" aria-label="Áreas administrativas">
+        <a class="nav-link" href="../admin/">Administração</a>
+        <a class="nav-link is-active" href="./">Atendimento</a>
+        <a class="nav-link" href="../push/">Notificações</a>
+        <a class="nav-link" href="../mmn/">MMN</a>
+        <a class="nav-link" href="../../sobolao/?role=admin">Só Bolão</a>
+      </nav>
+      <div class="queue-nav" aria-label="Filas">
+        <strong>Filas e setores</strong>
+        <button class="queue-button is-active" data-sector="">Todas as filas <span id="countAll">0</span></button>
+        <button class="queue-button" data-sector="comercial">Comercial <span>0</span></button>
+        <button class="queue-button" data-sector="financeiro">Financeiro <span>0</span></button>
+        <button class="queue-button" data-sector="suporte_tecnico">Suporte técnico <span>0</span></button>
+        <button class="queue-button" data-sector="ouvidoria">Ouvidoria <span>0</span></button>
+      </div>
+      <div class="sidebar-footer">
+        <label class="agent-status"><span class="status-dot"></span><select id="agentStatus" aria-label="Status do atendente"><option value="online">Online</option><option value="ocupado">Ocupado</option><option value="pausa">Pausa</option><option value="offline">Offline</option></select></label>
+        <button class="btn btn-danger" id="logoutButton" type="button">Sair</button>
+      </div>
+    </aside>
+
+    <main class="atendimento-main">
+      <header class="atendimento-topbar">
+        <div><h1>Caixa de entrada</h1><span id="pageStatus" class="status-line">Carregando atendimento</span></div>
+        <div class="topbar-actions"><button class="btn btn-ghost" id="templatesButton" type="button">Templates</button><button class="btn btn-ghost" id="settingsButton" type="button">Configurações</button><button class="btn btn-ghost" id="reloadButton" type="button">Atualizar</button></div>
+      </header>
+
+      <section class="inbox" aria-label="Caixa de entrada omnichannel">
+        <div class="conversation-list-panel">
+          <div class="conversation-filters">
+            <input id="conversationSearch" type="search" placeholder="Buscar conversas" aria-label="Buscar conversas">
+            <div class="channel-tabs" role="tablist">
+              <button class="channel-tab is-active" data-channel="">Todos</button>
+              <button class="channel-tab" data-channel="whatsapp">WhatsApp</button>
+              <button class="channel-tab" data-channel="instagram">Instagram</button>
+              <button class="channel-tab" data-channel="messenger">Messenger</button>
+            </div>
+          </div>
+          <div class="conversation-list" id="conversationList"><div class="empty-list">Nenhuma conversa carregada.</div></div>
+        </div>
+
+        <div class="chat-panel">
+          <div class="chat-empty" id="chatEmpty"><strong>Selecione uma conversa</strong><span>O histórico e as ações aparecerão aqui.</span></div>
+          <div class="chat-content" id="chatContent" hidden>
+            <header class="chat-header">
+              <div><strong id="chatContact">Contato</strong><span id="chatMeta"></span></div>
+              <div class="chat-deadlines"><span id="slaStatus"></span><span id="windowStatus"></span><button class="btn btn-primary btn-small" id="takeConversationButton" type="button">Assumir conversa</button></div>
+            </header>
+            <div class="ai-banner" id="aiBanner">A IA está fazendo a triagem inicial. Assuma a conversa para interromper a automação.</div>
+            <div class="message-stream" id="messageStream"></div>
+            <form class="composer" id="messageForm">
+              <div class="composer-tabs"><button class="is-active" type="button">Responder</button><button type="button" id="internalNoteTab">Nota interna</button></div>
+              <textarea id="messageInput" placeholder="Digite sua mensagem..." aria-label="Mensagem"></textarea>
+              <div class="composer-actions"><span id="composerHint">Dentro da janela de atendimento</span><button class="btn btn-ghost" id="chooseTemplateButton" type="button">Templates</button><button class="btn btn-primary" id="sendButton" type="submit">Enviar</button></div>
+            </form>
+          </div>
+        </div>
+
+        <aside class="customer-panel" id="customerPanel">
+          <div class="detail-tabs"><button class="is-active">Cliente</button><button>Contexto</button><button>Histórico</button></div>
+          <div class="customer-empty" id="customerEmpty">Selecione uma conversa para ver o cliente.</div>
+          <div id="customerContent" hidden>
+            <section class="customer-identity"><div class="avatar" id="customerAvatar">TT</div><div><strong id="customerName">Contato</strong><span id="customerPhone"></span></div></section>
+            <section class="detail-section"><h2>Conversa atual</h2><dl><div><dt>Canal</dt><dd id="detailChannel">—</dd></div><div><dt>Setor</dt><dd id="detailSector">—</dd></div><div><dt>Atribuição</dt><dd id="detailAssignment">—</dd></div><div><dt>Janela WhatsApp</dt><dd id="detailWindow">—</dd></div></dl></section>
+            <section class="detail-section"><h2>Notas internas</h2><div id="notesList" class="notes-list"></div><form id="noteForm"><textarea id="noteInput" placeholder="Adicionar nota interna..."></textarea><button class="btn btn-ghost btn-small" type="submit">Salvar nota</button></form></section>
+            <section class="detail-section"><h2>Auditoria</h2><div id="auditList" class="audit-list"></div></section>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+  <script src="atendimento.js?v=20260823-01"></script>
+</body>
+</html>

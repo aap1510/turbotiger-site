@@ -3,7 +3,7 @@
 ## Identidade oficial
 
 - Projeto: **MKT Digital**.
-- Diretório oficial: `C:\AAP\BET\ProjetoTurboTiger\TurboTiger Codex\turbotiger-site\adm\mkt`.
+- Diretório oficial: `\TurboTiger\Desenvolvimento\turbotiger-site\adm\mkt`, resolvido a partir da unidade ou compartilhamento atual.
 - Natureza: sistema web/backend de marketing digital do Turbo Tiger, separado do aplicativo Delphi/FireMonkey.
 
 ## Banco e infraestrutura
@@ -11,7 +11,7 @@
 - O MKT Digital usará o mesmo projeto Supabase já utilizado pelo aplicativo Turbo Tiger.
 - Todos os objetos próprios do módulo ficarão no schema exclusivo `mod_mkt`.
 - A infraestrutura Supabase compartilhada, o vínculo do projeto e as migrations físicas permanecem na raiz principal do workspace.
-- CLI obrigatória: `C:\AAP\BET\ProjetoTurboTiger\TurboTiger Codex\tools\supabase-cli\supabase.exe`.
+- CLI obrigatória: `\TurboTiger\Desenvolvimento\tools\supabase-cli\supabase.exe`, resolvida a partir da unidade ou compartilhamento atual.
 - Não usar `supabase db push` sem solicitação explícita e não aplicar migrations não relacionadas.
 - Integrações com usuários, assinaturas, lista de espera ou outros dados existentes serão definidas por contratos explícitos, RPCs/views autorizadas, auditoria e menor privilégio.
 - O módulo não deve misturar suas tabelas com schemas existentes nem consultar tabelas grandes do app de forma ampla ou repetitiva.

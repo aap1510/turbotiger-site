@@ -3,7 +3,7 @@
 ## Identidade e localização oficial
 
 - Nome oficial do projeto: **MKT Digital**.
-- Diretório oficial: `C:\AAP\BET\ProjetoTurboTiger\TurboTiger Codex\turbotiger-site\adm\mkt`.
+- Diretório oficial: `\TurboTiger\Desenvolvimento\turbotiger-site\adm\mkt`, resolvido a partir da unidade ou compartilhamento atual.
 - O MKT Digital é um sistema web/backend de marketing separado do aplicativo Delphi/FireMonkey, embora compartilhe infraestrutura autorizada do ecossistema Turbo Tiger.
 - Código, documentação e arquivos próprios do MKT Digital devem permanecer neste diretório. A infraestrutura Supabase compartilhada continua no projeto principal.
 
@@ -68,7 +68,7 @@
 - Todos os objetos próprios do MKT Digital devem ficar no schema exclusivo `mod_mkt`.
 - Não criar tabelas próprias do MKT Digital em `public` nem misturar seus registros com `mod_admin`, `mod_aprendizado`, `mod_espera`, `mod_ie`, `mod_push`, `mod_suporte` ou outros módulos existentes.
 - Integrações com dados do app devem usar contratos explícitos, RPCs/views autorizadas e menor privilégio. Não criar acoplamento direto ou escrita em tabelas do app por conveniência.
-- Usar sempre a CLI local `C:\AAP\BET\ProjetoTurboTiger\TurboTiger Codex\tools\supabase-cli\supabase.exe` e o vínculo Supabase existente no projeto principal.
+- Usar sempre a CLI local `\TurboTiger\Desenvolvimento\tools\supabase-cli\supabase.exe`, resolvida a partir da unidade ou compartilhamento atual, e o vínculo Supabase existente no projeto principal.
 - Não executar `supabase db push` sem pedido explícito. Para aplicar SQL, executar somente a migration criada ou solicitada, preferencialmente com `& "tools\supabase-cli\supabase.exe" db query --linked --file "supabase\migrations\<arquivo>.sql"` a partir da raiz principal.
 - Para SQL ad hoc somente leitura, esta CLI recebe o SQL como argumento posicional; ela não suporta `db query --sql`.
 - Tratar o Disk IO Budget como recurso sensível: evitar varreduras amplas, exportações, `count(*)` repetido e consultas pesadas nas tabelas grandes do app. Preferir leituras indexadas, incrementais e com `limit`.

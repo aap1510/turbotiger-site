@@ -87,7 +87,7 @@ Produção nunca deve compartilhar credenciais, banco ou buckets com homologaç�
 
 ## Integração com o Supabase existente
 
-- Reutilizar o projeto Supabase já vinculado na raiz `C:\AAP\BET\ProjetoTurboTiger\TurboTiger Codex`.
+- Reutilizar o projeto Supabase já vinculado na raiz `\TurboTiger\Desenvolvimento`, resolvida a partir da unidade ou compartilhamento atual.
 - Usar a CLI local `tools\supabase-cli\supabase.exe`; não instalar ou vincular outro projeto Supabase para o MKT Digital.
 - As migrations físicas permanecem na infraestrutura Supabase do projeto principal, com objetos qualificados por `mod_mkt`.
 - O acesso a dados de outros schemas deve ocorrer somente por interfaces autorizadas, com menor privilégio e auditoria.

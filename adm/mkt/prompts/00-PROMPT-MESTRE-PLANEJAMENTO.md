@@ -33,7 +33,7 @@ Produza:
 ## Restrições obrigatórias
 
 - Não alterar nem integrar código do app Delphi/FM﻿X nesta fase.
-- Considerar `C:\AAP\BET\ProjetoTurboTiger\TurboTiger Codex\turbotiger-site\adm\mkt` como diretório oficial do MKT Digital.
+- Considerar `\TurboTiger\Desenvolvimento\turbotiger-site\adm\mkt`, resolvido a partir da unidade ou compartilhamento atual, como diretório oficial do MKT Digital.
 - Reutilizar o projeto Supabase existente do aplicativo e manter todos os objetos próprios no schema `mod_mkt`.
 - Usar a CLI local do projeto principal, não criar outro vínculo Supabase e não executar `supabase db push`.
 - Não copiar credenciais ou valores do arquivo local de segredos de emergência.
