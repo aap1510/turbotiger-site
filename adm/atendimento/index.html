@@ -7,7 +7,7 @@
   <meta name="description" content="Central administrativa de atendimento Turbo Tiger.">
   <link rel="icon" href="../../assets/icone-turbotiger-raio.ico">
   <link rel="stylesheet" href="../assets/admin.css?v=20260823-atd-01">
-  <link rel="stylesheet" href="atendimento.css?v=20260824-audio-02">
+  <link rel="stylesheet" href="atendimento.css?v=20260825-agenda-01">
 </head>
 <body data-admin-page="atendimento">
   <div class="admin-shell atendimento-shell">
@@ -40,7 +40,7 @@
     <main class="atendimento-main">
       <header class="atendimento-topbar">
         <div><h1>Caixa de entrada</h1><span id="pageStatus" class="status-line">Carregando atendimento</span></div>
-        <div class="topbar-actions"><button class="btn btn-ghost" id="templatesButton" type="button">Templates</button><button class="btn btn-ghost" id="settingsButton" type="button">Configurações</button><button class="btn btn-ghost" id="reloadButton" type="button">Atualizar</button></div>
+        <div class="topbar-actions"><button class="btn btn-primary" id="schedulerButton" type="button">Agendador</button><button class="btn btn-ghost" id="templatesButton" type="button">Templates</button><button class="btn btn-ghost" id="settingsButton" type="button">Configurações</button><button class="btn btn-ghost" id="reloadButton" type="button">Atualizar</button></div>
       </header>
 
       <section class="inbox" aria-label="Caixa de entrada omnichannel">
@@ -87,6 +87,33 @@
       </section>
     </main>
   </div>
-  <script src="atendimento.js?v=20260824-audio-02"></script>
+
+  <dialog class="scheduler-dialog" id="schedulerDialog" aria-labelledby="schedulerTitle">
+    <div class="scheduler-heading">
+      <div><span class="scheduler-kicker">Mensagens programadas</span><h2 id="schedulerTitle">Agendador inteligente</h2><p>A IA personaliza cada mensagem usando o histórico individual.</p></div>
+      <button class="dialog-close" id="schedulerClose" type="button" aria-label="Fechar agendador">×</button>
+    </div>
+    <div class="scheduler-layout">
+      <form id="schedulerForm" class="scheduler-form">
+        <label>Nome da programação<input id="schedulerName" maxlength="160" required placeholder="Ex.: Retomar conversas do grupo Alpha"></label>
+        <label>Quando enviar<input id="schedulerDate" type="datetime-local" required></label>
+        <fieldset><legend>Quem receberá</legend>
+          <label class="choice-card"><input type="radio" name="schedulerAudience" value="todos_contatos" checked><span><strong>Todos que já enviaram mensagem</strong><small>Inclui todos os contatos elegíveis do WhatsApp.</small></span></label>
+          <label class="choice-card"><input type="radio" name="schedulerAudience" value="selecionados"><span><strong>Somente contatos selecionados</strong><small>Escolha as conversas abaixo.</small></span></label>
+          <div class="scheduler-contacts" id="schedulerContacts" hidden></div>
+        </fieldset>
+        <label>Orientação para a IA<textarea id="schedulerInstruction" maxlength="4000" required placeholder="Ex.: Dê bom dia, retome o assunto da conversa com naturalidade e diga que estamos à disposição quando for conveniente."></textarea><small>A IA produzirá uma mensagem diferente e coerente para cada histórico.</small></label>
+        <fieldset><legend>Se a janela de 24 horas estiver fechada</legend>
+          <label class="choice-card"><input type="radio" name="schedulerOutsideWindow" value="nao_enviar" checked><span><strong>Não enviar nada</strong><small>O contato será ignorado com segurança.</small></span></label>
+          <label class="choice-card"><input type="radio" name="schedulerOutsideWindow" value="template"><span><strong>Usar template aprovado</strong><small>Envia somente um modelo aprovado pela Meta.</small></span></label>
+          <label id="schedulerTemplateField" hidden>Template aprovado<select id="schedulerTemplate"></select><small id="schedulerTemplateHint"></small></label>
+        </fieldset>
+        <div class="scheduler-feedback" id="schedulerFeedback" role="status"></div>
+        <div class="scheduler-actions"><button class="btn btn-ghost" id="schedulerCancel" type="button">Fechar</button><button class="btn btn-primary" id="schedulerSubmit" type="submit">Programar envio</button></div>
+      </form>
+      <section class="scheduler-history" aria-labelledby="schedulerHistoryTitle"><div class="scheduler-history-heading"><h3 id="schedulerHistoryTitle">Programações</h3><button class="btn btn-ghost btn-small" id="schedulerReload" type="button">Atualizar</button></div><div id="schedulerCampaigns" class="scheduler-campaigns"><p>Nenhuma programação carregada.</p></div></section>
+    </div>
+  </dialog>
+  <script src="atendimento.js?v=20260825-agenda-01"></script>
 </body>
 </html>
