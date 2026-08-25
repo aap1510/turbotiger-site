@@ -378,7 +378,7 @@
   }
 
   function emptyState(title, text, canConfigure) {
-    return "<div class=\"ie-empty\"><strong>" + escapeHtml(title) + "</strong><p>" + escapeHtml(text) + "</p>" + (canConfigure ? "<button class=\"ie-button ie-button-primary\" type=\"button\" data-open-settings>Configurar</button>" : "") + "</div>";
+    return "<div class=\"ie-empty\"><strong>" + escapeHtml(title) + "</strong><p>" + escapeHtml(text) + "</p></div>";
   }
 
   function matchSides(item) {
@@ -679,6 +679,7 @@
     all("[data-tab]").forEach(function (button) { button.classList.toggle("is-active", button.getAttribute("data-tab") === tab); });
     byId("settingsButton").classList.toggle("is-active", tab === "settings");
     byId("settingsButton").setAttribute("aria-pressed", tab === "settings" ? "true" : "false");
+    byId("backButton").classList.toggle("is-hidden-home", tab === "home");
     all("[data-panel]").forEach(function (panel) {
       var active = panel.getAttribute("data-panel") === tab;
       panel.hidden = !active;

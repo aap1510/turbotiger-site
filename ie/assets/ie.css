@@ -195,6 +195,11 @@ button {
   background: var(--ie-surface-raised);
 }
 
+.ie-header #backButton.is-hidden-home {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .ie-icon-button svg,
 .ie-header-settings svg,
 .ie-tabs svg,
