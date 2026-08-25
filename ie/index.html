@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#050607">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Inteligência Esportiva — Turbo Tiger</title>
+  <meta name="description" content="Central personalizada de acompanhamento esportivo do Turbo Tiger.">
+  <link rel="icon" href="../assets/icone-turbotiger-raio.ico">
+  <link rel="stylesheet" href="assets/ie.css?v=20260825-01">
+</head>
+<body>
+  <svg class="ie-symbols" aria-hidden="true">
+    <symbol id="ie-ico-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="ie-ico-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="ie-ico-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.86 2.86-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.55v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.88.34l-.06.06-2.86-2.86.06-.06A1.7 1.7 0 0 0 4.05 15a1.7 1.7 0 0 0-1.5-1.1H2.5V9.85h.05a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.86-2.86.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.1-1.5V2.8h4.05v.05a1.7 1.7 0 0 0 1.1 1.5 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.86 2.86-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.5 1.1h.05v4.05h-.05a1.7 1.7 0 0 0-1.2 1.1Z"/></symbol>
+    <symbol id="ie-ico-home" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5V21h-6v-6H9v6H3Z"/></symbol>
+    <symbol id="ie-ico-games" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+    <symbol id="ie-ico-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0ZM10 15h4M12 13v6M8 21h8M6 6H3v2a4 4 0 0 0 4 4M18 6h3v2a4 4 0 0 1-4 4"/></symbol>
+    <symbol id="ie-ico-team" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="ie-ico-news" viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 7h8M8 11h8M8 15h5"/></symbol>
+    <symbol id="ie-ico-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0 1 4M20 4v7h-7"/></symbol>
+    <symbol id="ie-ico-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9Z"/></symbol>
+    <symbol id="ie-ico-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></symbol>
+    <symbol id="ie-ico-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="ie-ico-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="ie-ico-live" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9"/></symbol>
+    <symbol id="ie-ico-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="ie-ico-chart" viewBox="0 0 24 24"><path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7"/></symbol>
+  </svg>
+
+  <div id="loadingPanel" class="ie-gate" aria-live="polite">
+    <span class="ie-spinner" aria-hidden="true"></span>
+    <strong>Carregando sua central esportiva</strong>
+    <span id="loadingStatus">Validando a sessão do aplicativo...</span>
+  </div>
+
+  <div id="accessPanel" class="ie-gate" hidden>
+    <img src="../assets/icone-turbotiger-raio.webp" alt="" width="54" height="54">
+    <strong>Acesso pelo aplicativo</strong>
+    <span>Esta central usa sua sessão segura do Turbo Tiger e não pode ser aberta diretamente.</span>
+    <button id="retryButton" class="ie-button ie-button-primary" type="button">Tentar novamente</button>
+  </div>
+
+  <div id="ieApp" class="ie-app" hidden>
+    <header class="ie-header">
+      <button id="backButton" class="ie-icon-button" type="button" aria-label="Voltar">
+        <svg><use href="#ie-ico-back"/></svg>
+      </button>
+      <div class="ie-header-title">
+        <h1>Inteligência Esportiva</h1>
+        <span id="headerFreshness">Atualizando...</span>
+      </div>
+      <button id="settingsButton" class="ie-header-settings" type="button" aria-label="Configurações">
+        <svg><use href="#ie-ico-settings"/></svg><span>Configurações</span>
+      </button>
+    </header>
+
+    <nav class="ie-tabs" aria-label="Áreas da central">
+      <button class="is-active" type="button" data-tab="home"><svg><use href="#ie-ico-home"/></svg><span>Para você</span></button>
+      <button type="button" data-tab="games"><svg><use href="#ie-ico-games"/></svg><span>Jogos</span></button>
+      <button type="button" data-tab="competitions"><svg><use href="#ie-ico-trophy"/></svg><span>Campeonatos</span></button>
+      <button type="button" data-tab="teams"><svg><use href="#ie-ico-team"/></svg><span>Times</span></button>
+      <button type="button" data-tab="news"><svg><use href="#ie-ico-news"/></svg><span>Notícias</span></button>
+    </nav>
+
+    <main class="ie-main">
+      <section class="ie-panel is-active" data-panel="home" aria-labelledby="favoriteSportTitle">
+        <div class="ie-section-heading">
+          <div class="ie-sport-heading">
+            <span id="favoriteSportIcon" class="ie-sport-icon" aria-hidden="true">●</span>
+            <h2 id="favoriteSportTitle">Seu esporte favorito</h2>
+          </div>
+          <button class="ie-text-action" type="button" data-open-settings>Configurar</button>
+        </div>
+        <div id="homeContent" class="ie-feed"></div>
+      </section>
+
+      <section class="ie-panel" data-panel="games" aria-labelledby="gamesTitle" hidden>
+        <div class="ie-panel-toolbar">
+          <h2 id="gamesTitle">Jogos</h2>
+          <div class="ie-segmented" role="tablist" aria-label="Filtro de jogos">
+            <button class="is-active" type="button" data-game-filter="live">Ao vivo</button>
+            <button type="button" data-game-filter="upcoming">Próximos</button>
+            <button type="button" data-game-filter="results">Resultados</button>
+          </div>
+        </div>
+        <div id="gamesContent" class="ie-feed"></div>
+      </section>
+
+      <section class="ie-panel" data-panel="competitions" aria-labelledby="competitionsTitle" hidden>
+        <div class="ie-panel-toolbar"><h2 id="competitionsTitle">Campeonatos</h2></div>
+        <div id="competitionsContent" class="ie-feed"></div>
+      </section>
+
+      <section class="ie-panel" data-panel="teams" aria-labelledby="teamsTitle" hidden>
+        <div class="ie-panel-toolbar"><h2 id="teamsTitle">Times e participantes</h2></div>
+        <div id="teamsContent" class="ie-feed"></div>
+      </section>
+
+      <section class="ie-panel" data-panel="news" aria-labelledby="newsTitle" hidden>
+        <div class="ie-panel-toolbar"><h2 id="newsTitle">Notícias</h2></div>
+        <div id="newsContent" class="ie-feed"></div>
+      </section>
+
+      <section class="ie-panel" data-panel="settings" aria-labelledby="settingsTitle" hidden>
+        <div class="ie-panel-toolbar ie-settings-title">
+          <button class="ie-icon-button" type="button" data-close-settings aria-label="Voltar"><svg><use href="#ie-ico-back"/></svg></button>
+          <h2 id="settingsTitle">Configurações</h2>
+        </div>
+
+        <form id="settingsForm" class="ie-settings-form">
+          <section class="ie-form-section">
+            <h3>Esporte favorito</h3>
+            <label class="ie-field">
+              <span class="ie-visually-hidden">Esporte favorito</span>
+              <select id="favoriteSportSelect" name="favoriteSport"></select>
+            </label>
+          </section>
+
+          <section class="ie-form-section">
+            <h3>Filtros</h3>
+            <div class="ie-filter-stack">
+              <label class="ie-filter-row"><span>Continente</span><select id="continentSelect"><option value="">Todos</option></select></label>
+              <label class="ie-filter-row"><span>País</span><select id="countrySelect"><option value="">Todos</option></select></label>
+              <label class="ie-filter-row"><span>Esporte</span><select id="sportSelect"><option value="">Todos</option></select></label>
+            </div>
+          </section>
+
+          <section class="ie-selection-columns">
+            <div class="ie-form-section">
+              <div class="ie-list-title"><h3>Times e participantes</h3><span id="teamSelectionCount">0 selecionados</span></div>
+              <label class="ie-search"><svg><use href="#ie-ico-search"/></svg><input id="teamSearch" type="search" placeholder="Buscar time ou participante" autocomplete="off"></label>
+              <div id="teamSelectionList" class="ie-selection-list"></div>
+            </div>
+            <div class="ie-form-section">
+              <div class="ie-list-title"><h3>Campeonatos</h3><span id="competitionSelectionCount">0 selecionados</span></div>
+              <label class="ie-search"><svg><use href="#ie-ico-search"/></svg><input id="competitionSearch" type="search" placeholder="Buscar campeonato" autocomplete="off"></label>
+              <div id="competitionSelectionList" class="ie-selection-list"></div>
+            </div>
+          </section>
+
+          <section class="ie-form-section">
+            <div class="ie-switch-row">
+              <div><h3>Notificar</h3><span>Somente os times e participantes com sino ativo.</span></div>
+              <label class="ie-switch"><input id="notificationsEnabled" type="checkbox"><span aria-hidden="true"></span></label>
+            </div>
+            <fieldset class="ie-time-fieldset">
+              <legend>Antecedência</legend>
+              <div id="alertTimes" class="ie-time-options"></div>
+            </fieldset>
+            <fieldset class="ie-time-fieldset">
+              <legend>Tipos de alerta</legend>
+              <div id="alertEvents" class="ie-event-options"></div>
+            </fieldset>
+          </section>
+
+          <button id="saveSettingsButton" class="ie-button ie-button-primary ie-save-button" type="submit">Salvar</button>
+        </form>
+      </section>
+    </main>
+
+    <footer class="ie-footer">
+      <button id="refreshButton" class="ie-refresh" type="button"><svg><use href="#ie-ico-refresh"/></svg><span id="footerFreshness">Atualizado agora</span></button>
+    </footer>
+  </div>
+
+  <div id="detailModal" class="ie-modal" hidden>
+    <div class="ie-modal-backdrop" data-close-detail></div>
+    <section class="ie-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <header><div><h2 id="detailTitle">Detalhes</h2><span id="detailSubtitle"></span></div><button class="ie-icon-button" type="button" data-close-detail aria-label="Fechar"><svg><use href="#ie-ico-close"/></svg></button></header>
+      <div id="detailContent" class="ie-detail-content"></div>
+    </section>
+  </div>
+
+  <div id="toast" class="ie-toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="assets/ie.js?v=20260825-01"></script>
+</body>
+</html>
