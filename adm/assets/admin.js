@@ -1149,27 +1149,23 @@
     });
   }
 
+  function adminLandingPath(areas) {
+    if (!Array.isArray(areas)) return "";
+    if (areas.indexOf("admin") >= 0) return "admin/";
+    if (areas.indexOf("push") >= 0) return "push/";
+    if (areas.indexOf("mmn") >= 0) return "mmn/";
+    if (areas.indexOf("sobolao") >= 0) return "../sobolao/?role=admin";
+    if (areas.indexOf("atendimento") >= 0) return "atendimento/";
+    return "";
+  }
+
   async function initLogin() {
     state.session = readSession();
     if (state.session && state.session.access_token) {
       try {
         var contexto = await rpc("adm_contexto_rpc", {});
-        if (contexto && contexto.ok === true && Array.isArray(contexto.areas) && contexto.areas.indexOf("admin") >= 0) {
-          window.location.href = "admin/";
-          return;
-        }
-        if (contexto && contexto.ok === true && Array.isArray(contexto.areas) && contexto.areas.indexOf("push") >= 0) {
-          window.location.href = "push/";
-          return;
-        }
-        if (contexto && contexto.ok === true && Array.isArray(contexto.areas) && contexto.areas.indexOf("mmn") >= 0) {
-          window.location.href = "mmn/";
-          return;
-        }
-        if (contexto && contexto.ok === true && Array.isArray(contexto.areas) && contexto.areas.indexOf("sobolao") >= 0) {
-          window.location.href = "../sobolao/?role=admin";
-          return;
-        }
+        var existingPath = contexto && contexto.ok === true ? adminLandingPath(contexto.areas) : "";
+        if (existingPath) { window.location.href = existingPath; return; }
       } catch (error) {
         clearSession();
       }
@@ -1189,11 +1185,12 @@
           clearSession();
           throw new Error((contexto && contexto.error) || "sem_permissao_admin");
         }
-        if (!Array.isArray(contexto.areas) || (contexto.areas.indexOf("push") === -1 && contexto.areas.indexOf("admin") === -1 && contexto.areas.indexOf("mmn") === -1 && contexto.areas.indexOf("sobolao") === -1)) {
+        var landingPath = adminLandingPath(contexto.areas);
+        if (!landingPath) {
           clearSession();
           throw new Error("sem_permissao_admin");
         }
-        window.location.href = contexto.areas.indexOf("admin") >= 0 ? "admin/" : (contexto.areas.indexOf("push") >= 0 ? "push/" : (contexto.areas.indexOf("mmn") >= 0 ? "mmn/" : "../sobolao/?role=admin"));
+        window.location.href = landingPath;
       } catch (error) {
         setStatus(qs("loginStatus"), error.message || String(error), "error");
       } finally {

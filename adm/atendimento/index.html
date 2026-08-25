@@ -7,7 +7,7 @@
   <meta name="description" content="Central administrativa de atendimento Turbo Tiger.">
   <link rel="icon" href="../../assets/icone-turbotiger-raio.ico">
   <link rel="stylesheet" href="../assets/admin.css?v=20260823-atd-01">
-  <link rel="stylesheet" href="atendimento.css?v=20260825-agenda-02">
+  <link rel="stylesheet" href="atendimento.css?v=20260825-live-01">
 </head>
 <body data-admin-page="atendimento">
   <div class="admin-shell atendimento-shell">
@@ -61,15 +61,15 @@
           <div class="chat-empty" id="chatEmpty"><strong>Selecione uma conversa</strong><span>O histórico e as ações aparecerão aqui.</span></div>
           <div class="chat-content" id="chatContent" hidden>
             <header class="chat-header">
-              <div><strong id="chatContact">Contato</strong><span id="chatMeta"></span></div>
+              <div class="chat-contact-summary"><div class="avatar chat-avatar" id="chatAvatar">TT</div><div><strong id="chatContact">Contato</strong><span id="chatMeta"></span></div></div>
               <div class="chat-deadlines"><span id="slaStatus"></span><span id="windowStatus"></span><button class="btn btn-primary btn-small" id="takeConversationButton" type="button">Assumir conversa</button></div>
             </header>
             <div class="ai-banner" id="aiBanner">A IA está fazendo a triagem inicial. Assuma a conversa para interromper a automação.</div>
-            <div class="message-stream" id="messageStream"></div>
+            <div class="message-stream" id="messageStream" role="log" aria-live="polite" aria-relevant="additions text"></div>
             <form class="composer" id="messageForm">
               <div class="composer-tabs"><button class="is-active" type="button">Responder</button><button type="button" id="internalNoteTab">Nota interna</button></div>
               <textarea id="messageInput" placeholder="Digite sua mensagem..." aria-label="Mensagem"></textarea>
-              <div class="composer-actions"><span id="composerHint">Dentro da janela de atendimento</span><button class="btn btn-ghost" id="chooseTemplateButton" type="button">Templates</button><button class="btn btn-primary" id="sendButton" type="submit">Enviar</button></div>
+              <div class="composer-actions"><span id="composerHint">Assuma uma conversa para responder</span><button class="btn btn-ghost" id="chooseTemplateButton" type="button">Templates</button><button class="btn btn-primary" id="sendButton" type="submit">Enviar</button></div>
             </form>
           </div>
         </div>
@@ -115,6 +115,6 @@
       <section class="scheduler-history" aria-labelledby="schedulerHistoryTitle"><div class="scheduler-history-heading"><h3 id="schedulerHistoryTitle">Programações</h3><button class="btn btn-ghost btn-small" id="schedulerReload" type="button">Atualizar</button></div><div id="schedulerCampaigns" class="scheduler-campaigns"><p>Nenhuma programação carregada.</p></div></section>
     </div>
   </dialog>
-  <script src="atendimento.js?v=20260825-agenda-02"></script>
+  <script src="atendimento.js?v=20260825-live-01"></script>
 </body>
 </html>
