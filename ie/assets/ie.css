@@ -25,6 +25,13 @@
 
 * {
   box-sizing: border-box;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 html,
@@ -127,7 +134,7 @@ button {
   top: 0;
   min-height: var(--ie-header-height);
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto;
+  grid-template-columns: 44px minmax(0, 1fr) auto 44px;
   align-items: center;
   gap: 8px;
   padding: max(10px, env(safe-area-inset-top)) 18px 10px;
@@ -221,13 +228,34 @@ button {
   color: var(--ie-text);
 }
 
+.ie-header-settings.is-active {
+  border-radius: 10px;
+  background: var(--ie-red-soft);
+  color: var(--ie-red);
+}
+
+.ie-close-button {
+  border: 1px solid var(--ie-border-strong);
+  background: var(--ie-surface-raised);
+  color: var(--ie-text);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, .24);
+}
+
+.ie-close-button:hover,
+.ie-close-button:focus-visible {
+  border-color: rgba(239, 63, 72, .65);
+  background: var(--ie-red-soft);
+  color: var(--ie-red);
+}
+
 .ie-tabs {
   position: sticky;
   z-index: 25;
   top: var(--ie-header-height);
   display: grid;
-  grid-template-columns: repeat(5, minmax(74px, 1fr));
-  overflow-x: auto;
+  width: 100%;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  overflow: hidden;
   border-bottom: 1px solid var(--ie-border);
   background: rgba(5, 6, 7, .96);
   scrollbar-width: none;
@@ -239,6 +267,7 @@ button {
 
 .ie-tabs button {
   position: relative;
+  min-width: 0;
   min-height: 58px;
   display: inline-flex;
   align-items: center;
@@ -248,6 +277,13 @@ button {
   color: var(--ie-muted);
   font-size: 12px;
   font-weight: 620;
+  white-space: nowrap;
+}
+
+.ie-tabs button span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -683,6 +719,13 @@ button {
   border: 1px solid var(--ie-border);
   border-radius: var(--ie-radius);
   background: var(--ie-surface);
+  scroll-margin-top: calc(var(--ie-header-height) + 72px);
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.ie-form-section.is-context-target {
+  border-color: rgba(244, 191, 67, .72);
+  box-shadow: 0 0 0 3px rgba(244, 191, 67, .08);
 }
 
 .ie-form-section > h3,
@@ -792,7 +835,6 @@ button {
 .ie-selection-list {
   max-height: 368px;
   overflow-y: auto;
-  scrollbar-color: var(--ie-border-strong) transparent;
 }
 
 .ie-selection-row {
@@ -1241,14 +1283,12 @@ button {
     padding: 0;
   }
 
-  .ie-tabs {
-    grid-template-columns: repeat(5, 82px);
-  }
-
   .ie-tabs button {
     min-height: 54px;
     flex-direction: column;
     gap: 3px;
+    padding-right: 2px;
+    padding-left: 2px;
     font-size: 9px;
   }
 

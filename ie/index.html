@@ -10,7 +10,7 @@
   <title>Inteligência Esportiva — Turbo Tiger</title>
   <meta name="description" content="Central personalizada de acompanhamento esportivo do Turbo Tiger.">
   <link rel="icon" href="../assets/icone-turbotiger-raio.ico">
-  <link rel="stylesheet" href="assets/ie.css?v=20260825-01">
+  <link rel="stylesheet" href="assets/ie.css?v=20260825-04">
 </head>
 <body>
   <svg class="ie-symbols" aria-hidden="true">
@@ -54,8 +54,11 @@
         <h1>Inteligência Esportiva</h1>
         <span id="headerFreshness">Atualizando...</span>
       </div>
-      <button id="settingsButton" class="ie-header-settings" type="button" aria-label="Configurações">
+      <button id="settingsButton" class="ie-header-settings" type="button" aria-label="Configurações" aria-pressed="false">
         <svg><use href="#ie-ico-settings"/></svg><span>Configurações</span>
+      </button>
+      <button id="closeButton" class="ie-icon-button ie-close-button" type="button" aria-label="Fechar a Central de Inteligência Esportiva">
+        <svg><use href="#ie-ico-close"/></svg>
       </button>
     </header>
 
@@ -113,7 +116,7 @@
         </div>
 
         <form id="settingsForm" class="ie-settings-form">
-          <section class="ie-form-section">
+          <section id="settingsFavoriteSport" class="ie-form-section" data-settings-section="favorite">
             <h3>Esporte favorito</h3>
             <label class="ie-field">
               <span class="ie-visually-hidden">Esporte favorito</span>
@@ -121,7 +124,7 @@
             </label>
           </section>
 
-          <section class="ie-form-section">
+          <section id="settingsFilters" class="ie-form-section" data-settings-section="filters">
             <h3>Filtros</h3>
             <div class="ie-filter-stack">
               <label class="ie-filter-row"><span>Continente</span><select id="continentSelect"><option value="">Todos</option></select></label>
@@ -131,19 +134,19 @@
           </section>
 
           <section class="ie-selection-columns">
-            <div class="ie-form-section">
+            <div id="settingsParticipants" class="ie-form-section" data-settings-section="participants">
               <div class="ie-list-title"><h3>Times e participantes</h3><span id="teamSelectionCount">0 selecionados</span></div>
               <label class="ie-search"><svg><use href="#ie-ico-search"/></svg><input id="teamSearch" type="search" placeholder="Buscar time ou participante" autocomplete="off"></label>
               <div id="teamSelectionList" class="ie-selection-list"></div>
             </div>
-            <div class="ie-form-section">
+            <div id="settingsCompetitions" class="ie-form-section" data-settings-section="competitions">
               <div class="ie-list-title"><h3>Campeonatos</h3><span id="competitionSelectionCount">0 selecionados</span></div>
               <label class="ie-search"><svg><use href="#ie-ico-search"/></svg><input id="competitionSearch" type="search" placeholder="Buscar campeonato" autocomplete="off"></label>
               <div id="competitionSelectionList" class="ie-selection-list"></div>
             </div>
           </section>
 
-          <section class="ie-form-section">
+          <section id="settingsNotifications" class="ie-form-section" data-settings-section="notifications">
             <div class="ie-switch-row">
               <div><h3>Notificar</h3><span>Somente os times e participantes com sino ativo.</span></div>
               <label class="ie-switch"><input id="notificationsEnabled" type="checkbox"><span aria-hidden="true"></span></label>
@@ -178,6 +181,6 @@
 
   <div id="toast" class="ie-toast" role="status" aria-live="polite" hidden></div>
 
-  <script src="assets/ie.js?v=20260825-03"></script>
+  <script src="assets/ie.js?v=20260825-05"></script>
 </body>
 </html>

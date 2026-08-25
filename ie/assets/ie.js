@@ -30,6 +30,8 @@
     news: [],
     activeTab: "home",
     previousTab: "home",
+    homeSectionFilter: "",
+    settingsContext: "",
     gameFilter: "live",
     catalog: { participants: [], competitions: [] },
     catalogRequestId: 0,
@@ -449,18 +451,31 @@
     return "<article class=\"ie-feed-card\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("trophy") + "</span>Campeonato</span>" + detailButton("competition", item.id_competicao || item.id || "", "", item.nome) + "</div><h3 class=\"ie-news-title\">" + escapeHtml(item.nome || item.competicao_nome || "Campeonato") + "</h3>" + body + "</article>";
   }
 
+  function subcardMatchesSection(subcard, section) {
+    var code = String(subcard && (subcard.codigo || subcard.tipo) || "").toLowerCase();
+    var wanted = String(section || "").toLowerCase();
+    if (wanted === "partidas" || wanted === "jogos") return code.indexOf("part") >= 0 || code.indexOf("jogo") >= 0 || code.indexOf("evento") >= 0;
+    if (wanted === "campeonatos") return code.indexOf("camp") >= 0 || code.indexOf("class") >= 0 || code.indexOf("compet") >= 0;
+    if (wanted === "noticias") return code.indexOf("notic") >= 0;
+    if (wanted === "cotacoes") return code.indexOf("cotac") >= 0 || code.indexOf("odd") >= 0;
+    if (wanted === "analises") return code.indexOf("analis") >= 0 || code.indexOf("pred") >= 0 || code.indexOf("prob") >= 0;
+    return true;
+  }
+
   function renderHome() {
     var card = state.card || {};
     var configured = card.configurado !== false && !!(state.bootstrap && (state.bootstrap.preferencias && state.bootstrap.preferencias.id_esporte_favorito || arrayOf(state.bootstrap.selecoes).length));
     var favorite = favoriteSport();
-    byId("favoriteSportTitle").textContent = favorite ? favorite.nome : "Seu esporte favorito";
-    byId("favoriteSportIcon").textContent = favorite ? initials(favorite.nome) : "●";
+    var filteredSection = String(state.homeSectionFilter || "").toLowerCase();
+    var sectionTitles = { cotacoes: "Cotações informativas", analises: "Análises estatísticas" };
+    byId("favoriteSportTitle").textContent = sectionTitles[filteredSection] || (favorite ? favorite.nome : "Seu esporte favorito");
+    byId("favoriteSportIcon").textContent = filteredSection === "cotacoes" ? "1X2" : filteredSection === "analises" ? "∑" : (favorite ? initials(favorite.nome) : "●");
     if (!configured) {
       byId("homeContent").innerHTML = emptyState("Escolha seus esportes", "Defina um esporte favorito e acompanhe os times, participantes e campeonatos que realmente interessam a você.", true);
       return;
     }
     var html = [];
-    arrayOf(card.subcards).forEach(function (subcard) {
+    arrayOf(card.subcards).filter(function (subcard) { return subcardMatchesSection(subcard, filteredSection); }).forEach(function (subcard) {
       var code = String(subcard.codigo || subcard.tipo || "").toLowerCase();
       arrayOf(subcard.itens).slice(0, 3).forEach(function (item) {
         if (code.indexOf("notic") >= 0) html.push(renderNewsCard(item));
@@ -470,7 +485,7 @@
         else html.push(renderMatchCard(item, subcard.titulo));
       });
     });
-    byId("homeContent").innerHTML = html.join("") || emptyState("Nenhuma informação disponível", "Os dados do seu esporte favorito ainda não foram atualizados pela fonte.", false);
+    byId("homeContent").innerHTML = html.join("") || emptyState("Nenhuma informação disponível", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Os dados do seu esporte favorito ainda não foram atualizados pela fonte.", false);
   }
 
   function renderGames() {
@@ -662,6 +677,8 @@
     if (tab !== "settings") state.previousTab = tab;
     state.activeTab = tab;
     all("[data-tab]").forEach(function (button) { button.classList.toggle("is-active", button.getAttribute("data-tab") === tab); });
+    byId("settingsButton").classList.toggle("is-active", tab === "settings");
+    byId("settingsButton").setAttribute("aria-pressed", tab === "settings" ? "true" : "false");
     all("[data-panel]").forEach(function (panel) {
       var active = panel.getAttribute("data-panel") === tab;
       panel.hidden = !active;
@@ -670,20 +687,55 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function settingsContextDefinition(context) {
+    var definitions = {
+      partidas: { label: "Partidas", target: "settingsParticipants" },
+      campeonatos: { label: "Campeonatos", target: "settingsCompetitions" },
+      noticias: { label: "Notícias", target: "settingsParticipants" },
+      cotacoes: { label: "Cotações", target: "settingsParticipants" },
+      analises: { label: "Análises", target: "settingsFavoriteSport" }
+    };
+    return definitions[String(context || "").toLowerCase()] || null;
+  }
+
+  function applySettingsContext(context, scrollToTarget) {
+    var definition = settingsContextDefinition(context);
+    state.settingsContext = definition ? String(context).toLowerCase() : "";
+    byId("settingsTitle").textContent = definition ? "Configurações · " + definition.label : "Configurações";
+    all("[data-settings-section]").forEach(function (section) { section.classList.remove("is-context-target"); });
+    if (!definition) return;
+    var target = byId(definition.target);
+    if (!target) return;
+    target.classList.add("is-context-target");
+    if (scrollToTarget) window.setTimeout(function () { target.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
+  }
+
+  function openSettings(context, scrollToTarget) {
+    activateTab("settings");
+    applySettingsContext(context, scrollToTarget !== false);
+  }
+
+  function chooseAvailableGameFilter() {
+    var filter = state.games.live.length ? "live" : state.games.upcoming.length ? "upcoming" : state.games.results.length ? "results" : "live";
+    state.gameFilter = filter;
+    all("[data-game-filter]").forEach(function (button) { button.classList.toggle("is-active", button.getAttribute("data-game-filter") === filter); });
+    renderGames();
+  }
+
   function applyInitialRoute() {
     var params = new URLSearchParams(location.search);
     var section = String(params.get("secao") || "").toLowerCase();
-    var tabsBySection = {
-      configuracoes: "settings",
-      partidas: "games",
-      jogos: "games",
-      campeonatos: "competitions",
-      times: "teams",
-      noticias: "news",
-      cotacoes: "home",
-      analises: "home"
-    };
-    if (tabsBySection[section]) activateTab(tabsBySection[section]);
+    var context = String(params.get("contexto") || "").toLowerCase();
+    if (section === "configuracoes") openSettings(context, true);
+    else if (section === "partidas" || section === "jogos") { activateTab("games"); chooseAvailableGameFilter(); }
+    else if (section === "campeonatos") activateTab("competitions");
+    else if (section === "times") activateTab("teams");
+    else if (section === "noticias") activateTab("news");
+    else if (section === "cotacoes" || section === "analises") {
+      state.homeSectionFilter = section;
+      activateTab("home");
+      renderHome();
+    }
     var eventId = Number(params.get("id_evento") || 0);
     var competitionId = Number(params.get("id_competicao") || 0);
     if (eventId > 0) openEventDetail(eventId, "Detalhes da partida");
@@ -698,6 +750,17 @@
   window.TurboTigerIEHandleBack = function () {
     if (!byId("detailModal").hidden) {
       closeDetail();
+      return true;
+    }
+    if (state.activeTab === "settings") {
+      applySettingsContext("", false);
+      activateTab(state.previousTab || "home");
+      return true;
+    }
+    if (state.homeSectionFilter) {
+      state.homeSectionFilter = "";
+      renderHome();
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return true;
     }
     if (state.activeTab !== "home") {
@@ -809,22 +872,40 @@
   function setupEvents() {
     byId("retryButton").addEventListener("click", function () { byId("accessPanel").hidden = true; byId("loadingPanel").hidden = false; loadAll(false); });
     byId("refreshButton").addEventListener("click", function () { loadAll(true); });
-    byId("settingsButton").addEventListener("click", function () { activateTab("settings"); });
-    all("[data-open-settings]").forEach(function (button) { button.addEventListener("click", function () { activateTab("settings"); }); });
+    byId("settingsButton").addEventListener("click", function () { openSettings("", true); });
+    byId("closeButton").addEventListener("click", function () { if (!postNative("close", {})) history.back(); });
+    all("[data-open-settings]").forEach(function (button) { button.addEventListener("click", function () { openSettings("", true); }); });
     all("[data-close-settings]").forEach(function (button) { button.addEventListener("click", window.TurboTigerIEHandleBack); });
     all("[data-tab]").forEach(function (button) { button.addEventListener("click", function () { activateTab(button.getAttribute("data-tab")); }); });
     all("[data-game-filter]").forEach(function (button) { button.addEventListener("click", function () { state.gameFilter = button.getAttribute("data-game-filter"); all("[data-game-filter]").forEach(function (item) { item.classList.toggle("is-active", item === button); }); renderGames(); }); });
     all("[data-close-detail]").forEach(function (button) { button.addEventListener("click", closeDetail); });
     byId("settingsForm").addEventListener("submit", saveSettings);
-    var updateCatalog = debounce(function () { loadCatalog().catch(function (error) { showToast(friendlyError(error), true); }); }, 280);
-    byId("continentSelect").addEventListener("change", function () {
-      fillCountrySelect(byId("continentSelect").value, "");
-      updateCatalog();
+    function refreshCatalog() {
+      loadCatalog().catch(function (error) { showToast(friendlyError(error), true); });
+    }
+    var updateCatalogFromFilter = debounce(refreshCatalog, 40);
+    var updateCatalogFromSearch = debounce(refreshCatalog, 280);
+    var lastContinent = byId("continentSelect").value;
+    function continentChanged() {
+      var continent = byId("continentSelect").value;
+      if (continent !== lastContinent) {
+        lastContinent = continent;
+        fillCountrySelect(continent, "");
+      }
+      updateCatalogFromFilter();
+    }
+    byId("continentSelect").addEventListener("input", continentChanged);
+    byId("continentSelect").addEventListener("change", continentChanged);
+    ["countrySelect", "sportSelect"].forEach(function (id) {
+      byId(id).addEventListener("input", updateCatalogFromFilter);
+      byId(id).addEventListener("change", updateCatalogFromFilter);
     });
-    ["countrySelect", "sportSelect", "teamSearch", "competitionSearch"].forEach(function (id) { byId(id).addEventListener(id.indexOf("Search") >= 0 ? "input" : "change", updateCatalog); });
+    ["teamSearch", "competitionSearch"].forEach(function (id) {
+      byId(id).addEventListener("input", updateCatalogFromSearch);
+    });
     document.addEventListener("click", function (event) {
       var settings = event.target.closest("[data-open-settings]");
-      if (settings) { activateTab("settings"); return; }
+      if (settings) { openSettings("", true); return; }
       var detail = event.target.closest("[data-detail-kind]");
       if (detail) {
         var kind = detail.getAttribute("data-detail-kind");
