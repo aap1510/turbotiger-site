@@ -229,8 +229,18 @@ button {
 }
 
 .ie-header-settings.is-active {
-  border-radius: 10px;
-  background: var(--ie-red-soft);
+  border-color: transparent;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ie-red);
+}
+
+.ie-header-settings.is-active:hover,
+.ie-header-settings.is-active:focus-visible {
+  outline: none;
+  background: transparent;
+  box-shadow: none;
   color: var(--ie-red);
 }
 
