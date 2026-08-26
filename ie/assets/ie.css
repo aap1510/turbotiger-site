@@ -505,6 +505,14 @@ button {
   object-fit: contain;
 }
 
+.ie-crest img {
+  width: 82%;
+  height: 82%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+
 .ie-side strong {
   max-width: 100%;
   overflow: hidden;
@@ -534,6 +542,12 @@ button {
   color: var(--ie-gold);
   font-size: 16px;
   font-weight: 720;
+}
+
+.ie-match-date {
+  color: var(--ie-muted);
+  font-size: calc(12px - 1pt);
+  font-weight: 600;
 }
 
 .ie-feed-card.is-live .ie-match-time {
@@ -914,6 +928,70 @@ button {
 .ie-selection-action:hover,
 .ie-selection-action:focus-visible {
   background: var(--ie-surface-raised);
+}
+
+.ie-field-help {
+  margin: -2px 0 10px;
+  color: var(--ie-muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.ie-favorite-order-list {
+  display: grid;
+}
+
+.ie-favorite-order-row {
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: 22px 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  border-bottom: 1px solid var(--ie-border);
+}
+
+.ie-favorite-order-row:last-child {
+  border-bottom: 0;
+}
+
+.ie-favorite-position {
+  color: var(--ie-gold);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.ie-favorite-order-row .ie-entity-logo {
+  width: 32px;
+  height: 32px;
+}
+
+.ie-favorite-order-row strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ie-favorite-order-actions {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.ie-favorite-order-actions button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--ie-border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ie-text);
+  font-size: 17px;
+}
+
+.ie-favorite-order-actions button:disabled {
+  opacity: .24;
 }
 
 .ie-switch-row h3 {

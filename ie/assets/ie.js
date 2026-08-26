@@ -36,6 +36,8 @@
     catalog: { participants: [], competitions: [] },
     catalogRequestId: 0,
     selectionChanges: {},
+    favorites: [],
+    favoriteOrder: [],
     loading: false,
     toastTimer: null
   };
@@ -78,6 +80,13 @@
     if (Number.isNaN(date.getTime())) return String(value);
     if (withDate === false) return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
     return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }) + " · " + date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function formatDate(value) {
+    if (!value) return "";
+    var date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
   }
 
   function relativeFreshness(value) {
@@ -216,6 +225,8 @@
     state.catalog = { participants: [], competitions: [] };
     state.catalogRequestId += 1;
     state.selectionChanges = {};
+    state.favorites = [];
+    state.favoriteOrder = [];
     state.loading = false;
     if (byId("detailModal")) closeDetail();
     if (byId("ieApp")) showApp(false);
@@ -342,6 +353,8 @@
       var offset = Math.max(0, Number(payload.p_offset) || 0);
       return Promise.resolve({ ok: true, itens: filteredItems.slice(offset, offset + Math.max(1, Number(payload.p_limite) || 50)) });
     }
+    if (name === "ie_favoritos_listar_rpc") return Promise.resolve({ ok: true, itens: participants.filter(function (item) { return item.acompanhar; }).map(function (item, index) { return Object.assign({}, item, { ordem: index + 1 }); }) });
+    if (name === "ie_favoritos_ordenar_rpc") return Promise.resolve({ ok: true, itens: arrayOf(payload.p_ids_participantes).map(function (id, index) { var item = participants.find(function (participant) { return Number(participant.id_participante) === Number(id); }) || {}; return Object.assign({}, item, { ordem: index + 1 }); }) });
     if (name === "ie_partida_detalhe_rpc") return Promise.resolve({ ok: true, evento: matches.find(function (item) { return Number(item.id_evento) === Number(payload.p_id_evento); }) || matches[0], linha_tempo: [], estatisticas: [], escalacoes: [], classificacao: [], odds: [], noticias: [] });
     return Promise.resolve({ ok: true });
   }
@@ -353,7 +366,7 @@
   function saveCache() {
     if (CONFIG.preview) return;
     try {
-      sessionStorage.setItem(cacheKey(), JSON.stringify({ saved_at: new Date().toISOString(), bootstrap: state.bootstrap, card: state.card, games: state.games, news: state.news }));
+      sessionStorage.setItem(cacheKey(), JSON.stringify({ saved_at: new Date().toISOString(), bootstrap: state.bootstrap, card: state.card, games: state.games, news: state.news, favorites: state.favorites }));
     } catch (error) {}
   }
 
@@ -402,13 +415,20 @@
     var result = item.placar || item.resultado || {};
     var scoreHome = item.placar_casa == null ? (sides.home.score == null ? (result.casa == null ? "" : result.casa) : sides.home.score) : item.placar_casa;
     var scoreAway = item.placar_fora == null ? (sides.away.score == null ? (result.fora == null ? "" : result.fora) : sides.away.score) : item.placar_fora;
+    var started = live || ["intervalo", "prorrogacao", "penaltis", "encerrada", "finished"].indexOf(status) >= 0;
+    if (!started) {
+      scoreHome = "";
+      scoreAway = "";
+    }
     var startAt = item.inicio_em || item.data_partida || item.data_inicio;
     var rawStatusText = String(item.minuto || item.status_texto || item.status_detalhado || "").trim();
     var technicalStatus = /^(TIMED|SCHEDULED|NOT_STARTED|NS)$/i.test(rawStatusText) || /^[A-Z_]+$/.test(rawStatusText);
     var statusText = technicalStatus ? "" : rawStatusText;
     if (!statusText) statusText = live ? "Ao vivo" : formatDateTime(startAt, false);
+    var dateText = formatDate(startAt);
     var center = live || scoreHome !== "" || scoreAway !== "" ? "<span class=\"ie-score\">" + escapeHtml(scoreHome === "" ? 0 : scoreHome) + " – " + escapeHtml(scoreAway === "" ? 0 : scoreAway) + "</span><span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>" : "<span class=\"ie-match-time\">" + escapeHtml(formatDateTime(startAt, false) || "A definir") + "</span>";
-    return "<article class=\"ie-feed-card ie-wide" + (live ? " is-live" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "clock") + "</span>" + escapeHtml(label || (live ? "Ao vivo" : "Partida")) + "</span>" + detailButton("event", id, "", sides.home.name + " x " + sides.away.name) + "</div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name, "", sides.home.abbreviation) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name, "", sides.away.abbreviation) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div><div class=\"ie-meta\"><span>" + escapeHtml(item.competicao_nome || item.competicao || "") + "</span>" + (startAt ? "<span>" + escapeHtml(formatDateTime(startAt)) + "</span>" : "") + "</div></article>";
+    if (dateText) center += "<span class=\"ie-match-date\">" + escapeHtml(dateText) + "</span>";
+    return "<article class=\"ie-feed-card ie-wide" + (live ? " is-live" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "clock") + "</span>" + escapeHtml(label || (live ? "Ao vivo" : "Partida")) + "</span>" + detailButton("event", id, "", sides.home.name + " x " + sides.away.name) + "</div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name, "", sides.home.abbreviation) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name, "", sides.away.abbreviation) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div><div class=\"ie-meta\"><span>" + escapeHtml(item.competicao_nome || item.competicao || "") + "</span></div></article>";
   }
 
   function renderNewsCard(item) {
@@ -532,6 +552,55 @@
     return map;
   }
 
+  function orderedFavoriteParticipants() {
+    var candidates = {};
+    function add(item, forcedId) {
+      var id = forcedId || item.id_participante || item.id_time || item.id_alvo || item.id;
+      if (!id) return;
+      var key = "participant:" + id;
+      candidates[String(id)] = Object.assign({}, candidates[String(id)] || {}, item, { id_participante: Number(id), selection_key: key });
+    }
+    arrayOf(state.favorites).forEach(function (item) { add(item); });
+    arrayOf(state.bootstrap && state.bootstrap.selecoes).forEach(function (item) {
+      var identity = selectionIdentity(item);
+      if (identity.type === "participant") add(item, identity.id);
+    });
+    arrayOf(state.catalog.participants).forEach(function (item) { add(item); });
+
+    var selected = selectionMap();
+    var items = Object.keys(candidates).map(function (id) {
+      var item = candidates[id];
+      var current = state.selectionChanges[item.selection_key] || selected[item.selection_key] || item;
+      item.acompanhar = !!current.acompanhar;
+      return item;
+    }).filter(function (item) { return item.acompanhar; });
+
+    var available = {};
+    items.forEach(function (item) { available[String(item.id_participante)] = true; });
+    state.favoriteOrder = state.favoriteOrder.filter(function (id) { return available[String(id)]; });
+    items.sort(function (a, b) {
+      var aOrder = state.favoriteOrder.indexOf(Number(a.id_participante));
+      var bOrder = state.favoriteOrder.indexOf(Number(b.id_participante));
+      if (aOrder < 0) aOrder = Number.MAX_SAFE_INTEGER;
+      if (bOrder < 0) bOrder = Number.MAX_SAFE_INTEGER;
+      return aOrder - bOrder || numberOf(a.ordem, Number.MAX_SAFE_INTEGER) - numberOf(b.ordem, Number.MAX_SAFE_INTEGER) || String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
+    });
+    items.forEach(function (item) {
+      var id = Number(item.id_participante);
+      if (state.favoriteOrder.indexOf(id) < 0) state.favoriteOrder.push(id);
+    });
+    items.sort(function (a, b) { return state.favoriteOrder.indexOf(Number(a.id_participante)) - state.favoriteOrder.indexOf(Number(b.id_participante)); });
+    return items;
+  }
+
+  function renderFavoriteOrder() {
+    var items = orderedFavoriteParticipants();
+    byId("favoriteOrderList").innerHTML = items.length ? items.map(function (item, index) {
+      var id = Number(item.id_participante);
+      return "<div class=\"ie-favorite-order-row\"><span class=\"ie-favorite-position\">" + (index + 1) + "</span>" + logoHtml(item.imagem_url || item.logo_url || item.logo, item.nome, "ie-entity-logo") + "<strong>" + escapeHtml(item.nome || item.nome_exibicao || "Time") + "</strong><div class=\"ie-favorite-order-actions\"><button type=\"button\" data-favorite-id=\"" + id + "\" data-favorite-direction=\"up\" aria-label=\"Subir " + escapeHtml(item.nome || "time") + "\"" + (index === 0 ? " disabled" : "") + ">↑</button><button type=\"button\" data-favorite-id=\"" + id + "\" data-favorite-direction=\"down\" aria-label=\"Descer " + escapeHtml(item.nome || "time") + "\"" + (index === items.length - 1 ? " disabled" : "") + ">↓</button></div></div>";
+    }).join("") : emptyState("Nenhum time favorito", "Marque a estrela dos times que deseja acompanhar.", false);
+  }
+
   function renderSelectionLists() {
     byId("teamSelectionList").innerHTML = selectionRows("participant") || emptyState("Nenhum resultado", "Ajuste os filtros ou a busca.", false);
     byId("competitionSelectionList").innerHTML = selectionRows("competition") || emptyState("Nenhum resultado", "Ajuste os filtros ou a busca.", false);
@@ -540,6 +609,7 @@
     var competitionCount = Object.keys(merged).filter(function (key) { return key.indexOf("competition:") === 0 && merged[key].acompanhar; }).length;
     byId("teamSelectionCount").textContent = teamCount + " selecionado" + (teamCount === 1 ? "" : "s");
     byId("competitionSelectionCount").textContent = competitionCount + " selecionado" + (competitionCount === 1 ? "" : "s");
+    renderFavoriteOrder();
   }
 
   function renderEntities() {
@@ -643,7 +713,8 @@
         rpc("ie_partidas_listar_rpc", { p_secao: "ao_vivo", p_limite: 30, p_offset: 0 }),
         rpc("ie_partidas_listar_rpc", { p_secao: "proximos", p_limite: 30, p_offset: 0 }),
         rpc("ie_partidas_listar_rpc", { p_secao: "resultados", p_limite: 30, p_offset: 0 }),
-        rpc("ie_noticias_listar_rpc", { p_limite: 30, p_offset: 0 })
+        rpc("ie_noticias_listar_rpc", { p_limite: 30, p_offset: 0 }),
+        rpc("ie_favoritos_listar_rpc", {})
       ]);
       state.bootstrap = results[0] || {};
       state.card = results[1] || {};
@@ -651,6 +722,8 @@
       state.games.upcoming = arrayOf(results[3]);
       state.games.results = arrayOf(results[4]);
       state.news = arrayOf(results[5]);
+      state.favorites = arrayOf(results[6]);
+      state.favoriteOrder = state.favorites.map(function (item) { return Number(item.id_participante); }).filter(function (id) { return id > 0; });
       showApp(true);
       renderAll();
       await loadCatalog();
@@ -663,6 +736,8 @@
         state.card = cached.card;
         state.games = cached.games || state.games;
         state.news = cached.news || [];
+        state.favorites = cached.favorites || [];
+        state.favoriteOrder = state.favorites.map(function (item) { return Number(item.id_participante); }).filter(function (id) { return id > 0; });
         showApp(true);
         renderAll();
         setFreshness(cached.saved_at);
@@ -846,11 +921,14 @@
         var value = state.selectionChanges[key];
         return rpc("ie_selecao_salvar_rpc", { p_tipo_alvo: parts[0] === "participant" ? "participante" : "competicao", p_id_alvo: Number(parts[1]), p_acompanhar: !!value.acompanhar, p_notificar: parts[0] === "participant" && !!value.notificar });
       });
+      await Promise.all(changes);
       var times = all("input[name=alertTime]:checked").map(function (input) { return Number(input.value); });
       var events = all("input[name=alertEvent]:checked").map(function (input) { return input.value; });
+      changes = [];
       changes.push(rpc("ie_esporte_favorito_salvar_rpc", { p_id_esporte: byId("favoriteSportSelect").value ? Number(byId("favoriteSportSelect").value) : null }));
       changes.push(rpc("ie_filtros_salvar_rpc", { p_ids_esportes: byId("sportSelect").value ? [Number(byId("sportSelect").value)] : [], p_ids_continentes: byId("continentSelect").value ? [Number(byId("continentSelect").value)] : [], p_ids_paises: byId("countrySelect").value ? [Number(byId("countrySelect").value)] : [] }));
       changes.push(rpc("ie_alertas_salvar_rpc", { p_ativo: byId("notificationsEnabled").checked, p_antecedencias_minutos: times, p_tipos_evento: events }));
+      changes.push(rpc("ie_favoritos_ordenar_rpc", { p_ids_participantes: orderedFavoriteParticipants().map(function (item) { return Number(item.id_participante); }) }));
       await Promise.all(changes);
       state.selectionChanges = {};
       showToast("Configurações salvas.", false);
@@ -917,6 +995,20 @@
         if (kind === "news") openNewsSource(detail.getAttribute("data-detail-url"), detail.getAttribute("data-detail-title"));
         else if (kind === "event") openEventDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
         else openGenericDetail(kind, detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
+        return;
+      }
+      var favoriteMove = event.target.closest("[data-favorite-id]");
+      if (favoriteMove) {
+        var favoriteId = Number(favoriteMove.getAttribute("data-favorite-id"));
+        var favoriteIndex = state.favoriteOrder.indexOf(favoriteId);
+        var direction = favoriteMove.getAttribute("data-favorite-direction") === "up" ? -1 : 1;
+        var targetIndex = favoriteIndex + direction;
+        if (favoriteIndex >= 0 && targetIndex >= 0 && targetIndex < state.favoriteOrder.length) {
+          var swapped = state.favoriteOrder[targetIndex];
+          state.favoriteOrder[targetIndex] = favoriteId;
+          state.favoriteOrder[favoriteIndex] = swapped;
+          renderFavoriteOrder();
+        }
         return;
       }
       var selection = event.target.closest("[data-selection-key]");
