@@ -336,7 +336,7 @@
       { codigo: "partidas", titulo: "Partidas", itens: matches },
       { codigo: "campeonatos", titulo: "Campeonato", itens: [{ id_competicao: 101, nome: "Brasileirão · Série A", classificacao: [{ posicao: 1, nome: "Palmeiras", pontos: 16 }, { posicao: 2, nome: "Flamengo", pontos: 16 }] }] },
       { codigo: "noticias", titulo: "Notícias", itens: [{ id_noticia: 501, titulo: "Clubes se preparam para a próxima rodada do campeonato nacional", resumo: "Informações atualizadas sobre as equipes acompanhadas.", fonte_nome: "Fonte esportiva", publicado_em: now.toISOString(), url_original: "https://example.com/noticia" }] },
-      { codigo: "cotacoes", titulo: "Cotações informativas", itens: [{ id_evento: 102, casa: 2.35, empate: 3.2, fora: 2.9, atualizado_em: now.toISOString() }] },
+      { codigo: "cotacoes", titulo: "Cotações informativas", itens: [{ id_evento: 102, casa: 2.35, empate: 3.2, fora: 2.9, operador: "Média de 6 casas", fonte: "Média do mercado", quantidade_casas: 6, atualizado_em: now.toISOString() }] },
       { codigo: "analises", titulo: "Probabilidade estatística", itens: [{ tipo: "probabilidade_1x2", id_evento: 102, probabilidade_casa: 41, probabilidade_empate: 29, probabilidade_fora: 30, atualizado_em: now.toISOString() }] }
     ] });
     if (name === "ie_partidas_listar_rpc") return Promise.resolve({ ok: true, itens: payload.p_secao === "proximos" ? [matches[1]] : payload.p_secao === "resultados" ? [] : [matches[0]] });
@@ -356,6 +356,27 @@
     }
     if (name === "ie_favoritos_listar_rpc") return Promise.resolve({ ok: true, itens: participants.filter(function (item) { return item.acompanhar; }).map(function (item, index) { return Object.assign({}, item, { ordem: index + 1 }); }) });
     if (name === "ie_favoritos_ordenar_rpc") return Promise.resolve({ ok: true, itens: arrayOf(payload.p_ids_participantes).map(function (id, index) { var item = participants.find(function (participant) { return Number(participant.id_participante) === Number(id); }) || {}; return Object.assign({}, item, { ordem: index + 1 }); }) });
+    if (name === "ie_confronto_evento_rpc") return Promise.resolve({
+      time_a: { id: 4, nome: "São Paulo", sigla: "SAO" }, time_b: { id: 2, nome: "Palmeiras", sigla: "PAL" },
+      resumo: { jogos: 350, vitorias_time_a: 121, empates: 110, vitorias_time_b: 119, percentual_time_a: 34.6, percentual_empates: 31.4, percentual_time_b: 34.0 },
+      mando_time_a: { jogos: 180, vitorias_time_a: 74, empates: 58, vitorias_time_b: 48 },
+      mando_time_b: { jogos: 170, vitorias_time_a: 47, empates: 52, vitorias_time_b: 71 },
+      desempenho_time_a: { casa: { jogos: 180, vitorias: 74, empates: 58, derrotas: 48, percentual_vitorias: 41.1, aproveitamento: 51.9 }, fora: { jogos: 170, vitorias: 47, empates: 52, derrotas: 71, percentual_vitorias: 27.6, aproveitamento: 37.8 } },
+      desempenho_time_b: { casa: { jogos: 170, vitorias: 71, empates: 52, derrotas: 47, percentual_vitorias: 41.8, aproveitamento: 52.0 }, fora: { jogos: 180, vitorias: 48, empates: 58, derrotas: 74, percentual_vitorias: 26.7, aproveitamento: 37.4 } },
+      competicoes: [{ competicao: "Campeonato Paulista", jogos: 240 }, { competicao: "Campeonato Brasileiro", jogos: 92 }],
+      jogos: [{ id: 1, data: "2026-03-15", competicao: "Campeonato Brasileiro", time_casa: "São Paulo", time_fora: "Palmeiras", placar_casa: 1, placar_fora: 1 }],
+      aviso: "Estatística baseada nos confrontos históricos disponíveis. Resultados passados não garantem resultados futuros."
+    });
+    if (name === "ie_desempenho_geral_evento_rpc") return Promise.resolve({
+      time_a: { id: 4, nome: "São Paulo", sigla: "SAO" }, time_b: { id: 2, nome: "Palmeiras", sigla: "PAL" },
+      desempenho_time_a: { casa: { jogos: 2850, vitorias: 1732, empates: 654, derrotas: 464, percentual_vitorias: 60.8, aproveitamento: 68.4 }, fora: { jogos: 2520, vitorias: 1189, empates: 701, derrotas: 630, percentual_vitorias: 47.2, aproveitamento: 56.5 } },
+      desempenho_time_b: { casa: { jogos: 2920, vitorias: 1810, empates: 646, derrotas: 464, percentual_vitorias: 62.0, aproveitamento: 69.6 }, fora: { jogos: 2580, vitorias: 1268, empates: 704, derrotas: 608, percentual_vitorias: 49.1, aproveitamento: 57.9 } },
+      escopo: "Todos os jogos oficiais disponíveis na base, independentemente do adversário."
+    });
+    if (name === "ie_base_futebol_brasil_resumo_rpc") return Promise.resolve({
+      titulo: "Base própria — Futebol do Brasil", modalidade: "Futebol", pais: "Brasil",
+      total_registros: 297076, total_competicoes: 1055, total_times: 21365, atualizado_em: now.toISOString()
+    });
     if (name === "ie_partida_detalhe_rpc") {
       return Promise.resolve({
         ok: true,
@@ -903,11 +924,52 @@
     var home = sides && sides.home && sides.home.name || "time da casa";
     var away = sides && sides.away && sides.away.name || "time visitante";
     var explanation = "<div class=\"ie-odds-help\"><strong>Como interpretar</strong><span><b>Casa</b> vitória de " + escapeHtml(home) + "</span><span><b>Empate</b> nenhum time vence</span><span><b>Fora</b> vitória de " + escapeHtml(away) + "</span></div>";
+    var complete = entries.filter(function (group) { return Number.isFinite(Number(group.values.home)) && Number.isFinite(Number(group.values.draw)) && Number.isFinite(Number(group.values.away)); });
+    var average = complete.reduce(function (result, group) {
+      result.home += Number(group.values.home); result.draw += Number(group.values.draw); result.away += Number(group.values.away); return result;
+    }, { home: 0, draw: 0, away: 0 });
+    if (complete.length) { average.home /= complete.length; average.draw /= complete.length; average.away /= complete.length; }
+    var averageHtml = complete.length ? "<article class=\"ie-odds-provider ie-odds-average\"><header><div><strong>Média do mercado</strong><span>Resumo de " + escapeHtml(complete.length) + (complete.length === 1 ? " casa" : " casas") + "</span></div></header><div class=\"ie-odds-grid\"><div><span class=\"ie-odds-label\">Casa</span><small>Vitória de</small><b>" + escapeHtml(home) + "</b><strong>" + escapeHtml(odd(average.home)) + "</strong></div><div><span class=\"ie-odds-label\">Empate</span><small>Nenhum time vence</small><b>Empate</b><strong>" + escapeHtml(odd(average.draw)) + "</strong></div><div><span class=\"ie-odds-label\">Fora</span><small>Vitória de</small><b>" + escapeHtml(away) + "</b><strong>" + escapeHtml(odd(average.away)) + "</strong></div></div></article>" : "";
     var cards = entries.map(function (group) {
       var marketLabel = /1x2|resultado/i.test(group.market) ? "Resultado da partida" : group.market;
       return "<article class=\"ie-odds-provider\"><header><div><strong>" + escapeHtml(group.operator) + "</strong><span>" + escapeHtml(marketLabel) + "</span></div>" + (group.source && group.source !== group.operator ? "<small>Dados: " + escapeHtml(group.source) + "</small>" : "") + "</header><div class=\"ie-odds-grid\"><div><span class=\"ie-odds-label\">Casa</span><small>Vitória de</small><b>" + escapeHtml(home) + "</b><strong>" + escapeHtml(odd(group.values.home)) + "</strong></div><div><span class=\"ie-odds-label\">Empate</span><small>Nenhum time vence</small><b>Empate</b><strong>" + escapeHtml(odd(group.values.draw)) + "</strong></div><div><span class=\"ie-odds-label\">Fora</span><small>Vitória de</small><b>" + escapeHtml(away) + "</b><strong>" + escapeHtml(odd(group.values.away)) + "</strong></div></div>" + (group.updatedAt ? "<footer>Atualizado em " + escapeHtml(formatDateTime(group.updatedAt)) + "</footer>" : "") + "</article>";
     }).join("");
-    return explanation + "<div class=\"ie-odds-providers\">" + cards + "</div><p class=\"ie-odds-notice\">" + escapeHtml(notice || "Cotações informativas, sem recomendação ou garantia de resultado.") + "</p>";
+    return explanation + averageHtml + "<div class=\"ie-odds-providers\">" + cards + "</div><p class=\"ie-odds-notice\">" + escapeHtml(notice || "Cotações informativas, sem recomendação ou garantia de resultado.") + "</p>";
+  }
+
+  function renderHistoricalComparison(data) {
+    var teamA = data && data.time_a || {};
+    var teamB = data && data.time_b || {};
+    var summary = data && data.resumo || {};
+    var homeA = data && data.mando_time_a || {};
+    var homeB = data && data.mando_time_b || {};
+    var total = numberOf(summary.jogos, 0);
+    if (!total) return emptyState("Histórico ainda indisponível", "Ainda não há confrontos históricos organizados para estas equipes.", false);
+    function resultGrid(values, label) {
+      return "<section class=\"ie-h2h-block\"><h4>" + escapeHtml(label) + " <small>" + escapeHtml(numberOf(values.jogos, 0)) + " jogos</small></h4><div class=\"ie-h2h-results\"><div><strong>" + escapeHtml(numberOf(values.vitorias_time_a, 0)) + "</strong><span>Vitórias<br>" + escapeHtml(teamA.nome || "Time A") + "</span></div><div><strong>" + escapeHtml(numberOf(values.empates, 0)) + "</strong><span>Empates</span></div><div><strong>" + escapeHtml(numberOf(values.vitorias_time_b, 0)) + "</strong><span>Vitórias<br>" + escapeHtml(teamB.nome || "Time B") + "</span></div></div></section>";
+    }
+    function performanceBlock(team, performance) {
+      function row(label, values) {
+        values = values || {};
+        return "<div class=\"ie-performance-row\"><strong>" + escapeHtml(label) + "</strong><div class=\"ie-performance-metrics\"><span><b>" + escapeHtml(numberOf(values.jogos, 0)) + "</b><small>Jogos</small></span><span><b>" + escapeHtml(numberOf(values.vitorias, 0)) + "</b><small>Vitórias</small></span><span><b>" + escapeHtml(numberOf(values.empates, 0)) + "</b><small>Empates</small></span><span><b>" + escapeHtml(numberOf(values.derrotas, 0)) + "</b><small>Derrotas</small></span><span><b>" + escapeHtml(numberOf(values.aproveitamento, 0).toLocaleString("pt-BR")) + "%</b><small>Aproveit.</small></span></div><p>Vitórias em " + escapeHtml(numberOf(values.percentual_vitorias, 0).toLocaleString("pt-BR")) + "% dos jogos</p></div>";
+      }
+      return "<article class=\"ie-performance-team\"><h4>" + escapeHtml(team.nome || "Time") + "</h4>" + row("Em casa", performance && performance.casa) + row("Fora de casa", performance && performance.fora) + "</article>";
+    }
+    var overall = "<div class=\"ie-h2h-hero\"><p>Em todos os confrontos registrados</p><strong>" + escapeHtml(total) + " jogos</strong><div class=\"ie-h2h-results ie-h2h-overall\"><div><strong>" + escapeHtml(numberOf(summary.vitorias_time_a, 0)) + "</strong><span>" + escapeHtml(teamA.nome || "Time A") + "</span><small>" + escapeHtml(numberOf(summary.percentual_time_a, 0).toLocaleString("pt-BR")) + "%</small></div><div><strong>" + escapeHtml(numberOf(summary.empates, 0)) + "</strong><span>Empates</span><small>" + escapeHtml(numberOf(summary.percentual_empates, 0).toLocaleString("pt-BR")) + "%</small></div><div><strong>" + escapeHtml(numberOf(summary.vitorias_time_b, 0)) + "</strong><span>" + escapeHtml(teamB.nome || "Time B") + "</span><small>" + escapeHtml(numberOf(summary.percentual_time_b, 0).toLocaleString("pt-BR")) + "%</small></div></div></div>";
+    var competitions = arrayOf(data.competicoes);
+    var competitionsHtml = competitions.length ? "<div class=\"ie-h2h-competitions\">" + competitions.map(function (item) { return "<div><span>" + escapeHtml(item.competicao || "Competição") + "</span><strong>" + escapeHtml(numberOf(item.jogos, 0)) + " jogos</strong></div>"; }).join("") + "</div>" : "";
+    var games = arrayOf(data.jogos);
+    var gamesHtml = games.length ? "<div class=\"ie-h2h-games\">" + games.map(function (game) { return "<div><time>" + escapeHtml(formatDate(game.data)) + "</time><span><b>" + escapeHtml(game.time_casa) + "</b> " + escapeHtml(game.placar_casa) + " – " + escapeHtml(game.placar_fora) + " <b>" + escapeHtml(game.time_fora) + "</b><small>" + escapeHtml(game.competicao || "") + "</small></span></div>"; }).join("") + "</div>" : "";
+    var performanceHtml = data.desempenho_time_a && data.desempenho_time_b ? "<div class=\"ie-performance-compare\">" + performanceBlock(teamA, data.desempenho_time_a) + performanceBlock(teamB, data.desempenho_time_b) + "</div>" : "";
+    var general = data.desempenho_geral || {};
+    var generalHtml = general.desempenho_time_a && general.desempenho_time_b ? "<p class=\"ie-performance-scope\">" + escapeHtml(general.escopo || "Todos os jogos oficiais disponíveis, independentemente do adversário.") + "</p><div class=\"ie-performance-compare\">" + performanceBlock(teamA, general.desempenho_time_a) + performanceBlock(teamB, general.desempenho_time_b) + "</div>" : "";
+    return "<div class=\"ie-h2h\">" + overall + resultGrid(homeA, "Com mando de " + (teamA.nome || "Time A")) + resultGrid(homeB, "Com mando de " + (teamB.nome || "Time B")) + (performanceHtml ? detailSection("Somente neste confronto: casa e fora", performanceHtml) : "") + (generalHtml ? detailSection("Desempenho geral: casa e fora", generalHtml) : "") + (competitionsHtml ? detailSection("Competições", competitionsHtml) : "") + (gamesHtml ? detailSection("Confrontos mais recentes", gamesHtml) : "") + "<p class=\"ie-h2h-notice\">" + escapeHtml(data.aviso || "Resultados passados não garantem resultados futuros.") + "</p></div>";
+  }
+
+  function renderBrazilDatabaseSummary(data) {
+    if (!data || data.pais !== "Brasil" || data.modalidade !== "Futebol") return "";
+    function total(value) { return numberOf(value, 0).toLocaleString("pt-BR"); }
+    return "<section class=\"ie-database-summary\"><div><span>Base própria</span><strong>Futebol do Brasil</strong><small>Acervo histórico organizado pelo Turbo Tiger</small></div><dl><div><dt>Partidas</dt><dd>" + escapeHtml(total(data.total_registros)) + "</dd></div><div><dt>Campeonatos</dt><dd>" + escapeHtml(total(data.total_competicoes)) + "</dd></div><div><dt>Times</dt><dd>" + escapeHtml(total(data.total_times)) + "</dd></div></dl></section>";
   }
 
   async function openEventDetail(id, title) {
@@ -940,6 +1002,11 @@
       });
       var oddsHtml = renderOddsDetail(data.odds, sides, data.odds_aviso);
       if (oddsHtml) html += detailSection("Cotações informativas", oddsHtml);
+      try {
+        var historical = await rpc("ie_confronto_evento_rpc", { p_id_evento: Number(id), p_limite: 20, p_offset: 0 });
+        try { historical.desempenho_geral = await rpc("ie_desempenho_geral_evento_rpc", { p_id_evento: Number(id) }); } catch (generalError) { /* desempenho geral pode não estar mapeado */ }
+        html += detailSection("Histórico do confronto", renderHistoricalComparison(historical));
+      } catch (historicalError) { /* histórico pode não estar mapeado para este esporte ou participante */ }
       byId("detailContent").innerHTML = html;
     } catch (error) {
       byId("detailContent").innerHTML = emptyState("Detalhes indisponíveis", friendlyError(error), false);
@@ -952,6 +1019,26 @@
     byId("detailContent").innerHTML = emptyState("Informações completas na central", kind === "analysis" ? "As análises usam somente os dados disponíveis para as suas seleções e não representam recomendação nem garantia de resultado." : "As próximas partidas, resultados e dados relacionados ficam disponíveis nas áreas correspondentes.", false);
     byId("detailModal").hidden = false;
     document.body.style.overflow = "hidden";
+  }
+
+  async function openAnalysisDetail(id, title) {
+    if (!Number(id)) { openGenericDetail("analysis", id, title); return; }
+    byId("detailTitle").textContent = title || "Análises estatísticas";
+    byId("detailSubtitle").textContent = "Carregando histórico do confronto...";
+    byId("detailContent").innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
+    byId("detailModal").hidden = false;
+    document.body.style.overflow = "hidden";
+    try {
+      var data = await rpc("ie_confronto_evento_rpc", { p_id_evento: Number(id), p_limite: 20, p_offset: 0 });
+      try { data.desempenho_geral = await rpc("ie_desempenho_geral_evento_rpc", { p_id_evento: Number(id) }); } catch (generalError) { /* desempenho geral pode não estar mapeado */ }
+      var baseSummary = null;
+      try { baseSummary = await rpc("ie_base_futebol_brasil_resumo_rpc", {}); } catch (baseError) { /* selo da base não bloqueia as estatísticas */ }
+      byId("detailTitle").textContent = (data.time_a && data.time_a.nome || "Time A") + " × " + (data.time_b && data.time_b.nome || "Time B");
+      byId("detailSubtitle").textContent = "Histórico completo do confronto";
+      byId("detailContent").innerHTML = renderBrazilDatabaseSummary(baseSummary) + renderHistoricalComparison(data);
+    } catch (error) {
+      byId("detailContent").innerHTML = emptyState("Análise indisponível", friendlyError(error), false);
+    }
   }
 
   async function openCompetitionDetail(id, title) {
@@ -1076,6 +1163,7 @@
         if (kind === "news") openNewsSource(detail.getAttribute("data-detail-url"), detail.getAttribute("data-detail-title"));
         else if (kind === "event") openEventDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
         else if (kind === "competition") openCompetitionDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
+        else if (kind === "analysis") openAnalysisDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
         else openGenericDetail(kind, detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
         return;
       }
