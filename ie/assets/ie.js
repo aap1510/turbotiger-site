@@ -331,6 +331,7 @@
       return Object.assign({}, item, { id: index + 101, id_competicao: index + 101, tipo_alvo: "competicao", acompanhar: index < 2 });
     });
     if (name === "ie_central_bootstrap_rpc") return Promise.resolve({ ok: true, preferencias: { id_esporte_favorito: 1, notificacoes_ativas: true }, alertas: { ativo: true, antecedencias_minutos: [30, 60], tipos_evento: ["pre_inicio", "gol", "encerramento"] }, selecoes: participants.filter(function (item) { return item.acompanhar || item.notificar; }).concat(competitions.filter(function (item) { return item.acompanhar; })), filtros: {}, catalogo: { esportes: [{ id: 1, nome: "Futebol", codigo: "football" }, { id: 2, nome: "Basquete", codigo: "basketball" }, { id: 3, nome: "Vôlei", codigo: "volleyball" }], continentes: [{ id: 1, nome: "América do Sul" }, { id: 2, nome: "Europa" }], paises: [{ id: 1, nome: "Brasil", id_continente: 1 }, { id: 2, nome: "Argentina", id_continente: 1 }, { id: 3, nome: "Inglaterra", id_continente: 2 }], antecedencias_alerta: ALERT_TIMES.map(function (minutes) { return { minutos: minutes, nome: minutes + " min" }; }), tipos_alerta: ALERT_EVENTS.map(function (item) { return { codigo: item.code, nome: item.label }; }) } });
+    if (name === "ie_competicao_detalhe_rpc") return Promise.resolve({ ok: true, competicao: { id_competicao: payload.p_id_competicao, nome: "Campeonato Brasileiro Série A", temporada: "2026", fase_atual: "Temporada regular", data_inicio: "2026-03-28", data_fim: "2026-12-06" }, times_classificados: participants.map(function (item, index) { return { id_participante: item.id_participante, nome: item.nome, sigla: item.sigla, imagem_url: item.imagem_url, posicao: index + 1 }; }) });
     if (name === "ie_card_resumo_rpc") return Promise.resolve({ ok: true, configurado: true, generated_at: now.toISOString(), subcards: [
       { codigo: "partidas", titulo: "Partidas", itens: matches },
       { codigo: "campeonatos", titulo: "Campeonato", itens: [{ id_competicao: 101, nome: "Brasileirão · Série A", classificacao: [{ posicao: 1, nome: "Palmeiras", pontos: 16 }, { posicao: 2, nome: "Flamengo", pontos: 16 }] }] },
@@ -471,7 +472,9 @@
 
   function renderCompetitionCard(item) {
     var rows = arrayOf(item.classificacao || item.posicoes).slice(0, 4);
-    var body = rows.length ? "<div class=\"ie-standings\">" + rows.map(function (row) { return "<div class=\"ie-standing-row\"><span>" + escapeHtml(row.posicao || row.rank || "—") + "</span><strong>" + escapeHtml(row.nome || row.time_nome || row.participante_nome || "") + "</strong><strong>" + escapeHtml(row.pontos == null ? "" : row.pontos) + "</strong></div>"; }).join("") + "</div>" : "<p class=\"ie-news-description\">Acompanhe partidas, classificação e atualizações desta competição.</p>";
+    var period = [item.data_inicio ? "Início " + formatDate(item.data_inicio) : "", item.data_fim ? "Fim " + formatDate(item.data_fim) : ""].filter(Boolean).join(" • ");
+    var summary = (item.fase_atual ? "<p class=\"ie-news-description\"><strong>" + escapeHtml(item.fase_atual) + "</strong></p>" : "") + (period ? "<span class=\"ie-source\">" + escapeHtml(period) + "</span>" : "");
+    var body = rows.length ? "<div class=\"ie-standings\">" + rows.map(function (row) { return "<div class=\"ie-standing-row\"><span>" + escapeHtml(row.posicao || row.rank || "—") + "</span><strong>" + escapeHtml(row.nome || row.time_nome || row.participante_nome || "") + "</strong><strong>" + escapeHtml(row.pontos == null ? "" : row.pontos) + "</strong></div>"; }).join("") + "</div>" : summary || "<p class=\"ie-news-description\">Calendário em atualização.</p>";
     return "<article class=\"ie-feed-card\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("trophy") + "</span>Campeonato</span>" + detailButton("competition", item.id_competicao || item.id || "", "", item.nome) + "</div><h3 class=\"ie-news-title\">" + escapeHtml(item.nome || item.competicao_nome || "Campeonato") + "</h3>" + body + "</article>";
   }
 
@@ -819,7 +822,7 @@
     var eventId = Number(params.get("id_evento") || 0);
     var competitionId = Number(params.get("id_competicao") || 0);
     if (eventId > 0) openEventDetail(eventId, "Detalhes da partida");
-    else if (competitionId > 0) openGenericDetail("competition", competitionId, "Detalhes do campeonato");
+    else if (competitionId > 0) openCompetitionDetail(competitionId, "Detalhes do campeonato");
   }
 
   function closeDetail() {
@@ -897,6 +900,32 @@
     byId("detailContent").innerHTML = emptyState("Informações completas na central", kind === "analysis" ? "As análises usam somente os dados disponíveis para as suas seleções e não representam recomendação nem garantia de resultado." : "As próximas partidas, resultados e dados relacionados ficam disponíveis nas áreas correspondentes.", false);
     byId("detailModal").hidden = false;
     document.body.style.overflow = "hidden";
+  }
+
+  async function openCompetitionDetail(id, title) {
+    byId("detailTitle").textContent = title || "Detalhes do campeonato";
+    byId("detailSubtitle").textContent = "Carregando informações...";
+    byId("detailContent").innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
+    byId("detailModal").hidden = false;
+    document.body.style.overflow = "hidden";
+    try {
+      var data = await rpc("ie_competicao_detalhe_rpc", { p_id_competicao: Number(id) });
+      var competition = data && data.competicao || {};
+      var teams = arrayOf(data && data.times_classificados);
+      byId("detailTitle").textContent = competition.nome || title || "Campeonato";
+      byId("detailSubtitle").textContent = [competition.temporada, competition.pais].filter(Boolean).join(" • ") || "Detalhes do campeonato";
+      var overview = "<div class=\"ie-detail-list\">" + [
+        ["Fase atual", competition.fase_atual || "Em atualização"],
+        ["Início", competition.data_inicio ? formatDate(competition.data_inicio) : "Em atualização"],
+        ["Fim", competition.data_fim ? formatDate(competition.data_fim) : "Em atualização"]
+      ].map(function (row) { return "<div><span>" + escapeHtml(row[0]) + "</span><strong>" + escapeHtml(row[1]) + "</strong></div>"; }).join("") + "</div>";
+      var teamHtml = teams.length ? "<div class=\"ie-detail-list\">" + teams.map(function (team) {
+        return "<div><span>" + logoHtml(team.imagem_url, team.nome, "ie-entity-logo", team.sigla) + " " + escapeHtml(team.nome || "Time") + "</span><strong>" + escapeHtml(team.posicao ? team.posicao + "º" : team.grupo || team.sigla || "") + "</strong></div>";
+      }).join("") + "</div>" : "<p>Os classificados ainda não foram disponibilizados pela fonte.</p>";
+      byId("detailContent").innerHTML = detailSection("Informações do campeonato", overview) + detailSection("Times classificados na fase", teamHtml);
+    } catch (error) {
+      byId("detailContent").innerHTML = emptyState("Detalhes indisponíveis", friendlyError(error), false);
+    }
   }
 
   function openNewsSource(url, title) {
@@ -994,6 +1023,7 @@
         var kind = detail.getAttribute("data-detail-kind");
         if (kind === "news") openNewsSource(detail.getAttribute("data-detail-url"), detail.getAttribute("data-detail-title"));
         else if (kind === "event") openEventDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
+        else if (kind === "competition") openCompetitionDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
         else openGenericDetail(kind, detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
         return;
       }
