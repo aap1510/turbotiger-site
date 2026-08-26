@@ -336,7 +336,7 @@
       { codigo: "partidas", titulo: "Partidas", itens: matches },
       { codigo: "campeonatos", titulo: "Campeonato", itens: [{ id_competicao: 101, nome: "Brasileirão · Série A", classificacao: [{ posicao: 1, nome: "Palmeiras", pontos: 16 }, { posicao: 2, nome: "Flamengo", pontos: 16 }] }] },
       { codigo: "noticias", titulo: "Notícias", itens: [{ id_noticia: 501, titulo: "Clubes se preparam para a próxima rodada do campeonato nacional", resumo: "Informações atualizadas sobre as equipes acompanhadas.", fonte_nome: "Fonte esportiva", publicado_em: now.toISOString(), url_original: "https://example.com/noticia" }] },
-      { codigo: "cotacoes", titulo: "1X2 · Informativo", itens: [{ id_evento: 102, casa: 2.35, empate: 3.2, fora: 2.9, atualizado_em: now.toISOString() }] },
+      { codigo: "cotacoes", titulo: "Cotações informativas", itens: [{ id_evento: 102, casa: 2.35, empate: 3.2, fora: 2.9, atualizado_em: now.toISOString() }] },
       { codigo: "analises", titulo: "Probabilidade estatística", itens: [{ tipo: "probabilidade_1x2", id_evento: 102, probabilidade_casa: 41, probabilidade_empate: 29, probabilidade_fora: 30, atualizado_em: now.toISOString() }] }
     ] });
     if (name === "ie_partidas_listar_rpc") return Promise.resolve({ ok: true, itens: payload.p_secao === "proximos" ? [matches[1]] : payload.p_secao === "resultados" ? [] : [matches[0]] });
@@ -356,7 +356,26 @@
     }
     if (name === "ie_favoritos_listar_rpc") return Promise.resolve({ ok: true, itens: participants.filter(function (item) { return item.acompanhar; }).map(function (item, index) { return Object.assign({}, item, { ordem: index + 1 }); }) });
     if (name === "ie_favoritos_ordenar_rpc") return Promise.resolve({ ok: true, itens: arrayOf(payload.p_ids_participantes).map(function (id, index) { var item = participants.find(function (participant) { return Number(participant.id_participante) === Number(id); }) || {}; return Object.assign({}, item, { ordem: index + 1 }); }) });
-    if (name === "ie_partida_detalhe_rpc") return Promise.resolve({ ok: true, evento: matches.find(function (item) { return Number(item.id_evento) === Number(payload.p_id_evento); }) || matches[0], linha_tempo: [], estatisticas: [], escalacoes: [], classificacao: [], odds: [], noticias: [] });
+    if (name === "ie_partida_detalhe_rpc") {
+      return Promise.resolve({
+        ok: true,
+        evento: matches.find(function (item) { return Number(item.id_evento) === Number(payload.p_id_evento); }) || matches[0],
+        linha_tempo: [],
+        estatisticas: [],
+        escalacoes: [],
+        classificacao: [],
+        odds: [
+          { mercado: "Resultado 1X2", selecao: "Casa", valor: 1.78, operador: "Winamax", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" },
+          { mercado: "Resultado 1X2", selecao: "Empate", valor: 3.30, operador: "Winamax", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" },
+          { mercado: "Resultado 1X2", selecao: "Fora", valor: 3.95, operador: "Winamax", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" },
+          { mercado: "Resultado 1X2", selecao: "Casa", valor: 1.82, operador: "Pinnacle", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" },
+          { mercado: "Resultado 1X2", selecao: "Empate", valor: 3.25, operador: "Pinnacle", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" },
+          { mercado: "Resultado 1X2", selecao: "Fora", valor: 4.05, operador: "Pinnacle", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" }
+        ],
+        odds_aviso: "Informação esportiva neutra, sem indicação ou direcionamento para apostas.",
+        noticias: []
+      });
+    }
     return Promise.resolve({ ok: true });
   }
 
@@ -452,7 +471,8 @@
       firstValue([item.odd_fora, item.fora])
     ];
     var suffix = prediction ? "%" : "";
-    return "<article class=\"ie-feed-card\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span>" + (prediction ? "Probabilidade estatística" : "1X2 · Informativo") + "</span>" + detailButton("event", item.id_evento || item.id_partida || "") + "</div><div class=\"ie-stat-row\"><span>1<strong>" + escapeHtml(values[0] == null ? "—" : values[0] + suffix) + "</strong></span><span>X<strong>" + escapeHtml(values[1] == null ? "—" : values[1] + suffix) + "</strong></span><span>2<strong>" + escapeHtml(values[2] == null ? "—" : values[2] + suffix) + "</strong></span></div>" + (prediction ? "<p class=\"ie-disclaimer\">Estimativa estatística. Não representa recomendação nem garantia de resultado.</p>" : "<p class=\"ie-disclaimer\">Informação neutra, sem indicação ou direcionamento para apostas.</p>") + "</article>";
+    var labels = ["Casa", "Empate", "Fora"];
+    return "<article class=\"ie-feed-card\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span>" + (prediction ? "Probabilidade estatística" : "Cotações informativas") + "</span>" + detailButton("event", item.id_evento || item.id_partida || "") + "</div><div class=\"ie-stat-row\"><span>" + labels[0] + "<strong>" + escapeHtml(values[0] == null ? "—" : values[0] + suffix) + "</strong></span><span>" + labels[1] + "<strong>" + escapeHtml(values[1] == null ? "—" : values[1] + suffix) + "</strong></span><span>" + labels[2] + "<strong>" + escapeHtml(values[2] == null ? "—" : values[2] + suffix) + "</strong></span></div>" + (prediction ? "<p class=\"ie-disclaimer\">Estimativa estatística. Não representa recomendação nem garantia de resultado.</p>" : "<p class=\"ie-disclaimer\">Informação neutra, sem indicação ou direcionamento para apostas.</p>") + "</article>";
   }
 
   function renderAnalysisCard(item) {
@@ -496,7 +516,7 @@
     var filteredSection = String(state.homeSectionFilter || "").toLowerCase();
     var sectionTitles = { cotacoes: "Cotações informativas", analises: "Análises estatísticas" };
     byId("favoriteSportTitle").textContent = sectionTitles[filteredSection] || (favorite ? favorite.nome : "Seu esporte favorito");
-    byId("favoriteSportIcon").textContent = filteredSection === "cotacoes" ? "1X2" : filteredSection === "analises" ? "∑" : (favorite ? initials(favorite.nome) : "●");
+    byId("favoriteSportIcon").textContent = filteredSection === "cotacoes" ? "C/E/F" : filteredSection === "analises" ? "∑" : (favorite ? initials(favorite.nome) : "●");
     if (!configured) {
       byId("homeContent").innerHTML = emptyState("Escolha seus esportes", "Defina um esporte favorito e acompanhe os times, participantes e campeonatos que realmente interessam a você.", true);
       return;
@@ -859,6 +879,37 @@
     return "<section class=\"ie-detail-section\"><h3>" + escapeHtml(title) + "</h3>" + body + "</section>";
   }
 
+  function renderOddsDetail(items, sides, notice) {
+    var groups = {};
+    arrayOf(items).forEach(function (row) {
+      var operator = String(row.operador || row.fonte || "Fonte não informada");
+      var market = String(row.mercado || "Resultado 1X2");
+      var key = operator + "|" + market;
+      if (!groups[key]) groups[key] = { operator: operator, market: market, source: row.fonte || "", updatedAt: row.observado_em || "", values: {} };
+      var selection = String(row.selecao || "").toLowerCase();
+      if (selection.indexOf("casa") >= 0 || selection === "1") groups[key].values.home = row.valor;
+      else if (selection.indexOf("empate") >= 0 || selection === "x") groups[key].values.draw = row.valor;
+      else if (selection.indexOf("fora") >= 0 || selection === "2") groups[key].values.away = row.valor;
+    });
+    var entries = Object.keys(groups).map(function (key) { return groups[key]; }).filter(function (group) {
+      return group.values.home != null || group.values.draw != null || group.values.away != null;
+    });
+    if (!entries.length) return "";
+    function odd(value) {
+      if (value == null || value === "") return "—";
+      var parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed.toFixed(2).replace(".", ",") : String(value);
+    }
+    var home = sides && sides.home && sides.home.name || "time da casa";
+    var away = sides && sides.away && sides.away.name || "time visitante";
+    var explanation = "<div class=\"ie-odds-help\"><strong>Como interpretar</strong><span><b>Casa</b> vitória de " + escapeHtml(home) + "</span><span><b>Empate</b> nenhum time vence</span><span><b>Fora</b> vitória de " + escapeHtml(away) + "</span></div>";
+    var cards = entries.map(function (group) {
+      var marketLabel = /1x2|resultado/i.test(group.market) ? "Resultado da partida" : group.market;
+      return "<article class=\"ie-odds-provider\"><header><div><strong>" + escapeHtml(group.operator) + "</strong><span>" + escapeHtml(marketLabel) + "</span></div>" + (group.source && group.source !== group.operator ? "<small>Dados: " + escapeHtml(group.source) + "</small>" : "") + "</header><div class=\"ie-odds-grid\"><div><span class=\"ie-odds-label\">Casa</span><small>Vitória de</small><b>" + escapeHtml(home) + "</b><strong>" + escapeHtml(odd(group.values.home)) + "</strong></div><div><span class=\"ie-odds-label\">Empate</span><small>Nenhum time vence</small><b>Empate</b><strong>" + escapeHtml(odd(group.values.draw)) + "</strong></div><div><span class=\"ie-odds-label\">Fora</span><small>Vitória de</small><b>" + escapeHtml(away) + "</b><strong>" + escapeHtml(odd(group.values.away)) + "</strong></div></div>" + (group.updatedAt ? "<footer>Atualizado em " + escapeHtml(formatDateTime(group.updatedAt)) + "</footer>" : "") + "</article>";
+    }).join("");
+    return explanation + "<div class=\"ie-odds-providers\">" + cards + "</div><p class=\"ie-odds-notice\">" + escapeHtml(notice || "Cotações informativas, sem recomendação ou garantia de resultado.") + "</p>";
+  }
+
   async function openEventDetail(id, title) {
     byId("detailTitle").textContent = title || "Detalhes da partida";
     byId("detailSubtitle").textContent = "Carregando informações...";
@@ -876,8 +927,7 @@
         ["Linha do tempo", data.linha_tempo],
         ["Estatísticas", data.estatisticas],
         ["Escalações", data.escalacoes],
-        ["Classificação", data.classificacao],
-        ["Cotações informativas", data.odds]
+        ["Classificação", data.classificacao]
       ];
       collections.forEach(function (entry) {
         var rows = arrayOf(entry[1]);
@@ -888,6 +938,8 @@
           return "<div><span>" + escapeHtml(label) + "</span><strong>" + escapeHtml(value) + "</strong></div>";
         }).join("") + "</div>");
       });
+      var oddsHtml = renderOddsDetail(data.odds, sides, data.odds_aviso);
+      if (oddsHtml) html += detailSection("Cotações informativas", oddsHtml);
       byId("detailContent").innerHTML = html;
     } catch (error) {
       byId("detailContent").innerHTML = emptyState("Detalhes indisponíveis", friendlyError(error), false);
