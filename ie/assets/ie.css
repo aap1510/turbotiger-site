@@ -548,6 +548,10 @@ button {
   text-align: center;
 }
 
+.ie-meta span {
+  display: block;
+}
+
 .ie-news-title {
   margin: 0 0 8px;
   color: var(--ie-text);

@@ -98,9 +98,10 @@
     return parts.slice(0, 2).map(function (part) { return part.charAt(0).toUpperCase(); }).join("") || "?";
   }
 
-  function logoHtml(url, name, className) {
+  function logoHtml(url, name, className, abbreviation) {
     var safe = safeUrl(url);
-    return "<span class=\"" + (className || "ie-crest") + "\">" + (safe ? "<img src=\"" + escapeHtml(safe) + "\" alt=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer\">" : escapeHtml(initials(name))) + "</span>";
+    var fallback = String(abbreviation || "").trim().toUpperCase() || initials(name);
+    return "<span class=\"" + (className || "ie-crest") + "\">" + (safe ? "<img src=\"" + escapeHtml(safe) + "\" alt=\"\" loading=\"lazy\" referrerpolicy=\"no-referrer\">" : escapeHtml(fallback)) + "</span>";
   }
 
   function icon(name) {
@@ -388,8 +389,8 @@
     var home = item.participante_casa || item.mandante || item.time_casa || item.home || homeFromList;
     var away = item.participante_fora || item.visitante || item.time_fora || item.away || awayFromList;
     return {
-      home: { name: home.nome || home.nome_curto || item.time_casa_nome || item.mandante_nome || "Casa", logo: home.imagem_url || home.logo_url || home.logo || item.time_casa_logo, score: home.placar_numerico == null ? home.placar : home.placar_numerico },
-      away: { name: away.nome || away.nome_curto || item.time_fora_nome || item.visitante_nome || "Visitante", logo: away.imagem_url || away.logo_url || away.logo || item.time_fora_logo, score: away.placar_numerico == null ? away.placar : away.placar_numerico }
+      home: { name: home.nome || home.nome_curto || item.time_casa_nome || item.mandante_nome || "Casa", abbreviation: home.sigla || home.tla || item.time_casa_sigla, logo: home.imagem_url || home.logo_url || home.logo || item.time_casa_logo, score: home.placar_numerico == null ? home.placar : home.placar_numerico },
+      away: { name: away.nome || away.nome_curto || item.time_fora_nome || item.visitante_nome || "Visitante", abbreviation: away.sigla || away.tla || item.time_fora_sigla, logo: away.imagem_url || away.logo_url || away.logo || item.time_fora_logo, score: away.placar_numerico == null ? away.placar : away.placar_numerico }
     };
   }
 
@@ -402,9 +403,12 @@
     var scoreHome = item.placar_casa == null ? (sides.home.score == null ? (result.casa == null ? "" : result.casa) : sides.home.score) : item.placar_casa;
     var scoreAway = item.placar_fora == null ? (sides.away.score == null ? (result.fora == null ? "" : result.fora) : sides.away.score) : item.placar_fora;
     var startAt = item.inicio_em || item.data_partida || item.data_inicio;
-    var statusText = item.minuto || item.status_texto || item.status_detalhado || (live ? "Ao vivo" : formatDateTime(startAt, false));
+    var rawStatusText = String(item.minuto || item.status_texto || item.status_detalhado || "").trim();
+    var technicalStatus = /^(TIMED|SCHEDULED|NOT_STARTED|NS)$/i.test(rawStatusText) || /^[A-Z_]+$/.test(rawStatusText);
+    var statusText = technicalStatus ? "" : rawStatusText;
+    if (!statusText) statusText = live ? "Ao vivo" : formatDateTime(startAt, false);
     var center = live || scoreHome !== "" || scoreAway !== "" ? "<span class=\"ie-score\">" + escapeHtml(scoreHome === "" ? 0 : scoreHome) + " – " + escapeHtml(scoreAway === "" ? 0 : scoreAway) + "</span><span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>" : "<span class=\"ie-match-time\">" + escapeHtml(formatDateTime(startAt, false) || "A definir") + "</span>";
-    return "<article class=\"ie-feed-card ie-wide" + (live ? " is-live" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "clock") + "</span>" + escapeHtml(label || (live ? "Ao vivo" : "Partida")) + "</span>" + detailButton("event", id, "", sides.home.name + " x " + sides.away.name) + "</div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div><div class=\"ie-meta\">" + escapeHtml(item.competicao_nome || item.competicao || "") + (startAt ? " · " + escapeHtml(formatDateTime(startAt)) : "") + "</div></article>";
+    return "<article class=\"ie-feed-card ie-wide" + (live ? " is-live" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "clock") + "</span>" + escapeHtml(label || (live ? "Ao vivo" : "Partida")) + "</span>" + detailButton("event", id, "", sides.home.name + " x " + sides.away.name) + "</div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name, "", sides.home.abbreviation) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name, "", sides.away.abbreviation) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div><div class=\"ie-meta\"><span>" + escapeHtml(item.competicao_nome || item.competicao || "") + "</span>" + (startAt ? "<span>" + escapeHtml(formatDateTime(startAt)) + "</span>" : "") + "</div></article>";
   }
 
   function renderNewsCard(item) {
