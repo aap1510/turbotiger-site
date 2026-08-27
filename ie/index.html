@@ -10,7 +10,7 @@
   <title>Inteligência Esportiva — Turbo Tiger</title>
   <meta name="description" content="Central personalizada de acompanhamento esportivo do Turbo Tiger.">
   <link rel="icon" href="../assets/icone-turbotiger-raio.ico">
-  <link rel="stylesheet" href="assets/ie.css?v=20260826-03">
+  <link rel="stylesheet" href="assets/ie.css?v=20260827-01">
 </head>
 <body>
   <svg class="ie-symbols" aria-hidden="true">
@@ -46,6 +46,10 @@
   </div>
 
   <div id="ieApp" class="ie-app" hidden>
+    <div id="pullRefreshIndicator" class="ie-pull-refresh" aria-hidden="true">
+      <svg><use href="#ie-ico-refresh"/></svg>
+    </div>
+
     <header class="ie-header">
       <button id="backButton" class="ie-icon-button is-hidden-home" type="button" aria-label="Voltar">
         <svg><use href="#ie-ico-back"/></svg>
@@ -171,9 +175,6 @@
       </section>
     </main>
 
-    <footer class="ie-footer">
-      <button id="refreshButton" class="ie-refresh" type="button"><svg><use href="#ie-ico-refresh"/></svg><span id="footerFreshness">Atualizado agora</span></button>
-    </footer>
   </div>
 
   <div id="detailModal" class="ie-modal" hidden>
@@ -186,6 +187,6 @@
 
   <div id="toast" class="ie-toast" role="status" aria-live="polite" hidden></div>
 
-  <script src="assets/ie.js?v=20260826-03"></script>
+  <script src="assets/ie.js?v=20260827-01"></script>
 </body>
 </html>

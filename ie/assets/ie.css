@@ -19,6 +19,7 @@
   --ie-radius-small: 10px;
   --ie-header-height: 72px;
   --ie-max-width: 980px;
+  --ie-modal-lift: calc(30px + env(safe-area-inset-bottom));
   font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
 }
@@ -173,8 +174,7 @@ button {
 .ie-header-settings,
 .ie-text-action,
 .ie-tabs button,
-.ie-segmented button,
-.ie-refresh {
+.ie-segmented button {
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -203,9 +203,7 @@ button {
 .ie-icon-button svg,
 .ie-header-settings svg,
 .ie-tabs svg,
-.ie-refresh svg,
 .ie-search svg,
-.ie-details svg,
 .ie-selection-action svg,
 .ie-feed-icon svg {
   width: 21px;
@@ -410,6 +408,23 @@ button {
   background: linear-gradient(135deg, var(--ie-surface-raised), var(--ie-surface));
 }
 
+.ie-feed-card[data-detail-kind],
+.ie-entity-row[data-detail-kind] {
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.ie-feed-card[data-detail-kind]:focus-visible,
+.ie-entity-row[data-detail-kind]:focus-visible {
+  outline: 2px solid var(--ie-gold);
+  outline-offset: 3px;
+}
+
+.ie-feed-card[data-detail-kind]:active,
+.ie-entity-row[data-detail-kind]:active {
+  filter: brightness(1.08);
+}
+
 .ie-feed-card.is-live {
   border-color: rgba(239, 63, 72, .38);
 }
@@ -446,25 +461,6 @@ button {
 .ie-feed-icon svg {
   width: 18px;
   height: 18px;
-}
-
-.ie-details {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 7px 0 7px 8px;
-  border: 0;
-  background: transparent;
-  color: var(--ie-red);
-  font-size: 12px;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-.ie-details svg {
-  width: 16px;
-  height: 16px;
 }
 
 .ie-match {
@@ -609,6 +605,45 @@ button {
   color: var(--ie-text);
   font-size: 18px;
   font-weight: 650;
+}
+
+.ie-stat-row small {
+  color: var(--ie-faint);
+  font-size: 9px;
+}
+
+.ie-h2h-card-title {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  margin: -2px 0 13px;
+  text-align: center;
+}
+
+.ie-h2h-card-title strong {
+  color: var(--ie-text);
+  font-size: 22px;
+}
+
+.ie-h2h-card-title span {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--ie-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ie-analysis-summary .ie-stat-row span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ie-base-summary-card .ie-news-description {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
 }
 
 .ie-disclaimer {
@@ -1160,34 +1195,43 @@ button {
   width: 100%;
 }
 
-.ie-footer {
-  position: static;
-  min-height: 58px;
+.ie-pull-refresh {
+  position: fixed;
+  z-index: 70;
+  top: calc(env(safe-area-inset-top) + 9px);
+  left: 50%;
+  width: 42px;
+  height: 42px;
   display: grid;
   place-items: center;
-  padding: 8px 16px max(8px, env(safe-area-inset-bottom));
-  border-top: 1px solid rgba(41, 43, 48, .85);
-  background: rgba(5, 6, 7, .94);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid var(--ie-border-strong);
+  border-radius: 50%;
+  background: rgba(21, 22, 25, .96);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .38);
+  color: var(--ie-gold);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -18px) scale(.78);
+  transition: opacity .12s ease, transform .12s ease;
 }
 
-.ie-refresh {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  color: var(--ie-muted);
-  font-size: 11px;
-  font-weight: 560;
+.ie-pull-refresh.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
 }
 
-.ie-refresh svg {
-  width: 17px;
-  height: 17px;
+.ie-pull-refresh svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: rotate(var(--ie-pull-rotation, 0deg));
 }
 
-.ie-refresh.is-loading svg {
+.ie-pull-refresh.is-refreshing svg {
   animation: ie-spin .8s linear infinite;
 }
 
@@ -1197,6 +1241,7 @@ button {
   inset: 0;
   display: grid;
   align-items: end;
+  padding-bottom: var(--ie-modal-lift);
 }
 
 .ie-modal-backdrop {
@@ -1211,12 +1256,11 @@ button {
   position: relative;
   z-index: 1;
   width: min(100%, 700px);
-  max-height: min(86dvh, 820px);
+  max-height: min(calc(86dvh - var(--ie-modal-lift)), 820px);
   margin: 0 auto;
   overflow: hidden;
   border: 1px solid var(--ie-border-strong);
-  border-bottom: 0;
-  border-radius: 22px 22px 0 0;
+  border-radius: 22px;
   background: var(--ie-surface);
   box-shadow: 0 -24px 70px rgba(0, 0, 0, .5);
   animation: ie-sheet-in .22s ease-out;
@@ -1251,9 +1295,9 @@ button {
 }
 
 .ie-detail-content {
-  max-height: calc(min(86dvh, 820px) - 68px);
+  max-height: calc(min(calc(86dvh - var(--ie-modal-lift)), 820px) - 68px);
   overflow-y: auto;
-  padding: 18px;
+  padding: 18px 18px calc(24px + env(safe-area-inset-bottom));
 }
 
 .ie-detail-section {
@@ -1791,8 +1835,14 @@ button {
   }
 
   .ie-modal-sheet {
+    max-height: min(86dvh, 820px);
     border-bottom: 1px solid var(--ie-border-strong);
     border-radius: 22px;
+  }
+
+  .ie-detail-content {
+    max-height: calc(min(86dvh, 820px) - 68px);
+    padding-bottom: 18px;
   }
 }
 
