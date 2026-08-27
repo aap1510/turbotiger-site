@@ -18,6 +18,8 @@
   --ie-radius: 14px;
   --ie-radius-small: 10px;
   --ie-header-height: 72px;
+  --ie-tabs-height: 58px;
+  --ie-sports-height: 44px;
   --ie-max-width: 980px;
   --ie-modal-lift: calc(30px + env(safe-area-inset-bottom));
   font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -248,10 +250,18 @@ button {
 }
 
 .ie-close-button {
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--ie-border-strong);
   background: var(--ie-surface-raised);
   color: var(--ie-text);
   box-shadow: 0 5px 18px rgba(0, 0, 0, .24);
+}
+
+.ie-close-button svg,
+.ie-detail-close svg {
+  width: 18px;
+  height: 18px;
 }
 
 .ie-close-button:hover,
@@ -319,6 +329,48 @@ button {
   background: var(--ie-red);
 }
 
+.ie-sports-nav {
+  position: sticky;
+  z-index: 24;
+  top: calc(var(--ie-header-height) + var(--ie-tabs-height));
+  min-height: var(--ie-sports-height);
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 5px 14px;
+  border-bottom: 1px solid var(--ie-border);
+  background: rgba(5, 6, 7, .97);
+  scrollbar-width: none;
+}
+
+.ie-sports-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.ie-sports-nav button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ie-muted);
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ie-sports-nav button.is-favorite {
+  color: #d4d5d8;
+}
+
+.ie-sports-nav button.is-active {
+  background: var(--ie-red-soft);
+  color: var(--ie-red);
+}
+
 .ie-main {
   width: min(100%, var(--ie-max-width));
   margin: 0 auto;
@@ -348,6 +400,12 @@ button {
 .ie-panel-toolbar {
   min-height: 50px;
   margin-bottom: 14px;
+}
+
+.ie-filter-toolbar {
+  min-height: 0;
+  justify-content: center;
+  margin-bottom: 12px;
 }
 
 .ie-section-heading h2,
@@ -409,19 +467,22 @@ button {
 }
 
 .ie-feed-card[data-detail-kind],
-.ie-entity-row[data-detail-kind] {
+.ie-entity-row[data-detail-kind],
+.ie-classified-row[data-detail-kind] {
   cursor: pointer;
   touch-action: pan-y;
 }
 
 .ie-feed-card[data-detail-kind]:focus-visible,
-.ie-entity-row[data-detail-kind]:focus-visible {
+.ie-entity-row[data-detail-kind]:focus-visible,
+.ie-classified-row[data-detail-kind]:focus-visible {
   outline: 2px solid var(--ie-gold);
   outline-offset: 3px;
 }
 
 .ie-feed-card[data-detail-kind]:active,
-.ie-entity-row[data-detail-kind]:active {
+.ie-entity-row[data-detail-kind]:active,
+.ie-classified-row[data-detail-kind]:active {
   filter: brightness(1.08);
 }
 
@@ -435,6 +496,53 @@ button {
   justify-content: space-between;
   gap: 14px;
   margin-bottom: 15px;
+}
+
+.ie-feed-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ie-match-actions {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ie-match-actions button {
+  width: 35px;
+  height: 35px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--ie-border);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .18);
+  color: var(--ie-gold);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.ie-match-actions button:last-child {
+  color: #d7d8db;
+}
+
+.ie-match-actions button:focus-visible,
+.ie-match-actions button:hover {
+  border-color: currentColor;
+  background: var(--ie-surface-soft);
+}
+
+.ie-match-actions svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .ie-feed-label {
@@ -730,6 +838,39 @@ button {
   color: var(--ie-text);
 }
 
+.ie-news-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 13px;
+}
+
+.ie-news-filters label {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  color: var(--ie-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.ie-news-filters select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 34px 0 12px;
+  border: 1px solid var(--ie-border);
+  border-radius: 10px;
+  outline: 0;
+  background: var(--ie-surface-raised);
+  color: var(--ie-text);
+  font-size: 12px;
+}
+
+.ie-news-filters select:focus {
+  border-color: var(--ie-gold);
+  box-shadow: 0 0 0 3px rgba(244, 191, 67, .1);
+}
+
 .ie-entity-row {
   min-height: 66px;
   display: grid;
@@ -770,6 +911,17 @@ button {
 .ie-entity-copy span {
   color: var(--ie-muted);
   font-size: 11px;
+}
+
+.ie-entity-row > svg,
+.ie-classified-row > svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--ie-faint);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .ie-panel-toolbar.ie-settings-title {
@@ -1029,6 +1181,58 @@ button {
   opacity: .24;
 }
 
+.ie-sport-favorite-list {
+  display: grid;
+}
+
+.ie-sport-favorite-row {
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  border-bottom: 1px solid var(--ie-border);
+}
+
+.ie-sport-favorite-row:last-child {
+  border-bottom: 0;
+}
+
+.ie-sport-favorite-row > strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ie-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ie-sport-favorite-row.is-selected > strong {
+  color: var(--ie-text);
+}
+
+.ie-sport-favorite-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.ie-sport-favorite-actions > button:not(.ie-selection-action) {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--ie-border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ie-text);
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.ie-sport-favorite-actions > button:disabled {
+  opacity: .24;
+}
+
 .ie-switch-row h3 {
   margin: 0 0 5px;
 }
@@ -1281,6 +1485,21 @@ button {
   border-bottom: 1px solid var(--ie-border);
 }
 
+.ie-modal-sheet > header > div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ie-detail-back,
+.ie-detail-close {
+  flex: 0 0 auto;
+}
+
+.ie-detail-close {
+  width: 36px;
+  height: 36px;
+}
+
 .ie-modal-sheet h2 {
   margin: 0;
   font-size: 18px;
@@ -1342,6 +1561,44 @@ button {
 .ie-detail-list strong {
   color: var(--ie-text);
   text-align: right;
+}
+
+.ie-classified-list,
+.ie-detail-entities {
+  display: grid;
+}
+
+.ie-classified-row {
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: 34px 38px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ie-border);
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.ie-classified-row:last-child {
+  border-bottom: 0;
+}
+
+.ie-classified-position {
+  color: var(--ie-gold);
+  font-size: 12px;
+  font-weight: 720;
+  text-align: center;
+}
+
+.ie-classified-row strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ie-text);
+  font-size: 12px;
+  font-weight: 620;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ie-odds-help {
@@ -1849,6 +2106,7 @@ button {
 @media (max-width: 560px) {
   :root {
     --ie-header-height: 66px;
+    --ie-tabs-height: 54px;
   }
 
   .ie-header {

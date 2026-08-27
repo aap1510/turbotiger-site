@@ -5,8 +5,7 @@
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
     sessionTimeoutMs: 15000,
-    cachePrefix: "tt_ie_cache_v1_",
-    preview: (location.hostname === "localhost" || location.hostname === "127.0.0.1") && new URLSearchParams(location.search).get("preview") === "1"
+    cachePrefix: "tt_ie_cache_v1_"
   };
 
   var ALERT_EVENTS = [
@@ -27,8 +26,14 @@
     bootstrap: null,
     card: null,
     baseSummary: null,
-    games: { live: [], upcoming: [], results: [] },
+    games: { forYou: [], live: [], upcoming: [], results: [] },
+    favoriteCompetitions: [],
     news: [],
+    activeSportId: null,
+    sportFavoriteOrder: [],
+    sportRequestId: 0,
+    newsRequestId: 0,
+    newsFilters: { participantId: null, competitionId: null },
     activeTab: "home",
     previousTab: "home",
     homeSectionFilter: "",
@@ -40,6 +45,7 @@
     selectionChanges: {},
     favorites: [],
     favoriteOrder: [],
+    detailStack: [],
     loading: false,
     toastTimer: null
   };
@@ -270,6 +276,7 @@
 
   window.TurboTigerIEReceiveSession = function (payload) {
     try {
+      if (!hasBridge() || !sessionPromise || !sessionResolve) throw new Error("app_session_unavailable");
       if (!payload || payload.ok !== true) throw new Error(payload && payload.error || "app_session_unavailable");
       var value = payload.session || payload;
       var token = String(value.access_token || "").trim();
@@ -304,24 +311,27 @@
     state.bootstrap = null;
     state.card = null;
     state.baseSummary = null;
-    state.games = { live: [], upcoming: [], results: [] };
+    state.games = { forYou: [], live: [], upcoming: [], results: [] };
+    state.favoriteCompetitions = [];
     state.news = [];
+    state.activeSportId = null;
+    state.sportFavoriteOrder = [];
+    state.sportRequestId += 1;
+    state.newsRequestId += 1;
+    state.newsFilters = { participantId: null, competitionId: null };
     state.catalog = { participants: [], competitions: [] };
     state.catalogKnown = { participants: {}, competitions: {} };
     state.catalogRequestId += 1;
     state.selectionChanges = {};
     state.favorites = [];
     state.favoriteOrder = [];
+    state.detailStack = [];
     state.loading = false;
     if (byId("detailModal")) closeDetail();
     if (byId("ieApp")) showApp(false);
   };
 
   function requestSession() {
-    if (CONFIG.preview) {
-      state.session = { access_token: "preview", expires_at: Date.now() + 3600000, user_id: "preview" };
-      return Promise.resolve(state.session);
-    }
     if (!hasBridge()) return Promise.reject(new Error("app_session_unavailable"));
     if (state.session && state.session.access_token && state.session.expires_at > Date.now() + 60000) return Promise.resolve(state.session);
     if (sessionPromise) return sessionPromise;
@@ -349,7 +359,6 @@
   }
 
   async function rpc(name, payload) {
-    if (CONFIG.preview) return previewRpc(name, payload || {});
     var session = await requestSession();
     if (!session || !session.access_token) throw new Error("sessao_expirada");
     var response = await fetch(CONFIG.supabaseUrl + "/rest/v1/rpc/" + name, {
@@ -377,125 +386,13 @@
     return result;
   }
 
-  function previewRpc(name, payload) {
-    var now = new Date();
-    var later = new Date(now.getTime() + 3 * 3600000);
-    var matches = [
-      { id_evento: 101, status: "ao_vivo", minuto: "64'", competicao_nome: "Brasileirão · Série A", inicio_em: now.toISOString(), participante_casa: { nome: "Atlético-MG" }, participante_fora: { nome: "Internacional" }, placar_casa: 1, placar_fora: 0, atualizado_em: now.toISOString() },
-      { id_evento: 102, status: "agendado", competicao_nome: "Brasileirão · Série A", inicio_em: later.toISOString(), participante_casa: { nome: "São Paulo" }, participante_fora: { nome: "Palmeiras" }, atualizado_em: now.toISOString() }
-    ];
-    var participants = [
-      { nome: "Flamengo", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "Palmeiras", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "Corinthians", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "São Paulo", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "Santos", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "Grêmio", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "Internacional", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "Atlético-MG", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "River Plate", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 2 },
-      { nome: "Arsenal", id_esporte: 1, esporte_nome: "Futebol", id_continente: 2, id_pais: 3 },
-      { nome: "Chelsea", id_esporte: 1, esporte_nome: "Futebol", id_continente: 2, id_pais: 3 },
-      { nome: "Sesi Franca", id_esporte: 2, esporte_nome: "Basquete", id_continente: 1, id_pais: 1 },
-      { nome: "Minas Tênis Clube", id_esporte: 3, esporte_nome: "Vôlei", id_continente: 1, id_pais: 1 }
-    ].map(function (item, index) {
-      return Object.assign({}, item, { id: index + 1, id_participante: index + 1, tipo_alvo: "participante", acompanhar: index < 3, notificar: index < 2 });
-    });
-    var competitions = [
-      { nome: "Brasileirão Série A", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "Copa do Brasil", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "CONMEBOL Libertadores", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: null },
-      { nome: "Sul-Americana", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: null },
-      { nome: "Paulistão", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "Carioca", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 1 },
-      { nome: "Liga Profissional Argentina", id_esporte: 1, esporte_nome: "Futebol", id_continente: 1, id_pais: 2 },
-      { nome: "Premier League", id_esporte: 1, esporte_nome: "Futebol", id_continente: 2, id_pais: 3 },
-      { nome: "NBB", id_esporte: 2, esporte_nome: "Basquete", id_continente: 1, id_pais: 1 },
-      { nome: "Superliga", id_esporte: 3, esporte_nome: "Vôlei", id_continente: 1, id_pais: 1 }
-    ].map(function (item, index) {
-      return Object.assign({}, item, { id: index + 101, id_competicao: index + 101, tipo_alvo: "competicao", acompanhar: index < 2 });
-    });
-    if (name === "ie_central_bootstrap_rpc") return Promise.resolve({ ok: true, preferencias: { id_esporte_favorito: 1, notificacoes_ativas: true }, alertas: { ativo: true, antecedencias_minutos: [30, 60], tipos_evento: ["pre_inicio", "gol", "encerramento"] }, selecoes: participants.filter(function (item) { return item.acompanhar || item.notificar; }).concat(competitions.filter(function (item) { return item.acompanhar; })), filtros: {}, catalogo: { esportes: [{ id: 1, nome: "Futebol", codigo: "football" }, { id: 2, nome: "Basquete", codigo: "basketball" }, { id: 3, nome: "Vôlei", codigo: "volleyball" }], continentes: [{ id: 1, nome: "América do Sul" }, { id: 2, nome: "Europa" }], paises: [{ id: 1, nome: "Brasil", id_continente: 1 }, { id: 2, nome: "Argentina", id_continente: 1 }, { id: 3, nome: "Inglaterra", id_continente: 2 }], antecedencias_alerta: ALERT_TIMES.map(function (minutes) { return { minutos: minutes, nome: minutes + " min" }; }), tipos_alerta: ALERT_EVENTS.map(function (item) { return { codigo: item.code, nome: item.label }; }) } });
-    if (name === "ie_competicao_detalhe_rpc") return Promise.resolve({ ok: true, competicao: { id_competicao: payload.p_id_competicao, nome: "Campeonato Brasileiro Série A", temporada: "2026", fase_atual: "Temporada regular", data_inicio: "2026-03-28", data_fim: "2026-12-06" }, times_classificados: participants.map(function (item, index) { return { id_participante: item.id_participante, nome: item.nome, sigla: item.sigla, imagem_url: item.imagem_url, posicao: index + 1 }; }) });
-    if (name === "ie_card_resumo_rpc") return Promise.resolve({ ok: true, configurado: true, generated_at: now.toISOString(), subcards: [
-      { codigo: "partidas", titulo: "Partidas", itens: matches },
-      { codigo: "campeonatos", titulo: "Campeonato", itens: [{ id_competicao: 101, nome: "Brasileirão · Série A", classificacao: [{ posicao: 1, nome: "Palmeiras", pontos: 16 }, { posicao: 2, nome: "Flamengo", pontos: 16 }] }] },
-      { codigo: "noticias", titulo: "Notícias", itens: [{ id_noticia: 501, titulo: "Clubes se preparam para a próxima rodada do campeonato nacional", resumo: "Informações atualizadas sobre as equipes acompanhadas.", fonte_nome: "Fonte esportiva", publicado_em: now.toISOString(), url_original: "https://example.com/noticia" }] },
-      { codigo: "cotacoes", titulo: "Cotações informativas", itens: [{ id_evento: 102, casa: 2.35, empate: 3.2, fora: 2.9, operador: "Média de 6 casas", fonte: "Média do mercado", quantidade_casas: 6, atualizado_em: now.toISOString() }] },
-      { codigo: "analises", titulo: "Análises", itens: [
-        { tipo: "confronto_historico", id_evento: 102, time_a_nome: "São Paulo", time_b_nome: "Palmeiras", jogos: 220, vitorias_time_a: 90, empates: 54, vitorias_time_b: 76, atualizado_em: now.toISOString() },
-        { tipo: "probabilidade_1x2", id_evento: 102, probabilidade_casa: 41, probabilidade_empate: 29, probabilidade_fora: 30, atualizado_em: now.toISOString() }
-      ] }
-    ] });
-    if (name === "ie_partidas_listar_rpc") return Promise.resolve({ ok: true, itens: payload.p_secao === "proximos" ? [matches[1]] : payload.p_secao === "resultados" ? [] : [matches[0]] });
-    if (name === "ie_noticias_listar_rpc") return Promise.resolve({ ok: true, itens: [{ id_noticia: 501, titulo: "Clubes se preparam para a próxima rodada do campeonato nacional", resumo: "Informações atualizadas sobre os times que você acompanha.", fonte_nome: "Fonte esportiva", publicado_em: now.toISOString(), url_original: "https://example.com/noticia" }] });
-    if (name === "ie_catalogo_buscar_rpc") {
-      var catalogItems = payload.p_tipo === "competicao" || payload.p_tipo === "competicoes" || payload.p_tipo === "campeonato" || payload.p_tipo === "campeonatos" ? competitions : participants;
-      var normalizedSearch = normalizeSearchText(payload.p_busca || "");
-      var filteredItems = catalogItems.filter(function (item) {
-        var normalizedName = normalizeSearchText(item.nome || "");
-        return (!payload.p_id_esporte || Number(item.id_esporte) === Number(payload.p_id_esporte))
-          && (!payload.p_id_continente || Number(item.id_continente) === Number(payload.p_id_continente))
-          && (!payload.p_id_pais || Number(item.id_pais) === Number(payload.p_id_pais))
-          && (!normalizedSearch || normalizedName.indexOf(normalizedSearch) >= 0);
-      });
-      var offset = Math.max(0, Number(payload.p_offset) || 0);
-      return Promise.resolve({ ok: true, itens: filteredItems.slice(offset, offset + Math.max(1, Number(payload.p_limite) || 50)) });
-    }
-    if (name === "ie_favoritos_listar_rpc") return Promise.resolve({ ok: true, itens: participants.filter(function (item) { return item.acompanhar; }).map(function (item, index) { return Object.assign({}, item, { ordem: index + 1 }); }) });
-    if (name === "ie_favoritos_ordenar_rpc") return Promise.resolve({ ok: true, itens: arrayOf(payload.p_ids_participantes).map(function (id, index) { var item = participants.find(function (participant) { return Number(participant.id_participante) === Number(id); }) || {}; return Object.assign({}, item, { ordem: index + 1 }); }) });
-    if (name === "ie_confronto_evento_rpc") return Promise.resolve({
-      time_a: { id: 4, nome: "São Paulo", sigla: "SAO" }, time_b: { id: 2, nome: "Palmeiras", sigla: "PAL" },
-      resumo: { jogos: 220, vitorias_time_a: 90, empates: 54, vitorias_time_b: 76, percentual_time_a: 40.9, percentual_empates: 24.5, percentual_time_b: 34.6 },
-      mando_time_a: { jogos: 112, vitorias_time_a: 55, empates: 30, vitorias_time_b: 27 },
-      mando_time_b: { jogos: 108, vitorias_time_a: 35, empates: 24, vitorias_time_b: 49 },
-      desempenho_time_a: { casa: { jogos: 180, vitorias: 74, empates: 58, derrotas: 48, percentual_vitorias: 41.1, aproveitamento: 51.9 }, fora: { jogos: 170, vitorias: 47, empates: 52, derrotas: 71, percentual_vitorias: 27.6, aproveitamento: 37.8 } },
-      desempenho_time_b: { casa: { jogos: 170, vitorias: 71, empates: 52, derrotas: 47, percentual_vitorias: 41.8, aproveitamento: 52.0 }, fora: { jogos: 180, vitorias: 48, empates: 58, derrotas: 74, percentual_vitorias: 26.7, aproveitamento: 37.4 } },
-      competicoes: [{ competicao: "Campeonato Paulista", jogos: 140 }, { competicao: "Campeonato Brasileiro", jogos: 80 }],
-      jogos: [{ id: 1, data: "2026-03-15", competicao: "Campeonato Brasileiro", time_casa: "São Paulo", time_fora: "Palmeiras", placar_casa: 1, placar_fora: 1 }],
-      aviso: "Estatística baseada nos confrontos históricos disponíveis. Resultados passados não garantem resultados futuros."
-    });
-    if (name === "ie_desempenho_geral_evento_rpc") return Promise.resolve({
-      time_a: { id: 4, nome: "São Paulo", sigla: "SAO" }, time_b: { id: 2, nome: "Palmeiras", sigla: "PAL" },
-      desempenho_time_a: { casa: { jogos: 2850, vitorias: 1732, empates: 654, derrotas: 464, percentual_vitorias: 60.8, aproveitamento: 68.4 }, fora: { jogos: 2520, vitorias: 1189, empates: 701, derrotas: 630, percentual_vitorias: 47.2, aproveitamento: 56.5 } },
-      desempenho_time_b: { casa: { jogos: 2920, vitorias: 1810, empates: 646, derrotas: 464, percentual_vitorias: 62.0, aproveitamento: 69.6 }, fora: { jogos: 2580, vitorias: 1268, empates: 704, derrotas: 608, percentual_vitorias: 49.1, aproveitamento: 57.9 } },
-      escopo: "Todos os jogos oficiais disponíveis na base, independentemente do adversário."
-    });
-    if (name === "ie_base_futebol_brasil_resumo_rpc") return Promise.resolve({
-      titulo: "Base própria — Futebol do Brasil", modalidade: "Futebol", pais: "Brasil",
-      total_registros: 297076, total_competicoes: 1055, total_times: 21365, data_inicio: "1902-05-11", data_fim: "2026-08-26", atualizado_em: now.toISOString()
-    });
-    if (name === "ie_partida_detalhe_rpc") {
-      return Promise.resolve({
-        ok: true,
-        evento: matches.find(function (item) { return Number(item.id_evento) === Number(payload.p_id_evento); }) || matches[0],
-        linha_tempo: [],
-        estatisticas: [],
-        escalacoes: [],
-        classificacao: [],
-        odds: [
-          { mercado: "Resultado 1X2", selecao: "Casa", valor: 1.78, operador: "Winamax", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" },
-          { mercado: "Resultado 1X2", selecao: "Empate", valor: 3.30, operador: "Winamax", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" },
-          { mercado: "Resultado 1X2", selecao: "Fora", valor: 3.95, operador: "Winamax", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" },
-          { mercado: "Resultado 1X2", selecao: "Casa", valor: 1.82, operador: "Pinnacle", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" },
-          { mercado: "Resultado 1X2", selecao: "Empate", valor: 3.25, operador: "Pinnacle", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" },
-          { mercado: "Resultado 1X2", selecao: "Fora", valor: 4.05, operador: "Pinnacle", fonte: "the-odds-api.com", observado_em: "2026-08-26T11:00:00Z" }
-        ],
-        odds_aviso: "Informação esportiva neutra, sem indicação ou direcionamento para apostas.",
-        noticias: []
-      });
-    }
-    return Promise.resolve({ ok: true });
-  }
-
   function cacheKey() {
     return CONFIG.cachePrefix + (state.session && state.session.user_id || "anonymous");
   }
 
   function saveCache() {
-    if (CONFIG.preview) return;
     try {
-      sessionStorage.setItem(cacheKey(), JSON.stringify({ saved_at: new Date().toISOString(), bootstrap: state.bootstrap, card: state.card, baseSummary: state.baseSummary, games: state.games, news: state.news, favorites: state.favorites }));
+      sessionStorage.setItem(cacheKey(), JSON.stringify({ saved_at: new Date().toISOString(), bootstrap: state.bootstrap, card: state.card, baseSummary: state.baseSummary, games: state.games, favoriteCompetitions: state.favoriteCompetitions, news: state.news, favorites: state.favorites, activeSportId: state.activeSportId, sportFavoriteOrder: state.sportFavoriteOrder }));
     } catch (error) {}
   }
 
@@ -534,6 +431,73 @@
     };
   }
 
+  function sportIdOf(item) {
+    return Number(item && (item.id_esporte || item.esporte_id || item.esporte && (item.esporte.id_esporte || item.esporte.id)) || 0);
+  }
+
+  function catalogSports() {
+    return arrayOf(state.bootstrap && state.bootstrap.catalogo && state.bootstrap.catalogo.esportes);
+  }
+
+  function sportId(item) {
+    return Number(item && (item.id_esporte || item.id) || item || 0);
+  }
+
+  function sportById(id) {
+    return catalogSports().find(function (item) { return sportId(item) === Number(id); }) || null;
+  }
+
+  function normalizeSportFavoriteOrder(preferences) {
+    var allowed = {};
+    catalogSports().forEach(function (item) { allowed[String(sportId(item))] = true; });
+    var rows = arrayOf(preferences && preferences.esportes_favoritos).slice().sort(function (a, b) { return numberOf(a.ordem, 0) - numberOf(b.ordem, 0); });
+    var ids = rows.map(sportId).filter(function (id, index, values) { return id > 0 && allowed[String(id)] && values.indexOf(id) === index; });
+    var first = Number(preferences && preferences.id_esporte_favorito || 0);
+    if (!ids.length && first > 0 && allowed[String(first)]) ids.push(first);
+    return ids;
+  }
+
+  function ensureActiveSport() {
+    var available = catalogSports().map(sportId).filter(function (id) { return id > 0; });
+    state.sportFavoriteOrder = state.sportFavoriteOrder.filter(function (id, index, values) { return available.indexOf(Number(id)) >= 0 && values.indexOf(id) === index; }).map(Number);
+    if (available.indexOf(Number(state.activeSportId)) < 0) state.activeSportId = state.sportFavoriteOrder[0] || available[0] || null;
+  }
+
+  function activeSport() {
+    return sportById(state.activeSportId);
+  }
+
+  function selectionSportMatches(item, wantedId) {
+    var itemSport = sportIdOf(item);
+    return !wantedId || itemSport === Number(wantedId);
+  }
+
+  function followedSelections(type, wantedSportId) {
+    return arrayOf(state.bootstrap && state.bootstrap.selecoes).filter(function (item) {
+      return selectionIdentity(item).type === type && item.acompanhar && selectionSportMatches(item, wantedSportId);
+    });
+  }
+
+  function favoriteParticipantIds(wantedSportId) {
+    return followedSelections("participant", wantedSportId).map(function (item) { return Number(selectionIdentity(item).id); }).filter(function (id) { return id > 0; });
+  }
+
+  function matchParticipantIds(item) {
+    var sides = [item && (item.participante_casa || item.mandante || item.time_casa || item.home), item && (item.participante_fora || item.visitante || item.time_fora || item.away)];
+    var ids = arrayOf(item && item.participantes).map(function (participant) { return Number(participant.id_participante || participant.participante_id || participant.id || 0); });
+    sides.forEach(function (participant) { if (participant) ids.push(Number(participant.id_participante || participant.participante_id || participant.id || 0)); });
+    return ids.filter(function (id, index, values) { return id > 0 && values.indexOf(id) === index; });
+  }
+
+  function matchInvolvesFavoriteTeam(item, wantedSportId) {
+    var favorites = favoriteParticipantIds(wantedSportId);
+    var ids = matchParticipantIds(item);
+    if (ids.length) return ids.some(function (id) { return favorites.indexOf(id) >= 0; });
+    var favoriteNames = followedSelections("participant", wantedSportId).map(function (selection) { return normalizeSearchText(selection.nome || selection.nome_exibicao || ""); });
+    var sides = matchSides(item || {});
+    return [sides.home.name, sides.away.name].some(function (name) { return favoriteNames.indexOf(normalizeSearchText(name)) >= 0; });
+  }
+
   function renderMatchCard(item, label, interactive) {
     var sides = matchSides(item || {});
     var status = String(item.status || item.status_canonico || "").toLowerCase();
@@ -556,13 +520,15 @@
     var center = live || scoreHome !== "" || scoreAway !== "" ? "<span class=\"ie-score\">" + escapeHtml(scoreHome === "" ? 0 : scoreHome) + " – " + escapeHtml(scoreAway === "" ? 0 : scoreAway) + "</span><span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>" : "<span class=\"ie-match-time\">" + escapeHtml(formatDateTime(startAt, false) || "A definir") + "</span>";
     if (dateText) center += "<span class=\"ie-match-date\">" + escapeHtml(dateText) + "</span>";
     var attributes = interactive === false ? "" : detailAttributes("event", id, "", sides.home.name + " x " + sides.away.name);
-    return "<article class=\"ie-feed-card ie-wide" + (live ? " is-live" : "") + "\"" + attributes + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "clock") + "</span>" + escapeHtml(label || (live ? "Ao vivo" : "Partida")) + "</span></div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name, "", sides.home.abbreviation) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name, "", sides.away.abbreviation) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div><div class=\"ie-meta\"><span>" + escapeHtml(item.competicao_nome || item.competicao || "") + "</span></div></article>";
+    var competition = item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Confronto";
+    var actions = interactive === false || !id ? "" : "<div class=\"ie-match-actions\"><button type=\"button\" data-match-action=\"odds\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir cotações de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("chart") + "</button><button type=\"button\" data-match-action=\"analysis\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir análises de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("analysis") + "</button></div>";
+    return "<article class=\"ie-feed-card ie-wide ie-match-card" + (live ? " is-live" : "") + "\"" + attributes + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "trophy") + "</span>" + escapeHtml(competition) + "</span>" + actions + "</div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name, "", sides.home.abbreviation) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name, "", sides.away.abbreviation) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div></article>";
   }
 
   function renderNewsCard(item) {
     var id = item.id_noticia || item.id || "";
     var url = item.url_original || item.url || "";
-    return "<article class=\"ie-feed-card\"" + detailAttributes("news", id, url, item.titulo || "Notícia esportiva") + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("news") + "</span>Notícias</span></div><h3 class=\"ie-news-title\">" + escapeHtml(item.titulo || "Notícia esportiva") + "</h3>" + (item.resumo || item.descricao ? "<p class=\"ie-news-description\">" + escapeHtml(item.resumo || item.descricao) + "</p>" : "") + "<span class=\"ie-source\">Fonte: " + escapeHtml(item.fonte_nome || item.fonte || "não informada") + (item.publicado_em ? " · " + escapeHtml(formatDateTime(item.publicado_em)) : "") + "</span></article>";
+    return "<article class=\"ie-feed-card\"" + detailAttributes("news", id, url, item.titulo || "Notícia esportiva") + "><h3 class=\"ie-news-title\">" + escapeHtml(item.titulo || "Notícia esportiva") + "</h3>" + (item.resumo || item.descricao ? "<p class=\"ie-news-description\">" + escapeHtml(item.resumo || item.descricao) + "</p>" : "") + "<span class=\"ie-source\">Fonte: " + escapeHtml(item.fonte_nome || item.fonte || "não informada") + (item.publicado_em ? " · " + escapeHtml(formatDateTime(item.publicado_em)) : "") + "</span></article>";
   }
 
   function renderOddsCard(item, prediction) {
@@ -653,42 +619,71 @@
 
   function renderHome() {
     var card = state.card || {};
-    var configured = card.configurado !== false && !!(state.bootstrap && (state.bootstrap.preferencias && state.bootstrap.preferencias.id_esporte_favorito || arrayOf(state.bootstrap.selecoes).length));
-    var favorite = favoriteSport();
     var filteredSection = String(state.homeSectionFilter || "").toLowerCase();
-    var sectionTitles = { cotacoes: "Cotações informativas", analises: "Análises estatísticas" };
-    byId("favoriteSportTitle").textContent = displayText(sectionTitles[filteredSection] || (favorite ? favorite.nome : "Seu esporte favorito"));
-    byId("favoriteSportIcon").textContent = filteredSection === "cotacoes" ? "C/E/F" : filteredSection === "analises" ? "∑" : (favorite ? initials(favorite.nome) : "●");
-    if (!configured) {
+    if (!activeSport()) {
       byId("homeContent").innerHTML = emptyState("Escolha seus esportes", "Defina um esporte favorito e acompanhe os times, participantes e campeonatos que realmente interessam a você.", true);
       return;
     }
     var html = [];
-    if (filteredSection === "analises") {
-      var databaseCard = renderDatabaseSummaryCard(state.baseSummary);
-      if (databaseCard) html.push(databaseCard);
-    }
-    arrayOf(card.subcards).filter(function (subcard) { return subcardMatchesSection(subcard, filteredSection); }).forEach(function (subcard) {
-      var code = String(subcard.codigo || subcard.tipo || "").toLowerCase();
-      arrayOf(subcard.itens).slice(0, 3).forEach(function (item) {
-        if (code.indexOf("notic") >= 0) html.push(renderNewsCard(item));
-        else if (code.indexOf("cotac") >= 0 || code.indexOf("odd") >= 0) html.push(renderOddsCard(item, false));
-        else if (code.indexOf("analis") >= 0 || code.indexOf("pred") >= 0 || code.indexOf("prob") >= 0) html.push(renderAnalysisCard(item));
-        else if (code.indexOf("camp") >= 0 || code.indexOf("class") >= 0) html.push(renderCompetitionCard(item));
-        else html.push(renderMatchCard(item, subcard.titulo));
+    if (filteredSection) {
+      if (filteredSection === "analises") {
+        var databaseCard = renderDatabaseSummaryCard(state.baseSummary);
+        if (databaseCard) html.push(databaseCard);
+      }
+      arrayOf(card.subcards).filter(function (subcard) { return subcardMatchesSection(subcard, filteredSection); }).forEach(function (subcard) {
+        var code = String(subcard.codigo || subcard.tipo || "").toLowerCase();
+        arrayOf(subcard.itens).slice(0, 3).forEach(function (item) {
+          if (code.indexOf("cotac") >= 0 || code.indexOf("odd") >= 0) html.push(renderOddsCard(item, false));
+          else if (code.indexOf("analis") >= 0 || code.indexOf("pred") >= 0 || code.indexOf("prob") >= 0) html.push(renderAnalysisCard(item));
+        });
       });
-    });
-    byId("homeContent").innerHTML = html.join("") || emptyState("Nenhuma informação disponível", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Os dados do seu esporte favorito ainda não foram atualizados pela fonte.", false);
+    } else {
+      state.games.forYou.filter(function (item) { return matchInvolvesFavoriteTeam(item, state.activeSportId); }).forEach(function (item) { html.push(renderMatchCard(item)); });
+      state.favoriteCompetitions.forEach(function (item) { html.push(renderCompetitionCard(item)); });
+    }
+    byId("homeContent").innerHTML = html.join("") || emptyState(filteredSection ? "Nenhuma informação disponível" : "Nenhum favorito neste esporte", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Acompanhe times ou campeonatos deste esporte para montar o seu espaço.", false);
   }
 
   function renderGames() {
     var rows = state.games[state.gameFilter] || [];
-    var labels = { live: "Ao vivo", upcoming: "Próximos", results: "Resultados" };
-    byId("gamesContent").innerHTML = rows.length ? rows.map(function (item) { return renderMatchCard(item, labels[state.gameFilter]); }).join("") : emptyState("Nenhuma partida", "Não há partidas nesta seção para os times e campeonatos acompanhados.", false);
+    byId("gamesContent").innerHTML = rows.length ? rows.map(function (item) { return renderMatchCard(item); }).join("") : emptyState("Nenhum confronto", "Não há confrontos nesta seção para os times e campeonatos acompanhados.", false);
   }
 
   function renderNews() {
     byId("newsContent").innerHTML = state.news.length ? state.news.map(renderNewsCard).join("") : emptyState("Nenhuma notícia", "Ainda não encontramos notícias autorizadas relacionadas às suas seleções.", false);
+  }
+
+  function orderedSports() {
+    var favorites = state.sportFavoriteOrder.slice();
+    return catalogSports().slice().sort(function (a, b) {
+      var aIndex = favorites.indexOf(sportId(a));
+      var bIndex = favorites.indexOf(sportId(b));
+      if (aIndex < 0) aIndex = Number.MAX_SAFE_INTEGER;
+      if (bIndex < 0) bIndex = Number.MAX_SAFE_INTEGER;
+      return aIndex - bIndex || String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
+    });
+  }
+
+  function renderSportsNav() {
+    var sports = orderedSports();
+    var nav = byId("sportsNav");
+    nav.innerHTML = sports.map(function (item) {
+      var id = sportId(item);
+      var favorite = state.sportFavoriteOrder.indexOf(id) >= 0;
+      return "<button type=\"button\" data-sport-id=\"" + id + "\" class=\"" + (id === Number(state.activeSportId) ? "is-active" : "") + (favorite ? " is-favorite" : "") + "\" aria-pressed=\"" + (id === Number(state.activeSportId)) + "\">" + escapeHtml(item.nome || "Esporte") + "</button>";
+    }).join("");
+    nav.hidden = !sports.length || state.activeTab === "settings";
+  }
+
+  function renderNewsFilters() {
+    var teams = followedSelections("participant", state.activeSportId);
+    var competitions = followedSelections("competition", state.activeSportId);
+    if (!teams.some(function (item) { return Number(selectionIdentity(item).id) === Number(state.newsFilters.participantId); })) state.newsFilters.participantId = null;
+    if (!competitions.some(function (item) { return Number(selectionIdentity(item).id) === Number(state.newsFilters.competitionId); })) state.newsFilters.competitionId = null;
+    byId("newsTeamFilter").innerHTML = "<option value=\"\">Todos</option>" + teams.map(function (item) { return "<option value=\"" + escapeHtml(selectionIdentity(item).id) + "\">" + escapeHtml(item.nome || item.nome_exibicao || "Time") + "</option>"; }).join("");
+    byId("newsCompetitionFilter").innerHTML = "<option value=\"\">Todos</option>" + competitions.map(function (item) { return "<option value=\"" + escapeHtml(selectionIdentity(item).id) + "\">" + escapeHtml(item.nome || item.nome_exibicao || "Campeonato") + "</option>"; }).join("");
+    byId("newsTeamFilter").value = state.newsFilters.participantId ? String(state.newsFilters.participantId) : "";
+    byId("newsCompetitionFilter").value = state.newsFilters.competitionId ? String(state.newsFilters.competitionId) : "";
   }
 
   function selectionRows(targetType) {
@@ -808,16 +803,33 @@
   }
 
   function renderEntities() {
-    var selections = arrayOf(state.bootstrap && state.bootstrap.selecoes);
-    var participants = selections.filter(function (item) { return selectionIdentity(item).type === "participant" && item.acompanhar; });
-    var competitions = selections.filter(function (item) { return selectionIdentity(item).type === "competition" && item.acompanhar; });
-    byId("teamsContent").innerHTML = participants.length ? participants.map(function (item) { return "<article class=\"ie-entity-row\"" + detailAttributes("participant", selectionIdentity(item).id, "", item.nome || "Time ou participante") + ">" + logoHtml(item.imagem_url || item.logo_url, item.nome, "ie-entity-logo") + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(item.nome || "Time ou participante") + "</strong><span>" + escapeHtml(item.esporte_nome || "") + (item.notificar ? " · notificações ativas" : "") + "</span></div></article>"; }).join("") : emptyState("Nenhum time acompanhado", "Use as configurações para escolher times ou participantes.", true);
-    byId("competitionsContent").innerHTML = competitions.length ? competitions.map(function (item) { return "<article class=\"ie-entity-row\"" + detailAttributes("competition", selectionIdentity(item).id, "", item.nome || "Campeonato") + ">" + logoHtml(item.imagem_url || item.logo_url, item.nome, "ie-entity-logo") + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(item.nome || "Campeonato") + "</strong><span>" + escapeHtml(item.esporte_nome || "") + "</span></div></article>"; }).join("") : emptyState("Nenhum campeonato acompanhado", "Use as configurações para escolher seus campeonatos.", true);
+    var participants = followedSelections("participant", state.activeSportId);
+    var competitions = state.favoriteCompetitions;
+    byId("teamsContent").innerHTML = participants.length ? participants.map(function (item) {
+      var name = item.nome || item.nome_exibicao || "Time ou participante";
+      var abbreviation = String(item.sigla || item.abreviacao || "").trim().toUpperCase();
+      var displayName = abbreviation ? abbreviation + " - " + name : name;
+      return "<article class=\"ie-entity-row\"" + detailAttributes("participant", selectionIdentity(item).id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", abbreviation) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(displayName) + "</strong></div>" + icon("chevron") + "</article>";
+    }).join("") : emptyState("Nenhum time acompanhado", "Use as configurações para escolher times ou participantes deste esporte.", true);
+    byId("competitionsContent").innerHTML = competitions.length ? competitions.map(function (item) {
+      var name = item.nome || item.competicao_nome || "Campeonato";
+      return "<article class=\"ie-entity-row\"" + detailAttributes("competition", item.id_competicao || item.id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", item.sigla) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(name) + "</strong><span>" + escapeHtml(item.fase_atual || item.temporada || "") + "</span></div>" + icon("chevron") + "</article>";
+    }).join("") : emptyState("Nenhum campeonato acompanhado", "Use as configurações para escolher seus campeonatos deste esporte.", true);
   }
 
   function favoriteSport() {
-    var id = state.bootstrap && state.bootstrap.preferencias && state.bootstrap.preferencias.id_esporte_favorito;
-    return arrayOf(state.bootstrap && state.bootstrap.catalogo && state.bootstrap.catalogo.esportes).find(function (item) { return String(item.id || item.id_esporte) === String(id); }) || null;
+    return sportById(state.sportFavoriteOrder[0]);
+  }
+
+  function renderSportFavoriteSettings() {
+    var favorites = state.sportFavoriteOrder.slice();
+    var rows = orderedSports();
+    byId("sportFavoriteList").innerHTML = rows.length ? rows.map(function (item) {
+      var id = sportId(item);
+      var index = favorites.indexOf(id);
+      var selected = index >= 0;
+      return "<div class=\"ie-sport-favorite-row" + (selected ? " is-selected" : "") + "\"><span class=\"ie-favorite-position\">" + (selected ? index + 1 : "") + "</span><strong>" + escapeHtml(item.nome || "Esporte") + "</strong><div class=\"ie-sport-favorite-actions\"><button class=\"ie-selection-action" + (selected ? " is-active" : "") + "\" type=\"button\" data-sport-favorite-id=\"" + id + "\" data-sport-favorite-action=\"toggle\" aria-label=\"" + (selected ? "Remover " : "Favoritar ") + escapeHtml(item.nome || "esporte") + "\" aria-pressed=\"" + selected + "\">" + icon("star") + "</button>" + (selected ? "<button type=\"button\" data-sport-favorite-id=\"" + id + "\" data-sport-favorite-action=\"up\" aria-label=\"Subir " + escapeHtml(item.nome || "esporte") + "\"" + (index === 0 ? " disabled" : "") + ">↑</button><button type=\"button\" data-sport-favorite-id=\"" + id + "\" data-sport-favorite-action=\"down\" aria-label=\"Descer " + escapeHtml(item.nome || "esporte") + "\"" + (index === favorites.length - 1 ? " disabled" : "") + ">↓</button>" : "") + "</div></div>";
+    }).join("") : emptyState("Nenhum esporte disponível", "Os esportes aparecem quando há um provedor ativo com dados disponíveis.", false);
   }
 
   function fillSelect(select, items, placeholder, value) {
@@ -848,7 +860,7 @@
     var prefs = state.bootstrap && state.bootstrap.preferencias || {};
     var filters = state.bootstrap && state.bootstrap.filtros || {};
     var alerts = normalizeAlerts(state.bootstrap && state.bootstrap.alertas, prefs);
-    fillSelect(byId("favoriteSportSelect"), catalog.esportes, "Escolha um esporte", prefs.id_esporte_favorito);
+    renderSportFavoriteSettings();
     var selectedContinent = arrayOf(filters.ids_continentes)[0];
     fillSelect(byId("continentSelect"), catalog.continentes, "Todos", selectedContinent);
     fillCountrySelect(selectedContinent, arrayOf(filters.ids_paises)[0]);
@@ -869,8 +881,10 @@
   }
 
   function renderAll() {
+    renderSportsNav();
     renderHome();
     renderGames();
+    renderNewsFilters();
     renderNews();
     renderEntities();
     renderSettings();
@@ -907,6 +921,65 @@
     indicator.classList.toggle("is-refreshing", !!refreshing);
   }
 
+  async function loadNewsForActiveSport(renderAfter) {
+    var requestId = ++state.newsRequestId;
+    var result = await rpc("ie_noticias_listar_rpc", {
+      p_id_esporte: state.activeSportId ? Number(state.activeSportId) : null,
+      p_id_participante: state.newsFilters.participantId ? Number(state.newsFilters.participantId) : null,
+      p_id_competicao: state.newsFilters.competitionId ? Number(state.newsFilters.competitionId) : null,
+      p_limite: 30,
+      p_offset: 0
+    });
+    if (requestId !== state.newsRequestId) return;
+    state.news = arrayOf(result);
+    if (renderAfter !== false) renderNews();
+  }
+
+  async function loadActiveSportData(renderAfter) {
+    var requestId = ++state.sportRequestId;
+    var sport = state.activeSportId ? Number(state.activeSportId) : null;
+    if (!sport) {
+      state.games = { forYou: [], live: [], upcoming: [], results: [] };
+      state.favoriteCompetitions = [];
+      state.news = [];
+      if (renderAfter !== false) renderAll();
+      return;
+    }
+    var results = await Promise.all([
+      rpc("ie_partidas_listar_rpc", { p_secao: "para_voce", p_id_esporte: sport, p_fase: null, p_limite: 30, p_offset: 0 }),
+      rpc("ie_partidas_listar_rpc", { p_secao: "ao_vivo", p_id_esporte: sport, p_fase: null, p_limite: 30, p_offset: 0 }),
+      rpc("ie_partidas_listar_rpc", { p_secao: "proximos", p_id_esporte: sport, p_fase: null, p_limite: 30, p_offset: 0 }),
+      rpc("ie_partidas_listar_rpc", { p_secao: "resultados", p_id_esporte: sport, p_fase: null, p_limite: 30, p_offset: 0 }),
+      rpc("ie_competicoes_favoritas_listar_rpc", { p_id_esporte: sport, p_limite: 30, p_offset: 0 }),
+      rpc("ie_noticias_listar_rpc", { p_id_esporte: sport, p_id_participante: state.newsFilters.participantId ? Number(state.newsFilters.participantId) : null, p_id_competicao: state.newsFilters.competitionId ? Number(state.newsFilters.competitionId) : null, p_limite: 30, p_offset: 0 })
+    ]);
+    if (requestId !== state.sportRequestId) return;
+    state.games.forYou = arrayOf(results[0]);
+    state.games.live = arrayOf(results[1]);
+    state.games.upcoming = arrayOf(results[2]);
+    state.games.results = arrayOf(results[3]);
+    state.favoriteCompetitions = arrayOf(results[4]);
+    state.news = arrayOf(results[5]);
+    if (renderAfter !== false) renderAll();
+  }
+
+  async function changeActiveSport(id) {
+    var next = Number(id || 0);
+    if (!next || next === Number(state.activeSportId)) return;
+    state.activeSportId = next;
+    state.newsFilters = { participantId: null, competitionId: null };
+    state.newsRequestId += 1;
+    state.homeSectionFilter = "";
+    renderSportsNav();
+    try {
+      await loadActiveSportData(true);
+      saveCache();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      showToast(friendlyError(error), true);
+    }
+  }
+
   async function loadAll(manual) {
     if (state.loading) return;
     state.loading = true;
@@ -916,30 +989,24 @@
     }
     try {
       await requestSession();
+      state.bootstrap = await rpc("ie_central_bootstrap_rpc", {}) || {};
+      state.sportFavoriteOrder = normalizeSportFavoriteOrder(state.bootstrap.preferencias || {});
+      ensureActiveSport();
       var results = await Promise.all([
-        rpc("ie_central_bootstrap_rpc", {}),
         rpc("ie_card_resumo_rpc", { p_limite: 3 }),
-        rpc("ie_partidas_listar_rpc", { p_secao: "ao_vivo", p_limite: 30, p_offset: 0 }),
-        rpc("ie_partidas_listar_rpc", { p_secao: "proximos", p_limite: 30, p_offset: 0 }),
-        rpc("ie_partidas_listar_rpc", { p_secao: "resultados", p_limite: 30, p_offset: 0 }),
-        rpc("ie_noticias_listar_rpc", { p_limite: 30, p_offset: 0 }),
         rpc("ie_favoritos_listar_rpc", {}),
         rpc("ie_base_futebol_brasil_resumo_rpc", {}).catch(function () { return null; })
       ]);
-      state.bootstrap = results[0] || {};
-      state.card = results[1] || {};
-      state.games.live = arrayOf(results[2]);
-      state.games.upcoming = arrayOf(results[3]);
-      state.games.results = arrayOf(results[4]);
-      state.news = arrayOf(results[5]);
-      state.favorites = arrayOf(results[6]);
-      state.baseSummary = results[7] || null;
+      state.card = results[0] || {};
+      state.favorites = arrayOf(results[1]);
+      state.baseSummary = results[2] || null;
       arrayOf(state.bootstrap && state.bootstrap.selecoes).forEach(function (item) {
         var identity = selectionIdentity(item);
         if (identity.type) rememberCatalogItems(identity.type, [item]);
       });
       rememberCatalogItems("participant", state.favorites);
       state.favoriteOrder = state.favorites.map(function (item) { return Number(item.id_participante); }).filter(function (id) { return id > 0; });
+      await loadActiveSportData(false);
       showApp(true);
       renderAll();
       await loadCatalog();
@@ -952,8 +1019,12 @@
         state.card = cached.card;
         state.baseSummary = cached.baseSummary || null;
         state.games = cached.games || state.games;
+        state.favoriteCompetitions = cached.favoriteCompetitions || [];
         state.news = cached.news || [];
         state.favorites = cached.favorites || [];
+        state.sportFavoriteOrder = arrayOf(cached.sportFavoriteOrder).map(Number).filter(function (id) { return id > 0; });
+        state.activeSportId = Number(cached.activeSportId || state.sportFavoriteOrder[0] || 0) || null;
+        ensureActiveSport();
         state.favoriteOrder = state.favorites.map(function (item) { return Number(item.id_participante); }).filter(function (id) { return id > 0; });
         showApp(true);
         renderAll();
@@ -981,6 +1052,7 @@
       panel.hidden = !active;
       panel.classList.toggle("is-active", active);
     });
+    renderSportsNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -1044,11 +1116,36 @@
   function closeDetail() {
     byId("detailModal").hidden = true;
     document.body.style.overflow = "";
+    state.detailStack = [];
+    byId("detailBackButton").hidden = true;
+  }
+
+  function beginDetail(title, subtitle, pushCurrent) {
+    if (pushCurrent && !byId("detailModal").hidden) {
+      state.detailStack.push({ title: byId("detailTitle").textContent, subtitle: byId("detailSubtitle").textContent, html: byId("detailContent").innerHTML });
+    } else if (!pushCurrent) {
+      state.detailStack = [];
+    }
+    byId("detailBackButton").hidden = state.detailStack.length === 0;
+    byId("detailTitle").textContent = displayText(title || "Detalhes");
+    byId("detailSubtitle").textContent = displayText(subtitle || "");
+    byId("detailContent").innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
+    byId("detailModal").hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  function backDetail() {
+    var previous = state.detailStack.pop();
+    if (!previous) { closeDetail(); return; }
+    byId("detailTitle").textContent = previous.title;
+    byId("detailSubtitle").textContent = previous.subtitle;
+    byId("detailContent").innerHTML = previous.html;
+    byId("detailBackButton").hidden = state.detailStack.length === 0;
   }
 
   window.TurboTigerIEHandleBack = function () {
     if (!byId("detailModal").hidden) {
-      closeDetail();
+      if (state.detailStack.length) backDetail(); else closeDetail();
       return true;
     }
     if (state.activeTab === "settings") {
@@ -1148,12 +1245,8 @@
     return "<section class=\"ie-database-summary\"><div><span>Base própria</span><strong>Futebol do Brasil</strong><small>Acervo histórico organizado pelo Turbo Tiger" + (period ? " · " + escapeHtml(period) : "") + "</small></div><dl><div><dt>Partidas</dt><dd>" + escapeHtml(total(data.total_registros)) + "</dd></div><div><dt>Campeonatos</dt><dd>" + escapeHtml(total(data.total_competicoes)) + "</dd></div><div><dt>Times</dt><dd>" + escapeHtml(total(data.total_times)) + "</dd></div></dl></section>";
   }
 
-  async function openEventDetail(id, title) {
-    byId("detailTitle").textContent = displayText(title || "Detalhes da partida");
-    byId("detailSubtitle").textContent = "Carregando informações...";
-    byId("detailContent").innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
-    byId("detailModal").hidden = false;
-    document.body.style.overflow = "hidden";
+  async function openEventDetail(id, title, pushCurrent) {
+    beginDetail(title || "Detalhes do confronto", "Carregando informações...", !!pushCurrent);
     try {
       var data = await rpc("ie_partida_detalhe_rpc", { p_id_evento: Number(id) });
       var event = data && data.evento || {};
@@ -1184,13 +1277,9 @@
     }
   }
 
-  async function openOddsDetail(id, title) {
-    if (!Number(id)) { openGenericDetail("odds", id, title); return; }
-    byId("detailTitle").textContent = displayText(title || "Cotações informativas");
-    byId("detailSubtitle").textContent = "Carregando cotações...";
-    byId("detailContent").innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
-    byId("detailModal").hidden = false;
-    document.body.style.overflow = "hidden";
+  async function openOddsDetail(id, title, pushCurrent) {
+    if (!Number(id)) { openGenericDetail("odds", id, title, pushCurrent); return; }
+    beginDetail(title || "Cotações informativas", "Carregando cotações...", !!pushCurrent);
     try {
       var data = await rpc("ie_partida_detalhe_rpc", { p_id_evento: Number(id) });
       var event = data && data.evento || {};
@@ -1204,21 +1293,15 @@
     }
   }
 
-  function openGenericDetail(kind, id, title) {
-    byId("detailTitle").textContent = displayText(title || "Detalhes");
+  function openGenericDetail(kind, id, title, pushCurrent) {
+    beginDetail(title || "Detalhes", "", !!pushCurrent);
     byId("detailSubtitle").textContent = kind === "competition" ? "Campeonato acompanhado" : kind === "analysis" ? "Resumo estatístico personalizado" : kind === "odds" ? "Cotações informativas" : "Time ou participante acompanhado";
     byId("detailContent").innerHTML = emptyState("Informações completas na central", kind === "analysis" ? "As análises usam somente os dados disponíveis para as suas seleções e não representam recomendação nem garantia de resultado." : kind === "odds" ? "Ainda não há cotações atualizadas para esta partida." : "As próximas partidas, resultados e dados relacionados ficam disponíveis nas áreas correspondentes.", false);
-    byId("detailModal").hidden = false;
-    document.body.style.overflow = "hidden";
   }
 
-  async function openAnalysisDetail(id, title) {
-    if (!Number(id)) { openGenericDetail("analysis", id, title); return; }
-    byId("detailTitle").textContent = displayText(title || "Análises estatísticas");
-    byId("detailSubtitle").textContent = "Carregando histórico do confronto...";
-    byId("detailContent").innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
-    byId("detailModal").hidden = false;
-    document.body.style.overflow = "hidden";
+  async function openAnalysisDetail(id, title, pushCurrent) {
+    if (!Number(id)) { openGenericDetail("analysis", id, title, pushCurrent); return; }
+    beginDetail(title || "Análises estatísticas", "Carregando histórico do confronto...", !!pushCurrent);
     try {
       var data = await rpc("ie_confronto_evento_rpc", { p_id_evento: Number(id), p_limite: 20, p_offset: 0 });
       try { data.desempenho_geral = await rpc("ie_desempenho_geral_evento_rpc", { p_id_evento: Number(id) }); } catch (generalError) { /* desempenho geral pode não estar mapeado */ }
@@ -1232,12 +1315,8 @@
     }
   }
 
-  async function openCompetitionDetail(id, title) {
-    byId("detailTitle").textContent = displayText(title || "Detalhes do campeonato");
-    byId("detailSubtitle").textContent = "Carregando informações...";
-    byId("detailContent").innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
-    byId("detailModal").hidden = false;
-    document.body.style.overflow = "hidden";
+  async function openCompetitionDetail(id, title, pushCurrent) {
+    beginDetail(title || "Detalhes do campeonato", "Carregando informações...", !!pushCurrent);
     try {
       var data = await rpc("ie_competicao_detalhe_rpc", { p_id_competicao: Number(id) });
       var competition = data && data.competicao || {};
@@ -1249,12 +1328,47 @@
         ["Início", competition.data_inicio ? formatDate(competition.data_inicio) : "Em atualização"],
         ["Fim", competition.data_fim ? formatDate(competition.data_fim) : "Em atualização"]
       ].map(function (row) { return "<div><span>" + escapeHtml(row[0]) + "</span><strong>" + escapeHtml(row[1]) + "</strong></div>"; }).join("") + "</div>";
-      var teamHtml = teams.length ? "<div class=\"ie-detail-list\">" + teams.map(function (team) {
-        return "<div><span>" + logoHtml(team.imagem_url, team.nome, "ie-entity-logo", team.sigla) + " " + escapeHtml(team.nome || "Time") + "</span><strong>" + escapeHtml(team.posicao ? team.posicao + "º" : team.grupo || team.sigla || "") + "</strong></div>";
+      var teamHtml = teams.length ? "<div class=\"ie-classified-list\">" + teams.map(function (team) {
+        var teamName = team.nome || "Time";
+        var abbreviation = String(team.sigla || team.abreviacao || "").trim().toUpperCase();
+        var label = (abbreviation ? abbreviation + " - " : "") + teamName + (team.pontos == null ? "" : " (" + team.pontos + ")");
+        return "<article class=\"ie-classified-row\"" + detailAttributes("competition-participant", team.id_participante || team.id, "", teamName) + " data-participant-id=\"" + escapeHtml(team.id_participante || team.id || "") + "\" data-competition-id=\"" + escapeHtml(competition.id_competicao || id) + "\" data-phase=\"" + escapeHtml(competition.fase_atual || "") + "\"><span class=\"ie-classified-position\">" + escapeHtml(team.posicao ? team.posicao + "º" : team.grupo || "—") + "</span>" + logoHtml(team.imagem_url || team.logo_url, teamName, "ie-entity-logo", abbreviation) + "<strong>" + escapeHtml(label) + "</strong>" + icon("chevron") + "</article>";
       }).join("") + "</div>" : "<p>Os classificados ainda não foram disponibilizados pela fonte.</p>";
       byId("detailContent").innerHTML = detailSection("Informações do campeonato", overview) + detailSection("Times classificados na fase", teamHtml);
     } catch (error) {
       byId("detailContent").innerHTML = emptyState("Detalhes indisponíveis", friendlyError(error), false);
+    }
+  }
+
+  async function openParticipantDetail(id, title, pushCurrent) {
+    beginDetail(title || "Time ou participante", "Carregando campeonatos...", !!pushCurrent);
+    try {
+      var data = await rpc("ie_participante_competicoes_rpc", { p_id_participante: Number(id), p_id_esporte: state.activeSportId ? Number(state.activeSportId) : null, p_limite: 50, p_offset: 0 });
+      var participant = data && data.participante || followedSelections("participant", state.activeSportId).find(function (item) { return Number(selectionIdentity(item).id) === Number(id); }) || {};
+      var competitions = arrayOf(data);
+      byId("detailTitle").textContent = displayText(participant.nome || title || "Time ou participante");
+      byId("detailSubtitle").textContent = "Campeonatos em que participa";
+      byId("detailContent").innerHTML = competitions.length ? "<div class=\"ie-detail-entities\">" + competitions.map(function (competition) {
+        var competitionId = competition.id_competicao || competition.id;
+        var name = competition.nome || competition.competicao_nome || "Campeonato";
+        return "<article class=\"ie-entity-row\"" + detailAttributes("participant-competition", competitionId, "", name) + " data-participant-id=\"" + escapeHtml(id) + "\" data-competition-id=\"" + escapeHtml(competitionId) + "\" data-phase=\"" + escapeHtml(competition.fase_atual || "") + "\">" + logoHtml(competition.imagem_url || competition.logo_url, name, "ie-entity-logo", competition.sigla) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(name) + "</strong><span>" + escapeHtml(competition.fase_atual || competition.temporada || "") + "</span></div>" + icon("chevron") + "</article>";
+      }).join("") + "</div>" : emptyState("Nenhum campeonato disponível", "Ainda não há campeonatos relacionados a este participante.", false);
+    } catch (error) {
+      byId("detailContent").innerHTML = emptyState("Campeonatos indisponíveis", friendlyError(error), false);
+    }
+  }
+
+  async function openParticipantCompetitionMatches(participantId, competitionId, phase, title, pushCurrent) {
+    beginDetail(title || "Confrontos", phase || "Próximos confrontos", !!pushCurrent);
+    try {
+      var phaseFilter = normalizeSearchText(phase) === "temporada regular" ? null : (phase || null);
+      var result = await rpc("ie_partidas_listar_rpc", { p_secao: "proximos", p_id_esporte: state.activeSportId ? Number(state.activeSportId) : null, p_id_competicao: Number(competitionId), p_id_participante: Number(participantId), p_fase: phaseFilter, p_limite: 50, p_offset: 0 });
+      var matches = arrayOf(result);
+      byId("detailTitle").textContent = displayText(title || "Confrontos");
+      byId("detailSubtitle").textContent = displayText(phase || "Próximos confrontos");
+      byId("detailContent").innerHTML = matches.length ? "<div class=\"ie-feed\">" + matches.map(function (item) { return renderMatchCard(item); }).join("") + "</div>" : emptyState("Nenhum confronto programado", "Ainda não há confrontos futuros disponíveis nesta fase.", false);
+    } catch (error) {
+      byId("detailContent").innerHTML = emptyState("Confrontos indisponíveis", friendlyError(error), false);
     }
   }
 
@@ -1284,12 +1398,13 @@
       var times = all("input[name=alertTime]:checked").map(function (input) { return Number(input.value); });
       var events = all("input[name=alertEvent]:checked").map(function (input) { return input.value; });
       changes = [];
-      changes.push(rpc("ie_esporte_favorito_salvar_rpc", { p_id_esporte: byId("favoriteSportSelect").value ? Number(byId("favoriteSportSelect").value) : null }));
+      changes.push(rpc("ie_esportes_favoritos_ordenar_rpc", { p_ids_esportes: state.sportFavoriteOrder.slice() }));
       changes.push(rpc("ie_filtros_salvar_rpc", { p_ids_esportes: byId("sportSelect").value ? [Number(byId("sportSelect").value)] : [], p_ids_continentes: byId("continentSelect").value ? [Number(byId("continentSelect").value)] : [], p_ids_paises: byId("countrySelect").value ? [Number(byId("countrySelect").value)] : [] }));
       changes.push(rpc("ie_alertas_salvar_rpc", { p_ativo: byId("notificationsEnabled").checked, p_antecedencias_minutos: times, p_tipos_evento: events }));
       changes.push(rpc("ie_favoritos_ordenar_rpc", { p_ids_participantes: orderedFavoriteParticipants().map(function (item) { return Number(item.id_participante); }) }));
       await Promise.all(changes);
       state.selectionChanges = {};
+      state.activeSportId = state.sportFavoriteOrder[0] || null;
       showToast("Configurações salvas.", false);
       await loadAll(false);
       activateTab(state.previousTab || "home");
@@ -1360,7 +1475,18 @@
     all("[data-tab]").forEach(function (button) { button.addEventListener("click", function () { activateTab(button.getAttribute("data-tab")); }); });
     all("[data-game-filter]").forEach(function (button) { button.addEventListener("click", function () { state.gameFilter = button.getAttribute("data-game-filter"); all("[data-game-filter]").forEach(function (item) { item.classList.toggle("is-active", item === button); }); renderGames(); }); });
     all("[data-close-detail]").forEach(function (button) { button.addEventListener("click", closeDetail); });
+    byId("detailBackButton").addEventListener("click", backDetail);
     byId("settingsForm").addEventListener("submit", saveSettings);
+    byId("newsTeamFilter").addEventListener("change", function () {
+      state.newsFilters.participantId = byId("newsTeamFilter").value ? Number(byId("newsTeamFilter").value) : null;
+      if (state.newsFilters.participantId) { state.newsFilters.competitionId = null; byId("newsCompetitionFilter").value = ""; }
+      loadNewsForActiveSport(true).catch(function (error) { showToast(friendlyError(error), true); });
+    });
+    byId("newsCompetitionFilter").addEventListener("change", function () {
+      state.newsFilters.competitionId = byId("newsCompetitionFilter").value ? Number(byId("newsCompetitionFilter").value) : null;
+      if (state.newsFilters.competitionId) { state.newsFilters.participantId = null; byId("newsTeamFilter").value = ""; }
+      loadNewsForActiveSport(true).catch(function (error) { showToast(friendlyError(error), true); });
+    });
     function refreshCatalog() {
       loadCatalog().catch(function (error) { showToast(friendlyError(error), true); });
     }
@@ -1406,19 +1532,33 @@
     }, { passive: true });
     document.addEventListener("touchcancel", function () { detailGesture = null; }, { passive: true });
 
-    function openDetailElement(detail) {
+    function openDetailElement(detail, pushCurrent) {
       var kind = detail.getAttribute("data-detail-kind");
       if (kind === "news") openNewsSource(detail.getAttribute("data-detail-url"), detail.getAttribute("data-detail-title"));
-      else if (kind === "event") openEventDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
-      else if (kind === "odds") openOddsDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
-      else if (kind === "competition") openCompetitionDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
-      else if (kind === "analysis") openAnalysisDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
-      else openGenericDetail(kind, detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"));
+      else if (kind === "event") openEventDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"), pushCurrent);
+      else if (kind === "odds") openOddsDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"), pushCurrent);
+      else if (kind === "competition") openCompetitionDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"), pushCurrent);
+      else if (kind === "participant") openParticipantDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"), pushCurrent);
+      else if (kind === "competition-participant" || kind === "participant-competition") openParticipantCompetitionMatches(detail.getAttribute("data-participant-id"), detail.getAttribute("data-competition-id"), detail.getAttribute("data-phase"), detail.getAttribute("data-detail-title"), true);
+      else if (kind === "analysis") openAnalysisDetail(detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"), pushCurrent);
+      else openGenericDetail(kind, detail.getAttribute("data-detail-id"), detail.getAttribute("data-detail-title"), pushCurrent);
     }
 
     document.addEventListener("click", function (event) {
       var settings = event.target.closest("[data-open-settings]");
       if (settings) { openSettings("", true); return; }
+      var sportButton = event.target.closest("[data-sport-id]");
+      if (sportButton) { changeActiveSport(sportButton.getAttribute("data-sport-id")); return; }
+      var matchAction = event.target.closest("[data-match-action]");
+      if (matchAction) {
+        var actionCard = matchAction.closest("[data-detail-kind]");
+        if (detailGesture && actionCard && detailGesture.target === actionCard && detailGesture.moved) { event.preventDefault(); detailGesture = null; return; }
+        detailGesture = null;
+        var pushAction = !byId("detailModal").hidden && byId("detailModal").contains(matchAction);
+        if (matchAction.getAttribute("data-match-action") === "odds") openOddsDetail(matchAction.getAttribute("data-event-id"), "Cotações informativas", pushAction);
+        else openAnalysisDetail(matchAction.getAttribute("data-event-id"), "Análises estatísticas", pushAction);
+        return;
+      }
       var detail = event.target.closest("[data-detail-kind]");
       if (detail) {
         if (detailGesture && detailGesture.target === detail && detailGesture.moved) {
@@ -1427,7 +1567,26 @@
           return;
         }
         detailGesture = null;
-        openDetailElement(detail);
+        openDetailElement(detail, !byId("detailModal").hidden && byId("detailModal").contains(detail));
+        return;
+      }
+      var sportFavorite = event.target.closest("[data-sport-favorite-id]");
+      if (sportFavorite) {
+        var favoriteSportId = Number(sportFavorite.getAttribute("data-sport-favorite-id"));
+        var favoriteSportIndex = state.sportFavoriteOrder.indexOf(favoriteSportId);
+        var favoriteSportAction = sportFavorite.getAttribute("data-sport-favorite-action");
+        if (favoriteSportAction === "toggle") {
+          if (favoriteSportIndex >= 0) state.sportFavoriteOrder.splice(favoriteSportIndex, 1);
+          else state.sportFavoriteOrder.push(favoriteSportId);
+        } else if (favoriteSportIndex >= 0) {
+          var favoriteSportTarget = favoriteSportIndex + (favoriteSportAction === "up" ? -1 : 1);
+          if (favoriteSportTarget >= 0 && favoriteSportTarget < state.sportFavoriteOrder.length) {
+            var movedSport = state.sportFavoriteOrder[favoriteSportTarget];
+            state.sportFavoriteOrder[favoriteSportTarget] = favoriteSportId;
+            state.sportFavoriteOrder[favoriteSportIndex] = movedSport;
+          }
+        }
+        renderSportFavoriteSettings();
         return;
       }
       var favoriteMove = event.target.closest("[data-favorite-id]");
@@ -1458,10 +1617,11 @@
     });
     document.addEventListener("keydown", function (event) {
       if (event.key !== "Enter" && event.key !== " ") return;
+      if (event.target.closest("[data-match-action]")) return;
       var detail = event.target.closest("[data-detail-kind]");
       if (!detail) return;
       event.preventDefault();
-      openDetailElement(detail);
+      openDetailElement(detail, !byId("detailModal").hidden && byId("detailModal").contains(detail));
     });
     byId("backButton").addEventListener("click", window.TurboTigerIEHandleBack);
     window.addEventListener("popstate", function () {
@@ -1472,6 +1632,13 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     setupEvents();
-    loadAll(false).then(applyInitialRoute);
+    if (!hasBridge()) {
+      byId("loadingStatus").textContent = friendlyError(new Error("app_session_unavailable"));
+      showApp(false);
+      return;
+    }
+    loadAll(false).then(function () {
+      if (state.session && state.bootstrap && !byId("ieApp").hidden) applyInitialRoute();
+    });
   });
 })();

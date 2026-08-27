@@ -20,11 +20,7 @@ window.TurboTigerIEReceiveSession({
 });
 ```
 
-O token não é colocado na URL, no armazenamento do navegador ou em logs. Fora do aplicativo, a página permanece bloqueada.
-
-## Prévia local
-
-Somente em `localhost` ou `127.0.0.1`, a query `?preview=1` ativa dados demonstrativos para validação visual. Esse modo não funciona em um domínio publicado.
+O token não é colocado na URL, no armazenamento do navegador ou em logs. Fora do aplicativo, a página permanece bloqueada. Não existe modo de prévia, parâmetro de URL ou dados demonstrativos capazes de liberar a interface em navegador desktop ou mobile.
 
 ## Backend esperado
 
@@ -77,6 +73,7 @@ Antes da publicação/teste final:
 - testar sessão, voltar, atualizar, fechar e logout;
 - testar busca/filtros, seleções independentes e esporte favorito;
 - abrir uma notícia e confirmar que só é possível rolar;
-- conferir desktop apenas como prévia e Android como ambiente funcional real.
+- confirmar em navegador desktop e mobile que a página permanece bloqueada, inclusive com parâmetros de URL arbitrários;
+- validar a interface funcional somente dentro da WebView dedicada do app Turbo Tiger.
 
 Referência técnica completa: `docs/_referencias/inteligencia_esportiva/README.md`.
