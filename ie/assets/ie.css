@@ -357,18 +357,19 @@ button {
   background: transparent;
   color: var(--ie-muted);
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 400;
   white-space: nowrap;
   cursor: pointer;
 }
 
 .ie-sports-nav button.is-favorite {
-  color: #d4d5d8;
+  color: var(--ie-muted);
 }
 
 .ie-sports-nav button.is-active {
-  background: var(--ie-red-soft);
-  color: var(--ie-red);
+  background: transparent;
+  color: #fff;
+  font-weight: 750;
 }
 
 .ie-main {
