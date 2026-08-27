@@ -35,6 +35,7 @@
     settingsContext: "",
     gameFilter: "live",
     catalog: { participants: [], competitions: [] },
+    catalogKnown: { participants: {}, competitions: {} },
     catalogRequestId: 0,
     selectionChanges: {},
     favorites: [],
@@ -46,8 +47,88 @@
   function byId(id) { return document.getElementById(id); }
   function all(selector, root) { return Array.prototype.slice.call((root || document).querySelectorAll(selector)); }
 
+  var WINDOWS_1252_BYTES = {
+    "\u20ac": 0x80, "\u201a": 0x82, "\u0192": 0x83, "\u201e": 0x84,
+    "\u2026": 0x85, "\u2020": 0x86, "\u2021": 0x87, "\u02c6": 0x88,
+    "\u2030": 0x89, "\u0160": 0x8a, "\u2039": 0x8b, "\u0152": 0x8c,
+    "\u017d": 0x8e, "\u2018": 0x91, "\u2019": 0x92, "\u201c": 0x93,
+    "\u201d": 0x94, "\u2022": 0x95, "\u2013": 0x96, "\u2014": 0x97,
+    "\u02dc": 0x98, "\u2122": 0x99, "\u0161": 0x9a, "\u203a": 0x9b,
+    "\u0153": 0x9c, "\u017e": 0x9e, "\u0178": 0x9f
+  };
+
+  function mojibakeScore(value) {
+    var text = String(value || "");
+    var markers = text.match(/[\u00c2\u00c3\u00e2\u00f0\ufffd]/g);
+    var controls = text.match(/[\u0080-\u009f]/g);
+    return (markers ? markers.length : 0) + (controls ? controls.length * 2 : 0);
+  }
+
+  function decodeWesternUtf8(value) {
+    var text = String(value || "");
+    var encoded = "";
+    for (var index = 0; index < text.length; index += 1) {
+      var character = text.charAt(index);
+      var code = text.charCodeAt(index);
+      var byte = code <= 0xff ? code : WINDOWS_1252_BYTES[character];
+      if (byte == null) return text;
+      encoded += "%" + byte.toString(16).padStart(2, "0");
+    }
+    try { return decodeURIComponent(encoded); } catch (error) { return text; }
+  }
+
+  function decodeTextEntities(value) {
+    var text = String(value == null ? "" : value);
+    for (var attempt = 0; attempt < 2 && /&(?:#\d+|#x[\da-f]+|[a-z][\da-z]+);/i.test(text); attempt += 1) {
+      var decoder = document.createElement("textarea");
+      decoder.innerHTML = text;
+      var decoded = decoder.value;
+      if (decoded === text) break;
+      text = decoded;
+    }
+    return text;
+  }
+
+  var CONFIRMED_DISPLAY_REPLACEMENTS = [
+    ["Ta\ufffda", "Taça"],
+    ["S\ufffdo", "São"],
+    ["J\ufffdnior", "Júnior"],
+    ["Cear\ufffd", "Ceará"],
+    ["S\ufffdO", "SÃO"],
+    ["Ferrovi\ufffdrio", "Ferroviário"],
+    ["Am\ufffdrica", "América"],
+    ["Quixad\ufffd", "Quixadá"],
+    ["Atl\ufffdtico", "Atlético"],
+    ["TA\ufffdA", "TAÇA"],
+    ["Jos\ufffd", "José"],
+    ["Uni\ufffdo", "União"],
+    ["Gr\ufffdmio", "Grêmio"]
+  ];
+
+  function repairConfirmedDisplayText(value) {
+    return CONFIRMED_DISPLAY_REPLACEMENTS.reduce(function (text, replacement) {
+      return text.split(replacement[0]).join(replacement[1]);
+    }, String(value == null ? "" : value));
+  }
+
+  function displayText(value) {
+    var text = repairConfirmedDisplayText(decodeTextEntities(value));
+    for (var attempt = 0; attempt < 2; attempt += 1) {
+      var decoded = decodeWesternUtf8(text);
+      if (decoded === text || mojibakeScore(decoded) >= mojibakeScore(text)) break;
+      text = decoded;
+    }
+    return repairConfirmedDisplayText(text);
+  }
+
+  function normalizeSearchText(value) {
+    var text = displayText(value);
+    if (typeof text.normalize === "function") text = text.normalize("NFD");
+    return text.replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR").replace(/\s+/g, " ").trim();
+  }
+
   function escapeHtml(value) {
-    return String(value == null ? "" : value)
+    return displayText(value)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -104,7 +185,7 @@
   }
 
   function initials(name) {
-    var parts = String(name || "?").trim().split(/\s+/).filter(Boolean);
+    var parts = displayText(name || "?").trim().split(/\s+/).filter(Boolean);
     return parts.slice(0, 2).map(function (part) { return part.charAt(0).toUpperCase(); }).join("") || "?";
   }
 
@@ -138,7 +219,7 @@
   function showToast(message, isError) {
     var toast = byId("toast");
     window.clearTimeout(state.toastTimer);
-    toast.textContent = message;
+    toast.textContent = displayText(message);
     toast.classList.toggle("is-error", !!isError);
     toast.hidden = false;
     state.toastTimer = window.setTimeout(function () { toast.hidden = true; }, 3600);
@@ -226,6 +307,7 @@
     state.games = { live: [], upcoming: [], results: [] };
     state.news = [];
     state.catalog = { participants: [], competitions: [] };
+    state.catalogKnown = { participants: {}, competitions: {} };
     state.catalogRequestId += 1;
     state.selectionChanges = {};
     state.favorites = [];
@@ -349,9 +431,9 @@
     if (name === "ie_noticias_listar_rpc") return Promise.resolve({ ok: true, itens: [{ id_noticia: 501, titulo: "Clubes se preparam para a próxima rodada do campeonato nacional", resumo: "Informações atualizadas sobre os times que você acompanha.", fonte_nome: "Fonte esportiva", publicado_em: now.toISOString(), url_original: "https://example.com/noticia" }] });
     if (name === "ie_catalogo_buscar_rpc") {
       var catalogItems = payload.p_tipo === "competicao" || payload.p_tipo === "competicoes" || payload.p_tipo === "campeonato" || payload.p_tipo === "campeonatos" ? competitions : participants;
-      var normalizedSearch = String(payload.p_busca || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      var normalizedSearch = normalizeSearchText(payload.p_busca || "");
       var filteredItems = catalogItems.filter(function (item) {
-        var normalizedName = String(item.nome || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        var normalizedName = normalizeSearchText(item.nome || "");
         return (!payload.p_id_esporte || Number(item.id_esporte) === Number(payload.p_id_esporte))
           && (!payload.p_id_continente || Number(item.id_continente) === Number(payload.p_id_continente))
           && (!payload.p_id_pais || Number(item.id_pais) === Number(payload.p_id_pais))
@@ -433,7 +515,7 @@
   }
 
   function setFreshness(value) {
-    byId("headerFreshness").textContent = relativeFreshness(value);
+    byId("headerFreshness").textContent = displayText(relativeFreshness(value));
   }
 
   function emptyState(title, text, canConfigure) {
@@ -575,7 +657,7 @@
     var favorite = favoriteSport();
     var filteredSection = String(state.homeSectionFilter || "").toLowerCase();
     var sectionTitles = { cotacoes: "Cotações informativas", analises: "Análises estatísticas" };
-    byId("favoriteSportTitle").textContent = sectionTitles[filteredSection] || (favorite ? favorite.nome : "Seu esporte favorito");
+    byId("favoriteSportTitle").textContent = displayText(sectionTitles[filteredSection] || (favorite ? favorite.nome : "Seu esporte favorito"));
     byId("favoriteSportIcon").textContent = filteredSection === "cotacoes" ? "C/E/F" : filteredSection === "analises" ? "∑" : (favorite ? initials(favorite.nome) : "●");
     if (!configured) {
       byId("homeContent").innerHTML = emptyState("Escolha seus esportes", "Defina um esporte favorito e acompanhe os times, participantes e campeonatos que realmente interessam a você.", true);
@@ -622,6 +704,32 @@
     }).join("");
   }
 
+  function rememberCatalogItems(targetType, items) {
+    var bucketName = targetType === "participant" ? "participants" : "competitions";
+    var bucket = state.catalogKnown[bucketName];
+    arrayOf(items).forEach(function (item) {
+      var id = targetType === "participant"
+        ? (item.id_participante || item.id_time || item.id_alvo || item.id)
+        : (item.id_competicao || item.id_alvo || item.id);
+      if (!id) return;
+      bucket[String(id)] = Object.assign({}, bucket[String(id)] || {}, item);
+    });
+  }
+
+  function filterCatalogItems(items, search) {
+    var wanted = normalizeSearchText(search);
+    if (!wanted) return arrayOf(items);
+    return arrayOf(items).filter(function (item) {
+      return normalizeSearchText([
+        item.nome,
+        item.nome_exibicao,
+        item.nome_curto,
+        item.sigla,
+        item.codigo
+      ].filter(Boolean).join(" ")).indexOf(wanted) >= 0;
+    });
+  }
+
   function selectionIdentity(item) {
       var targetType = String(item.tipo_alvo || item.tipo || "").toLowerCase();
       var genericId = item.id_alvo || item.alvo_id || item.id;
@@ -652,7 +760,7 @@
       var identity = selectionIdentity(item);
       if (identity.type === "participant") add(item, identity.id);
     });
-    arrayOf(state.catalog.participants).forEach(function (item) { add(item); });
+    Object.keys(state.catalogKnown.participants).forEach(function (id) { add(state.catalogKnown.participants[id], id); });
 
     var selected = selectionMap();
     var items = Object.keys(candidates).map(function (id) {
@@ -778,12 +886,14 @@
     var teamSearch = byId("teamSearch") ? byId("teamSearch").value.trim() : "";
     var competitionSearch = byId("competitionSearch") ? byId("competitionSearch").value.trim() : "";
     var results = await Promise.all([
-      rpc("ie_catalogo_buscar_rpc", { p_tipo: "participante", p_busca: teamSearch || null, p_id_esporte: sport ? Number(sport) : null, p_id_continente: continent ? Number(continent) : null, p_id_pais: country ? Number(country) : null, p_limite: 50, p_offset: 0 }),
-      rpc("ie_catalogo_buscar_rpc", { p_tipo: "competicao", p_busca: competitionSearch || null, p_id_esporte: sport ? Number(sport) : null, p_id_continente: continent ? Number(continent) : null, p_id_pais: country ? Number(country) : null, p_limite: 50, p_offset: 0 })
+      rpc("ie_catalogo_buscar_rpc", { p_tipo: "participante", p_busca: teamSearch || null, p_id_esporte: sport ? Number(sport) : null, p_id_continente: continent ? Number(continent) : null, p_id_pais: country ? Number(country) : null, p_limite: 100, p_offset: 0 }),
+      rpc("ie_catalogo_buscar_rpc", { p_tipo: "competicao", p_busca: competitionSearch || null, p_id_esporte: sport ? Number(sport) : null, p_id_continente: continent ? Number(continent) : null, p_id_pais: country ? Number(country) : null, p_limite: 100, p_offset: 0 })
     ]);
     if (requestId !== state.catalogRequestId) return;
-    state.catalog.participants = arrayOf(results[0]);
-    state.catalog.competitions = arrayOf(results[1]);
+    state.catalog.participants = filterCatalogItems(results[0], teamSearch);
+    state.catalog.competitions = filterCatalogItems(results[1], competitionSearch);
+    rememberCatalogItems("participant", state.catalog.participants);
+    rememberCatalogItems("competition", state.catalog.competitions);
     renderSelectionLists();
   }
 
@@ -824,6 +934,11 @@
       state.news = arrayOf(results[5]);
       state.favorites = arrayOf(results[6]);
       state.baseSummary = results[7] || null;
+      arrayOf(state.bootstrap && state.bootstrap.selecoes).forEach(function (item) {
+        var identity = selectionIdentity(item);
+        if (identity.type) rememberCatalogItems(identity.type, [item]);
+      });
+      rememberCatalogItems("participant", state.favorites);
       state.favoriteOrder = state.favorites.map(function (item) { return Number(item.id_participante); }).filter(function (id) { return id > 0; });
       showApp(true);
       renderAll();
@@ -845,7 +960,7 @@
         setFreshness(cached.saved_at);
         showToast("Sem conexão. Exibindo a última atualização disponível.", true);
       } else {
-        byId("loadingStatus").textContent = friendlyError(error);
+        byId("loadingStatus").textContent = displayText(friendlyError(error));
         showApp(false);
       }
     } finally {
@@ -1034,7 +1149,7 @@
   }
 
   async function openEventDetail(id, title) {
-    byId("detailTitle").textContent = title || "Detalhes da partida";
+    byId("detailTitle").textContent = displayText(title || "Detalhes da partida");
     byId("detailSubtitle").textContent = "Carregando informações...";
     byId("detailContent").innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
     byId("detailModal").hidden = false;
@@ -1043,8 +1158,8 @@
       var data = await rpc("ie_partida_detalhe_rpc", { p_id_evento: Number(id) });
       var event = data && data.evento || {};
       var sides = matchSides(event);
-      byId("detailTitle").textContent = sides.home.name + " × " + sides.away.name;
-      byId("detailSubtitle").textContent = event.competicao_nome || event.status_texto || "Detalhes da partida";
+      byId("detailTitle").textContent = displayText(sides.home.name + " × " + sides.away.name);
+      byId("detailSubtitle").textContent = displayText(event.competicao_nome || event.status_texto || "Detalhes da partida");
       var html = renderMatchCard(event, event.status_texto || "Partida", false);
       var collections = [
         ["Linha do tempo", data.linha_tempo],
@@ -1071,7 +1186,7 @@
 
   async function openOddsDetail(id, title) {
     if (!Number(id)) { openGenericDetail("odds", id, title); return; }
-    byId("detailTitle").textContent = title || "Cotações informativas";
+    byId("detailTitle").textContent = displayText(title || "Cotações informativas");
     byId("detailSubtitle").textContent = "Carregando cotações...";
     byId("detailContent").innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
     byId("detailModal").hidden = false;
@@ -1080,8 +1195,8 @@
       var data = await rpc("ie_partida_detalhe_rpc", { p_id_evento: Number(id) });
       var event = data && data.evento || {};
       var sides = matchSides(event);
-      byId("detailTitle").textContent = sides.home.name + " × " + sides.away.name;
-      byId("detailSubtitle").textContent = "Cotações informativas" + (event.competicao_nome ? " · " + event.competicao_nome : "");
+      byId("detailTitle").textContent = displayText(sides.home.name + " × " + sides.away.name);
+      byId("detailSubtitle").textContent = displayText("Cotações informativas" + (event.competicao_nome ? " · " + event.competicao_nome : ""));
       var html = renderOddsDetail(data.odds, sides, data.odds_aviso);
       byId("detailContent").innerHTML = html || emptyState("Cotações indisponíveis", "Ainda não há cotações atualizadas para esta partida.", false);
     } catch (error) {
@@ -1090,7 +1205,7 @@
   }
 
   function openGenericDetail(kind, id, title) {
-    byId("detailTitle").textContent = title || "Detalhes";
+    byId("detailTitle").textContent = displayText(title || "Detalhes");
     byId("detailSubtitle").textContent = kind === "competition" ? "Campeonato acompanhado" : kind === "analysis" ? "Resumo estatístico personalizado" : kind === "odds" ? "Cotações informativas" : "Time ou participante acompanhado";
     byId("detailContent").innerHTML = emptyState("Informações completas na central", kind === "analysis" ? "As análises usam somente os dados disponíveis para as suas seleções e não representam recomendação nem garantia de resultado." : kind === "odds" ? "Ainda não há cotações atualizadas para esta partida." : "As próximas partidas, resultados e dados relacionados ficam disponíveis nas áreas correspondentes.", false);
     byId("detailModal").hidden = false;
@@ -1099,7 +1214,7 @@
 
   async function openAnalysisDetail(id, title) {
     if (!Number(id)) { openGenericDetail("analysis", id, title); return; }
-    byId("detailTitle").textContent = title || "Análises estatísticas";
+    byId("detailTitle").textContent = displayText(title || "Análises estatísticas");
     byId("detailSubtitle").textContent = "Carregando histórico do confronto...";
     byId("detailContent").innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
     byId("detailModal").hidden = false;
@@ -1109,7 +1224,7 @@
       try { data.desempenho_geral = await rpc("ie_desempenho_geral_evento_rpc", { p_id_evento: Number(id) }); } catch (generalError) { /* desempenho geral pode não estar mapeado */ }
       var baseSummary = null;
       try { baseSummary = await rpc("ie_base_futebol_brasil_resumo_rpc", {}); } catch (baseError) { /* selo da base não bloqueia as estatísticas */ }
-      byId("detailTitle").textContent = (data.time_a && data.time_a.nome || "Time A") + " × " + (data.time_b && data.time_b.nome || "Time B");
+      byId("detailTitle").textContent = displayText((data.time_a && data.time_a.nome || "Time A") + " × " + (data.time_b && data.time_b.nome || "Time B"));
       byId("detailSubtitle").textContent = "Histórico completo do confronto";
       byId("detailContent").innerHTML = renderBrazilDatabaseSummary(baseSummary) + renderHistoricalComparison(data);
     } catch (error) {
@@ -1118,7 +1233,7 @@
   }
 
   async function openCompetitionDetail(id, title) {
-    byId("detailTitle").textContent = title || "Detalhes do campeonato";
+    byId("detailTitle").textContent = displayText(title || "Detalhes do campeonato");
     byId("detailSubtitle").textContent = "Carregando informações...";
     byId("detailContent").innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
     byId("detailModal").hidden = false;
@@ -1127,8 +1242,8 @@
       var data = await rpc("ie_competicao_detalhe_rpc", { p_id_competicao: Number(id) });
       var competition = data && data.competicao || {};
       var teams = arrayOf(data && data.times_classificados);
-      byId("detailTitle").textContent = competition.nome || title || "Campeonato";
-      byId("detailSubtitle").textContent = [competition.temporada, competition.pais].filter(Boolean).join(" • ") || "Detalhes do campeonato";
+      byId("detailTitle").textContent = displayText(competition.nome || title || "Campeonato");
+      byId("detailSubtitle").textContent = displayText([competition.temporada, competition.pais].filter(Boolean).join(" • ") || "Detalhes do campeonato");
       var overview = "<div class=\"ie-detail-list\">" + [
         ["Fase atual", competition.fase_atual || "Em atualização"],
         ["Início", competition.data_inicio ? formatDate(competition.data_inicio) : "Em atualização"],
