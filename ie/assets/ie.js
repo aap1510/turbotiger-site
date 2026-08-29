@@ -39,6 +39,10 @@
     homeSectionFilter: "",
     settingsContext: "",
     gameFilter: "live",
+    gameCompetitionId: null,
+    gameCompetitionGames: { live: [], upcoming: [], results: [] },
+    gameCompetitionLoading: false,
+    gameCompetitionRequestId: 0,
     catalog: { participants: [], competitions: [] },
     catalogKnown: { participants: {}, competitions: {} },
     catalogRequestId: 0,
@@ -329,6 +333,10 @@
     state.sportRequestId += 1;
     state.newsRequestId += 1;
     state.newsFilters = { participantId: null, competitionId: null };
+    state.gameCompetitionId = null;
+    state.gameCompetitionGames = { live: [], upcoming: [], results: [] };
+    state.gameCompetitionLoading = false;
+    state.gameCompetitionRequestId += 1;
     state.catalog = { participants: [], competitions: [] };
     state.catalogKnown = { participants: {}, competitions: {} };
     state.catalogRequestId += 1;
@@ -490,6 +498,34 @@
     });
   }
 
+  function gameCompetitionSelections() {
+    return followedSelections("competition", state.activeSportId).slice().sort(function (a, b) {
+      var aName = competitionDisplayName(a.nome || a.nome_exibicao || a.competicao_nome || "Competição");
+      var bName = competitionDisplayName(b.nome || b.nome_exibicao || b.competicao_nome || "Competição");
+      return aName.localeCompare(bName, "pt-BR");
+    });
+  }
+
+  function resetGameCompetitionFilter() {
+    state.gameCompetitionId = null;
+    state.gameCompetitionGames = { live: [], upcoming: [], results: [] };
+    state.gameCompetitionLoading = false;
+    state.gameCompetitionRequestId += 1;
+  }
+
+  function selectedGameCompetitionId() {
+    var selected = Number(state.gameCompetitionId || 0);
+    if (!selected) return null;
+    var valid = gameCompetitionSelections().some(function (item) {
+      return Number(selectionIdentity(item).id) === selected;
+    });
+    if (!valid) {
+      resetGameCompetitionFilter();
+      return null;
+    }
+    return selected;
+  }
+
   function favoriteParticipantIds(wantedSportId) {
     return followedSelections("participant", wantedSportId).map(function (item) { return Number(selectionIdentity(item).id); }).filter(function (id) { return id > 0; });
   }
@@ -593,8 +629,8 @@
     var period = [item.data_inicio ? "Início " + formatDate(item.data_inicio) : "", item.data_fim ? "Fim " + formatDate(item.data_fim) : ""].filter(Boolean).join(" • ");
     var summary = (item.fase_atual ? "<p class=\"ie-news-description\"><strong>" + escapeHtml(item.fase_atual) + "</strong></p>" : "") + (period ? "<span class=\"ie-source\">" + escapeHtml(period) + "</span>" : "");
     var body = rows.length ? "<div class=\"ie-standings\">" + rows.map(function (row) { return "<div class=\"ie-standing-row\"><span>" + escapeHtml(row.posicao || row.rank || "—") + "</span><strong>" + escapeHtml(row.nome || row.time_nome || row.participante_nome || "") + "</strong><strong>" + escapeHtml(row.pontos == null ? "" : row.pontos) + "</strong></div>"; }).join("") + "</div>" : summary || "<p class=\"ie-news-description\">Calendário em atualização.</p>";
-    var name = competitionDisplayName(item.nome || item.competicao_nome || "Campeonato");
-    return "<article class=\"ie-feed-card\"" + detailAttributes("competition", item.id_competicao || item.id || "", "", name) + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("trophy") + "</span>Campeonato</span></div><h3 class=\"ie-news-title\">" + escapeHtml(name) + "</h3>" + body + "</article>";
+    var name = competitionDisplayName(item.nome || item.competicao_nome || "Competição");
+    return "<article class=\"ie-feed-card\"" + detailAttributes("competition", item.id_competicao || item.id || "", "", name) + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("trophy") + "</span>Competição</span></div><h3 class=\"ie-news-title\">" + escapeHtml(name) + "</h3>" + body + "</article>";
   }
 
   function subcardMatchesSection(subcard, section) {
@@ -626,14 +662,14 @@
     if (!data || data.pais !== "Brasil" || data.modalidade !== "Futebol") return "";
     function total(value) { return numberOf(value, 0).toLocaleString("pt-BR"); }
     var period = formatDatabasePeriod(data);
-    return "<article class=\"ie-feed-card ie-wide ie-base-summary-card\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span>Base própria</span></div><h3 class=\"ie-news-title\">Futebol do Brasil</h3><p class=\"ie-news-description\">Acervo histórico organizado pelo Turbo Tiger" + (period ? " · " + escapeHtml(period) : "") + "</p><div class=\"ie-stat-row\"><span>Partidas<strong>" + escapeHtml(total(data.total_registros)) + "</strong></span><span>Campeonatos<strong>" + escapeHtml(total(data.total_competicoes)) + "</strong></span><span>Times<strong>" + escapeHtml(total(data.total_times)) + "</strong></span></div></article>";
+    return "<article class=\"ie-feed-card ie-wide ie-base-summary-card\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span>Base própria</span></div><h3 class=\"ie-news-title\">Futebol do Brasil</h3><p class=\"ie-news-description\">Acervo histórico organizado pelo Turbo Tiger" + (period ? " · " + escapeHtml(period) : "") + "</p><div class=\"ie-stat-row\"><span>Partidas<strong>" + escapeHtml(total(data.total_registros)) + "</strong></span><span>Competições<strong>" + escapeHtml(total(data.total_competicoes)) + "</strong></span><span>Times<strong>" + escapeHtml(total(data.total_times)) + "</strong></span></div></article>";
   }
 
   function renderHome() {
     var card = state.card || {};
     var filteredSection = String(state.homeSectionFilter || "").toLowerCase();
     if (!activeSport()) {
-      byId("homeContent").innerHTML = emptyState("Escolha seus esportes", "Defina um esporte favorito e acompanhe os times, participantes e campeonatos que realmente interessam a você.", true);
+      byId("homeContent").innerHTML = emptyState("Escolha seus esportes", "Defina um esporte favorito e acompanhe os times, participantes e competições que realmente interessam a você.", true);
       return;
     }
     var html = [];
@@ -653,12 +689,28 @@
       state.games.forYou.filter(function (item) { return matchInvolvesFavoriteTeam(item, state.activeSportId); }).forEach(function (item) { html.push(renderMatchCard(item)); });
       state.favoriteCompetitions.forEach(function (item) { html.push(renderCompetitionCard(item)); });
     }
-    byId("homeContent").innerHTML = html.join("") || emptyState(filteredSection ? "Nenhuma informação disponível" : "Nenhum favorito neste esporte", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Acompanhe times ou campeonatos deste esporte para montar o seu espaço.", false);
+    byId("homeContent").innerHTML = html.join("") || emptyState(filteredSection ? "Nenhuma informação disponível" : "Nenhum favorito neste esporte", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Acompanhe times ou competições deste esporte para montar o seu espaço.", false);
   }
 
   function renderGames() {
-    var rows = state.games[state.gameFilter] || [];
-    byId("gamesContent").innerHTML = rows.length ? rows.map(function (item) { return renderMatchCard(item); }).join("") : emptyState("Nenhum confronto", "Não há confrontos nesta seção para os times e campeonatos acompanhados.", false);
+    var competitions = gameCompetitionSelections();
+    var competitionId = selectedGameCompetitionId();
+    var filter = byId("gamesCompetitionFilter");
+    filter.innerHTML = "<option value=\"\">Todas as favoritas</option>" + competitions.map(function (item) {
+      var identity = selectionIdentity(item);
+      var name = competitionDisplayName(item.nome || item.nome_exibicao || item.competicao_nome || "Competição");
+      return "<option value=\"" + escapeHtml(identity.id) + "\">" + escapeHtml(name) + "</option>";
+    }).join("");
+    filter.value = competitionId ? String(competitionId) : "";
+    filter.disabled = !competitions.length;
+    filter.setAttribute("aria-busy", state.gameCompetitionLoading ? "true" : "false");
+
+    var rows = competitionId ? state.gameCompetitionGames[state.gameFilter] || [] : state.games[state.gameFilter] || [];
+    if (competitionId && state.gameCompetitionLoading && !rows.length) {
+      byId("gamesContent").innerHTML = emptyState("Carregando confrontos", "Buscando os confrontos desta competição.", false);
+      return;
+    }
+    byId("gamesContent").innerHTML = rows.length ? rows.map(function (item) { return renderMatchCard(item); }).join("") : emptyState("Nenhum confronto", "Não há confrontos nesta seção para os times e competições acompanhados.", false);
   }
 
   function renderNews() {
@@ -693,7 +745,7 @@
     if (!teams.some(function (item) { return Number(selectionIdentity(item).id) === Number(state.newsFilters.participantId); })) state.newsFilters.participantId = null;
     if (!competitions.some(function (item) { return Number(selectionIdentity(item).id) === Number(state.newsFilters.competitionId); })) state.newsFilters.competitionId = null;
     byId("newsTeamFilter").innerHTML = "<option value=\"\">Todos</option>" + teams.map(function (item) { return "<option value=\"" + escapeHtml(selectionIdentity(item).id) + "\">" + escapeHtml(item.nome || item.nome_exibicao || "Time") + "</option>"; }).join("");
-    byId("newsCompetitionFilter").innerHTML = "<option value=\"\">Todos</option>" + competitions.map(function (item) { return "<option value=\"" + escapeHtml(selectionIdentity(item).id) + "\">" + escapeHtml(competitionDisplayName(item.nome || item.nome_exibicao || "Campeonato")) + "</option>"; }).join("");
+    byId("newsCompetitionFilter").innerHTML = "<option value=\"\">Todas</option>" + competitions.map(function (item) { return "<option value=\"" + escapeHtml(selectionIdentity(item).id) + "\">" + escapeHtml(competitionDisplayName(item.nome || item.nome_exibicao || "Competição")) + "</option>"; }).join("");
     byId("newsTeamFilter").value = state.newsFilters.participantId ? String(state.newsFilters.participantId) : "";
     byId("newsCompetitionFilter").value = state.newsFilters.competitionId ? String(state.newsFilters.competitionId) : "";
   }
@@ -874,12 +926,12 @@
       return "<article class=\"ie-entity-row" + (busy ? " is-saving" : "") + "\"><div class=\"ie-entity-main\"" + detailAttributes("participant", selectionIdentity(item).id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", abbreviation) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(displayName) + "</strong></div>" + icon("chevron") + "</div><div class=\"ie-entity-actions\"><button class=\"ie-selection-action is-active\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + "\" data-entity-selection-kind=\"follow\" aria-label=\"Remover " + escapeHtml(name) + " dos favoritos\" aria-pressed=\"true\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button><button class=\"ie-selection-action" + (current.notificar ? " is-active" : "") + "\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + "\" data-entity-selection-kind=\"notify\" aria-label=\"" + (current.notificar ? "Desativar" : "Ativar") + " notificações de " + escapeHtml(name) + "\" aria-pressed=\"" + (!!current.notificar) + "\"" + (busy ? " disabled" : "") + ">" + icon("bell") + "</button></div></article>";
     }).join("") : emptyState("Nenhum time acompanhado", "Use as configurações para escolher times ou participantes deste esporte.", true);
     byId("competitionsContent").innerHTML = competitions.length ? competitions.map(function (item) {
-      var name = competitionDisplayName(item.nome || item.competicao_nome || "Campeonato");
+      var name = competitionDisplayName(item.nome || item.competicao_nome || "Competição");
       var id = item.id_competicao || item.id;
       var key = "competition:" + id;
       var busy = !!state.selectionBusy[key];
       return "<article class=\"ie-entity-row" + (busy ? " is-saving" : "") + "\"><div class=\"ie-entity-main\"" + detailAttributes("competition", id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", item.sigla) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(name) + "</strong><span>" + escapeHtml(item.fase_atual || item.temporada || "") + "</span></div>" + icon("chevron") + "</div><div class=\"ie-entity-actions\"><button class=\"ie-selection-action is-active\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + "\" data-entity-selection-kind=\"follow\" aria-label=\"Remover " + escapeHtml(name) + " dos favoritos\" aria-pressed=\"true\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button></div></article>";
-    }).join("") : emptyState("Nenhum campeonato acompanhado", "Use as configurações para escolher seus campeonatos deste esporte.", true);
+    }).join("") : emptyState("Nenhuma competição acompanhada", "Use as configurações para escolher suas competições deste esporte.", true);
   }
 
   function favoriteSport() {
@@ -1008,11 +1060,11 @@
     });
   }
 
-  function sportSectionRequest(name, sport) {
+  function sportSectionRequest(name, sport, competitionId) {
     if (name === "forYou") return rpc("ie_partidas_listar_rpc", { p_secao: "para_voce", p_id_esporte: sport, p_fase: null, p_limite: 30, p_offset: 0 });
-    if (name === "live") return rpc("ie_partidas_listar_rpc", { p_secao: "ao_vivo", p_id_esporte: sport, p_fase: null, p_limite: 30, p_offset: 0 });
-    if (name === "upcoming") return rpc("ie_partidas_listar_rpc", { p_secao: "proximos", p_id_esporte: sport, p_fase: null, p_limite: 30, p_offset: 0 });
-    if (name === "results") return rpc("ie_partidas_listar_rpc", { p_secao: "resultados", p_id_esporte: sport, p_fase: null, p_limite: 30, p_offset: 0 });
+    if (name === "live") return rpc("ie_partidas_listar_rpc", { p_secao: "ao_vivo", p_id_esporte: sport, p_id_competicao: competitionId ? Number(competitionId) : null, p_fase: null, p_limite: 30, p_offset: 0 });
+    if (name === "upcoming") return rpc("ie_partidas_listar_rpc", { p_secao: "proximos", p_id_esporte: sport, p_id_competicao: competitionId ? Number(competitionId) : null, p_fase: null, p_limite: 30, p_offset: 0 });
+    if (name === "results") return rpc("ie_partidas_listar_rpc", { p_secao: "resultados", p_id_esporte: sport, p_id_competicao: competitionId ? Number(competitionId) : null, p_fase: null, p_limite: 30, p_offset: 0 });
     if (name === "competitions") return rpc("ie_competicoes_favoritas_listar_rpc", { p_id_esporte: sport, p_limite: 30, p_offset: 0 });
     return rpc("ie_noticias_listar_rpc", { p_id_esporte: sport, p_id_participante: state.newsFilters.participantId ? Number(state.newsFilters.participantId) : null, p_id_competicao: state.newsFilters.competitionId ? Number(state.newsFilters.competitionId) : null, p_limite: 30, p_offset: 0 });
   }
@@ -1073,8 +1125,50 @@
     return { errors: errors };
   }
 
-  function loadActiveSportData(renderAfter) {
-    return loadActiveSportSections(ALL_SPORT_DATA_SECTIONS, renderAfter, null, true);
+  async function loadGameCompetitionData(renderAfter, generation, strict) {
+    var requestId = ++state.gameCompetitionRequestId;
+    var sport = state.activeSportId ? Number(state.activeSportId) : null;
+    var competitionId = selectedGameCompetitionId();
+    var sections = ["live", "upcoming", "results"];
+    if (!sport || !competitionId) {
+      state.gameCompetitionGames = { live: [], upcoming: [], results: [] };
+      state.gameCompetitionLoading = false;
+      if (renderAfter !== false) renderGames();
+      return { errors: [] };
+    }
+
+    state.gameCompetitionLoading = true;
+    if (renderAfter !== false) renderGames();
+    var results = await Promise.all(sections.map(function (name) {
+      return sportSectionRequest(name, sport, competitionId).then(function (value) {
+        return { name: name, ok: true, value: value };
+      }, function (error) {
+        return { name: name, ok: false, error: error };
+      });
+    }));
+    if (!loadIsCurrent(generation) || requestId !== state.gameCompetitionRequestId || sport !== Number(state.activeSportId) || competitionId !== Number(selectedGameCompetitionId())) {
+      if (requestId === state.gameCompetitionRequestId) {
+        state.gameCompetitionLoading = false;
+        if (renderAfter !== false) renderGames();
+      }
+      return { stale: true, errors: [] };
+    }
+
+    var errors = results.filter(function (result) { return !result.ok; }).map(function (result) { return result.error; });
+    results.forEach(function (result) {
+      if (result.ok) state.gameCompetitionGames[result.name] = arrayOf(result.value);
+    });
+    state.gameCompetitionLoading = false;
+    if (renderAfter !== false) renderGames();
+    if (strict && errors.length) throw errors[0];
+    return { errors: errors };
+  }
+
+  async function loadActiveSportData(renderAfter) {
+    var result = await loadActiveSportSections(ALL_SPORT_DATA_SECTIONS, false, null, true);
+    if (selectedGameCompetitionId()) await loadGameCompetitionData(false, null, true);
+    if (renderAfter !== false) renderAll();
+    return result;
   }
 
   async function changeActiveSport(id) {
@@ -1083,13 +1177,17 @@
     state.activeSportId = next;
     state.newsFilters = { participantId: null, competitionId: null };
     state.newsRequestId += 1;
+    resetGameCompetitionFilter();
+    clearSportSections(["live", "upcoming", "results"]);
     state.homeSectionFilter = "";
     renderSportsNav();
+    renderGames();
     try {
       await loadActiveSportData(true);
       saveCache();
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
+      renderGames();
       showToast(friendlyError(error), true);
     }
   }
@@ -1305,6 +1403,7 @@
     rememberCatalogItems("participant", state.favorites);
     state.favoriteOrder = state.favorites.map(function (item) { return Number(item.id_participante); }).filter(function (id) { return id > 0; });
     await loadActiveSportSections(ALL_SPORT_DATA_SECTIONS, false, generation, true);
+    if (selectedGameCompetitionId()) await loadGameCompetitionData(false, generation, true);
     if (!loadIsCurrent(generation)) return;
     showApp(true);
     renderAll();
@@ -1377,7 +1476,7 @@
   function settingsContextDefinition(context) {
     var definitions = {
       partidas: { label: "Partidas", target: "settingsParticipants" },
-      campeonatos: { label: "Campeonatos", target: "settingsCompetitions" },
+      campeonatos: { label: "Competição", target: "settingsCompetitions" },
       noticias: { label: "Notícias", target: "settingsParticipants" },
       cotacoes: { label: "Cotações", target: "settingsParticipants" },
       analises: { label: "Análises", target: "settingsFavoriteSport" }
@@ -1403,7 +1502,8 @@
   }
 
   function chooseAvailableGameFilter() {
-    var filter = state.games.live.length ? "live" : state.games.upcoming.length ? "upcoming" : state.games.results.length ? "results" : "live";
+    var source = selectedGameCompetitionId() ? state.gameCompetitionGames : state.games;
+    var filter = source.live.length ? "live" : source.upcoming.length ? "upcoming" : source.results.length ? "results" : "live";
     state.gameFilter = filter;
     all("[data-game-filter]").forEach(function (button) { button.classList.toggle("is-active", button.getAttribute("data-game-filter") === filter); });
     renderGames();
@@ -1434,7 +1534,7 @@
     if (requested.eventId > 0 && requested.section === "analises") await openAnalysisDetail(requested.eventId, "Análises estatísticas");
     else if (requested.eventId > 0 && requested.section === "cotacoes") await openOddsDetail(requested.eventId, "Cotações informativas");
     else if (requested.eventId > 0) await openEventDetail(requested.eventId, "Detalhes da partida");
-    else if (requested.competitionId > 0) await openCompetitionDetail(requested.competitionId, "Detalhes do campeonato");
+    else if (requested.competitionId > 0) await openCompetitionDetail(requested.competitionId, "Detalhes da competição");
   }
 
   function closeDetail() {
@@ -1570,7 +1670,7 @@
     if (!data || data.pais !== "Brasil" || data.modalidade !== "Futebol") return "";
     function total(value) { return numberOf(value, 0).toLocaleString("pt-BR"); }
     var period = formatDatabasePeriod(data);
-    return "<section class=\"ie-database-summary\"><div><span>Base própria</span><strong>Futebol do Brasil</strong><small>Acervo histórico organizado pelo Turbo Tiger" + (period ? " · " + escapeHtml(period) : "") + "</small></div><dl><div><dt>Partidas</dt><dd>" + escapeHtml(total(data.total_registros)) + "</dd></div><div><dt>Campeonatos</dt><dd>" + escapeHtml(total(data.total_competicoes)) + "</dd></div><div><dt>Times</dt><dd>" + escapeHtml(total(data.total_times)) + "</dd></div></dl></section>";
+    return "<section class=\"ie-database-summary\"><div><span>Base própria</span><strong>Futebol do Brasil</strong><small>Acervo histórico organizado pelo Turbo Tiger" + (period ? " · " + escapeHtml(period) : "") + "</small></div><dl><div><dt>Partidas</dt><dd>" + escapeHtml(total(data.total_registros)) + "</dd></div><div><dt>Competições</dt><dd>" + escapeHtml(total(data.total_competicoes)) + "</dd></div><div><dt>Times</dt><dd>" + escapeHtml(total(data.total_times)) + "</dd></div></dl></section>";
   }
 
   async function openEventDetail(id, title, pushCurrent) {
@@ -1623,7 +1723,7 @@
 
   function openGenericDetail(kind, id, title, pushCurrent) {
     beginDetail(title || "Detalhes", "", !!pushCurrent);
-    byId("detailSubtitle").textContent = kind === "competition" ? "Campeonato acompanhado" : kind === "analysis" ? "Resumo estatístico personalizado" : kind === "odds" ? "Cotações informativas" : "Time ou participante acompanhado";
+    byId("detailSubtitle").textContent = kind === "competition" ? "Competição acompanhada" : kind === "analysis" ? "Resumo estatístico personalizado" : kind === "odds" ? "Cotações informativas" : "Time ou participante acompanhado";
     byId("detailContent").innerHTML = emptyState("Informações completas na central", kind === "analysis" ? "As análises usam somente os dados disponíveis para as suas seleções e não representam recomendação nem garantia de resultado." : kind === "odds" ? "Ainda não há cotações atualizadas para esta partida." : "As próximas partidas, resultados e dados relacionados ficam disponíveis nas áreas correspondentes.", false);
   }
 
@@ -1644,13 +1744,13 @@
   }
 
   async function openCompetitionDetail(id, title, pushCurrent) {
-    beginDetail(title || "Detalhes do campeonato", "Carregando informações...", !!pushCurrent);
+    beginDetail(title || "Detalhes da competição", "Carregando informações...", !!pushCurrent);
     try {
       var data = await rpc("ie_competicao_detalhe_rpc", { p_id_competicao: Number(id) });
       var competition = data && data.competicao || {};
       var teams = arrayOf(data && data.times_classificados);
-      byId("detailTitle").textContent = competitionDisplayName(competition.nome || title || "Campeonato");
-      byId("detailSubtitle").textContent = displayText([competition.temporada, competition.pais].filter(Boolean).join(" • ") || "Detalhes do campeonato");
+      byId("detailTitle").textContent = competitionDisplayName(competition.nome || title || "Competição");
+      byId("detailSubtitle").textContent = displayText([competition.temporada, competition.pais].filter(Boolean).join(" • ") || "Detalhes da competição");
       var overview = "<div class=\"ie-detail-list\">" + [
         ["Fase atual", competition.fase_atual || "Em atualização"],
         ["Início", competition.data_inicio ? formatDate(competition.data_inicio) : "Em atualização"],
@@ -1662,27 +1762,27 @@
         var label = (abbreviation ? abbreviation + " - " : "") + teamName + (team.pontos == null ? "" : " (" + team.pontos + ")");
         return "<article class=\"ie-classified-row\"" + detailAttributes("competition-participant", team.id_participante || team.id, "", teamName) + " data-participant-id=\"" + escapeHtml(team.id_participante || team.id || "") + "\" data-competition-id=\"" + escapeHtml(competition.id_competicao || id) + "\" data-phase=\"" + escapeHtml(competition.fase_atual || "") + "\"><span class=\"ie-classified-position\">" + escapeHtml(team.posicao ? team.posicao + "º" : team.grupo || "—") + "</span>" + logoHtml(team.imagem_url || team.logo_url, teamName, "ie-entity-logo", abbreviation) + "<strong>" + escapeHtml(label) + "</strong>" + icon("chevron") + "</article>";
       }).join("") + "</div>" : "<p>Os classificados ainda não foram disponibilizados pela fonte.</p>";
-      byId("detailContent").innerHTML = detailSection("Informações do campeonato", overview) + detailSection("Times classificados na fase", teamHtml);
+      byId("detailContent").innerHTML = detailSection("Informações da competição", overview) + detailSection("Times classificados na fase", teamHtml);
     } catch (error) {
       byId("detailContent").innerHTML = emptyState("Detalhes indisponíveis", friendlyError(error), false);
     }
   }
 
   async function openParticipantDetail(id, title, pushCurrent) {
-    beginDetail(title || "Time ou participante", "Carregando campeonatos...", !!pushCurrent);
+    beginDetail(title || "Time ou participante", "Carregando competições...", !!pushCurrent);
     try {
       var data = await rpc("ie_participante_competicoes_rpc", { p_id_participante: Number(id), p_id_esporte: state.activeSportId ? Number(state.activeSportId) : null, p_limite: 50, p_offset: 0 });
       var participant = data && data.participante || followedSelections("participant", state.activeSportId).find(function (item) { return Number(selectionIdentity(item).id) === Number(id); }) || {};
       var competitions = arrayOf(data);
       byId("detailTitle").textContent = displayText(participant.nome || title || "Time ou participante");
-      byId("detailSubtitle").textContent = "Campeonatos em que participa";
+      byId("detailSubtitle").textContent = "Competições em que participa";
       byId("detailContent").innerHTML = competitions.length ? "<div class=\"ie-detail-entities\">" + competitions.map(function (competition) {
         var competitionId = competition.id_competicao || competition.id;
-        var name = competitionDisplayName(competition.nome || competition.competicao_nome || "Campeonato");
+        var name = competitionDisplayName(competition.nome || competition.competicao_nome || "Competição");
         return "<article class=\"ie-entity-row\"" + detailAttributes("participant-competition", competitionId, "", name) + " data-participant-id=\"" + escapeHtml(id) + "\" data-competition-id=\"" + escapeHtml(competitionId) + "\" data-phase=\"" + escapeHtml(competition.fase_atual || "") + "\">" + logoHtml(competition.imagem_url || competition.logo_url, name, "ie-entity-logo", competition.sigla) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(name) + "</strong><span>" + escapeHtml(competition.fase_atual || competition.temporada || "") + "</span></div>" + icon("chevron") + "</article>";
-      }).join("") + "</div>" : emptyState("Nenhum campeonato disponível", "Ainda não há campeonatos relacionados a este participante.", false);
+      }).join("") + "</div>" : emptyState("Nenhuma competição disponível", "Ainda não há competições relacionadas a este participante.", false);
     } catch (error) {
-      byId("detailContent").innerHTML = emptyState("Campeonatos indisponíveis", friendlyError(error), false);
+      byId("detailContent").innerHTML = emptyState("Competições indisponíveis", friendlyError(error), false);
     }
   }
 
@@ -1733,6 +1833,7 @@
       await Promise.all(changes);
       state.selectionChanges = {};
       state.activeSportId = state.sportFavoriteOrder[0] || null;
+      resetGameCompetitionFilter();
       showToast("Configurações salvas.", false);
       await loadAll(false);
       activateTab(state.previousTab || "home");
@@ -1801,6 +1902,8 @@
         p_notificar: targetType === "participant" && next.notificar
       });
       updateBootstrapSelection(key, next);
+      if (targetType === "competition" && !next.acompanhar && Number(state.gameCompetitionId) === targetId) resetGameCompetitionFilter();
+      if (targetType === "competition") renderGames();
       delete state.selectionChanges[key];
       if (targetType === "participant" && !next.acompanhar) {
         state.favorites = state.favorites.filter(function (item) {
@@ -1887,6 +1990,13 @@
     all("[data-close-settings]").forEach(function (button) { button.addEventListener("click", window.TurboTigerIEHandleBack); });
     all("[data-tab]").forEach(function (button) { button.addEventListener("click", function () { activateTab(button.getAttribute("data-tab")); }); });
     all("[data-game-filter]").forEach(function (button) { button.addEventListener("click", function () { state.gameFilter = button.getAttribute("data-game-filter"); all("[data-game-filter]").forEach(function (item) { item.classList.toggle("is-active", item === button); }); renderGames(); }); });
+    byId("gamesCompetitionFilter").addEventListener("change", function () {
+      state.gameCompetitionId = byId("gamesCompetitionFilter").value ? Number(byId("gamesCompetitionFilter").value) : null;
+      state.gameCompetitionGames = { live: [], upcoming: [], results: [] };
+      loadGameCompetitionData(true, null, false).then(function (result) {
+        if (result && result.errors && result.errors.length) showToast(friendlyError(result.errors[0]), true);
+      }, function (error) { showToast(friendlyError(error), true); });
+    });
     all("[data-close-detail]").forEach(function (button) { button.addEventListener("click", closeDetail); });
     byId("detailBackButton").addEventListener("click", backDetail);
     byId("settingsForm").addEventListener("submit", saveSettings);
