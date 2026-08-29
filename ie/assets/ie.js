@@ -755,7 +755,11 @@
       var notify = targetType === "participant" && !!current.notificar;
       var name = targetType === "competition" ? competitionDisplayName(item.nome || item.nome_exibicao || "") : (item.nome || item.nome_exibicao || "");
       var busy = !!state.selectionBusy[key];
-      return "<div class=\"ie-selection-row" + (busy ? " is-saving" : "") + "\">" + logoHtml(item.imagem_url || item.logo_url || item.logo, name, "ie-entity-logo") + "<strong>" + escapeHtml(name) + "</strong><div class=\"ie-selection-actions\"><button class=\"ie-selection-action" + (follow ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"follow\" aria-label=\"Acompanhar\" aria-pressed=\"" + follow + "\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button>" + (targetType === "participant" ? "<button class=\"ie-selection-action" + (notify ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"notify\" aria-label=\"Notificar\" aria-pressed=\"" + notify + "\"" + (busy ? " disabled" : "") + ">" + icon("bell") + "</button>" : "") + "</div></div>";
+      var canReorder = targetType === "participant" && follow;
+      var reorderControl = canReorder
+        ? "<button class=\"ie-drag-handle\" type=\"button\" data-favorite-drag-id=\"" + escapeHtml(id) + "\" aria-label=\"Arrastar para ordenar " + escapeHtml(name) + "\"><span aria-hidden=\"true\"></span></button>"
+        : "<span class=\"ie-drag-placeholder\" aria-hidden=\"true\"></span>";
+      return "<div class=\"ie-selection-row" + (busy ? " is-saving" : "") + "\"" + (canReorder ? " data-favorite-row-id=\"" + escapeHtml(id) + "\"" : "") + ">" + reorderControl + logoHtml(item.imagem_url || item.logo_url || item.logo, name, "ie-entity-logo") + "<strong>" + escapeHtml(name) + "</strong><div class=\"ie-selection-actions\"><button class=\"ie-selection-action" + (follow ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"follow\" aria-label=\"Acompanhar\" aria-pressed=\"" + follow + "\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button>" + (targetType === "participant" ? "<button class=\"ie-selection-action" + (notify ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"notify\" aria-label=\"Notificar\" aria-pressed=\"" + notify + "\"" + (busy ? " disabled" : "") + ">" + icon("bell") + "</button>" : "") + "</div></div>";
     }).join("");
   }
 
@@ -843,14 +847,6 @@
     return items;
   }
 
-  function renderFavoriteOrder() {
-    var items = orderedFavoriteParticipants();
-    byId("favoriteOrderList").innerHTML = items.length ? items.map(function (item, index) {
-      var id = Number(item.id_participante);
-      return "<div class=\"ie-favorite-order-row\"><span class=\"ie-favorite-position\">" + (index + 1) + "</span>" + logoHtml(item.imagem_url || item.logo_url || item.logo, item.nome, "ie-entity-logo") + "<strong>" + escapeHtml(item.nome || item.nome_exibicao || "Time") + "</strong><div class=\"ie-favorite-order-actions\"><button type=\"button\" data-favorite-id=\"" + id + "\" data-favorite-direction=\"up\" aria-label=\"Subir " + escapeHtml(item.nome || "time") + "\"" + (index === 0 ? " disabled" : "") + ">↑</button><button type=\"button\" data-favorite-id=\"" + id + "\" data-favorite-direction=\"down\" aria-label=\"Descer " + escapeHtml(item.nome || "time") + "\"" + (index === items.length - 1 ? " disabled" : "") + ">↓</button></div></div>";
-    }).join("") : emptyState("Nenhum time favorito", "Marque a estrela dos times que deseja acompanhar.", false);
-  }
-
   function renderSelectionLists() {
     byId("teamSelectionList").innerHTML = selectionRows("participant") || emptyState("Nenhum resultado", "Ajuste os filtros ou a busca.", false);
     byId("competitionSelectionList").innerHTML = selectionRows("competition") || emptyState("Nenhum resultado", "Ajuste os filtros ou a busca.", false);
@@ -859,7 +855,6 @@
     var competitionCount = Object.keys(merged).filter(function (key) { return key.indexOf("competition:") === 0 && merged[key].acompanhar; }).length;
     byId("teamSelectionCount").textContent = teamCount + " selecionado" + (teamCount === 1 ? "" : "s");
     byId("competitionSelectionCount").textContent = competitionCount + " selecionado" + (competitionCount === 1 ? "" : "s");
-    renderFavoriteOrder();
   }
 
   function renderEntities() {
@@ -1686,6 +1681,69 @@
     }, { passive: true });
     document.addEventListener("touchcancel", function () { detailGesture = null; }, { passive: true });
 
+    var favoriteDrag = null;
+
+    function mergeVisibleFavoriteOrder(visibleOrder) {
+      var visible = {};
+      visibleOrder.forEach(function (id) { visible[String(id)] = true; });
+      var cursor = 0;
+      var merged = state.favoriteOrder.map(function (id) {
+        return visible[String(id)] ? visibleOrder[cursor++] : Number(id);
+      });
+      visibleOrder.forEach(function (id) {
+        if (merged.indexOf(Number(id)) < 0) merged.push(Number(id));
+      });
+      state.favoriteOrder = merged;
+    }
+
+    function finishFavoriteDrag(event) {
+      if (!favoriteDrag || (event && event.pointerId !== favoriteDrag.pointerId)) return;
+      var list = byId("teamSelectionList");
+      var visibleOrder = all("[data-favorite-row-id]", list).map(function (row) {
+        return Number(row.getAttribute("data-favorite-row-id"));
+      }).filter(function (id) { return id > 0; });
+      mergeVisibleFavoriteOrder(visibleOrder);
+      favoriteDrag.row.classList.remove("is-dragging");
+      document.body.classList.remove("ie-reordering-favorites");
+      favoriteDrag = null;
+      renderSelectionLists();
+    }
+
+    document.addEventListener("pointerdown", function (event) {
+      var handle = event.target.closest("[data-favorite-drag-id]");
+      if (!handle || event.button !== 0) return;
+      var row = handle.closest("[data-favorite-row-id]");
+      if (!row) return;
+      event.preventDefault();
+      detailGesture = null;
+      favoriteDrag = { pointerId: event.pointerId, row: row };
+      row.classList.add("is-dragging");
+      document.body.classList.add("ie-reordering-favorites");
+      if (handle.setPointerCapture) {
+        try { handle.setPointerCapture(event.pointerId); } catch (error) {}
+      }
+    }, { passive: false });
+
+    document.addEventListener("pointermove", function (event) {
+      if (!favoriteDrag || event.pointerId !== favoriteDrag.pointerId) return;
+      event.preventDefault();
+      var list = byId("teamSelectionList");
+      var listBounds = list.getBoundingClientRect();
+      if (event.clientY < listBounds.top + 42) list.scrollTop -= 14;
+      else if (event.clientY > listBounds.bottom - 42) list.scrollTop += 14;
+      var pointed = document.elementFromPoint(event.clientX, event.clientY);
+      var target = pointed && pointed.closest("[data-favorite-row-id]");
+      if (!target || target === favoriteDrag.row || target.parentNode !== favoriteDrag.row.parentNode) return;
+      var bounds = target.getBoundingClientRect();
+      target.parentNode.insertBefore(
+        favoriteDrag.row,
+        event.clientY < bounds.top + bounds.height / 2 ? target : target.nextSibling
+      );
+    }, { passive: false });
+
+    document.addEventListener("pointerup", finishFavoriteDrag, { passive: true });
+    document.addEventListener("pointercancel", finishFavoriteDrag, { passive: true });
+
     function openDetailElement(detail, pushCurrent) {
       var kind = detail.getAttribute("data-detail-kind");
       if (kind === "news") openNewsSource(detail.getAttribute("data-detail-url"), detail.getAttribute("data-detail-title"));
@@ -1754,20 +1812,6 @@
         renderSportFavoriteSettings();
         return;
       }
-      var favoriteMove = event.target.closest("[data-favorite-id]");
-      if (favoriteMove) {
-        var favoriteId = Number(favoriteMove.getAttribute("data-favorite-id"));
-        var favoriteIndex = state.favoriteOrder.indexOf(favoriteId);
-        var direction = favoriteMove.getAttribute("data-favorite-direction") === "up" ? -1 : 1;
-        var targetIndex = favoriteIndex + direction;
-        if (favoriteIndex >= 0 && targetIndex >= 0 && targetIndex < state.favoriteOrder.length) {
-          var swapped = state.favoriteOrder[targetIndex];
-          state.favoriteOrder[targetIndex] = favoriteId;
-          state.favoriteOrder[favoriteIndex] = swapped;
-          renderFavoriteOrder();
-        }
-        return;
-      }
       var selection = event.target.closest("[data-selection-key]");
       if (selection) {
         var key = selection.getAttribute("data-selection-key");
@@ -1777,10 +1821,31 @@
         if (kind === "follow") next.acompanhar = !next.acompanhar;
         if (kind === "notify") next.notificar = !next.notificar;
         state.selectionChanges[key] = next;
+        if (key.indexOf("participant:") === 0 && kind === "follow") {
+          var selectedParticipantId = Number(key.split(":")[1]);
+          if (next.acompanhar && state.favoriteOrder.indexOf(selectedParticipantId) < 0) state.favoriteOrder.push(selectedParticipantId);
+          if (!next.acompanhar) state.favoriteOrder = state.favoriteOrder.filter(function (id) { return Number(id) !== selectedParticipantId; });
+        }
         renderSelectionLists();
       }
     });
     document.addEventListener("keydown", function (event) {
+      var dragHandle = event.target.closest("[data-favorite-drag-id]");
+      if (dragHandle && (event.key === "ArrowUp" || event.key === "ArrowDown")) {
+        event.preventDefault();
+        var favoriteId = Number(dragHandle.getAttribute("data-favorite-drag-id"));
+        var favoriteIndex = state.favoriteOrder.indexOf(favoriteId);
+        var targetIndex = favoriteIndex + (event.key === "ArrowUp" ? -1 : 1);
+        if (favoriteIndex >= 0 && targetIndex >= 0 && targetIndex < state.favoriteOrder.length) {
+          var swapped = state.favoriteOrder[targetIndex];
+          state.favoriteOrder[targetIndex] = favoriteId;
+          state.favoriteOrder[favoriteIndex] = swapped;
+          renderSelectionLists();
+          var movedHandle = document.querySelector("[data-favorite-drag-id=\"" + favoriteId + "\"]");
+          if (movedHandle) movedHandle.focus();
+        }
+        return;
+      }
       if (event.key !== "Enter" && event.key !== " ") return;
       if (event.target.closest("[data-match-action], [data-entity-selection-key]")) return;
       var detail = event.target.closest("[data-detail-kind]");

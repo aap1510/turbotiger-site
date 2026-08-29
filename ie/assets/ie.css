@@ -1081,9 +1081,9 @@ button {
 .ie-selection-row {
   min-height: 58px;
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) auto;
+  grid-template-columns: 26px 34px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   border-bottom: 1px solid var(--ie-border);
 }
 
@@ -1143,6 +1143,78 @@ button {
   opacity: .55;
 }
 
+.ie-drag-placeholder {
+  width: 26px;
+  height: 38px;
+}
+
+.ie-drag-handle {
+  width: 26px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ie-muted);
+  cursor: grab;
+  touch-action: none;
+}
+
+.ie-drag-handle:active {
+  cursor: grabbing;
+}
+
+.ie-drag-handle span,
+.ie-drag-handle span::before,
+.ie-drag-handle span::after {
+  width: 19px;
+  height: 2px;
+  display: block;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.ie-drag-handle span {
+  position: relative;
+}
+
+.ie-drag-handle span::before,
+.ie-drag-handle span::after {
+  position: absolute;
+  left: 0;
+  content: "";
+}
+
+.ie-drag-handle span::before {
+  top: -6px;
+}
+
+.ie-drag-handle span::after {
+  top: 6px;
+}
+
+.ie-drag-handle:focus-visible {
+  border-radius: 7px;
+  outline: 2px solid var(--ie-gold);
+  outline-offset: 1px;
+  color: var(--ie-gold);
+}
+
+.ie-selection-row.is-dragging {
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(244, 191, 67, .55);
+  border-radius: 10px;
+  background: var(--ie-surface-raised);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .35);
+  opacity: .92;
+}
+
+body.ie-reordering-favorites {
+  user-select: none;
+}
+
 .ie-field-help {
   margin: -2px 0 10px;
   color: var(--ie-muted);
@@ -1150,61 +1222,11 @@ button {
   line-height: 1.55;
 }
 
-.ie-favorite-order-list {
-  display: grid;
-}
-
-.ie-favorite-order-row {
-  min-height: 58px;
-  display: grid;
-  grid-template-columns: 22px 34px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 9px;
-  border-bottom: 1px solid var(--ie-border);
-}
-
-.ie-favorite-order-row:last-child {
-  border-bottom: 0;
-}
-
 .ie-favorite-position {
   color: var(--ie-gold);
   font-size: 12px;
   font-weight: 700;
   text-align: center;
-}
-
-.ie-favorite-order-row .ie-entity-logo {
-  width: 32px;
-  height: 32px;
-}
-
-.ie-favorite-order-row strong {
-  min-width: 0;
-  overflow: hidden;
-  font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ie-favorite-order-actions {
-  display: inline-flex;
-  gap: 3px;
-}
-
-.ie-favorite-order-actions button {
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border: 1px solid var(--ie-border);
-  border-radius: 50%;
-  background: transparent;
-  color: var(--ie-text);
-  font-size: 17px;
-}
-
-.ie-favorite-order-actions button:disabled {
-  opacity: .24;
 }
 
 .ie-sport-favorite-list {
