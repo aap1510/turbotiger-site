@@ -43,6 +43,7 @@
     catalogKnown: { participants: {}, competitions: {} },
     catalogRequestId: 0,
     selectionChanges: {},
+    selectionBusy: {},
     favorites: [],
     favoriteOrder: [],
     detailStack: [],
@@ -330,6 +331,7 @@
     state.catalogKnown = { participants: {}, competitions: {} };
     state.catalogRequestId += 1;
     state.selectionChanges = {};
+    state.selectionBusy = {};
     state.favorites = [];
     state.favoriteOrder = [];
     state.detailStack = [];
@@ -694,8 +696,57 @@
   }
 
   function selectionRows(targetType) {
-    var source = targetType === "participant" ? state.catalog.participants : state.catalog.competitions;
+    var source = (targetType === "participant" ? state.catalog.participants : state.catalog.competitions).slice();
     var selected = selectionMap();
+    var search = targetType === "participant" ? byId("teamSearch").value.trim() : byId("competitionSearch").value.trim();
+    if (!search) {
+      arrayOf(state.bootstrap && state.bootstrap.selecoes).forEach(function (item) {
+        var identity = selectionIdentity(item);
+        if (identity.type !== targetType) return;
+        var wantedSport = byId("sportSelect").value;
+        var wantedContinent = byId("continentSelect").value;
+        var wantedCountry = byId("countrySelect").value;
+        var itemSport = item.id_esporte || item.esporte_id || item.cod_esporte;
+        var itemContinent = item.id_continente || item.continente_id || item.cod_continente;
+        var itemCountry = item.id_pais || item.pais_id || item.cod_pais;
+        if (wantedSport && String(itemSport || "") !== String(wantedSport)) return;
+        if (wantedContinent && String(itemContinent || "") !== String(wantedContinent)) return;
+        if (wantedCountry && String(itemCountry || "") !== String(wantedCountry)) return;
+        source.push(item);
+      });
+    }
+    var unique = {};
+    source.forEach(function (item) {
+      var id = targetType === "participant"
+        ? (item.id_participante || item.id_time || item.id_alvo || item.id)
+        : (item.id_competicao || item.id_alvo || item.id);
+      if (id) unique[String(id)] = Object.assign({}, unique[String(id)] || {}, item);
+    });
+    source = Object.keys(unique).map(function (id) { return unique[id]; });
+    source.sort(function (a, b) {
+      function stateFor(item) {
+        var id = targetType === "participant"
+          ? (item.id_participante || item.id_time || item.id_alvo || item.id)
+          : (item.id_competicao || item.id_alvo || item.id);
+        var key = targetType + ":" + id;
+        return state.selectionChanges[key] || selected[key] || item;
+      }
+      var aSelected = !!stateFor(a).acompanhar;
+      var bSelected = !!stateFor(b).acompanhar;
+      if (aSelected !== bSelected) return aSelected ? -1 : 1;
+      if (targetType === "participant" && aSelected) {
+        var aId = Number(a.id_participante || a.id_time || a.id_alvo || a.id);
+        var bId = Number(b.id_participante || b.id_time || b.id_alvo || b.id);
+        var aOrder = state.favoriteOrder.indexOf(aId);
+        var bOrder = state.favoriteOrder.indexOf(bId);
+        if (aOrder >= 0 || bOrder >= 0) {
+          if (aOrder < 0) aOrder = Number.MAX_SAFE_INTEGER;
+          if (bOrder < 0) bOrder = Number.MAX_SAFE_INTEGER;
+          if (aOrder !== bOrder) return aOrder - bOrder;
+        }
+      }
+      return displayText(a.nome || a.nome_exibicao || "").localeCompare(displayText(b.nome || b.nome_exibicao || ""), "pt-BR");
+    });
     return source.map(function (item) {
       var id = item.id_participante || item.id_time || item.id_competicao || item.id;
       var key = targetType + ":" + id;
@@ -703,7 +754,8 @@
       var follow = !!current.acompanhar;
       var notify = targetType === "participant" && !!current.notificar;
       var name = targetType === "competition" ? competitionDisplayName(item.nome || item.nome_exibicao || "") : (item.nome || item.nome_exibicao || "");
-      return "<div class=\"ie-selection-row\">" + logoHtml(item.imagem_url || item.logo_url || item.logo, name, "ie-entity-logo") + "<strong>" + escapeHtml(name) + "</strong><div class=\"ie-selection-actions\"><button class=\"ie-selection-action" + (follow ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"follow\" aria-label=\"Acompanhar\" aria-pressed=\"" + follow + "\">" + icon("star") + "</button>" + (targetType === "participant" ? "<button class=\"ie-selection-action" + (notify ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"notify\" aria-label=\"Notificar\" aria-pressed=\"" + notify + "\">" + icon("bell") + "</button>" : "") + "</div></div>";
+      var busy = !!state.selectionBusy[key];
+      return "<div class=\"ie-selection-row" + (busy ? " is-saving" : "") + "\">" + logoHtml(item.imagem_url || item.logo_url || item.logo, name, "ie-entity-logo") + "<strong>" + escapeHtml(name) + "</strong><div class=\"ie-selection-actions\"><button class=\"ie-selection-action" + (follow ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"follow\" aria-label=\"Acompanhar\" aria-pressed=\"" + follow + "\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button>" + (targetType === "participant" ? "<button class=\"ie-selection-action" + (notify ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"notify\" aria-label=\"Notificar\" aria-pressed=\"" + notify + "\"" + (busy ? " disabled" : "") + ">" + icon("bell") + "</button>" : "") + "</div></div>";
     }).join("");
   }
 
@@ -813,15 +865,22 @@
   function renderEntities() {
     var participants = followedSelections("participant", state.activeSportId);
     var competitions = state.favoriteCompetitions;
+    var selected = selectionMap();
     byId("teamsContent").innerHTML = participants.length ? participants.map(function (item) {
       var name = item.nome || item.nome_exibicao || "Time ou participante";
       var abbreviation = String(item.sigla || item.abreviacao || "").trim().toUpperCase();
       var displayName = abbreviation ? abbreviation + " - " + name : name;
-      return "<article class=\"ie-entity-row\"" + detailAttributes("participant", selectionIdentity(item).id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", abbreviation) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(displayName) + "</strong></div>" + icon("chevron") + "</article>";
+      var key = "participant:" + selectionIdentity(item).id;
+      var current = state.selectionChanges[key] || selected[key] || item;
+      var busy = !!state.selectionBusy[key];
+      return "<article class=\"ie-entity-row" + (busy ? " is-saving" : "") + "\"><div class=\"ie-entity-main\"" + detailAttributes("participant", selectionIdentity(item).id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", abbreviation) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(displayName) + "</strong></div>" + icon("chevron") + "</div><div class=\"ie-entity-actions\"><button class=\"ie-selection-action is-active\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + "\" data-entity-selection-kind=\"follow\" aria-label=\"Remover " + escapeHtml(name) + " dos favoritos\" aria-pressed=\"true\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button><button class=\"ie-selection-action" + (current.notificar ? " is-active" : "") + "\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + "\" data-entity-selection-kind=\"notify\" aria-label=\"" + (current.notificar ? "Desativar" : "Ativar") + " notificações de " + escapeHtml(name) + "\" aria-pressed=\"" + (!!current.notificar) + "\"" + (busy ? " disabled" : "") + ">" + icon("bell") + "</button></div></article>";
     }).join("") : emptyState("Nenhum time acompanhado", "Use as configurações para escolher times ou participantes deste esporte.", true);
     byId("competitionsContent").innerHTML = competitions.length ? competitions.map(function (item) {
       var name = competitionDisplayName(item.nome || item.competicao_nome || "Campeonato");
-      return "<article class=\"ie-entity-row\"" + detailAttributes("competition", item.id_competicao || item.id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", item.sigla) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(name) + "</strong><span>" + escapeHtml(item.fase_atual || item.temporada || "") + "</span></div>" + icon("chevron") + "</article>";
+      var id = item.id_competicao || item.id;
+      var key = "competition:" + id;
+      var busy = !!state.selectionBusy[key];
+      return "<article class=\"ie-entity-row" + (busy ? " is-saving" : "") + "\"><div class=\"ie-entity-main\"" + detailAttributes("competition", id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", item.sigla) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(name) + "</strong><span>" + escapeHtml(item.fase_atual || item.temporada || "") + "</span></div>" + icon("chevron") + "</div><div class=\"ie-entity-actions\"><button class=\"ie-selection-action is-active\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + "\" data-entity-selection-kind=\"follow\" aria-label=\"Remover " + escapeHtml(name) + " dos favoritos\" aria-pressed=\"true\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button></div></article>";
     }).join("") : emptyState("Nenhum campeonato acompanhado", "Use as configurações para escolher seus campeonatos deste esporte.", true);
   }
 
@@ -1429,6 +1488,89 @@
     }
   }
 
+  function updateBootstrapSelection(key, next) {
+    var parts = String(key || "").split(":");
+    var targetType = parts[0];
+    var targetId = Number(parts[1]);
+    var selections = arrayOf(state.bootstrap && state.bootstrap.selecoes).slice();
+    var index = selections.findIndex(function (item) {
+      var identity = selectionIdentity(item);
+      return identity.type === targetType && Number(identity.id) === targetId;
+    });
+    if (index >= 0) {
+      selections[index] = Object.assign({}, selections[index], next);
+    } else {
+      var known = targetType === "participant"
+        ? state.catalogKnown.participants[String(targetId)]
+        : state.catalogKnown.competitions[String(targetId)];
+      selections.push(Object.assign({}, known || {}, next, targetType === "participant"
+        ? { tipo_alvo: "participante", id_participante: targetId }
+        : { tipo_alvo: "competicao", id_competicao: targetId }));
+    }
+    state.bootstrap.selecoes = selections;
+  }
+
+  async function persistEntitySelection(key, kind) {
+    if (!key || state.selectionBusy[key]) return;
+    var parts = key.split(":");
+    var targetType = parts[0];
+    var targetId = Number(parts[1]);
+    if ((targetType !== "participant" && targetType !== "competition") || !targetId) return;
+
+    var selected = selectionMap();
+    var base = state.selectionChanges[key] || selected[key] || { acompanhar: false, notificar: false };
+    var next = {
+      acompanhar: !!base.acompanhar,
+      notificar: targetType === "participant" && !!base.notificar
+    };
+    if (kind === "follow") next.acompanhar = !next.acompanhar;
+    else if (kind === "notify" && targetType === "participant") next.notificar = !next.notificar;
+    else return;
+
+    var previousPending = Object.prototype.hasOwnProperty.call(state.selectionChanges, key)
+      ? Object.assign({}, state.selectionChanges[key])
+      : null;
+    state.selectionChanges[key] = next;
+    state.selectionBusy[key] = true;
+    renderEntities();
+    renderSelectionLists();
+
+    try {
+      await rpc("ie_selecao_salvar_rpc", {
+        p_tipo_alvo: targetType === "participant" ? "participante" : "competicao",
+        p_id_alvo: targetId,
+        p_acompanhar: next.acompanhar,
+        p_notificar: targetType === "participant" && next.notificar
+      });
+      updateBootstrapSelection(key, next);
+      delete state.selectionChanges[key];
+      if (targetType === "participant" && !next.acompanhar) {
+        state.favorites = state.favorites.filter(function (item) {
+          return Number(item.id_participante || item.id_time || item.id_alvo || item.id) !== targetId;
+        });
+        state.favoriteOrder = state.favoriteOrder.filter(function (id) { return Number(id) !== targetId; });
+      }
+      await loadActiveSportData(false);
+      renderHome();
+      renderGames();
+      renderNewsFilters();
+      renderNews();
+      renderEntities();
+      renderSelectionLists();
+      saveCache();
+      postNative("preferences_changed", {});
+      showToast(kind === "notify" ? "Notificações atualizadas." : "Favoritos atualizados.", false);
+    } catch (error) {
+      if (previousPending) state.selectionChanges[key] = previousPending;
+      else delete state.selectionChanges[key];
+      showToast(friendlyError(error), true);
+    } finally {
+      delete state.selectionBusy[key];
+      renderEntities();
+      renderSelectionLists();
+    }
+  }
+
   function debounce(fn, delay) {
     var timer = null;
     return function () {
@@ -1561,6 +1703,17 @@
       if (settings) { openSettings("", true); return; }
       var sportButton = event.target.closest("[data-sport-id]");
       if (sportButton) { changeActiveSport(sportButton.getAttribute("data-sport-id")); return; }
+      var entitySelection = event.target.closest("[data-entity-selection-key]");
+      if (entitySelection) {
+        event.preventDefault();
+        event.stopPropagation();
+        detailGesture = null;
+        persistEntitySelection(
+          entitySelection.getAttribute("data-entity-selection-key"),
+          entitySelection.getAttribute("data-entity-selection-kind")
+        );
+        return;
+      }
       var matchAction = event.target.closest("[data-match-action]");
       if (matchAction) {
         var actionCard = matchAction.closest("[data-detail-kind]");
@@ -1629,7 +1782,7 @@
     });
     document.addEventListener("keydown", function (event) {
       if (event.key !== "Enter" && event.key !== " ") return;
-      if (event.target.closest("[data-match-action]")) return;
+      if (event.target.closest("[data-match-action], [data-entity-selection-key]")) return;
       var detail = event.target.closest("[data-detail-kind]");
       if (!detail) return;
       event.preventDefault();
