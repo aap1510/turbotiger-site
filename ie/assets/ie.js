@@ -45,6 +45,7 @@
       teams: [],
       teamSuggestions: [],
       opponentSuggestions: [],
+      suggestionScroll: { team: 0, opponent: 0 },
       facets: { competitions: [], seasons: [], scopes: [], ufs: [] },
       rows: [],
       mode: "aguardando",
@@ -2108,7 +2109,16 @@
       return "<div class=\"ie-history-suggestion\" role=\"option\" aria-selected=\"" + (checked ? "true" : "false") + "\"><button type=\"button\" data-history-action=\"" + (opponent ? "select-opponent" : "select-team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(team.nome || "Time") + "\"><strong>" + escapeHtml(team.nome || "Time") + "</strong>" + (team.uf || period ? "<small>" + escapeHtml([team.uf, period].filter(Boolean).join(" · ")) + "</small>" : "") + "</button><input type=\"checkbox\" class=\"ie-history-suggestion-check\" data-history-action=\"toggle-" + (opponent ? "opponent" : "team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(team.nome || "Time") + "\" aria-label=\"" + (checked ? "Desmarcar " : "Marcar ") + escapeHtml(team.nome || "Time") + "\"" + (checked ? " checked" : "") + "></div>";
     }).join("") : "<span>Nenhum time encontrado.</span>";
     container.hidden = false;
+    container.scrollTop = numberOf(history.suggestionScroll && history.suggestionScroll[target], 0);
     if (input) input.setAttribute("aria-expanded", "true");
+  }
+
+  function captureHistorySuggestionScroll(target) {
+    var history = state.historyContribution;
+    var container = byId(target === "opponent" ? "historyOpponentSuggestions" : "historyTeamSuggestions");
+    if (!container || container.hidden) return;
+    if (!history.suggestionScroll) history.suggestionScroll = { team: 0, opponent: 0 };
+    history.suggestionScroll[target] = container.scrollTop;
   }
 
   function updateHistorySearchControls() {
@@ -2154,6 +2164,8 @@
 
   function renderHistoryContributionPage() {
     var history = state.historyContribution;
+    captureHistorySuggestionScroll("team");
+    captureHistorySuggestionScroll("opponent");
     byId("detailContent").setAttribute("data-detail-view", "history-list");
     byId("detailTitle").textContent = "Colabore com nossa base de dados";
     var totalPartidas = numberOf(state.baseSummary && state.baseSummary.total_registros, 0);
@@ -3014,6 +3026,8 @@
       var opponent = event.target.id === "historyOpponentInput";
       var query = String(event.target.value || "");
       history.filterRequestId += 1;
+      if (!history.suggestionScroll) history.suggestionScroll = { team: 0, opponent: 0 };
+      history.suggestionScroll[opponent ? "opponent" : "team"] = 0;
       if (opponent) history.opponentSuggestions = [];
       else history.teamSuggestions = [];
       if (opponent) {

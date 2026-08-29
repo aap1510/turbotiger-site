@@ -2366,11 +2366,13 @@ body.ie-reordering-favorites {
   background: var(--ie-gold-soft);
   color: var(--ie-text);
   font: inherit;
-  font-size: 10px;
+  font-size: 8px;
+  font-weight: 400;
 }
 
 .ie-history-team-chips button span {
   overflow: hidden;
+  font-weight: 400;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
