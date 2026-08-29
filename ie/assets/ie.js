@@ -54,6 +54,7 @@
     loading: false,
     loadGeneration: 0,
     preferenceRevision: 0,
+    openingReadySent: false,
     toastTimer: null
   };
 
@@ -258,6 +259,14 @@
     var message = Object.assign({ type: type }, payload || {});
     window.TurboTigerIEBridge.post(JSON.stringify(message));
     return true;
+  }
+
+  function notifyInitialOpeningReady() {
+    if (state.openingReadySent) return;
+    var token = "";
+    try { token = new URLSearchParams(window.location.search).get("carga") || ""; } catch (error) { token = ""; }
+    if (!token || !postNative("central_ready", { carga: token })) return;
+    state.openingReadySent = true;
   }
 
   function jwtPayload(token) {
@@ -1344,6 +1353,7 @@
     showApp(true);
     state.loading = false;
     byId("headerFreshness").textContent = "Atualizando...";
+    notifyInitialOpeningReady();
 
     var backgroundErrors = openingErrors.slice();
     var backgroundStale = false;
@@ -1450,10 +1460,12 @@
         showApp(true);
         setFreshness(cached.saved_at);
         showToast("Sem conexão. Exibindo a última atualização disponível.", true);
+        notifyInitialOpeningReady();
       } else {
         if (initialOpening) state.bootstrap = null;
         byId("loadingStatus").textContent = displayText(friendlyError(error));
         showApp(false);
+        if (initialOpening) notifyInitialOpeningReady();
       }
     } finally {
       if (loadIsCurrent(generation)) state.loading = false;
