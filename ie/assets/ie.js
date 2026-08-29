@@ -3243,8 +3243,14 @@
         hideHistoryTeamSuggestions("opponent");
       } else if (historyTeamField.querySelector("#historyTeamInput")) {
         hideHistoryTeamSuggestions("opponent");
+        if (event.target.id === "historyTeamInput" && !byId("historyTeamSuggestions").hidden) {
+          hideHistoryTeamSuggestions("team");
+        }
       } else {
         hideHistoryTeamSuggestions("team");
+        if (event.target.id === "historyOpponentInput" && !byId("historyOpponentSuggestions").hidden) {
+          hideHistoryTeamSuggestions("opponent");
+        }
       }
 
       var historyAction = event.target.closest("[data-history-action]");

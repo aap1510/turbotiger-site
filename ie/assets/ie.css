@@ -2280,11 +2280,9 @@ body.ie-reordering-favorites {
 }
 
 .ie-history-suggestions {
-  position: absolute;
-  z-index: 30;
-  top: calc(100% + 5px);
-  right: 0;
-  left: 0;
+  position: relative;
+  z-index: 1;
+  margin-top: 1px;
   max-height: 218px;
   overflow-y: auto;
   border: 1px solid var(--ie-border-strong);
