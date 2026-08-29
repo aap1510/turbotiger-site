@@ -250,15 +250,20 @@ button {
 }
 
 .ie-close-button {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
+  justify-self: center;
   border: 1px solid var(--ie-border-strong);
   background: var(--ie-surface-raised);
   color: var(--ie-text);
   box-shadow: 0 5px 18px rgba(0, 0, 0, .24);
 }
 
-.ie-close-button svg,
+.ie-close-button svg {
+  width: 13px;
+  height: 13px;
+}
+
 .ie-detail-close svg {
   width: 18px;
   height: 18px;
