@@ -2293,7 +2293,7 @@ body.ie-reordering-favorites {
   box-shadow: 0 14px 34px rgba(0, 0, 0, .48);
 }
 
-.ie-history-suggestions > button,
+.ie-history-suggestions > .ie-history-suggestion,
 .ie-history-suggestions > span {
   width: 100%;
   min-height: 44px;
@@ -2309,9 +2309,77 @@ body.ie-reordering-favorites {
   text-align: left;
 }
 
-.ie-history-suggestions > button:last-child,
+.ie-history-suggestions > .ie-history-suggestion:last-child,
 .ie-history-suggestions > span:last-child {
   border-bottom: 0;
+}
+
+.ie-history-suggestion {
+  grid-template-columns: minmax(0, 1fr) 34px;
+  align-items: center;
+  padding: 0 !important;
+}
+
+.ie-history-suggestion > button {
+  min-width: 0;
+  min-height: 44px;
+  display: grid;
+  gap: 2px;
+  padding: 9px 11px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.ie-history-suggestion-check {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  justify-self: center;
+  margin: 0 9px 0 0;
+  border: 1px solid var(--ie-border-strong);
+  border-radius: 5px;
+  background: transparent;
+}
+
+.ie-history-suggestion-check:checked {
+  border-color: var(--ie-gold);
+  background: var(--ie-gold);
+  box-shadow: inset 0 0 0 4px #17181c;
+}
+
+.ie-history-team-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.ie-history-team-chips button {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid rgba(226, 185, 86, .36);
+  border-radius: 999px;
+  background: var(--ie-gold-soft);
+  color: var(--ie-text);
+  font: inherit;
+  font-size: 10px;
+}
+
+.ie-history-team-chips button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ie-history-team-chips button b {
+  color: var(--ie-gold);
+  font-size: 14px;
 }
 
 .ie-history-suggestions small {

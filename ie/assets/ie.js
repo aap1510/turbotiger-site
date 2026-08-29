@@ -30,9 +30,13 @@
         teamQuery: "",
         teamKey: "",
         teamName: "",
+        teamKeys: [],
+        teamNames: [],
         opponentQuery: "",
         opponentKey: "",
         opponentName: "",
+        opponentKeys: [],
+        opponentNames: [],
         competitionKey: "",
         season: "",
         scope: "",
@@ -1516,7 +1520,8 @@
   function initialLoadRequirements(route) {
     var requirements = { card: false, favorites: false, base: false, catalog: false, sportSections: [] };
     if (route.eventId > 0 || route.competitionId > 0) return requirements;
-    if (route.section === "configuracoes") { requirements.favorites = true; requirements.catalog = true; }
+    if (route.section === "colaboracao") requirements.base = true;
+    else if (route.section === "configuracoes") { requirements.favorites = true; requirements.catalog = true; }
     else if (route.section === "partidas" || route.section === "jogos") {
       requirements.sportSections = ["live", "upcoming", "results"];
       requirements.favorites = route.context === "favoritos_primeiro";
@@ -1786,7 +1791,8 @@
 
   async function applyInitialRoute(route) {
     var requested = route || initialRouteDefinition();
-    if (requested.section === "configuracoes") openSettings(requested.context, true);
+    if (requested.section === "colaboracao") await openHistoryContribution(false);
+    else if (requested.section === "configuracoes") openSettings(requested.context, true);
     else if (requested.section === "partidas" || requested.section === "jogos") {
       activateTab("games");
       chooseAvailableGameFilter();
@@ -2015,7 +2021,58 @@
 
   function historyRequiredFiltersReady(history) {
     var yearReady = !history.filters.year || historyYearIsValid(history);
-    return !!history.filters.teamKey && yearReady && (history.filters.scope !== "estadual" || !!history.filters.uf);
+    return arrayOf(history.filters.teamKeys).length > 0 && yearReady && (history.filters.scope !== "estadual" || !!history.filters.uf);
+  }
+
+  function historySelectedKeys(opponent) {
+    var filters = state.historyContribution.filters;
+    return arrayOf(opponent ? filters.opponentKeys : filters.teamKeys).map(String).filter(Boolean);
+  }
+
+  function historySelectedNames(opponent) {
+    var filters = state.historyContribution.filters;
+    return arrayOf(opponent ? filters.opponentNames : filters.teamNames).map(String).filter(Boolean);
+  }
+
+  function historySelectionChips(opponent) {
+    var keys = historySelectedKeys(opponent);
+    var names = historySelectedNames(opponent);
+    if (!keys.length) return "";
+    return "<div class=\"ie-history-team-chips\">" + keys.map(function (key, index) {
+      return "<button type=\"button\" data-history-action=\"remove-" + (opponent ? "opponent" : "team") + "\" data-history-team-key=\"" + escapeHtml(key) + "\"><span>" + escapeHtml(names[index] || key) + "</span><b aria-hidden=\"true\">×</b></button>";
+    }).join("") + "</div>";
+  }
+
+  function setHistoryTeamSelection(opponent, key, name, exclusive) {
+    var filters = state.historyContribution.filters;
+    var keysField = opponent ? "opponentKeys" : "teamKeys";
+    var namesField = opponent ? "opponentNames" : "teamNames";
+    var keys = arrayOf(filters[keysField]).slice();
+    var names = arrayOf(filters[namesField]).slice();
+    var normalizedKey = String(key || "");
+    var index = keys.indexOf(normalizedKey);
+    if (exclusive) {
+      keys = normalizedKey ? [normalizedKey] : [];
+      names = normalizedKey ? [String(name || normalizedKey)] : [];
+    } else if (index >= 0) {
+      keys.splice(index, 1);
+      names.splice(index, 1);
+    } else if (normalizedKey) {
+      keys.push(normalizedKey);
+      names.push(String(name || normalizedKey));
+    }
+    filters[keysField] = keys;
+    filters[namesField] = names;
+    filters[opponent ? "opponentKey" : "teamKey"] = keys[0] || "";
+    filters[opponent ? "opponentName" : "teamName"] = names[0] || "";
+    if (!opponent) {
+      var opponents = historySelectedKeys(true);
+      var opponentNames = historySelectedNames(true);
+      filters.opponentKeys = opponents.filter(function (item) { return keys.indexOf(item) < 0; });
+      filters.opponentNames = opponentNames.filter(function (_, opponentIndex) { return keys.indexOf(opponents[opponentIndex]) < 0; });
+      filters.opponentKey = filters.opponentKeys[0] || "";
+      filters.opponentName = filters.opponentNames[0] || "";
+    }
   }
 
   function hideHistoryTeamSuggestions(target) {
@@ -2036,15 +2093,17 @@
     var input = byId(opponent ? "historyOpponentInput" : "historyTeamInput");
     var history = state.historyContribution;
     var query = String(opponent ? history.filters.opponentQuery : history.filters.teamQuery).trim();
-    var selectedKey = opponent ? history.filters.opponentKey : history.filters.teamKey;
-    if (query.length < 2 || selectedKey) {
+    var selectedKeys = historySelectedKeys(opponent);
+    if (query.length < 2) {
       hideHistoryTeamSuggestions(target);
       return;
     }
-    var suggestionTeams = history.teams.filter(function (team) { return !opponent || team.time_chave !== history.filters.teamKey; });
+    var ownKeys = historySelectedKeys(false);
+    var suggestionTeams = history.teams.filter(function (team) { return !opponent || ownKeys.indexOf(String(team.time_chave)) < 0; });
     container.innerHTML = suggestionTeams.length ? suggestionTeams.map(function (team) {
       var period = [team.primeiro_jogo_em ? historyDate(team.primeiro_jogo_em) : "", team.ultimo_jogo_em ? historyDate(team.ultimo_jogo_em) : ""].filter(Boolean).join(" a ");
-      return "<button type=\"button\" role=\"option\" data-history-action=\"" + (opponent ? "select-opponent" : "select-team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(team.nome || "Time") + "\"><strong>" + escapeHtml(team.nome || "Time") + "</strong>" + (team.uf || period ? "<small>" + escapeHtml([team.uf, period].filter(Boolean).join(" · ")) + "</small>" : "") + "</button>";
+      var checked = selectedKeys.indexOf(String(team.time_chave)) >= 0;
+      return "<div class=\"ie-history-suggestion\" role=\"option\" aria-selected=\"" + (checked ? "true" : "false") + "\"><button type=\"button\" data-history-action=\"" + (opponent ? "select-opponent" : "select-team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(team.nome || "Time") + "\"><strong>" + escapeHtml(team.nome || "Time") + "</strong>" + (team.uf || period ? "<small>" + escapeHtml([team.uf, period].filter(Boolean).join(" · ")) + "</small>" : "") + "</button><input type=\"checkbox\" class=\"ie-history-suggestion-check\" data-history-action=\"toggle-" + (opponent ? "opponent" : "team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(team.nome || "Time") + "\" aria-label=\"" + (checked ? "Desmarcar " : "Marcar ") + escapeHtml(team.nome || "Time") + "\"" + (checked ? " checked" : "") + "></div>";
     }).join("") : "<span>Nenhum time encontrado.</span>";
     container.hidden = false;
     if (input) input.setAttribute("aria-expanded", "true");
@@ -2052,7 +2111,7 @@
 
   function updateHistorySearchControls() {
     var history = state.historyContribution;
-    var teamSelected = !!history.filters.teamKey;
+    var teamSelected = historySelectedKeys(false).length > 0;
     var yearValid = !history.filters.year || historyYearIsValid(history);
     var baseReady = teamSelected && yearValid;
     var ready = historyRequiredFiltersReady(history);
@@ -2076,10 +2135,10 @@
     var seasonOptions = historySelectOptions(facets.seasons, filters.season, "Todas", null, null);
     var scopeOptions = historySelectOptions(facets.scopes, filters.scope, "Todas", null, function (value) { return value === "nacional" ? "Nacional" : value === "estadual" ? "Estadual" : value; });
     var ufOptions = historySelectOptions(facets.ufs, filters.uf, "Selecione", null, null);
-    var baseReady = !!filters.teamKey && (!filters.year || historyYearIsValid(history));
+    var baseReady = historySelectedKeys(false).length > 0 && (!filters.year || historyYearIsValid(history));
     var scopeFieldClass = filters.scope === "estadual" ? "ie-history-field" : "ie-history-field is-wide";
     var ufField = filters.scope === "estadual" ? "<label class=\"ie-history-field\"><span>UF *</span><select data-history-filter=\"uf\"" + (!baseReady ? " disabled" : "") + ">" + ufOptions + "</select></label>" : "";
-    return "<section class=\"ie-history-search\"><div class=\"ie-history-search-intro\"><strong>Encontre um confronto</strong><span>Os filtros com * são obrigatórios.</span></div><div class=\"ie-history-filters\"><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Seu time *</span><input id=\"historyTeamInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.teamQuery) + "\" placeholder=\"Digite e selecione o seu time\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyTeamSuggestions\" aria-expanded=\"false\"><div id=\"historyTeamSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div></label><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Time adversário</span><input id=\"historyOpponentInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.opponentQuery) + "\" placeholder=\"Opcional\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyOpponentSuggestions\" aria-expanded=\"false\"" + (!filters.teamKey ? " disabled" : "") + "><div id=\"historyOpponentSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div></label><label class=\"ie-history-field\"><span>Ano</span><input id=\"historyYearInput\" type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]{4}\" maxlength=\"4\" value=\"" + escapeHtml(filters.year) + "\" placeholder=\"Opcional\"" + (!filters.teamKey ? " disabled" : "") + "></label><label class=\"ie-history-field\"><span>Temporada</span><select data-history-filter=\"season\"" + (!baseReady ? " disabled" : "") + ">" + seasonOptions + "</select></label><label class=\"" + scopeFieldClass + "\"><span>Abrangência</span><select data-history-filter=\"scope\"" + (!baseReady ? " disabled" : "") + ">" + scopeOptions + "</select></label>" + ufField + "<label class=\"ie-history-field is-wide\"><span>Competição</span><select data-history-filter=\"competitionKey\"" + (!baseReady ? " disabled" : "") + ">" + competitionOptions + "</select></label></div><span id=\"historySearchHint\" class=\"ie-history-search-hint\" aria-live=\"polite\"></span><div class=\"ie-history-search-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" id=\"historySearchButton\" data-history-action=\"search\"" + (!historyRequiredFiltersReady(history) || history.loading ? " disabled" : "") + ">Pesquisar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"clear\">Limpar filtros</button></div></section>";
+    return "<section class=\"ie-history-search\"><div class=\"ie-history-search-intro\"><strong>Encontre um confronto</strong><span>Os filtros com * são obrigatórios.</span></div><div class=\"ie-history-filters\"><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Seu time *</span><input id=\"historyTeamInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.teamQuery) + "\" placeholder=\"Digite e selecione um ou mais times\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyTeamSuggestions\" aria-expanded=\"false\"><div id=\"historyTeamSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>" + historySelectionChips(false) + "</label><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Time adversário</span><input id=\"historyOpponentInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.opponentQuery) + "\" placeholder=\"Opcional: selecione um ou mais\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyOpponentSuggestions\" aria-expanded=\"false\"" + (!baseReady ? " disabled" : "") + "><div id=\"historyOpponentSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>" + historySelectionChips(true) + "</label><label class=\"ie-history-field\"><span>Ano</span><input id=\"historyYearInput\" type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]{4}\" maxlength=\"4\" value=\"" + escapeHtml(filters.year) + "\" placeholder=\"Opcional\"" + (!baseReady ? " disabled" : "") + "></label><label class=\"ie-history-field\"><span>Temporada</span><select data-history-filter=\"season\"" + (!baseReady ? " disabled" : "") + ">" + seasonOptions + "</select></label><label class=\"" + scopeFieldClass + "\"><span>Abrangência</span><select data-history-filter=\"scope\"" + (!baseReady ? " disabled" : "") + ">" + scopeOptions + "</select></label>" + ufField + "<label class=\"ie-history-field is-wide\"><span>Competição</span><select data-history-filter=\"competitionKey\"" + (!baseReady ? " disabled" : "") + ">" + competitionOptions + "</select></label></div><span id=\"historySearchHint\" class=\"ie-history-search-hint\" aria-live=\"polite\"></span><div class=\"ie-history-search-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" id=\"historySearchButton\" data-history-action=\"search\"" + (!historyRequiredFiltersReady(history) || history.loading ? " disabled" : "") + ">Pesquisar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"clear\">Limpar filtros</button></div></section>";
   }
 
   function renderHistoryRow(row) {
@@ -2095,11 +2154,12 @@
     var history = state.historyContribution;
     byId("detailContent").setAttribute("data-detail-view", "history-list");
     byId("detailTitle").textContent = "Colabore com nossa base de dados";
-    byId("detailSubtitle").textContent = "Futebol do Brasil";
+    var totalPartidas = numberOf(state.baseSummary && state.baseSummary.total_registros, 0);
+    byId("detailSubtitle").textContent = "Futebol do Brasil" + (totalPartidas > 0 ? " · " + totalPartidas.toLocaleString("pt-BR") + " partidas" : "");
     var listTitle = history.mode === "pesquisa" ? history.totalRows.toLocaleString("pt-BR") + (history.totalRows === 1 ? " confronto encontrado" : " confrontos encontrados") : "Confrontos";
     var rows = history.mode !== "pesquisa" ? emptyState("Selecione o seu time", "Os confrontos mais recentes aparecerão automaticamente.", false) : history.rows.length ? "<div class=\"ie-history-table\">" + history.rows.map(renderHistoryRow).join("") + "</div>" : emptyState("Nenhum confronto encontrado", "Revise os filtros informados ou envie um confronto que ainda não está na base.", false);
     var pager = history.totalPages > 1 ? "<nav class=\"ie-history-pager\" aria-label=\"Paginação dos confrontos\"><button type=\"button\" data-history-action=\"previous\"" + (history.page <= 1 || history.loading ? " disabled" : "") + ">Anterior</button><span>Página " + escapeHtml(history.page) + " de " + escapeHtml(history.totalPages) + "</span><button type=\"button\" data-history-action=\"next\"" + (!history.hasMore || history.loading ? " disabled" : "") + ">Próxima</button></nav>" : "";
-    byId("detailContent").innerHTML = renderHistoryFilters() + "<section class=\"ie-history-results\"><header><div><strong>" + escapeHtml(listTitle) + "</strong><span>Toque em um confronto para sugerir correção ou no + ao lado para incluir algum novo.</span></div><button class=\"ie-history-add\" type=\"button\" data-history-action=\"new\" aria-label=\"Enviar um confronto não localizado\">+</button></header>" + (history.loading ? "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>" : rows + pager) + "</section>";
+    byId("detailContent").innerHTML = renderHistoryFilters() + "<section class=\"ie-history-results\"><header><div><strong>" + escapeHtml(listTitle) + "</strong><span>Toque em um confronto para sugerir correção ou no + ao lado para incluir algum.</span></div><button class=\"ie-history-add\" type=\"button\" data-history-action=\"new\" aria-label=\"Enviar um confronto não localizado\">+</button></header>" + (history.loading ? "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>" : rows + pager) + "</section>";
     updateHistorySearchControls();
     renderHistoryTeamSuggestions("team");
     renderHistoryTeamSuggestions("opponent");
@@ -2121,13 +2181,14 @@
 
   async function loadHistoryFacets() {
     var history = state.historyContribution;
-    if (!history.filters.teamKey || (history.filters.year && !historyYearIsValid(history))) return;
+    var selectedTeams = historySelectedKeys(false);
+    if (!selectedTeams.length || (history.filters.year && !historyYearIsValid(history))) return;
     var requestId = ++history.filterRequestId;
     try {
       var result = await rpc("ie_hist_futebol_brasil_filtros_rpc", {
         p_ano: historyYearIsValid(history) ? Number(history.filters.year) : null,
         p_busca_time: null,
-        p_time_chave: history.filters.teamKey,
+        p_time_chave: selectedTeams[0],
         p_limite: 12
       });
       if (history !== state.historyContribution || requestId !== history.filterRequestId) return;
@@ -2142,9 +2203,9 @@
     var history = state.historyContribution;
     var opponent = target === "opponent";
     var wanted = String(query || "").trim();
-    var selectedKey = opponent ? history.filters.opponentKey : history.filters.teamKey;
+    var selectedKeys = historySelectedKeys(opponent);
     var currentQuery = String(opponent ? history.filters.opponentQuery : history.filters.teamQuery).trim();
-    if (selectedKey || wanted !== currentQuery) {
+    if (wanted !== currentQuery) {
       hideHistoryTeamSuggestions(target);
       return;
     }
@@ -2182,8 +2243,8 @@
     return {
       p_modo: history.mode,
       p_ano: history.mode === "pesquisa" && historyYearIsValid(history) ? Number(filters.year) : null,
-      p_time_chave: history.mode === "pesquisa" ? filters.teamKey : null,
-      p_time_adversario_chave: history.mode === "pesquisa" && filters.opponentKey ? filters.opponentKey : null,
+      p_times_chave: history.mode === "pesquisa" ? historySelectedKeys(false) : [],
+      p_times_adversarios_chave: history.mode === "pesquisa" ? historySelectedKeys(true) : [],
       p_competicao_chave: history.mode === "pesquisa" && filters.competitionKey ? filters.competitionKey : null,
       p_temporada: history.mode === "pesquisa" && filters.season ? filters.season : null,
       p_abrangencia: history.mode === "pesquisa" && filters.scope ? filters.scope : null,
@@ -2199,7 +2260,7 @@
     history.loading = true;
     renderHistoryContributionPage();
     try {
-      var result = await rpc("ie_hist_futebol_brasil_confrontos_listar_rpc", historyListPayload(cursor));
+      var result = await rpc("ie_hist_futebol_brasil_confrontos_multi_listar_rpc", historyListPayload(cursor));
       if (history !== state.historyContribution || requestId !== history.requestId) return false;
       history.rows = arrayOf(result);
       history.cursor = cursor || null;
@@ -2238,6 +2299,9 @@
     history.loading = true;
     var requestId = ++history.filterRequestId;
     try {
+      if (!state.baseSummary) {
+        try { state.baseSummary = await rpc("ie_base_futebol_brasil_resumo_rpc", {}); } catch (baseError) { /* o total não bloqueia a colaboração */ }
+      }
       var result = await rpc("ie_hist_futebol_brasil_filtros_rpc", { p_ano: null, p_busca_time: null, p_time_chave: null, p_limite: 12 });
       if (history !== state.historyContribution || requestId !== history.filterRequestId || historyDetailView() !== "history-loading") return;
       applyHistoryFilterResponse(result || {}, history);
@@ -2258,9 +2322,13 @@
       teamQuery: "",
       teamKey: "",
       teamName: "",
+      teamKeys: [],
+      teamNames: [],
       opponentQuery: "",
       opponentKey: "",
       opponentName: "",
+      opponentKeys: [],
+      opponentNames: [],
       competitionKey: "",
       season: "",
       scope: "",
@@ -2942,23 +3010,10 @@
       history.teams = [];
       if (opponent) {
         history.filters.opponentQuery = query;
-        if (normalizeSearchText(query) !== normalizeSearchText(history.filters.opponentName)) {
-          history.filters.opponentKey = "";
-          history.filters.opponentName = "";
-          resetHistorySearchResults();
-        }
+        resetHistorySearchResults();
       } else {
         history.filters.teamQuery = query;
-        if (normalizeSearchText(query) !== normalizeSearchText(history.filters.teamName)) {
-          history.filters.teamKey = "";
-          history.filters.teamName = "";
-          history.filters.opponentQuery = "";
-          history.filters.opponentKey = "";
-          history.filters.opponentName = "";
-          history.filters.year = "";
-          resetHistoryOptionalFilters();
-          resetHistorySearchResults();
-        }
+        resetHistorySearchResults();
       }
       updateHistorySearchControls();
       hideHistoryTeamSuggestions(opponent ? "opponent" : "team");
@@ -2972,7 +3027,7 @@
         resetHistoryOptionalFilters();
         resetHistorySearchResults();
         renderHistoryContributionPage();
-        if ((!history.filters.year || historyYearIsValid(history)) && history.filters.teamKey) {
+        if ((!history.filters.year || historyYearIsValid(history)) && historySelectedKeys(false).length) {
           updateHistoryFacets();
           updateHistoryRowsAutomatically();
         }
@@ -3184,9 +3239,10 @@
         if (action === "open") {
           openHistoryContribution(!byId("detailModal").hidden);
         } else if (action === "select-team") {
-          history.filters.teamKey = historyAction.getAttribute("data-history-team-key") || "";
-          history.filters.teamName = historyAction.getAttribute("data-history-team-name") || "";
-          history.filters.teamQuery = history.filters.teamName;
+          var selectedTeamKey = historyAction.getAttribute("data-history-team-key") || "";
+          var selectedTeamName = historyAction.getAttribute("data-history-team-name") || "";
+          setHistoryTeamSelection(false, selectedTeamKey, selectedTeamName, true);
+          history.filters.teamQuery = "";
           resetHistoryOptionalFilters();
           resetHistorySearchResults();
           renderHistoryContributionPage();
@@ -3198,15 +3254,33 @@
           }, 0);
         } else if (action === "select-opponent") {
           var opponentKey = historyAction.getAttribute("data-history-team-key") || "";
-          if (!opponentKey || opponentKey === history.filters.teamKey) {
+          if (!opponentKey || historySelectedKeys(false).indexOf(opponentKey) >= 0) {
             showToast("Escolha um time adversário diferente do seu time.", true);
             return;
           }
-          history.filters.opponentKey = opponentKey;
-          history.filters.opponentName = historyAction.getAttribute("data-history-team-name") || "";
-          history.filters.opponentQuery = history.filters.opponentName;
+          setHistoryTeamSelection(true, opponentKey, historyAction.getAttribute("data-history-team-name") || "", true);
+          history.filters.opponentQuery = "";
           resetHistorySearchResults();
           renderHistoryContributionPage();
+          loadHistoryAutomatically();
+        } else if (action === "toggle-team" || action === "toggle-opponent") {
+          var togglingOpponent = action === "toggle-opponent";
+          var toggledKey = historyAction.getAttribute("data-history-team-key") || "";
+          if (togglingOpponent && historySelectedKeys(false).indexOf(toggledKey) >= 0) {
+            showToast("Escolha um time adversário diferente do seu time.", true);
+            return;
+          }
+          setHistoryTeamSelection(togglingOpponent, toggledKey, historyAction.getAttribute("data-history-team-name") || "", false);
+          resetHistorySearchResults();
+          renderHistoryContributionPage();
+          if (!togglingOpponent) loadHistoryFacets();
+          loadHistoryAutomatically();
+        } else if (action === "remove-team" || action === "remove-opponent") {
+          var removingOpponent = action === "remove-opponent";
+          setHistoryTeamSelection(removingOpponent, historyAction.getAttribute("data-history-team-key") || "", "", false);
+          resetHistorySearchResults();
+          renderHistoryContributionPage();
+          if (!removingOpponent && historySelectedKeys(false).length) loadHistoryFacets();
           loadHistoryAutomatically();
         } else if (action === "search") {
           if (!historyRequiredFiltersReady(history) || history.loading) return;
