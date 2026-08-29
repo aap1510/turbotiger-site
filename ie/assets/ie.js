@@ -945,7 +945,11 @@
       var id = sportId(item);
       var index = favorites.indexOf(id);
       var selected = index >= 0;
-      return "<div class=\"ie-sport-favorite-row" + (selected ? " is-selected" : "") + "\"><span class=\"ie-favorite-position\">" + (selected ? index + 1 : "") + "</span><strong>" + escapeHtml(item.nome || "Esporte") + "</strong><div class=\"ie-sport-favorite-actions\"><button class=\"ie-selection-action" + (selected ? " is-active" : "") + "\" type=\"button\" data-sport-favorite-id=\"" + id + "\" data-sport-favorite-action=\"toggle\" aria-label=\"" + (selected ? "Remover " : "Favoritar ") + escapeHtml(item.nome || "esporte") + "\" aria-pressed=\"" + selected + "\">" + icon("star") + "</button>" + (selected ? "<button type=\"button\" data-sport-favorite-id=\"" + id + "\" data-sport-favorite-action=\"up\" aria-label=\"Subir " + escapeHtml(item.nome || "esporte") + "\"" + (index === 0 ? " disabled" : "") + ">↑</button><button type=\"button\" data-sport-favorite-id=\"" + id + "\" data-sport-favorite-action=\"down\" aria-label=\"Descer " + escapeHtml(item.nome || "esporte") + "\"" + (index === favorites.length - 1 ? " disabled" : "") + ">↓</button>" : "") + "</div></div>";
+      var name = item.nome || "Esporte";
+      var reorderControl = selected
+        ? "<button class=\"ie-drag-handle\" type=\"button\" data-sport-favorite-drag-id=\"" + id + "\" aria-label=\"Arrastar para ordenar " + escapeHtml(name) + "\"><span aria-hidden=\"true\"></span></button>"
+        : "<span class=\"ie-drag-placeholder\" aria-hidden=\"true\"></span>";
+      return "<div class=\"ie-sport-favorite-row" + (selected ? " is-selected" : "") + "\"" + (selected ? " data-sport-favorite-row-id=\"" + id + "\"" : "") + ">" + reorderControl + "<strong>" + escapeHtml(name) + "</strong><div class=\"ie-sport-favorite-actions\"><button class=\"ie-selection-action" + (selected ? " is-active" : "") + "\" type=\"button\" data-sport-favorite-id=\"" + id + "\" data-sport-favorite-action=\"toggle\" aria-label=\"" + (selected ? "Remover " : "Favoritar ") + escapeHtml(item.nome || "esporte") + "\" aria-pressed=\"" + selected + "\">" + icon("star") + "</button></div></div>";
     }).join("") : emptyState("Nenhum esporte disponível", "Os esportes aparecem quando há um provedor ativo com dados disponíveis.", false);
   }
 
@@ -2057,41 +2061,48 @@
 
     var favoriteDrag = null;
 
-    function mergeVisibleFavoriteOrder(visibleOrder) {
+    function mergeVisibleFavoriteOrder(currentOrder, visibleOrder) {
       var visible = {};
       visibleOrder.forEach(function (id) { visible[String(id)] = true; });
       var cursor = 0;
-      var merged = state.favoriteOrder.map(function (id) {
+      var merged = currentOrder.map(function (id) {
         return visible[String(id)] ? visibleOrder[cursor++] : Number(id);
       });
       visibleOrder.forEach(function (id) {
         if (merged.indexOf(Number(id)) < 0) merged.push(Number(id));
       });
-      state.favoriteOrder = merged;
+      return merged;
     }
 
     function finishFavoriteDrag(event) {
       if (!favoriteDrag || (event && event.pointerId !== favoriteDrag.pointerId)) return;
-      var list = byId("teamSelectionList");
-      var visibleOrder = all("[data-favorite-row-id]", list).map(function (row) {
-        return Number(row.getAttribute("data-favorite-row-id"));
+      var drag = favoriteDrag;
+      var visibleOrder = all(drag.rowSelector, drag.list).map(function (row) {
+        return Number(row.getAttribute(drag.rowAttribute));
       }).filter(function (id) { return id > 0; });
-      mergeVisibleFavoriteOrder(visibleOrder);
+      if (drag.kind === "sport") state.sportFavoriteOrder = mergeVisibleFavoriteOrder(state.sportFavoriteOrder, visibleOrder);
+      else state.favoriteOrder = mergeVisibleFavoriteOrder(state.favoriteOrder, visibleOrder);
       state.preferenceRevision += 1;
-      favoriteDrag.row.classList.remove("is-dragging");
+      drag.row.classList.remove("is-dragging");
       document.body.classList.remove("ie-reordering-favorites");
       favoriteDrag = null;
-      renderSelectionLists();
+      if (drag.kind === "sport") renderSportFavoriteSettings();
+      else renderSelectionLists();
     }
 
     document.addEventListener("pointerdown", function (event) {
-      var handle = event.target.closest("[data-favorite-drag-id]");
+      var sportHandle = event.target.closest("[data-sport-favorite-drag-id]");
+      var handle = sportHandle || event.target.closest("[data-favorite-drag-id]");
       if (!handle || event.button !== 0) return;
-      var row = handle.closest("[data-favorite-row-id]");
+      var kind = sportHandle ? "sport" : "participant";
+      var rowSelector = kind === "sport" ? "[data-sport-favorite-row-id]" : "[data-favorite-row-id]";
+      var rowAttribute = kind === "sport" ? "data-sport-favorite-row-id" : "data-favorite-row-id";
+      var list = byId(kind === "sport" ? "sportFavoriteList" : "teamSelectionList");
+      var row = handle.closest(rowSelector);
       if (!row) return;
       event.preventDefault();
       detailGesture = null;
-      favoriteDrag = { pointerId: event.pointerId, row: row };
+      favoriteDrag = { pointerId: event.pointerId, row: row, list: list, rowSelector: rowSelector, rowAttribute: rowAttribute, kind: kind };
       row.classList.add("is-dragging");
       document.body.classList.add("ie-reordering-favorites");
       if (handle.setPointerCapture) {
@@ -2102,12 +2113,19 @@
     document.addEventListener("pointermove", function (event) {
       if (!favoriteDrag || event.pointerId !== favoriteDrag.pointerId) return;
       event.preventDefault();
-      var list = byId("teamSelectionList");
-      var listBounds = list.getBoundingClientRect();
-      if (event.clientY < listBounds.top + 42) list.scrollTop -= 14;
-      else if (event.clientY > listBounds.bottom - 42) list.scrollTop += 14;
+      var list = favoriteDrag.list;
+      if (favoriteDrag.kind === "sport") {
+        var tabs = document.querySelector(".ie-tabs");
+        var pageTopEdge = tabs ? tabs.getBoundingClientRect().bottom + 24 : 72;
+        if (event.clientY < pageTopEdge) window.scrollBy(0, -14);
+        else if (event.clientY > window.innerHeight - 42) window.scrollBy(0, 14);
+      } else {
+        var listBounds = list.getBoundingClientRect();
+        if (event.clientY < listBounds.top + 42) list.scrollTop -= 14;
+        else if (event.clientY > listBounds.bottom - 42) list.scrollTop += 14;
+      }
       var pointed = document.elementFromPoint(event.clientX, event.clientY);
-      var target = pointed && pointed.closest("[data-favorite-row-id]");
+      var target = pointed && pointed.closest(favoriteDrag.rowSelector);
       if (!target || target === favoriteDrag.row || target.parentNode !== favoriteDrag.row.parentNode) return;
       var bounds = target.getBoundingClientRect();
       target.parentNode.insertBefore(
@@ -2173,18 +2191,8 @@
         state.preferenceRevision += 1;
         var favoriteSportId = Number(sportFavorite.getAttribute("data-sport-favorite-id"));
         var favoriteSportIndex = state.sportFavoriteOrder.indexOf(favoriteSportId);
-        var favoriteSportAction = sportFavorite.getAttribute("data-sport-favorite-action");
-        if (favoriteSportAction === "toggle") {
-          if (favoriteSportIndex >= 0) state.sportFavoriteOrder.splice(favoriteSportIndex, 1);
-          else state.sportFavoriteOrder.push(favoriteSportId);
-        } else if (favoriteSportIndex >= 0) {
-          var favoriteSportTarget = favoriteSportIndex + (favoriteSportAction === "up" ? -1 : 1);
-          if (favoriteSportTarget >= 0 && favoriteSportTarget < state.sportFavoriteOrder.length) {
-            var movedSport = state.sportFavoriteOrder[favoriteSportTarget];
-            state.sportFavoriteOrder[favoriteSportTarget] = favoriteSportId;
-            state.sportFavoriteOrder[favoriteSportIndex] = movedSport;
-          }
-        }
+        if (favoriteSportIndex >= 0) state.sportFavoriteOrder.splice(favoriteSportIndex, 1);
+        else state.sportFavoriteOrder.push(favoriteSportId);
         renderSportFavoriteSettings();
         return;
       }
@@ -2207,19 +2215,24 @@
       }
     });
     document.addEventListener("keydown", function (event) {
-      var dragHandle = event.target.closest("[data-favorite-drag-id]");
+      var sportDragHandle = event.target.closest("[data-sport-favorite-drag-id]");
+      var dragHandle = sportDragHandle || event.target.closest("[data-favorite-drag-id]");
       if (dragHandle && (event.key === "ArrowUp" || event.key === "ArrowDown")) {
         event.preventDefault();
-        var favoriteId = Number(dragHandle.getAttribute("data-favorite-drag-id"));
-        var favoriteIndex = state.favoriteOrder.indexOf(favoriteId);
+        var isSportDrag = !!sportDragHandle;
+        var dragAttribute = isSportDrag ? "data-sport-favorite-drag-id" : "data-favorite-drag-id";
+        var favoriteId = Number(dragHandle.getAttribute(dragAttribute));
+        var favoriteOrder = isSportDrag ? state.sportFavoriteOrder : state.favoriteOrder;
+        var favoriteIndex = favoriteOrder.indexOf(favoriteId);
         var targetIndex = favoriteIndex + (event.key === "ArrowUp" ? -1 : 1);
-        if (favoriteIndex >= 0 && targetIndex >= 0 && targetIndex < state.favoriteOrder.length) {
+        if (favoriteIndex >= 0 && targetIndex >= 0 && targetIndex < favoriteOrder.length) {
           state.preferenceRevision += 1;
-          var swapped = state.favoriteOrder[targetIndex];
-          state.favoriteOrder[targetIndex] = favoriteId;
-          state.favoriteOrder[favoriteIndex] = swapped;
-          renderSelectionLists();
-          var movedHandle = document.querySelector("[data-favorite-drag-id=\"" + favoriteId + "\"]");
+          var swapped = favoriteOrder[targetIndex];
+          favoriteOrder[targetIndex] = favoriteId;
+          favoriteOrder[favoriteIndex] = swapped;
+          if (isSportDrag) renderSportFavoriteSettings();
+          else renderSelectionLists();
+          var movedHandle = document.querySelector("[" + dragAttribute + "=\"" + favoriteId + "\"]");
           if (movedHandle) movedHandle.focus();
         }
         return;
