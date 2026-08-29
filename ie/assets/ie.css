@@ -572,13 +572,13 @@ button {
   border: 1px solid var(--ie-border);
   border-radius: 50%;
   background: rgba(0, 0, 0, .18);
-  color: var(--ie-gold);
+  color: #f4f4f5;
   cursor: pointer;
   touch-action: manipulation;
 }
 
-.ie-match-actions button:last-child {
-  color: #d7d8db;
+.ie-match-actions button[aria-current="true"] {
+  color: var(--ie-gold);
 }
 
 .ie-match-actions button:focus-visible,
@@ -1550,8 +1550,21 @@ body.ie-reordering-favorites {
   opacity: .55;
 }
 
-.ie-save-button {
-  width: 100%;
+.ie-settings-save-status {
+  min-height: 20px;
+  padding: 2px 4px calc(8px + env(safe-area-inset-bottom));
+  color: var(--ie-faint);
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.ie-settings-save-status.is-saving {
+  color: var(--ie-gold);
+}
+
+.ie-settings-save-status.is-error {
+  color: #ff8f97;
 }
 
 .ie-pull-refresh {
@@ -2246,8 +2259,8 @@ body.ie-reordering-favorites {
 
 .ie-history-field select,
 .ie-history-form-field select {
-  padding-right: 46px;
-  background-position: right 19px center;
+  padding-right: 58px;
+  background-position: calc(100% - 25px) center;
 }
 
 .ie-history-field input:focus,
@@ -2334,6 +2347,11 @@ body.ie-reordering-favorites {
 
 .ie-history-results {
   overflow: hidden;
+  margin-bottom: 22px;
+}
+
+.ie-detail-content[data-detail-view="history-list"] {
+  padding-bottom: calc(52px + env(safe-area-inset-bottom));
 }
 
 .ie-history-results > header {
@@ -2460,7 +2478,7 @@ body.ie-reordering-favorites {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 9px;
-  padding: 11px;
+  padding: 11px 11px 15px;
   border-top: 1px solid var(--ie-border);
 }
 
@@ -2515,7 +2533,7 @@ body.ie-reordering-favorites {
 
 .ie-history-match-type > div {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr);
   gap: 8px;
 }
 
@@ -2530,6 +2548,7 @@ body.ie-reordering-favorites {
   background: var(--ie-surface-raised);
   color: #c5c7cc;
   font-size: 11px;
+  white-space: nowrap;
 }
 
 .ie-history-match-type input {
