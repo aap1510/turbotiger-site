@@ -1301,13 +1301,28 @@ button {
 
 .ie-selection-row.is-dragging,
 .ie-sport-favorite-row.is-dragging {
-  position: relative;
-  z-index: 2;
+  z-index: 20;
   border: 1px solid rgba(244, 191, 67, .55);
   border-radius: 10px;
   background: var(--ie-surface-raised);
   box-shadow: 0 10px 24px rgba(0, 0, 0, .35);
   opacity: .92;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.ie-selection-row.is-settling,
+.ie-sport-favorite-row.is-settling {
+  position: relative;
+  z-index: 3;
+  will-change: transform;
+}
+
+.ie-favorite-drop-placeholder {
+  min-height: 42px;
+  border: 1px dashed rgba(244, 191, 67, .28);
+  border-radius: 10px;
+  background: rgba(244, 191, 67, .05);
 }
 
 body.ie-reordering-favorites {
@@ -1663,19 +1678,6 @@ body.ie-reordering-favorites {
   display: flex;
   justify-content: flex-end;
   margin: 0 0 14px;
-}
-
-.ie-detail-switcher .ie-button {
-  min-height: 40px;
-  gap: 8px;
-  padding: 0 14px;
-  color: var(--ie-text);
-}
-
-.ie-detail-switcher svg {
-  width: 17px;
-  height: 17px;
-  color: var(--ie-gold);
 }
 
 .ie-detail-section {
@@ -2227,6 +2229,7 @@ body.ie-reordering-favorites {
 .ie-history-field input,
 .ie-history-field select,
 .ie-history-form-field input,
+.ie-history-form-field select,
 .ie-history-form-field textarea {
   width: 100%;
   min-width: 0;
@@ -2241,13 +2244,16 @@ body.ie-reordering-favorites {
   font-size: 12px;
 }
 
-.ie-history-field select {
-  padding-right: 34px;
+.ie-history-field select,
+.ie-history-form-field select {
+  padding-right: 46px;
+  background-position: right 19px center;
 }
 
 .ie-history-field input:focus,
 .ie-history-field select:focus,
 .ie-history-form-field input:focus,
+.ie-history-form-field select:focus,
 .ie-history-form-field textarea:focus {
   border-color: rgba(226, 185, 86, .68);
 }
@@ -2304,6 +2310,13 @@ body.ie-reordering-favorites {
   display: block;
   min-height: 15px;
   margin-top: 9px;
+}
+
+.ie-history-required-note {
+  display: block;
+  margin-top: 9px;
+  color: var(--ie-faint);
+  font-size: 9px;
 }
 
 .ie-history-search-actions {
@@ -2486,18 +2499,43 @@ body.ie-reordering-favorites {
   resize: vertical;
 }
 
-.ie-history-official {
-  min-height: 40px;
+.ie-history-match-type {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ie-history-match-type legend {
+  margin-bottom: 6px;
+  color: #b8bac0;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.ie-history-match-type > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ie-history-match-type label {
+  min-height: 42px;
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--ie-border);
+  border-radius: 10px;
+  background: var(--ie-surface-raised);
   color: #c5c7cc;
   font-size: 11px;
 }
 
-.ie-history-official input {
+.ie-history-match-type input {
   width: 17px;
   height: 17px;
+  flex: 0 0 auto;
   margin: 0;
   accent-color: var(--ie-gold);
 }

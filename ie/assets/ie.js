@@ -38,7 +38,7 @@
       teams: [],
       facets: { competitions: [], seasons: [], scopes: [], ufs: [] },
       rows: [],
-      mode: "recentes",
+      mode: "aguardando",
       cursor: null,
       nextCursor: null,
       cursorStack: [],
@@ -851,6 +851,7 @@
       return;
     }
     var html = [];
+    var modeSwitcher = filteredSection ? sectionModeSwitch(filteredSection) : "";
     if (filteredSection) {
       if (filteredSection === "analises") {
         var databaseCard = renderDatabaseSummaryCard(state.baseSummary);
@@ -867,7 +868,8 @@
       orderMatchesByFavorites(state.games.forYou, state.activeSportId, "forYou").forEach(function (item) { html.push(renderMatchCard(item)); });
       state.favoriteCompetitions.forEach(function (item) { html.push(renderCompetitionCard(item)); });
     }
-    byId("homeContent").innerHTML = html.join("") || emptyState(filteredSection ? "Nenhuma informação disponível" : "Nenhum favorito neste esporte", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Acompanhe times ou competições deste esporte para montar o seu espaço.", false);
+    var content = html.join("") || emptyState(filteredSection ? "Nenhuma informação disponível" : "Nenhum favorito neste esporte", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Acompanhe times ou competições deste esporte para montar o seu espaço.", false);
+    byId("homeContent").innerHTML = modeSwitcher + content;
   }
 
   function renderGames() {
@@ -1950,7 +1952,7 @@
   }
 
   function historyContributionLinkHtml() {
-    return "<button class=\"ie-base-collaborate-link\" type=\"button\" data-history-action=\"open\">Ajude a completar esta história: confira os confrontos e contribua com informações do seu time.<span aria-hidden=\"true\">›</span></button>";
+    return "<button class=\"ie-base-collaborate-link\" type=\"button\" data-history-action=\"open\">Ajude a completar esta história: confira e contribua com informações do seu time.<span aria-hidden=\"true\">›</span></button>";
   }
 
   function historyDate(value) {
@@ -1978,6 +1980,30 @@
     filters.scope = "";
     filters.uf = "";
     state.historyContribution.facets = { competitions: [], seasons: [], scopes: [], ufs: [] };
+  }
+
+  function resetHistorySearchResults() {
+    var history = state.historyContribution;
+    history.rows = [];
+    history.mode = "aguardando";
+    history.cursor = null;
+    history.nextCursor = null;
+    history.cursorStack = [];
+    history.page = 1;
+    history.hasMore = false;
+  }
+
+  function historyYearIsValid(history) {
+    var value = String(history.filters.year || "");
+    if (!/^\d{4}$/.test(value)) return false;
+    var year = Number(value);
+    if (history.yearStart && year < Number(history.yearStart)) return false;
+    if (history.yearEnd && year > Number(history.yearEnd)) return false;
+    return true;
+  }
+
+  function historyRequiredFiltersReady(history) {
+    return !!history.filters.teamKey && historyYearIsValid(history) && (history.filters.scope !== "estadual" || !!history.filters.uf);
   }
 
   function hideHistoryTeamSuggestions() {
@@ -2010,14 +2036,19 @@
 
   function updateHistorySearchControls() {
     var history = state.historyContribution;
-    var ready = Number(history.filters.year) > 0 && !!history.filters.teamKey;
+    var teamSelected = !!history.filters.teamKey;
+    var yearValid = historyYearIsValid(history);
+    var baseReady = teamSelected && yearValid;
+    var ready = historyRequiredFiltersReady(history);
     var button = byId("historySearchButton");
     var hint = byId("historySearchHint");
+    var yearInput = byId("historyYearInput");
+    if (yearInput) yearInput.disabled = !teamSelected;
     if (button) button.disabled = !ready || history.loading;
-    if (hint) hint.textContent = ready ? "Os demais filtros são opcionais." : "Para pesquisar, escolha o ano e selecione um time na lista.";
+    if (hint) hint.textContent = !teamSelected ? "Primeiro, selecione um time na lista." : !yearValid ? "Digite o ano completo com 4 dígitos." : history.filters.scope === "estadual" && !history.filters.uf ? "Selecione a UF da competição estadual." : "Pronto para pesquisar.";
     all("[data-history-filter]").forEach(function (select) {
       var name = select.getAttribute("data-history-filter");
-      select.disabled = !ready || (name === "uf" && history.filters.scope === "nacional");
+      select.disabled = !baseReady || (name === "uf" && history.filters.scope !== "estadual");
     });
   }
 
@@ -2028,8 +2059,11 @@
     var competitionOptions = historySelectOptions(facets.competitions, filters.competitionKey, "Todas", function (item) { return item.chave; }, function (item) { return competitionDisplayName(item.nome || "Competição"); });
     var seasonOptions = historySelectOptions(facets.seasons, filters.season, "Todas", null, null);
     var scopeOptions = historySelectOptions(facets.scopes, filters.scope, "Todas", null, function (value) { return value === "nacional" ? "Nacional" : value === "estadual" ? "Estadual" : value; });
-    var ufOptions = historySelectOptions(facets.ufs, filters.uf, "Todas", null, null);
-    return "<section class=\"ie-history-search\"><div class=\"ie-history-search-intro\"><strong>Encontre um confronto</strong><span>A lista começa com os 20 registros mais recentes. Para uma pesquisa específica, informe ano e time.</span></div><div class=\"ie-history-filters\"><label class=\"ie-history-field\"><span>Ano *</span><input id=\"historyYearInput\" type=\"number\" inputmode=\"numeric\" min=\"" + escapeHtml(history.yearStart || 1800) + "\" max=\"" + escapeHtml(history.yearEnd || new Date().getFullYear()) + "\" value=\"" + escapeHtml(filters.year) + "\" placeholder=\"Ano\"></label><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Time *</span><input id=\"historyTeamInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.teamQuery) + "\" placeholder=\"Digite e selecione o time\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyTeamSuggestions\" aria-expanded=\"false\"><div id=\"historyTeamSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div></label><label class=\"ie-history-field is-wide\"><span>Competição</span><select data-history-filter=\"competitionKey\"" + (!filters.teamKey || !filters.year ? " disabled" : "") + ">" + competitionOptions + "</select></label><label class=\"ie-history-field\"><span>Temporada</span><select data-history-filter=\"season\"" + (!filters.teamKey || !filters.year ? " disabled" : "") + ">" + seasonOptions + "</select></label><label class=\"ie-history-field\"><span>Abrangência</span><select data-history-filter=\"scope\"" + (!filters.teamKey || !filters.year ? " disabled" : "") + ">" + scopeOptions + "</select></label><label class=\"ie-history-field\"><span>UF</span><select data-history-filter=\"uf\"" + (!filters.teamKey || !filters.year || filters.scope === "nacional" ? " disabled" : "") + ">" + ufOptions + "</select></label></div><span id=\"historySearchHint\" class=\"ie-history-search-hint\"></span><div class=\"ie-history-search-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" id=\"historySearchButton\" data-history-action=\"search\">Pesquisar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"clear\">Limpar filtros</button></div></section>";
+    var ufOptions = historySelectOptions(facets.ufs, filters.uf, "Selecione", null, null);
+    var baseReady = !!filters.teamKey && historyYearIsValid(history);
+    var scopeFieldClass = filters.scope === "estadual" ? "ie-history-field" : "ie-history-field is-wide";
+    var ufField = filters.scope === "estadual" ? "<label class=\"ie-history-field\"><span>UF *</span><select data-history-filter=\"uf\"" + (!baseReady ? " disabled" : "") + ">" + ufOptions + "</select></label>" : "";
+    return "<section class=\"ie-history-search\"><div class=\"ie-history-search-intro\"><strong>Encontre um confronto</strong><span>Selecione os campos obrigatórios para consultar até 20 confrontos por página.</span></div><div class=\"ie-history-filters\"><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Time *</span><input id=\"historyTeamInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.teamQuery) + "\" placeholder=\"Digite e selecione o time\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyTeamSuggestions\" aria-expanded=\"false\"><div id=\"historyTeamSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div></label><label class=\"ie-history-field\"><span>Ano *</span><input id=\"historyYearInput\" type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]{4}\" maxlength=\"4\" value=\"" + escapeHtml(filters.year) + "\" placeholder=\"0000\"" + (!filters.teamKey ? " disabled" : "") + "></label><label class=\"ie-history-field\"><span>Temporada</span><select data-history-filter=\"season\"" + (!baseReady ? " disabled" : "") + ">" + seasonOptions + "</select></label><label class=\"" + scopeFieldClass + "\"><span>Abrangência</span><select data-history-filter=\"scope\"" + (!baseReady ? " disabled" : "") + ">" + scopeOptions + "</select></label>" + ufField + "<label class=\"ie-history-field is-wide\"><span>Competição</span><select data-history-filter=\"competitionKey\"" + (!baseReady ? " disabled" : "") + ">" + competitionOptions + "</select></label></div><small class=\"ie-history-required-note\">* Campos obrigatórios.</small><span id=\"historySearchHint\" class=\"ie-history-search-hint\" aria-live=\"polite\"></span><div class=\"ie-history-search-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" id=\"historySearchButton\" data-history-action=\"search\"" + (!historyRequiredFiltersReady(history) || history.loading ? " disabled" : "") + ">Pesquisar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"clear\">Limpar filtros</button></div></section>";
   }
 
   function renderHistoryRow(row) {
@@ -2044,12 +2078,12 @@
   function renderHistoryContributionPage() {
     var history = state.historyContribution;
     byId("detailContent").setAttribute("data-detail-view", "history-list");
-    byId("detailTitle").textContent = "Colabore com nossa base";
+    byId("detailTitle").textContent = "Colabore com nossa base de dados";
     byId("detailSubtitle").textContent = "Futebol do Brasil";
-    var listTitle = history.mode === "pesquisa" ? "Resultados da pesquisa" : "Confrontos mais recentes";
-    var rows = history.rows.length ? "<div class=\"ie-history-table\">" + history.rows.map(renderHistoryRow).join("") + "</div>" : emptyState("Nenhum confronto encontrado", history.mode === "pesquisa" ? "Revise os filtros informados ou envie um confronto que ainda não está na base." : "Ainda não há registros disponíveis.", false);
+    var listTitle = history.mode === "pesquisa" ? "Resultados da pesquisa" : "Confrontos";
+    var rows = history.mode !== "pesquisa" ? emptyState("Selecione os filtros obrigatórios", "Escolha um time e informe o ano para consultar os confrontos mais recentes.", false) : history.rows.length ? "<div class=\"ie-history-table\">" + history.rows.map(renderHistoryRow).join("") + "</div>" : emptyState("Nenhum confronto encontrado", "Revise os filtros informados ou envie um confronto que ainda não está na base.", false);
     var pager = history.page > 1 || history.hasMore ? "<nav class=\"ie-history-pager\" aria-label=\"Paginação dos confrontos\"><button type=\"button\" data-history-action=\"previous\"" + (history.page <= 1 || history.loading ? " disabled" : "") + ">Anterior</button><span>Página " + escapeHtml(history.page) + "</span><button type=\"button\" data-history-action=\"next\"" + (!history.hasMore || history.loading ? " disabled" : "") + ">Próxima</button></nav>" : "";
-    byId("detailContent").innerHTML = renderHistoryFilters() + "<section class=\"ie-history-results\"><header><div><strong>" + escapeHtml(listTitle) + "</strong><span>Toque em uma linha para sugerir uma correção.</span></div><button class=\"ie-history-add\" type=\"button\" data-history-action=\"new\" aria-label=\"Enviar um confronto não localizado\">+</button></header>" + (history.loading ? "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>" : rows + pager) + "</section>";
+    byId("detailContent").innerHTML = renderHistoryFilters() + "<section class=\"ie-history-results\"><header><div><strong>" + escapeHtml(listTitle) + "</strong><span>Toque em um confronto para sugerir correção ou ao lado para incluir algum que não esteja listado.</span></div><button class=\"ie-history-add\" type=\"button\" data-history-action=\"new\" aria-label=\"Enviar um confronto não localizado\">+</button></header>" + (history.loading ? "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>" : rows + pager) + "</section>";
     updateHistorySearchControls();
     renderHistoryTeamSuggestions();
   }
@@ -2070,7 +2104,7 @@
 
   async function loadHistoryFacets() {
     var history = state.historyContribution;
-    if (!Number(history.filters.year) || !history.filters.teamKey) return;
+    if (!historyYearIsValid(history) || !history.filters.teamKey) return;
     var requestId = ++history.filterRequestId;
     try {
       var result = await rpc("ie_hist_futebol_brasil_filtros_rpc", {
@@ -2126,7 +2160,7 @@
     var filters = history.filters;
     return {
       p_modo: history.mode,
-      p_ano: history.mode === "pesquisa" ? Number(filters.year) : null,
+      p_ano: history.mode === "pesquisa" && historyYearIsValid(history) ? Number(filters.year) : null,
       p_time_chave: history.mode === "pesquisa" ? filters.teamKey : null,
       p_competicao_chave: history.mode === "pesquisa" && filters.competitionKey ? filters.competitionKey : null,
       p_temporada: history.mode === "pesquisa" && filters.season ? filters.season : null,
@@ -2163,21 +2197,16 @@
 
   async function openHistoryContribution(pushCurrent) {
     state.historyContribution = emptyHistoryContributionState();
-    beginDetail("Colabore com nossa base", "Carregando confrontos...", !!pushCurrent);
+    beginDetail("Colabore com nossa base de dados", "Carregando filtros...", !!pushCurrent);
     byId("detailContent").setAttribute("data-detail-view", "history-loading");
     var history = state.historyContribution;
     history.loading = true;
     var requestId = ++history.filterRequestId;
     try {
-      var results = await Promise.all([
-        rpc("ie_hist_futebol_brasil_filtros_rpc", { p_ano: null, p_busca_time: null, p_time_chave: null, p_limite: 12 }),
-        rpc("ie_hist_futebol_brasil_confrontos_listar_rpc", historyListPayload(null))
-      ]);
+      var result = await rpc("ie_hist_futebol_brasil_filtros_rpc", { p_ano: null, p_busca_time: null, p_time_chave: null, p_limite: 12 });
       if (history !== state.historyContribution || requestId !== history.filterRequestId || historyDetailView() !== "history-loading") return;
-      applyHistoryFilterResponse(results[0] || {}, history);
-      history.rows = arrayOf(results[1]);
-      history.nextCursor = results[1] && results[1].next_cursor || null;
-      history.hasMore = !!(results[1] && results[1].tem_mais);
+      applyHistoryFilterResponse(result || {}, history);
+      resetHistorySearchResults();
       history.loading = false;
       renderHistoryContributionPage();
     } catch (error) {
@@ -2201,7 +2230,7 @@
     };
     history.teams = [];
     history.facets = { competitions: [], seasons: [], scopes: [], ufs: [] };
-    history.mode = "recentes";
+    history.mode = "aguardando";
     history.cursor = null;
     history.nextCursor = null;
     history.cursorStack = [];
@@ -2210,15 +2239,10 @@
     var requestId = ++history.filterRequestId;
     renderHistoryContributionPage();
     try {
-      var results = await Promise.all([
-        rpc("ie_hist_futebol_brasil_filtros_rpc", { p_ano: null, p_busca_time: null, p_time_chave: null, p_limite: 12 }),
-        rpc("ie_hist_futebol_brasil_confrontos_listar_rpc", historyListPayload(null))
-      ]);
+      var result = await rpc("ie_hist_futebol_brasil_filtros_rpc", { p_ano: null, p_busca_time: null, p_time_chave: null, p_limite: 12 });
       if (history !== state.historyContribution || requestId !== history.filterRequestId || historyDetailView() !== "history-list") return;
-      applyHistoryFilterResponse(results[0] || {}, history);
-      history.rows = arrayOf(results[1]);
-      history.nextCursor = results[1] && results[1].next_cursor || null;
-      history.hasMore = !!(results[1] && results[1].tem_mais);
+      applyHistoryFilterResponse(result || {}, history);
+      resetHistorySearchResults();
     } catch (error) {
       if (history === state.historyContribution && requestId === history.filterRequestId && historyDetailView() === "history-list") showToast(friendlyError(error), true);
     } finally {
@@ -2260,7 +2284,9 @@
     html += historyFormField("Rodada", "rodada", "text", row.rodada, { required: requiredForInclusion, maxLength: 120 });
     html += historyFormField("Estádio", "estadio", "text", row.estadio, { required: requiredForInclusion, wide: true, maxLength: 200 });
     html += historyFormField("Cidade", "cidade", "text", row.cidade, { required: requiredForInclusion, wide: true, maxLength: 160 });
-    html += "<label class=\"ie-history-official is-wide\"><input type=\"checkbox\" name=\"partida_oficial\"" + (row.partida_oficial === false ? "" : " checked") + "><span>Partida oficial</span></label><label class=\"ie-history-form-field is-wide\"><span>Observação</span><textarea name=\"observacao\" maxlength=\"1000\" rows=\"3\" placeholder=\"Se desejar, explique o que deve ser conferido.\"></textarea></label></div><small class=\"ie-history-author-note\">Sua contribuição ficará vinculada à sua conta para análise.</small><button class=\"ie-button ie-button-primary ie-history-submit\" type=\"submit\">Enviar para análise</button></form>";
+    var officialSelected = correction && row.partida_oficial !== false;
+    var friendlySelected = correction && row.partida_oficial === false;
+    html += "<fieldset class=\"ie-history-match-type is-wide\"><legend>Tipo da partida *</legend><div><label><input type=\"radio\" name=\"partida_oficial\" value=\"true\" required" + (officialSelected ? " checked" : "") + "><span>Partida oficial</span></label><label><input type=\"radio\" name=\"partida_oficial\" value=\"false\" required" + (friendlySelected ? " checked" : "") + "><span>Amistoso</span></label></div></fieldset><label class=\"ie-history-form-field is-wide\"><span>Observação</span><textarea name=\"observacao\" maxlength=\"1000\" rows=\"3\" placeholder=\"Se desejar, explique o que deve ser conferido.\"></textarea></label></div><small class=\"ie-history-author-note\">Sua contribuição ficará vinculada à sua conta para análise.</small><button class=\"ie-button ie-button-primary ie-history-submit\" type=\"submit\">Enviar para análise</button></form>";
     byId("detailTitle").textContent = correction ? "Corrigir confronto" : "Enviar confronto";
     byId("detailSubtitle").textContent = correction ? historyDate(row.data_partida) + " · " + (row.time_casa || "Casa") + " × " + (row.time_fora || "Visitante") : "Nova informação para análise";
     byId("detailContent").innerHTML = html;
@@ -2303,7 +2329,7 @@
       rodada: String(values.get("rodada") || "").trim(),
       estadio: String(values.get("estadio") || "").trim(),
       cidade: String(values.get("cidade") || "").trim(),
-      partida_oficial: !!form.querySelector("[name=partida_oficial]").checked
+      partida_oficial: String(values.get("partida_oficial")) === "true"
     };
     if (type === "correcao") {
       if (normalizeSearchText(data.time_casa) === normalizeSearchText(row.time_casa)) data.time_casa_chave = row.time_casa_chave;
@@ -2372,9 +2398,9 @@
       });
       var oddsHtml = renderOddsDetail(data.odds, sides, data.odds_aviso);
       if (oddsHtml) html += detailSection("Cotações informativas", oddsHtml);
-      byId("detailContent").innerHTML = html;
+      byId("detailContent").innerHTML = detailModeSwitch("", id) + html;
     } catch (error) {
-      byId("detailContent").innerHTML = emptyState("Detalhes indisponíveis", friendlyError(error), false);
+      byId("detailContent").innerHTML = detailModeSwitch("", id) + emptyState("Detalhes indisponíveis", friendlyError(error), false);
     }
   }
 
@@ -2391,21 +2417,33 @@
       byId("detailTitle").textContent = displayText(sides.home.name + " × " + sides.away.name);
       byId("detailSubtitle").textContent = displayText("Cotações informativas" + (event.competicao_nome ? " · " + competitionDisplayName(event.competicao_nome) : ""));
       var html = renderOddsDetail(data.odds, sides, data.odds_aviso);
-      byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + (html || emptyState("Cotações indisponíveis", "Ainda não há cotações atualizadas para esta partida.", false));
+      byId("detailContent").innerHTML = detailModeSwitch("odds", id) + (html || emptyState("Cotações indisponíveis", "Ainda não há cotações atualizadas para esta partida.", false));
     } catch (error) {
-      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + emptyState("Cotações indisponíveis", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("odds", id) + emptyState("Cotações indisponíveis", friendlyError(error), false);
     }
   }
 
-  function detailModeSwitch(target, id) {
-    var analysis = target === "analysis";
-    return "<div class=\"ie-detail-switcher\"><button type=\"button\" class=\"ie-button ie-button-secondary\" data-detail-switch=\"" + (analysis ? "analysis" : "odds") + "\" data-event-id=\"" + escapeHtml(id) + "\">" + icon(analysis ? "analysis" : "chart") + "<span>" + (analysis ? "Ver análises" : "Ver cotações") + "</span></button></div>";
+  function detailModeSwitch(current, id) {
+    function switchButton(mode, iconName, label) {
+      var selected = current === mode;
+      return "<button type=\"button\" data-detail-switch=\"" + mode + "\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"" + label + "\"" + (selected ? " aria-current=\"true\"" : "") + ">" + icon(iconName) + "</button>";
+    }
+    return "<div class=\"ie-detail-switcher\"><div class=\"ie-match-actions\" role=\"group\" aria-label=\"Cotações e análises\">" + switchButton("odds", "chart", "Abrir cotações") + switchButton("analysis", "analysis", "Abrir análises") + "</div></div>";
+  }
+
+  function sectionModeSwitch(current) {
+    function switchButton(section, iconName, label) {
+      var selected = current === section;
+      return "<button type=\"button\" data-section-mode-switch=\"" + section + "\" aria-label=\"" + label + "\"" + (selected ? " aria-current=\"true\"" : "") + ">" + icon(iconName) + "</button>";
+    }
+    return "<div class=\"ie-detail-switcher\"><div class=\"ie-match-actions\" role=\"group\" aria-label=\"Cotações e análises\">" + switchButton("cotacoes", "chart", "Abrir cotações") + switchButton("analises", "analysis", "Abrir análises") + "</div></div>";
   }
 
   function openGenericDetail(kind, id, title, pushCurrent) {
-    beginDetail(title || "Detalhes", "", !!pushCurrent);
+    beginDetail(title || "Detalhes", "", pushCurrent);
     byId("detailSubtitle").textContent = kind === "competition" ? "Competição acompanhada" : kind === "analysis" ? "Resumo estatístico personalizado" : kind === "odds" ? "Cotações informativas" : "Time ou participante acompanhado";
-    byId("detailContent").innerHTML = emptyState("Informações completas na central", kind === "analysis" ? "As análises usam somente os dados disponíveis para as suas seleções e não representam recomendação nem garantia de resultado." : kind === "odds" ? "Ainda não há cotações atualizadas para esta partida." : "As próximas partidas, resultados e dados relacionados ficam disponíveis nas áreas correspondentes.", false);
+    var modeSwitcher = kind === "analysis" || kind === "odds" ? detailModeSwitch(kind, id) : "";
+    byId("detailContent").innerHTML = modeSwitcher + emptyState("Informações completas na central", kind === "analysis" ? "As análises usam somente os dados disponíveis para as suas seleções e não representam recomendação nem garantia de resultado." : kind === "odds" ? "Ainda não há cotações atualizadas para esta partida." : "As próximas partidas, resultados e dados relacionados ficam disponíveis nas áreas correspondentes.", false);
   }
 
   async function openAnalysisDetail(id, title, pushCurrent) {
@@ -2423,9 +2461,9 @@
       if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       byId("detailTitle").textContent = displayText((data.time_a && data.time_a.nome || "Time A") + " × " + (data.time_b && data.time_b.nome || "Time B"));
       byId("detailSubtitle").textContent = "Histórico completo do confronto";
-      byId("detailContent").innerHTML = detailModeSwitch("odds", id) + renderBrazilDatabaseSummary(baseSummary) + renderHistoricalComparison(data);
+      byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + renderBrazilDatabaseSummary(baseSummary) + renderHistoricalComparison(data);
     } catch (error) {
-      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("odds", id) + emptyState("Análise indisponível", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + emptyState("Análise indisponível", friendlyError(error), false);
     }
   }
 
@@ -2732,7 +2770,9 @@
     }, 120);
     document.addEventListener("input", function (event) {
       if (event.target.id === "historyYearInput") {
-        state.historyContribution.filters.year = String(event.target.value || "").trim();
+        var digits = String(event.target.value || "").replace(/\D/g, "").slice(0, 4);
+        event.target.value = digits;
+        state.historyContribution.filters.year = digits;
         updateHistorySearchControls();
         return;
       }
@@ -2745,7 +2785,9 @@
       if (normalizeSearchText(query) !== normalizeSearchText(history.filters.teamName)) {
         history.filters.teamKey = "";
         history.filters.teamName = "";
+        history.filters.year = "";
         resetHistoryOptionalFilters();
+        resetHistorySearchResults();
       }
       updateHistorySearchControls();
       hideHistoryTeamSuggestions();
@@ -2756,17 +2798,19 @@
         var history = state.historyContribution;
         history.filters.year = String(event.target.value || "").trim();
         resetHistoryOptionalFilters();
+        resetHistorySearchResults();
         renderHistoryContributionPage();
-        if (history.filters.year && history.filters.teamKey) updateHistoryFacets();
+        if (historyYearIsValid(history) && history.filters.teamKey) updateHistoryFacets();
         return;
       }
       var historyFilter = event.target.getAttribute && event.target.getAttribute("data-history-filter");
       if (!historyFilter) return;
       state.historyContribution.filters[historyFilter] = String(event.target.value || "");
       if (historyFilter === "scope") {
-        if (state.historyContribution.filters.scope === "nacional") state.historyContribution.filters.uf = "";
-        renderHistoryContributionPage();
+        if (state.historyContribution.filters.scope !== "estadual") state.historyContribution.filters.uf = "";
       }
+      resetHistorySearchResults();
+      renderHistoryContributionPage();
     });
     document.addEventListener("submit", function (event) {
       var form = event.target.closest && event.target.closest("[data-history-contribution-form]");
@@ -2798,6 +2842,30 @@
 
     var favoriteDrag = null;
 
+    function animateFavoriteRows(list, rowSelector, mutate) {
+      var rows = all(rowSelector, list).filter(function (row) { return !row.classList.contains("is-dragging"); });
+      var positions = new Map();
+      rows.forEach(function (row) { positions.set(row, row.getBoundingClientRect().top); });
+      mutate();
+      rows.forEach(function (row) {
+        var previousTop = positions.get(row);
+        var currentTop = row.getBoundingClientRect().top;
+        var offset = previousTop - currentTop;
+        if (Math.abs(offset) < 1) return;
+        row.style.transition = "none";
+        row.style.transform = "translate3d(0," + offset + "px,0)";
+        requestAnimationFrame(function () {
+          row.style.transition = "transform 170ms cubic-bezier(.22,.8,.3,1)";
+          row.style.transform = "translate3d(0,0,0)";
+          window.setTimeout(function () {
+            if (row.classList.contains("is-dragging")) return;
+            row.style.removeProperty("transition");
+            row.style.removeProperty("transform");
+          }, 190);
+        });
+      });
+    }
+
     function mergeVisibleFavoriteOrder(currentOrder, visibleOrder) {
       var visible = {};
       visibleOrder.forEach(function (id) { visible[String(id)] = true; });
@@ -2814,17 +2882,42 @@
     function finishFavoriteDrag(event) {
       if (!favoriteDrag || (event && event.pointerId !== favoriteDrag.pointerId)) return;
       var drag = favoriteDrag;
+      var currentRect = drag.row.getBoundingClientRect();
+      drag.placeholder.parentNode.insertBefore(drag.row, drag.placeholder);
+      drag.placeholder.remove();
+      drag.row.style.removeProperty("position");
+      drag.row.style.removeProperty("top");
+      drag.row.style.removeProperty("left");
+      drag.row.style.removeProperty("width");
+      drag.row.style.removeProperty("height");
+      drag.row.style.removeProperty("margin");
+      drag.row.style.removeProperty("transform");
+      drag.row.classList.remove("is-dragging");
+      var finalRect = drag.row.getBoundingClientRect();
+      drag.row.classList.add("is-settling");
+      drag.row.style.transition = "none";
+      drag.row.style.transform = "translate3d(" + (currentRect.left - finalRect.left) + "px," + (currentRect.top - finalRect.top) + "px,0)";
+      requestAnimationFrame(function () {
+        drag.row.style.transition = "transform 190ms cubic-bezier(.22,.8,.3,1)";
+        drag.row.style.transform = "translate3d(0,0,0)";
+      });
       var visibleOrder = all(drag.rowSelector, drag.list).map(function (row) {
         return Number(row.getAttribute(drag.rowAttribute));
       }).filter(function (id) { return id > 0; });
       if (drag.kind === "sport") state.sportFavoriteOrder = mergeVisibleFavoriteOrder(state.sportFavoriteOrder, visibleOrder);
       else state.favoriteOrder = mergeVisibleFavoriteOrder(state.favoriteOrder, visibleOrder);
       state.preferenceRevision += 1;
-      drag.row.classList.remove("is-dragging");
       document.body.classList.remove("ie-reordering-favorites");
       favoriteDrag = null;
-      if (drag.kind === "sport") renderSportFavoriteSettings();
-      else renderSelectionLists();
+      var settledRevision = state.preferenceRevision;
+      window.setTimeout(function () {
+        drag.row.classList.remove("is-settling");
+        drag.row.style.removeProperty("transition");
+        drag.row.style.removeProperty("transform");
+        if (favoriteDrag || state.preferenceRevision !== settledRevision) return;
+        if (drag.kind === "sport") renderSportFavoriteSettings();
+        else renderSelectionLists();
+      }, 210);
     }
 
     document.addEventListener("pointerdown", function (event) {
@@ -2839,8 +2932,20 @@
       if (!row) return;
       event.preventDefault();
       detailGesture = null;
-      favoriteDrag = { pointerId: event.pointerId, row: row, list: list, rowSelector: rowSelector, rowAttribute: rowAttribute, kind: kind };
+      var rect = row.getBoundingClientRect();
+      var placeholder = document.createElement("div");
+      placeholder.className = "ie-favorite-drop-placeholder";
+      placeholder.style.height = rect.height + "px";
+      row.parentNode.insertBefore(placeholder, row.nextSibling);
+      favoriteDrag = { pointerId: event.pointerId, row: row, list: list, rowSelector: rowSelector, rowAttribute: rowAttribute, kind: kind, placeholder: placeholder, startTop: rect.top, grabOffsetY: event.clientY - rect.top };
       row.classList.add("is-dragging");
+      row.style.position = "fixed";
+      row.style.top = rect.top + "px";
+      row.style.left = rect.left + "px";
+      row.style.width = rect.width + "px";
+      row.style.height = rect.height + "px";
+      row.style.margin = "0";
+      row.style.transform = "translate3d(0,0,0)";
       document.body.classList.add("ie-reordering-favorites");
       if (handle.setPointerCapture) {
         try { handle.setPointerCapture(event.pointerId); } catch (error) {}
@@ -2851,6 +2956,8 @@
       if (!favoriteDrag || event.pointerId !== favoriteDrag.pointerId) return;
       event.preventDefault();
       var list = favoriteDrag.list;
+      var dragTop = event.clientY - favoriteDrag.grabOffsetY;
+      favoriteDrag.row.style.transform = "translate3d(0," + (dragTop - favoriteDrag.startTop) + "px,0)";
       if (favoriteDrag.kind === "sport") {
         var tabs = document.querySelector(".ie-tabs");
         var pageTopEdge = tabs ? tabs.getBoundingClientRect().bottom + 24 : 72;
@@ -2865,10 +2972,12 @@
       var target = pointed && pointed.closest(favoriteDrag.rowSelector);
       if (!target || target === favoriteDrag.row || target.parentNode !== favoriteDrag.row.parentNode) return;
       var bounds = target.getBoundingClientRect();
-      target.parentNode.insertBefore(
-        favoriteDrag.row,
-        event.clientY < bounds.top + bounds.height / 2 ? target : target.nextSibling
-      );
+      var before = event.clientY < bounds.top + bounds.height / 2;
+      var reference = before ? target : target.nextSibling;
+      if (reference === favoriteDrag.placeholder || (!reference && favoriteDrag.placeholder === target.parentNode.lastElementChild)) return;
+      animateFavoriteRows(list, favoriteDrag.rowSelector, function () {
+        target.parentNode.insertBefore(favoriteDrag.placeholder, reference);
+      });
     }, { passive: false });
 
     document.addEventListener("pointerup", finishFavoriteDrag, { passive: true });
@@ -2901,10 +3010,15 @@
           history.filters.teamName = historyAction.getAttribute("data-history-team-name") || "";
           history.filters.teamQuery = history.filters.teamName;
           resetHistoryOptionalFilters();
+          resetHistorySearchResults();
           renderHistoryContributionPage();
-          if (history.filters.year) loadHistoryFacets();
+          if (historyYearIsValid(history)) loadHistoryFacets();
+          window.setTimeout(function () {
+            var yearInput = byId("historyYearInput");
+            if (yearInput) yearInput.focus();
+          }, 0);
         } else if (action === "search") {
-          if (!Number(history.filters.year) || !history.filters.teamKey || history.loading) return;
+          if (!historyRequiredFiltersReady(history) || history.loading) return;
           history.mode = "pesquisa";
           history.cursor = null;
           history.nextCursor = null;
@@ -2963,6 +3077,19 @@
         );
         return;
       }
+      var sectionModeSwitchButton = event.target.closest("[data-section-mode-switch]");
+      if (sectionModeSwitchButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        detailGesture = null;
+        var sectionMode = sectionModeSwitchButton.getAttribute("data-section-mode-switch");
+        if (sectionModeSwitchButton.getAttribute("aria-current") === "true") return;
+        state.homeSectionFilter = sectionMode;
+        activateTab("home");
+        renderHome();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
       var detailSwitch = event.target.closest("[data-detail-switch]");
       if (detailSwitch) {
         event.preventDefault();
@@ -2970,6 +3097,7 @@
         detailGesture = null;
         var switchTarget = detailSwitch.getAttribute("data-detail-switch");
         var switchEventId = detailSwitch.getAttribute("data-event-id");
+        if (detailSwitch.getAttribute("aria-current") === "true") return;
         if (switchTarget === "analysis") openAnalysisDetail(switchEventId, "Análises estatísticas", "replace");
         else openOddsDetail(switchEventId, "Cotações informativas", "replace");
         return;
