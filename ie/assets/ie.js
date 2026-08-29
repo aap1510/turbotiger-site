@@ -73,7 +73,6 @@
     gameCompetitionGames: { live: [], upcoming: [], results: [] },
     gameCompetitionLoading: false,
     gameCompetitionRequestId: 0,
-    gamesPrioritizeFavorites: false,
     catalog: { participants: [], competitions: [] },
     catalogKnown: { participants: {}, competitions: {} },
     catalogRequestId: 0,
@@ -566,7 +565,7 @@
   function ensureActiveSport() {
     var available = catalogSports().map(sportId).filter(function (id) { return id > 0; });
     state.sportFavoriteOrder = state.sportFavoriteOrder.filter(function (id, index, values) { return available.indexOf(Number(id)) >= 0 && values.indexOf(id) === index; }).map(Number);
-    if (available.indexOf(Number(state.activeSportId)) < 0) state.activeSportId = state.sportFavoriteOrder[0] || available[0] || null;
+    if (state.sportFavoriteOrder.indexOf(Number(state.activeSportId)) < 0) state.activeSportId = state.sportFavoriteOrder[0] || null;
   }
 
   function activeSport() {
@@ -584,12 +583,22 @@
     });
   }
 
+  function selectionFavoriteOrder(item, fallbackIndex) {
+    var value = item && item.ordem_favorito;
+    if (value !== null && value !== undefined && value !== "" && Number.isFinite(Number(value))) return Number(value);
+    value = item && item.id_selecao;
+    if (value !== null && value !== undefined && value !== "" && Number.isFinite(Number(value))) return Number(value);
+    return Number.MAX_SAFE_INTEGER - 1000 + numberOf(fallbackIndex, 0);
+  }
+
   function gameCompetitionSelections() {
-    return followedSelections("competition", state.activeSportId).slice().sort(function (a, b) {
-      var aName = competitionDisplayName(a.nome || a.nome_exibicao || a.competicao_nome || "Competição");
-      var bName = competitionDisplayName(b.nome || b.nome_exibicao || b.competicao_nome || "Competição");
-      return aName.localeCompare(bName, "pt-BR");
-    });
+    return followedSelections("competition", state.activeSportId).map(function (item, index) { return { item: item, index: index }; }).sort(function (a, b) {
+      var aOrder = selectionFavoriteOrder(a.item, a.index);
+      var bOrder = selectionFavoriteOrder(b.item, b.index);
+      var aName = competitionDisplayName(a.item.nome || a.item.nome_exibicao || a.item.competicao_nome || "Competição");
+      var bName = competitionDisplayName(b.item.nome || b.item.nome_exibicao || b.item.competicao_nome || "Competição");
+      return aOrder - bOrder || aName.localeCompare(bName, "pt-BR");
+    }).map(function (entry) { return entry.item; });
   }
 
   function resetGameCompetitionFilter() {
@@ -656,21 +665,23 @@
     return Number.isFinite(timestamp) ? timestamp : null;
   }
 
-  function sortMatchesByKickoff(rows, filter) {
-    var direction = filter === "results" ? -1 : 1;
-    return arrayOf(rows).map(function (item, index) {
-      return { item: item, index: index, timestamp: matchStartTimestamp(item), id: matchCanonicalId(item) };
-    }).sort(function (a, b) {
-      var aValid = a.timestamp !== null;
-      var bValid = b.timestamp !== null;
-      if (aValid !== bValid) return aValid ? -1 : 1;
-      if (aValid && a.timestamp !== b.timestamp) return (a.timestamp - b.timestamp) * direction;
-      var idOrder = a.id.localeCompare(b.id, "pt-BR", { numeric: true });
-      return idOrder || a.index - b.index;
-    }).map(function (entry) { return entry.item; });
+  function matchCompetitionId(item) {
+    return Number(item && (item.id_competicao || item.competicao_id || item.competicao && (item.competicao.id_competicao || item.competicao.id)) || 0);
   }
 
-  function prioritizeTopFavoriteMatches(rows, wantedSportId, filter) {
+  function orderedFavoriteCompetitionIds(wantedSportId) {
+    return followedSelections("competition", wantedSportId).map(function (item, index) {
+      return {
+        id: Number(selectionIdentity(item).id),
+        order: selectionFavoriteOrder(item, index),
+        index: index
+      };
+    }).filter(function (entry) { return entry.id > 0; }).sort(function (a, b) {
+      return a.order - b.order || a.index - b.index || a.id - b.id;
+    }).map(function (entry) { return entry.id; });
+  }
+
+  function orderMatchesByFavorites(rows, wantedSportId, filter) {
     var seen = {};
     var unique = arrayOf(rows).filter(function (item) {
       var id = matchCanonicalId(item);
@@ -679,19 +690,34 @@
       seen[id] = true;
       return true;
     });
-    var remaining = sortMatchesByKickoff(unique, filter);
-    var prioritized = [];
-    orderedFavoriteParticipantIds(wantedSportId).slice(0, 3).forEach(function (favoriteId) {
-      var alreadyRepresented = prioritized.some(function (item) {
-        return matchParticipantIds(item).indexOf(favoriteId) >= 0;
-      });
-      if (alreadyRepresented) return;
-      var index = remaining.findIndex(function (item) {
-        return matchParticipantIds(item).indexOf(favoriteId) >= 0;
-      });
-      if (index >= 0) prioritized.push(remaining.splice(index, 1)[0]);
+    var favoriteTeams = orderedFavoriteParticipantIds(wantedSportId);
+    var favoriteCompetitions = orderedFavoriteCompetitionIds(wantedSportId);
+    var now = Date.now();
+    return unique.map(function (item, index) {
+      var participantOrders = matchParticipantIds(item).map(function (id) { return favoriteTeams.indexOf(id); }).filter(function (order) { return order >= 0; });
+      var teamOrder = participantOrders.length ? Math.min.apply(Math, participantOrders) : -1;
+      var competitionOrder = favoriteCompetitions.indexOf(matchCompetitionId(item));
+      var groupType = teamOrder >= 0 ? 0 : competitionOrder >= 0 ? 1 : 2;
+      var groupOrder = teamOrder >= 0 ? teamOrder : competitionOrder >= 0 ? competitionOrder : Number.MAX_SAFE_INTEGER;
+      var timestamp = matchStartTimestamp(item);
+      var status = String(item && (item.status || item.status_canonico || item.status_normalizado) || "").toLowerCase();
+      var live = item && item.ao_vivo === true || ["ao_vivo", "live", "em_andamento", "intervalo", "prorrogacao", "penaltis"].indexOf(status) >= 0;
+      var statusOrder = filter === "forYou" ? (live ? 0 : timestamp !== null && timestamp >= now ? 1 : 2) : 0;
+      var descending = filter === "results" || filter === "forYou" && statusOrder === 2;
+      return { item: item, index: index, id: matchCanonicalId(item), groupType: groupType, groupOrder: groupOrder, statusOrder: statusOrder, timestamp: timestamp, descending: descending };
+    }).sort(function (a, b) {
+      if (a.groupType !== b.groupType) return a.groupType - b.groupType;
+      if (a.groupOrder !== b.groupOrder) return a.groupOrder - b.groupOrder;
+      if (a.statusOrder !== b.statusOrder) return a.statusOrder - b.statusOrder;
+      var aValid = a.timestamp !== null;
+      var bValid = b.timestamp !== null;
+      if (aValid !== bValid) return aValid ? -1 : 1;
+      if (aValid && a.timestamp !== b.timestamp) return (a.timestamp - b.timestamp) * (a.descending ? -1 : 1);
+      var idOrder = a.id.localeCompare(b.id, "pt-BR", { numeric: true });
+      return idOrder || a.index - b.index;
+    }).map(function (entry) {
+      return entry.item;
     });
-    return sortMatchesByKickoff(prioritized, filter).concat(remaining);
   }
 
   function renderMatchCard(item, label, interactive) {
@@ -838,7 +864,7 @@
         });
       });
     } else {
-      state.games.forYou.filter(function (item) { return matchInvolvesFavoriteTeam(item, state.activeSportId); }).forEach(function (item) { html.push(renderMatchCard(item)); });
+      orderMatchesByFavorites(state.games.forYou, state.activeSportId, "forYou").forEach(function (item) { html.push(renderMatchCard(item)); });
       state.favoriteCompetitions.forEach(function (item) { html.push(renderCompetitionCard(item)); });
     }
     byId("homeContent").innerHTML = html.join("") || emptyState(filteredSection ? "Nenhuma informação disponível" : "Nenhum favorito neste esporte", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Acompanhe times ou competições deste esporte para montar o seu espaço.", false);
@@ -847,6 +873,11 @@
   function renderGames() {
     var filter = byId("gamesCompetitionFilter");
     var toolbar = filter.closest(".ie-games-filter-toolbar");
+    if (!activeSport()) {
+      if (toolbar) toolbar.hidden = true;
+      byId("gamesContent").innerHTML = emptyState("Escolha seus esportes", "Defina ao menos um esporte favorito para acompanhar confrontos.", true);
+      return;
+    }
     if (!activeSportIsOperational()) {
       if (toolbar) toolbar.hidden = true;
       byId("gamesContent").innerHTML = comingSoonState();
@@ -865,7 +896,7 @@
     filter.setAttribute("aria-busy", state.gameCompetitionLoading ? "true" : "false");
 
     var rows = competitionId ? state.gameCompetitionGames[state.gameFilter] || [] : state.games[state.gameFilter] || [];
-    if (state.gamesPrioritizeFavorites) rows = prioritizeTopFavoriteMatches(rows, state.activeSportId, state.gameFilter);
+    rows = orderMatchesByFavorites(rows, state.activeSportId, state.gameFilter);
     if (competitionId && state.gameCompetitionLoading && !rows.length) {
       byId("gamesContent").innerHTML = emptyState("Carregando confrontos", "Buscando os confrontos desta competição.", false);
       return;
@@ -874,6 +905,10 @@
   }
 
   function renderNews() {
+    if (!activeSport()) {
+      byId("newsContent").innerHTML = emptyState("Escolha seus esportes", "Defina ao menos um esporte favorito para acompanhar notícias.", true);
+      return;
+    }
     if (!activeSportIsOperational()) {
       byId("newsContent").innerHTML = comingSoonState();
       return;
@@ -893,7 +928,7 @@
   }
 
   function renderSportsNav() {
-    var sports = orderedSports();
+    var sports = orderedSports().filter(function (item) { return state.sportFavoriteOrder.indexOf(sportId(item)) >= 0; });
     var nav = byId("sportsNav");
     nav.innerHTML = sports.map(function (item) {
       var id = sportId(item);
@@ -1092,6 +1127,11 @@
   }
 
   function renderEntities() {
+    if (!activeSport()) {
+      byId("teamsContent").innerHTML = emptyState("Escolha seus esportes", "Defina ao menos um esporte favorito para acompanhar times e participantes.", true);
+      byId("competitionsContent").innerHTML = emptyState("Escolha seus esportes", "Defina ao menos um esporte favorito para acompanhar competições.", true);
+      return;
+    }
     if (!activeSportIsOperational()) {
       byId("teamsContent").innerHTML = comingSoonState();
       byId("competitionsContent").innerHTML = comingSoonState();
@@ -1737,7 +1777,6 @@
     var requested = route || initialRouteDefinition();
     if (requested.section === "configuracoes") openSettings(requested.context, true);
     else if (requested.section === "partidas" || requested.section === "jogos") {
-      state.gamesPrioritizeFavorites = requested.context === "favoritos_primeiro";
       activateTab("games");
       chooseAvailableGameFilter();
     }
@@ -1769,7 +1808,7 @@
 
   function beginDetail(title, subtitle, pushCurrent) {
     var detailContent = byId("detailContent");
-    if (pushCurrent && !byId("detailModal").hidden) {
+    if (pushCurrent === true && !byId("detailModal").hidden) {
       state.detailStack.push({
         title: byId("detailTitle").textContent,
         subtitle: byId("detailSubtitle").textContent,
@@ -1777,7 +1816,7 @@
         view: detailContent.getAttribute("data-detail-view") || "",
         scrollTop: detailContent.scrollTop
       });
-    } else if (!pushCurrent) {
+    } else if (pushCurrent !== "replace") {
       state.detailStack = [];
     }
     byId("detailBackButton").hidden = state.detailStack.length === 0;
@@ -2341,18 +2380,26 @@
 
   async function openOddsDetail(id, title, pushCurrent) {
     if (!Number(id)) { openGenericDetail("odds", id, title, pushCurrent); return; }
-    beginDetail(title || "Cotações informativas", "Carregando cotações...", !!pushCurrent);
+    var view = "event-odds:" + Number(id);
+    beginDetail(title || "Cotações informativas", "Carregando cotações...", pushCurrent);
+    byId("detailContent").setAttribute("data-detail-view", view);
     try {
       var data = await rpc("ie_partida_detalhe_rpc", { p_id_evento: Number(id) });
+      if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       var event = data && data.evento || {};
       var sides = matchSides(event);
       byId("detailTitle").textContent = displayText(sides.home.name + " × " + sides.away.name);
       byId("detailSubtitle").textContent = displayText("Cotações informativas" + (event.competicao_nome ? " · " + competitionDisplayName(event.competicao_nome) : ""));
       var html = renderOddsDetail(data.odds, sides, data.odds_aviso);
-      byId("detailContent").innerHTML = html || emptyState("Cotações indisponíveis", "Ainda não há cotações atualizadas para esta partida.", false);
+      byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + (html || emptyState("Cotações indisponíveis", "Ainda não há cotações atualizadas para esta partida.", false));
     } catch (error) {
-      byId("detailContent").innerHTML = emptyState("Cotações indisponíveis", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + emptyState("Cotações indisponíveis", friendlyError(error), false);
     }
+  }
+
+  function detailModeSwitch(target, id) {
+    var analysis = target === "analysis";
+    return "<div class=\"ie-detail-switcher\"><button type=\"button\" class=\"ie-button ie-button-secondary\" data-detail-switch=\"" + (analysis ? "analysis" : "odds") + "\" data-event-id=\"" + escapeHtml(id) + "\">" + icon(analysis ? "analysis" : "chart") + "<span>" + (analysis ? "Ver análises" : "Ver cotações") + "</span></button></div>";
   }
 
   function openGenericDetail(kind, id, title, pushCurrent) {
@@ -2363,17 +2410,22 @@
 
   async function openAnalysisDetail(id, title, pushCurrent) {
     if (!Number(id)) { openGenericDetail("analysis", id, title, pushCurrent); return; }
-    beginDetail(title || "Análises estatísticas", "Carregando histórico do confronto...", !!pushCurrent);
+    var view = "event-analysis:" + Number(id);
+    beginDetail(title || "Análises estatísticas", "Carregando histórico do confronto...", pushCurrent);
+    byId("detailContent").setAttribute("data-detail-view", view);
     try {
       var data = await rpc("ie_confronto_evento_rpc", { p_id_evento: Number(id), p_limite: 20, p_offset: 0 });
+      if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       try { data.desempenho_geral = await rpc("ie_desempenho_geral_evento_rpc", { p_id_evento: Number(id) }); } catch (generalError) { /* desempenho geral pode não estar mapeado */ }
+      if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       var baseSummary = null;
       try { baseSummary = await rpc("ie_base_futebol_brasil_resumo_rpc", {}); } catch (baseError) { /* selo da base não bloqueia as estatísticas */ }
+      if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       byId("detailTitle").textContent = displayText((data.time_a && data.time_a.nome || "Time A") + " × " + (data.time_b && data.time_b.nome || "Time B"));
       byId("detailSubtitle").textContent = "Histórico completo do confronto";
-      byId("detailContent").innerHTML = renderBrazilDatabaseSummary(baseSummary) + renderHistoricalComparison(data);
+      byId("detailContent").innerHTML = detailModeSwitch("odds", id) + renderBrazilDatabaseSummary(baseSummary) + renderHistoricalComparison(data);
     } catch (error) {
-      byId("detailContent").innerHTML = emptyState("Análise indisponível", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("odds", id) + emptyState("Análise indisponível", friendlyError(error), false);
     }
   }
 
@@ -2425,7 +2477,7 @@
     try {
       var phaseFilter = normalizeSearchText(phase) === "temporada regular" ? null : (phase || null);
       var result = await rpc("ie_partidas_listar_rpc", { p_secao: "proximos", p_id_esporte: state.activeSportId ? Number(state.activeSportId) : null, p_id_competicao: Number(competitionId), p_id_participante: Number(participantId), p_fase: phaseFilter, p_limite: 50, p_offset: 0 });
-      var matches = arrayOf(result);
+      var matches = orderMatchesByFavorites(arrayOf(result), state.activeSportId, "upcoming");
       byId("detailTitle").textContent = displayText(title || "Confrontos");
       byId("detailSubtitle").textContent = displayText(phase || "Próximos confrontos");
       byId("detailContent").innerHTML = matches.length ? "<div class=\"ie-feed\">" + matches.map(function (item) { return renderMatchCard(item); }).join("") + "</div>" : emptyState("Nenhum confronto programado", "Ainda não há confrontos futuros disponíveis nesta fase.", false);
@@ -2625,7 +2677,6 @@
     all("[data-tab]").forEach(function (button) {
       button.addEventListener("click", function () {
         var tab = button.getAttribute("data-tab");
-        if (tab === "games") state.gamesPrioritizeFavorites = false;
         activateTab(tab);
       });
     });
@@ -2910,6 +2961,17 @@
           entitySelection.getAttribute("data-entity-selection-key"),
           entitySelection.getAttribute("data-entity-selection-kind")
         );
+        return;
+      }
+      var detailSwitch = event.target.closest("[data-detail-switch]");
+      if (detailSwitch) {
+        event.preventDefault();
+        event.stopPropagation();
+        detailGesture = null;
+        var switchTarget = detailSwitch.getAttribute("data-detail-switch");
+        var switchEventId = detailSwitch.getAttribute("data-event-id");
+        if (switchTarget === "analysis") openAnalysisDetail(switchEventId, "Análises estatísticas", "replace");
+        else openOddsDetail(switchEventId, "Cotações informativas", "replace");
         return;
       }
       var matchAction = event.target.closest("[data-match-action]");

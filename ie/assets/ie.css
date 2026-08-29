@@ -1659,6 +1659,25 @@ body.ie-reordering-favorites {
   padding: 18px 18px calc(24px + env(safe-area-inset-bottom));
 }
 
+.ie-detail-switcher {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 14px;
+}
+
+.ie-detail-switcher .ie-button {
+  min-height: 40px;
+  gap: 8px;
+  padding: 0 14px;
+  color: var(--ie-text);
+}
+
+.ie-detail-switcher svg {
+  width: 17px;
+  height: 17px;
+  color: var(--ie-gold);
+}
+
 .ie-detail-section {
   padding: 15px 0;
   border-bottom: 1px solid var(--ie-border);
