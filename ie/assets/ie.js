@@ -3237,6 +3237,16 @@
     }
 
     document.addEventListener("click", function (event) {
+      var historyTeamField = event.target.closest(".ie-history-team-field");
+      if (!historyTeamField) {
+        hideHistoryTeamSuggestions("team");
+        hideHistoryTeamSuggestions("opponent");
+      } else if (historyTeamField.querySelector("#historyTeamInput")) {
+        hideHistoryTeamSuggestions("opponent");
+      } else {
+        hideHistoryTeamSuggestions("team");
+      }
+
       var historyAction = event.target.closest("[data-history-action]");
       if (historyAction) {
         event.preventDefault();
