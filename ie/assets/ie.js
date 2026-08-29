@@ -43,6 +43,8 @@
         uf: ""
       },
       teams: [],
+      teamSuggestions: [],
+      opponentSuggestions: [],
       facets: { competitions: [], seasons: [], scopes: [], ufs: [] },
       rows: [],
       mode: "aguardando",
@@ -2099,7 +2101,7 @@
       return;
     }
     var ownKeys = historySelectedKeys(false);
-    var suggestionTeams = history.teams.filter(function (team) { return !opponent || ownKeys.indexOf(String(team.time_chave)) < 0; });
+    var suggestionTeams = arrayOf(opponent ? history.opponentSuggestions : history.teamSuggestions).filter(function (team) { return !opponent || ownKeys.indexOf(String(team.time_chave)) < 0; });
     container.innerHTML = suggestionTeams.length ? suggestionTeams.map(function (team) {
       var period = [team.primeiro_jogo_em ? historyDate(team.primeiro_jogo_em) : "", team.ultimo_jogo_em ? historyDate(team.ultimo_jogo_em) : ""].filter(Boolean).join(" a ");
       var checked = selectedKeys.indexOf(String(team.time_chave)) >= 0;
@@ -2211,7 +2213,8 @@
     }
     var requestId = ++history.filterRequestId;
     if (wanted.length < 2) {
-      history.teams = [];
+      if (opponent) history.opponentSuggestions = [];
+      else history.teamSuggestions = [];
       hideHistoryTeamSuggestions(target);
       return;
     }
@@ -2226,11 +2229,13 @@
       if (history !== state.historyContribution || requestId !== history.filterRequestId || wanted !== currentQuery) return;
       history.yearStart = Number(result && result.ano_inicio || history.yearStart || 0) || null;
       history.yearEnd = Number(result && result.ano_fim || history.yearEnd || 0) || null;
-      history.teams = arrayOf(result && result.times);
+      if (opponent) history.opponentSuggestions = arrayOf(result && result.times);
+      else history.teamSuggestions = arrayOf(result && result.times);
       renderHistoryTeamSuggestions(target);
     } catch (error) {
       if (history === state.historyContribution && requestId === history.filterRequestId && historyDetailView() === "history-list") {
-        history.teams = [];
+        if (opponent) history.opponentSuggestions = [];
+        else history.teamSuggestions = [];
         hideHistoryTeamSuggestions(target);
         showToast(friendlyError(error), true);
       }
@@ -2335,6 +2340,8 @@
       uf: ""
     };
     history.teams = [];
+    history.teamSuggestions = [];
+    history.opponentSuggestions = [];
     history.facets = { competitions: [], seasons: [], scopes: [], ufs: [] };
     history.mode = "aguardando";
     history.cursor = null;
@@ -3007,7 +3014,8 @@
       var opponent = event.target.id === "historyOpponentInput";
       var query = String(event.target.value || "");
       history.filterRequestId += 1;
-      history.teams = [];
+      if (opponent) history.opponentSuggestions = [];
+      else history.teamSuggestions = [];
       if (opponent) {
         history.filters.opponentQuery = query;
         resetHistorySearchResults();
