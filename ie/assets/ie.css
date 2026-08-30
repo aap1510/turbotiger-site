@@ -2240,6 +2240,11 @@ body.ie-reordering-favorites {
   font-weight: 650;
 }
 
+.ie-history-year-period {
+  font-size: 8px;
+  font-weight: 500;
+}
+
 .ie-history-field input,
 .ie-history-field select,
 .ie-history-form-field input,
