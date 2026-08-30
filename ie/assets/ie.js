@@ -3103,7 +3103,8 @@
       var isTeamInput = event.target.id === "historyTeamInput";
       var isOpponentInput = event.target.id === "historyOpponentInput";
       var isOtherHistoryField = !isTeamInput && !isOpponentInput
-        && event.target.matches(".ie-history-filters input, .ie-history-filters select");
+        && event.target.matches(".ie-history-filters input, .ie-history-filters select")
+        && !event.target.closest(".ie-history-suggestions");
       if (!isTeamInput && !isOpponentInput && !isOtherHistoryField) return;
       var history = state.historyContribution;
       var targetsToClear = isTeamInput ? ["opponent"] : isOpponentInput ? ["team"] : ["team", "opponent"];
