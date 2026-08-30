@@ -240,9 +240,9 @@
   }
 
   function relativeFreshness(value) {
-    if (!value) return "Atualização indisponível";
+    if (!value) return "";
     var date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "Atualização indisponível";
+    if (Number.isNaN(date.getTime())) return "";
     var seconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
     if (seconds < 60) return "Atualizado agora";
     var minutes = Math.round(seconds / 60);
@@ -2275,7 +2275,7 @@
     byId("detailContent").setAttribute("data-detail-view", "history-list");
     byId("detailTitle").textContent = "Colabore com nossa base";
     var totalPartidas = numberOf(state.baseSummary && state.baseSummary.total_registros, 0);
-    byId("detailSubtitle").innerHTML = "<span>Futebol do Brasil" + (totalPartidas > 0 ? " · " + totalPartidas.toLocaleString("pt-BR") + " partidas" : "") + "</span><button type=\"button\" class=\"ie-history-ranking-link\" data-history-action=\"ranking\">Ranking Top 10 dos colaboradores</button>";
+    byId("detailSubtitle").innerHTML = "<span>Futebol do Brasil" + (totalPartidas > 0 ? " · " + totalPartidas.toLocaleString("pt-BR") + " partidas" : "") + "</span><button type=\"button\" class=\"ie-history-ranking-link\" data-history-action=\"ranking\">Top 10 dos colaboradores</button>";
     byId("detailContent").innerHTML = renderHistoryFilters() + renderHistoryResults(history);
     updateHistorySearchControls();
     renderHistoryTeamSuggestions("team");

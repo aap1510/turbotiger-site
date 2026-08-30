@@ -1690,8 +1690,7 @@ body.ie-reordering-favorites {
   font: inherit;
   font-size: 10px;
   text-align: left;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration: none;
 }
 
 .ie-detail-content {
