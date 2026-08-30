@@ -2262,8 +2262,16 @@ body.ie-reordering-favorites {
 .ie-history-form select,
 .ie-history-field select,
 .ie-history-form-field select {
-  padding-right: 72px;
-  background-position: right 32px center;
+  padding-right: 46px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m7 9 5 5 5-5' fill='none' stroke='%239b9da3' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 14px 14px;
+}
+
+.ie-history-form-field input[type="date"]::-webkit-calendar-picker-indicator,
+.ie-history-form-field input[type="time"]::-webkit-calendar-picker-indicator {
+  margin-right: 5px;
 }
 
 .ie-history-field input:focus,
