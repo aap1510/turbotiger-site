@@ -5,7 +5,10 @@
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
     sessionTimeoutMs: 15000,
-    cachePrefix: "tt_ie_cache_v1_"
+    cachePrefix: "tt_ie_cache_v2_",
+    cacheContractVersion: 2,
+    liveFallbackMaxAgeMs: 5 * 60 * 1000,
+    liveFutureToleranceMs: 5 * 60 * 1000
   };
 
   var ALERT_EVENTS = [
@@ -284,32 +287,57 @@
 
   function currentSourceUpdatedAt() {
     if (state.activeTab === "games") {
-      return latestSourceUpdatedAt(state.gameCompetitionId ? state.gameCompetitionGames : state.games);
+      var gameSections = state.gameCompetitionId ? state.gameCompetitionGames : state.games;
+      return latestSourceUpdatedAt(gameSections[state.gameFilter] || []);
     }
     if (state.activeTab === "competitions") return latestSourceUpdatedAt(state.favoriteCompetitions);
     if (state.activeTab === "news") return latestSourceUpdatedAt(state.news);
-    if (state.activeTab === "teams") return latestSourceUpdatedAt(state.games);
-    if (state.homeSectionFilter) return latestSourceUpdatedAt(state.card);
-    return latestSourceUpdatedAt([state.games.forYou, state.favoriteCompetitions]);
+    if (state.activeTab === "teams") return latestSourceUpdatedAt(state.favorites);
+    if (state.homeSectionFilter) {
+      return latestSourceUpdatedAt(arrayOf(state.card && state.card.subcards).filter(function (subcard) {
+        return subcardMatchesSection(subcard, state.homeSectionFilter);
+      }));
+    }
+    return latestSourceUpdatedAt(state.games.forYou);
+  }
+
+  function sourceAuthority(value) {
+    var authority = value && (value.fonte_autoridade || value.source_authority || value.resumo_json && value.resumo_json.fonte_autoridade);
+    return authority && typeof authority === "object" ? authority : null;
+  }
+
+  function authorityIsAuthoritative(authority) {
+    return !!authority && (authority.fonte_autoritativa === true || String(authority.fonte_autoritativa).toLowerCase() === "true");
   }
 
   function liveSourceIsAuthorized(value) {
-    var authority = value && (value.fonte_autoridade || value.source_authority || value.resumo_json && value.resumo_json.fonte_autoridade);
-    if (!authority || typeof authority !== "object") return false;
-    return (authority.fonte_autoritativa === true || String(authority.fonte_autoritativa).toLowerCase() === "true")
+    var authority = sourceAuthority(value);
+    return authorityIsAuthoritative(authority)
       && (authority.tempo_real_confiavel === true || String(authority.tempo_real_confiavel).toLowerCase() === "true")
       && String(authority.dominio || authority.domain || "").toLowerCase() === "ao_vivo";
   }
 
+  function finalSourceIsAuthorized(value) {
+    var authority = sourceAuthority(value);
+    return authorityIsAuthoritative(authority)
+      && String(authority.dominio || authority.domain || "").toLowerCase() === "resultado_final";
+  }
+
   function liveSourceIsFresh(value) {
-    var authority = value && (value.fonte_autoridade || value.source_authority || value.resumo_json && value.resumo_json.fonte_autoridade);
-    if (!authority || typeof authority !== "object") return false;
+    var authority = sourceAuthority(value);
+    if (!authority) return false;
     var sourceUpdatedAt = authority.informado_em_fonte || authority.reported_at || "";
     if (!sourceUpdatedAt) return false;
     var sourceTime = new Date(sourceUpdatedAt).getTime();
     if (Number.isNaN(sourceTime)) return false;
-    var age = Date.now() - sourceTime;
-    return age >= -5 * 60 * 1000 && age <= 7 * 60 * 1000;
+    var now = Date.now();
+    if (sourceTime > now + CONFIG.liveFutureToleranceMs) return false;
+    var validUntilValue = authority.valid_until || authority.valido_ate || value && (value.valid_until || value.valido_ate) || "";
+    if (validUntilValue) {
+      var validUntil = new Date(validUntilValue).getTime();
+      return !Number.isNaN(validUntil) && validUntil >= sourceTime && now <= validUntil;
+    }
+    return now - sourceTime <= CONFIG.liveFallbackMaxAgeMs;
   }
 
   function initials(name) {
@@ -452,6 +480,7 @@
   window.TurboTigerIEClearSession = function () {
     var currentCacheKey = state.session && state.session.user_id ? cacheKey() : "";
     if (currentCacheKey) sessionStorage.removeItem(currentCacheKey);
+    if (state.session && state.session.user_id) sessionStorage.removeItem("tt_ie_cache_v1_" + state.session.user_id);
     window.clearTimeout(sessionTimer);
     sessionTimer = null;
     sessionPromise = null;
@@ -551,15 +580,23 @@
 
   function saveCache() {
     try {
-      sessionStorage.setItem(cacheKey(), JSON.stringify({ saved_at: new Date().toISOString(), bootstrap: state.bootstrap, card: state.card, baseSummary: state.baseSummary, games: state.games, favoriteCompetitions: state.favoriteCompetitions, news: state.news, favorites: state.favorites, activeSportId: state.activeSportId, sportFavoriteOrder: state.sportFavoriteOrder }));
+      sessionStorage.setItem(cacheKey(), JSON.stringify({ cache_contract_version: CONFIG.cacheContractVersion, saved_at: new Date().toISOString(), bootstrap: state.bootstrap, baseSummary: state.baseSummary, favoriteCompetitions: state.favoriteCompetitions, news: state.news, favorites: state.favorites, activeSportId: state.activeSportId, sportFavoriteOrder: state.sportFavoriteOrder }));
     } catch (error) {}
   }
 
   function loadCache() {
     try {
+      sessionStorage.removeItem("tt_ie_cache_v1_" + (state.session && state.session.user_id || "anonymous"));
       var raw = sessionStorage.getItem(cacheKey());
-      return raw ? JSON.parse(raw) : null;
+      if (!raw) return null;
+      var cached = JSON.parse(raw);
+      if (!cached || Number(cached.cache_contract_version) !== CONFIG.cacheContractVersion) {
+        sessionStorage.removeItem(cacheKey());
+        return null;
+      }
+      return cached;
     } catch (error) {
+      try { sessionStorage.removeItem(cacheKey()); } catch (ignored) {}
       return null;
     }
   }
@@ -806,12 +843,16 @@
     var status = String(item.status_normalizado || item.status || item.status_canonico || "").toLowerCase();
     var resultState = String(item.resultado_estado || item.estado_resultado || "").toLowerCase();
     var confirmationFlag = item.resultado_confirmado === true || String(item.resultado_confirmado || "").toLowerCase() === "true";
+    var startAt = item.inicio_em || item.data_partida || item.data_inicio;
+    var startTimestamp = startAt ? new Date(startAt).getTime() : NaN;
     var terminalStatus = ["encerrada", "encerrado", "finished", "finalizada", "finalizado"].indexOf(status) >= 0;
-    var pendingResult = ["pendente", "confirmando", "em_confirmacao", "aguardando_confirmacao", "pending", "pending_confirmation", "awaiting_confirmation"].indexOf(resultState) >= 0
-      || ["aguardando_confirmacao", "confirmando", "em_confirmacao"].indexOf(status) >= 0
-      || (terminalStatus && !(["confirmado", "confirmed"].indexOf(resultState) >= 0 && confirmationFlag));
-    var confirmedResult = !pendingResult && ["confirmado", "confirmed"].indexOf(resultState) >= 0 && confirmationFlag;
     var liveStatus = ["ao_vivo", "live", "em_andamento", "intervalo", "prorrogacao", "penaltis"].indexOf(status) >= 0;
+    var scheduledStatus = ["agendado", "agendada", "scheduled", "timed", "not_started", "nao_iniciado", "nao_iniciada", "ns"].indexOf(status) >= 0;
+    var futureSchedule = !terminalStatus && !liveStatus && (scheduledStatus || (!Number.isNaN(startTimestamp) && startTimestamp > Date.now()));
+    var pendingResult = !futureSchedule && (["pendente", "confirmando", "em_confirmacao", "aguardando_confirmacao", "pending", "pending_confirmation", "awaiting_confirmation"].indexOf(resultState) >= 0
+      || ["aguardando_confirmacao", "confirmando", "em_confirmacao"].indexOf(status) >= 0
+      || (terminalStatus && !(["confirmado", "confirmed"].indexOf(resultState) >= 0 && confirmationFlag && finalSourceIsAuthorized(item))));
+    var confirmedResult = terminalStatus && !pendingResult && ["confirmado", "confirmed"].indexOf(resultState) >= 0 && confirmationFlag && finalSourceIsAuthorized(item);
     var staleLive = liveStatus && !pendingResult && (!liveSourceIsAuthorized(item) || !liveSourceIsFresh(item));
     var provisionalResult = !pendingResult && !staleLive && resultState === "provisorio";
     var live = liveStatus && !pendingResult && !staleLive;
@@ -824,7 +865,6 @@
       scoreHome = "";
       scoreAway = "";
     }
-    var startAt = item.inicio_em || item.data_partida || item.data_inicio;
     var rawStatusText = String(item.minuto || item.status_texto || item.status_detalhado || "").trim();
     var technicalStatus = /^(TIMED|SCHEDULED|NOT_STARTED|NS)$/i.test(rawStatusText) || /^[A-Z_]+$/.test(rawStatusText);
     var statusText = technicalStatus ? "" : rawStatusText;
@@ -1390,6 +1430,7 @@
   }
 
   var ALL_SPORT_DATA_SECTIONS = ["forYou", "live", "upcoming", "results", "competitions", "news"];
+  var VOLATILE_SPORT_DATA_SECTIONS = ["forYou", "live", "upcoming", "results"];
 
   function uniqueSportSections(sectionNames) {
     return arrayOf(sectionNames).filter(function (name, index, values) {
@@ -1451,14 +1492,17 @@
     }));
     if (!loadIsCurrent(generation) || requestId !== state.sportRequestId || sport !== Number(state.activeSportId)) return { stale: true, errors: [] };
     var errors = results.filter(function (result) { return !result.ok; }).map(function (result) { return result.error; });
-    if (strict && errors.length) throw errors[0];
     results.forEach(function (result) {
-      if (!result.ok) return;
+      if (!result.ok) {
+        if (VOLATILE_SPORT_DATA_SECTIONS.indexOf(result.name) >= 0) applySportSection(result.name, []);
+        return;
+      }
       if (result.name === "news" && newsRequestId !== state.newsRequestId) return;
       applySportSection(result.name, result.value);
     });
     if (renderAfter === "partial") renderSportSections(sections);
     else if (renderAfter !== false) renderAll();
+    if (strict && errors.length) throw errors[0];
     return { errors: errors };
   }
 
@@ -1493,7 +1537,7 @@
 
     var errors = results.filter(function (result) { return !result.ok; }).map(function (result) { return result.error; });
     results.forEach(function (result) {
-      if (result.ok) state.gameCompetitionGames[result.name] = arrayOf(result.value);
+      state.gameCompetitionGames[result.name] = result.ok ? arrayOf(result.value) : [];
     });
     state.gameCompetitionLoading = false;
     if (renderAfter !== false) renderGames();
@@ -1532,7 +1576,7 @@
       saveCache();
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
-      renderGames();
+      renderAll();
       showToast(friendlyError(error), true);
     }
   }
@@ -1546,10 +1590,15 @@
 
   async function loadCardSummary(generation) {
     var preferenceRevision = state.preferenceRevision;
-    var result = await rpc("ie_card_resumo_rpc", { p_limite: 3 });
-    if (!loadIsCurrent(generation) || preferenceRevision !== state.preferenceRevision) return false;
-    state.card = result || {};
-    return true;
+    try {
+      var result = await rpc("ie_card_resumo_rpc", { p_limite: 3 });
+      if (!loadIsCurrent(generation) || preferenceRevision !== state.preferenceRevision) return false;
+      state.card = result || {};
+      return true;
+    } catch (error) {
+      if (loadIsCurrent(generation) && preferenceRevision === state.preferenceRevision) state.card = null;
+      throw error;
+    }
   }
 
   async function loadFavoritesSummary(generation) {
@@ -1571,23 +1620,19 @@
 
   function hydrateCachedOpening(cached) {
     if (!cached) return;
-    state.card = cached.card || null;
     state.baseSummary = cached.baseSummary || null;
     state.favorites = arrayOf(cached.favorites);
     rememberCatalogItems("participant", state.favorites);
     state.favoriteOrder = state.favorites.map(function (item) { return Number(item.id_participante); }).filter(function (id) { return id > 0; });
     if (Number(cached.activeSportId || 0) === Number(state.activeSportId || 0)) {
-      state.games = cached.games || state.games;
       state.favoriteCompetitions = cached.favoriteCompetitions || [];
       state.news = cached.news || [];
     }
   }
 
   function restoreCachedState(cached) {
-    state.bootstrap = cached.bootstrap;
-    state.card = cached.card;
+    if (!state.bootstrap) state.bootstrap = cached.bootstrap;
     state.baseSummary = cached.baseSummary || null;
-    state.games = cached.games || state.games;
     state.favoriteCompetitions = cached.favoriteCompetitions || [];
     state.news = cached.news || [];
     state.favorites = cached.favorites || [];
@@ -1735,30 +1780,43 @@
 
   async function loadFullRefresh(generation) {
     await requestSession();
+    state.card = null;
+    clearSportSections(VOLATILE_SPORT_DATA_SECTIONS);
+    state.gameCompetitionGames = { live: [], upcoming: [], results: [] };
     var bootstrap = await rpc("ie_central_bootstrap_rpc", {});
     if (!loadIsCurrent(generation)) return;
     state.bootstrap = bootstrap || {};
     state.sportFavoriteOrder = normalizeSportFavoriteOrder(state.bootstrap.preferencias || {});
     ensureActiveSport();
-    var results = await Promise.all([
-      rpc("ie_card_resumo_rpc", { p_limite: 3 }),
-      rpc("ie_favoritos_listar_rpc", {}),
-      rpc("ie_base_futebol_brasil_resumo_rpc", {}).catch(function () { return null; })
+    var summaryResults = await Promise.all([
+      loadCardSummary(generation).then(function (value) { return { ok: true, value: value }; }, function (error) { return { ok: false, error: error }; }),
+      loadFavoritesSummary(generation).then(function (value) { return { ok: true, value: value }; }, function (error) { return { ok: false, error: error }; }),
+      loadBaseSummary(generation).then(function (value) { return { ok: true, value: value }; }, function (error) {
+        if (loadIsCurrent(generation)) state.baseSummary = null;
+        return { ok: false, error: error };
+      })
     ]);
     if (!loadIsCurrent(generation)) return;
-    state.card = results[0] || {};
-    state.favorites = arrayOf(results[1]);
-    state.baseSummary = results[2] || null;
+    var refreshErrors = summaryResults.filter(function (result) { return !result.ok; }).map(function (result) { return result.error; });
     rememberCurrentSelections();
     rememberCatalogItems("participant", state.favorites);
     state.favoriteOrder = state.favorites.map(function (item) { return Number(item.id_participante); }).filter(function (id) { return id > 0; });
-    await loadActiveSportSections(ALL_SPORT_DATA_SECTIONS, false, generation, true);
-    if (selectedGameCompetitionId()) await loadGameCompetitionData(false, generation, true);
+    var sportResult = await loadActiveSportSections(ALL_SPORT_DATA_SECTIONS, false, generation, false);
+    refreshErrors = refreshErrors.concat(sportResult && sportResult.errors || []);
+    if (selectedGameCompetitionId()) {
+      var competitionResult = await loadGameCompetitionData(false, generation, false);
+      refreshErrors = refreshErrors.concat(competitionResult && competitionResult.errors || []);
+    }
     if (!loadIsCurrent(generation)) return;
     showApp(true);
     renderAll();
-    await loadCatalog(generation);
+    try {
+      await loadCatalog(generation);
+    } catch (error) {
+      refreshErrors.push(error);
+    }
     if (!loadIsCurrent(generation)) return;
+    if (refreshErrors.length) throw refreshErrors[0];
     saveCache();
   }
 
@@ -1787,15 +1845,28 @@
     } catch (error) {
       if (!loadIsCurrent(generation)) return;
       var cached = state.session ? loadCache() : null;
-      if (cached && cached.bootstrap) {
+      if (!state.bootstrap && cached && cached.bootstrap) {
         restoreCachedState(cached);
         renderAll();
         if (settingsDraft) restoreSettingsDraft(settingsDraft);
-        if (initialOpening) await applyInitialRoute(route);
+        if (initialOpening) {
+          try { await applyInitialRoute(route); } catch (routeError) {}
+        }
         if (!loadIsCurrent(generation)) return;
         showApp(true);
-        setSourceFreshness();
-        showToast("Sem conexão. Exibindo a última atualização disponível.", true);
+        byId("headerFreshness").textContent = "Sem conexão";
+        showToast("Sem conexão. Os confrontos e resultados não foram restaurados.", true);
+        notifyInitialOpeningReady();
+      } else if (state.bootstrap) {
+        renderAll();
+        if (settingsDraft) restoreSettingsDraft(settingsDraft);
+        if (initialOpening) {
+          try { await applyInitialRoute(route); } catch (routeError) {}
+        }
+        if (!loadIsCurrent(generation)) return;
+        showApp(true);
+        byId("headerFreshness").textContent = "Atualização parcial";
+        showToast("Algumas informações não puderam ser atualizadas.", true);
         notifyInitialOpeningReady();
       } else {
         if (initialOpening) state.bootstrap = null;
