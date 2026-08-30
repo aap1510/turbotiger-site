@@ -2228,7 +2228,8 @@ body.ie-reordering-favorites {
 
 .ie-history-field.is-wide,
 .ie-history-form-field.is-wide,
-.ie-history-official.is-wide {
+.ie-history-official.is-wide,
+.ie-history-match-type.is-wide {
   grid-column: 1 / -1;
 }
 
@@ -2603,7 +2604,7 @@ body.ie-reordering-favorites {
 
 .ie-history-match-type > div {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
   gap: 8px;
 }
 

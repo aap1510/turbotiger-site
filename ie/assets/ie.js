@@ -241,7 +241,7 @@
   function relativeFreshness(value) {
     if (!value) return "Atualização indisponível";
     var date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "Atualizado " + String(value);
+    if (Number.isNaN(date.getTime())) return "Atualização indisponível";
     var seconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
     if (seconds < 60) return "Atualizado agora";
     var minutes = Math.round(seconds / 60);
@@ -249,6 +249,54 @@
     var hours = Math.round(minutes / 60);
     if (hours < 24) return "Atualizado há " + hours + " h";
     return "Atualizado em " + date.toLocaleDateString("pt-BR");
+  }
+
+  function latestSourceUpdatedAt(value) {
+    var newestValue = "";
+    var newestTime = -Infinity;
+    var visited = [];
+
+    function consider(candidate) {
+      if (candidate == null || candidate === "") return;
+      var time = new Date(candidate).getTime();
+      if (Number.isNaN(time) || time <= newestTime) return;
+      newestTime = time;
+      newestValue = candidate;
+    }
+
+    function visit(node, depth) {
+      if (!node || depth > 12) return;
+      if (Array.isArray(node)) {
+        node.forEach(function (item) { visit(item, depth + 1); });
+        return;
+      }
+      if (typeof node !== "object" || visited.indexOf(node) >= 0) return;
+      visited.push(node);
+      consider(node.source_updated_at);
+      consider(node.atualizado_em_fonte);
+      Object.keys(node).forEach(function (key) { visit(node[key], depth + 1); });
+    }
+
+    visit(value, 0);
+    return newestValue;
+  }
+
+  function currentSourceUpdatedAt() {
+    return latestSourceUpdatedAt([
+      state.card,
+      state.games,
+      state.favoriteCompetitions,
+      state.news
+    ]);
+  }
+
+  function liveSourceIsFresh(value) {
+    var sourceUpdatedAt = latestSourceUpdatedAt(value);
+    if (!sourceUpdatedAt) return false;
+    var sourceTime = new Date(sourceUpdatedAt).getTime();
+    if (Number.isNaN(sourceTime)) return false;
+    var age = Date.now() - sourceTime;
+    return age >= -5 * 60 * 1000 && age <= 7 * 60 * 1000;
   }
 
   function initials(name) {
@@ -471,6 +519,8 @@
       var envelope = {
         schema_version: result.schema_version,
         generated_at: result.generated_at,
+        source_updated_at: result.source_updated_at,
+        atualizado_em_fonte: result.atualizado_em_fonte,
         freshness: result.freshness,
         source_status: result.source_status,
         next_cursor: result.next_cursor,
@@ -509,6 +559,10 @@
 
   function setFreshness(value) {
     byId("headerFreshness").textContent = displayText(relativeFreshness(value));
+  }
+
+  function setSourceFreshness() {
+    setFreshness(currentSourceUpdatedAt());
   }
 
   function emptyState(title, text, canConfigure) {
@@ -736,14 +790,24 @@
 
   function renderMatchCard(item, label, interactive) {
     var sides = matchSides(item || {});
-    var status = String(item.status || item.status_canonico || "").toLowerCase();
-    var live = status === "ao_vivo" || status === "live" || status === "em_andamento";
+    var status = String(item.status_normalizado || item.status || item.status_canonico || "").toLowerCase();
+    var resultState = String(item.resultado_estado || item.estado_resultado || "").toLowerCase();
+    var confirmationFlag = item.resultado_confirmado === true || String(item.resultado_confirmado || "").toLowerCase() === "true";
+    var terminalStatus = ["encerrada", "encerrado", "finished", "finalizada", "finalizado"].indexOf(status) >= 0;
+    var pendingResult = ["pendente", "confirmando", "em_confirmacao", "aguardando_confirmacao", "pending", "pending_confirmation", "awaiting_confirmation"].indexOf(resultState) >= 0
+      || ["aguardando_confirmacao", "confirmando", "em_confirmacao"].indexOf(status) >= 0
+      || (terminalStatus && !(["confirmado", "confirmed"].indexOf(resultState) >= 0 && confirmationFlag));
+    var confirmedResult = !pendingResult && ["confirmado", "confirmed"].indexOf(resultState) >= 0 && confirmationFlag;
+    var liveStatus = ["ao_vivo", "live", "em_andamento", "intervalo", "prorrogacao", "penaltis"].indexOf(status) >= 0;
+    var staleLive = liveStatus && !pendingResult && !liveSourceIsFresh(item);
+    var provisionalResult = !pendingResult && !staleLive && resultState === "provisorio";
+    var live = liveStatus && !pendingResult && !staleLive;
     var id = item.id_evento || item.id_partida || item.id || "";
     var result = item.placar || item.resultado || {};
     var scoreHome = item.placar_casa == null ? (sides.home.score == null ? (result.casa == null ? "" : result.casa) : sides.home.score) : item.placar_casa;
     var scoreAway = item.placar_fora == null ? (sides.away.score == null ? (result.fora == null ? "" : result.fora) : sides.away.score) : item.placar_fora;
-    var started = live || ["intervalo", "prorrogacao", "penaltis", "encerrada", "finished"].indexOf(status) >= 0;
-    if (!started) {
+    var scoreCanBeShown = confirmedResult || (provisionalResult && live);
+    if (!scoreCanBeShown) {
       scoreHome = "";
       scoreAway = "";
     }
@@ -751,9 +815,12 @@
     var rawStatusText = String(item.minuto || item.status_texto || item.status_detalhado || "").trim();
     var technicalStatus = /^(TIMED|SCHEDULED|NOT_STARTED|NS)$/i.test(rawStatusText) || /^[A-Z_]+$/.test(rawStatusText);
     var statusText = technicalStatus ? "" : rawStatusText;
-    if (!statusText) statusText = live ? "Ao vivo" : formatDateTime(startAt, false);
+    if (pendingResult) statusText = String(item.aviso_resultado || "Resultado aguardando confirmação da fonte.");
+    else if (staleLive) statusText = "Status aguardando atualização da fonte.";
+    else if (!statusText && confirmedResult && ["encerrada", "finished", "finalizada"].indexOf(status) >= 0) statusText = "Encerrado";
+    else if (!statusText) statusText = live ? "Ao vivo" : formatDateTime(startAt, false);
     var dateText = formatDate(startAt);
-    var center = live || scoreHome !== "" || scoreAway !== "" ? "<span class=\"ie-score\">" + escapeHtml(scoreHome === "" ? 0 : scoreHome) + " – " + escapeHtml(scoreAway === "" ? 0 : scoreAway) + "</span><span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>" : "<span class=\"ie-match-time\">" + escapeHtml(formatDateTime(startAt, false) || "A definir") + "</span>";
+    var center = scoreCanBeShown && scoreHome !== "" && scoreAway !== "" ? "<span class=\"ie-score\">" + escapeHtml(scoreHome) + " – " + escapeHtml(scoreAway) + "</span><span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>" : "<span class=\"ie-match-time\">" + escapeHtml((pendingResult || staleLive) ? statusText : formatDateTime(startAt, false) || "A definir") + "</span>";
     if (dateText) center += "<span class=\"ie-match-date\">" + escapeHtml(dateText) + "</span>";
     var attributes = interactive === false ? "" : detailAttributes("event", id, "", sides.home.name + " x " + sides.away.name);
     var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Confronto", 25);
@@ -1252,8 +1319,7 @@
     renderNews();
     renderEntities();
     renderSettings();
-    var generated = state.card && (state.card.generated_at || state.card.gerado_em) || new Date().toISOString();
-    setFreshness(generated);
+    setSourceFreshness();
   }
 
   async function loadCatalog(generation) {
@@ -1649,7 +1715,7 @@
     renderEntities();
     if (backgroundErrors.length || backgroundIncomplete) byId("headerFreshness").textContent = "Atualização parcial";
     else {
-      setFreshness(new Date().toISOString());
+      setSourceFreshness();
       saveCache();
     }
   }
@@ -1715,7 +1781,7 @@
         if (initialOpening) await applyInitialRoute(route);
         if (!loadIsCurrent(generation)) return;
         showApp(true);
-        setFreshness(cached.saved_at);
+        setSourceFreshness();
         showToast("Sem conexão. Exibindo a última atualização disponível.", true);
         notifyInitialOpeningReady();
       } else {
@@ -2866,7 +2932,7 @@
       renderNews();
       renderEntities();
       renderSelectionLists();
-      setFreshness(new Date().toISOString());
+      setSourceFreshness();
       saveCache();
       postNative("preferences_changed", {});
       showToast(kind === "notify" ? "Notificações atualizadas." : "Favoritos atualizados.", false);
