@@ -282,12 +282,21 @@
   }
 
   function currentSourceUpdatedAt() {
-    return latestSourceUpdatedAt([
-      state.card,
-      state.games,
-      state.favoriteCompetitions,
-      state.news
-    ]);
+    if (state.activeTab === "games") {
+      return latestSourceUpdatedAt(state.gameCompetitionId ? state.gameCompetitionGames : state.games);
+    }
+    if (state.activeTab === "competitions") return latestSourceUpdatedAt(state.favoriteCompetitions);
+    if (state.activeTab === "news") return latestSourceUpdatedAt(state.news);
+    if (state.activeTab === "teams") return latestSourceUpdatedAt(state.games);
+    if (state.homeSectionFilter) return latestSourceUpdatedAt(state.card);
+    return latestSourceUpdatedAt([state.games.forYou, state.favoriteCompetitions]);
+  }
+
+  function liveSourceIsAuthorized(value) {
+    var authority = value && (value.fonte_autoridade || value.source_authority || value.resumo_json && value.resumo_json.fonte_autoridade);
+    if (!authority || typeof authority !== "object") return false;
+    return (authority.fonte_autoritativa === true || String(authority.fonte_autoritativa).toLowerCase() === "true")
+      && (authority.tempo_real_confiavel === true || String(authority.tempo_real_confiavel).toLowerCase() === "true");
   }
 
   function liveSourceIsFresh(value) {
@@ -799,7 +808,7 @@
       || (terminalStatus && !(["confirmado", "confirmed"].indexOf(resultState) >= 0 && confirmationFlag));
     var confirmedResult = !pendingResult && ["confirmado", "confirmed"].indexOf(resultState) >= 0 && confirmationFlag;
     var liveStatus = ["ao_vivo", "live", "em_andamento", "intervalo", "prorrogacao", "penaltis"].indexOf(status) >= 0;
-    var staleLive = liveStatus && !pendingResult && !liveSourceIsFresh(item);
+    var staleLive = liveStatus && !pendingResult && (!liveSourceIsAuthorized(item) || !liveSourceIsFresh(item));
     var provisionalResult = !pendingResult && !staleLive && resultState === "provisorio";
     var live = liveStatus && !pendingResult && !staleLive;
     var id = item.id_evento || item.id_partida || item.id || "";
@@ -818,9 +827,10 @@
     if (pendingResult) statusText = String(item.aviso_resultado || "Resultado aguardando confirmação da fonte.");
     else if (staleLive) statusText = "Status aguardando atualização da fonte.";
     else if (!statusText && confirmedResult && ["encerrada", "finished", "finalizada"].indexOf(status) >= 0) statusText = "Encerrado";
+    else if (live && (scoreHome === "" || scoreAway === "")) statusText = "Ao vivo — placar indisponível";
     else if (!statusText) statusText = live ? "Ao vivo" : formatDateTime(startAt, false);
     var dateText = formatDate(startAt);
-    var center = scoreCanBeShown && scoreHome !== "" && scoreAway !== "" ? "<span class=\"ie-score\">" + escapeHtml(scoreHome) + " – " + escapeHtml(scoreAway) + "</span><span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>" : "<span class=\"ie-match-time\">" + escapeHtml((pendingResult || staleLive) ? statusText : formatDateTime(startAt, false) || "A definir") + "</span>";
+    var center = scoreCanBeShown && scoreHome !== "" && scoreAway !== "" ? "<span class=\"ie-score\">" + escapeHtml(scoreHome) + " – " + escapeHtml(scoreAway) + "</span><span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>" : "<span class=\"ie-match-time\">" + escapeHtml((pendingResult || staleLive || live) ? statusText : formatDateTime(startAt, false) || "A definir") + "</span>";
     if (dateText) center += "<span class=\"ie-match-date\">" + escapeHtml(dateText) + "</span>";
     var attributes = interactive === false ? "" : detailAttributes("event", id, "", sides.home.name + " x " + sides.away.name);
     var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Confronto", 25);
@@ -1892,6 +1902,11 @@
     }
   }
 
+  function dismissDetailFrame() {
+    if (state.detailStack.length) backDetail();
+    else closeDetail();
+  }
+
   function beginDetail(title, subtitle, pushCurrent) {
     var detailContent = byId("detailContent");
     if (pushCurrent === true && !byId("detailModal").hidden) {
@@ -1905,7 +1920,7 @@
     } else if (pushCurrent !== "replace") {
       state.detailStack = [];
     }
-    byId("detailBackButton").hidden = state.detailStack.length === 0;
+    byId("detailBackButton").hidden = true;
     byId("detailTitle").textContent = displayText(title || "Detalhes");
     byId("detailSubtitle").textContent = displayText(subtitle || "");
     detailContent.removeAttribute("data-detail-view");
@@ -1924,7 +1939,7 @@
     detailContent.innerHTML = previous.html;
     if (previous.view) detailContent.setAttribute("data-detail-view", previous.view);
     else detailContent.removeAttribute("data-detail-view");
-    byId("detailBackButton").hidden = state.detailStack.length === 0;
+    byId("detailBackButton").hidden = true;
     if (previous.view === "history-list") renderHistoryContributionPage();
     detailContent.scrollTop = Number(previous.scrollTop) || 0;
   }
@@ -2301,7 +2316,7 @@
         p_ano: Number(history.filters.year) || null,
         p_busca_time: wanted,
         p_time_chave: null,
-        p_limite: 12
+        p_limite: 20
       });
       currentQuery = String(opponent ? history.filters.opponentQuery : history.filters.teamQuery).trim();
       if (history !== state.historyContribution || requestId !== history.filterRequestId || wanted !== currentQuery) return;
@@ -3020,7 +3035,7 @@
         if (result && result.errors && result.errors.length) showToast(friendlyError(result.errors[0]), true);
       }, function (error) { showToast(friendlyError(error), true); });
     });
-    all("[data-close-detail]").forEach(function (button) { button.addEventListener("click", closeDetail); });
+    all("[data-close-detail]").forEach(function (button) { button.addEventListener("click", dismissDetailFrame); });
     byId("detailBackButton").addEventListener("click", backDetail);
     byId("settingsForm").addEventListener("submit", function (event) { event.preventDefault(); });
     byId("newsTeamFilter").addEventListener("change", function () {
