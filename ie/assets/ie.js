@@ -56,6 +56,7 @@
       totalRows: 0,
       totalPages: 0,
       hasMore: false,
+      requiresSearch: false,
       loading: false,
       requestId: 0,
       filterRequestId: 0,
@@ -2217,7 +2218,7 @@
       yearInput.setCustomValidity(yearValid ? "" : yearPeriod ? "Informe um ano entre " + history.yearStart + " e " + history.yearEnd + "." : "Informe um ano válido com 4 dígitos.");
     }
     if (button) button.disabled = !ready || history.loading;
-    if (hint) hint.textContent = !teamSelected ? "Primeiro, selecione o seu time na lista." : !yearValid ? (yearPeriod ? "Informe um ano entre " + history.yearStart + " e " + history.yearEnd + "." : "Se informar o ano, digite os 4 dígitos.") : history.filters.scope === "estadual" && !history.filters.uf ? "Selecione a UF da competição estadual." : "Os confrontos são atualizados automaticamente.";
+    if (hint) hint.textContent = !teamSelected ? "Primeiro, selecione o seu time na lista." : !yearValid ? (yearPeriod ? "Informe um ano entre " + history.yearStart + " e " + history.yearEnd + "." : "Se informar o ano, digite os 4 dígitos.") : history.filters.scope === "estadual" && !history.filters.uf ? "Selecione a UF da competição estadual." : history.requiresSearch ? "Toque em Pesquisar para atualizar os confrontos." : "Os confrontos são atualizados automaticamente.";
     all("[data-history-filter]").forEach(function (select) {
       var name = select.getAttribute("data-history-filter");
       select.disabled = !baseReady || (name === "uf" && history.filters.scope !== "estadual");
@@ -2248,6 +2249,21 @@
     return "<button type=\"button\" class=\"ie-history-row\" data-history-action=\"correct\" data-history-row-id=\"" + escapeHtml(id) + "\" aria-label=\"Conferir " + escapeHtml(label) + "\"><time datetime=\"" + escapeHtml(row.data_partida || "") + "\"><strong>" + escapeHtml(historyDate(row.data_partida)) + "</strong><span>" + escapeHtml(historyTime(row.hora_partida) || "horário não informado") + "</span></time><span class=\"ie-history-row-copy\"><strong><span>" + escapeHtml(row.time_casa || "Casa") + "</span><b>" + escapeHtml(score) + "</b><span>" + escapeHtml(row.time_fora || "Visitante") + "</span></strong><small>" + escapeHtml(meta || "Competição não informada") + "</small>" + (place ? "<small>" + escapeHtml(place) + "</small>" : "") + "</span>" + icon("chevron") + "</button>";
   }
 
+  function renderHistoryResults(history) {
+    var listTitle = history.mode === "pesquisa" ? history.totalRows.toLocaleString("pt-BR") + (history.totalRows === 1 ? " confronto encontrado" : " confrontos encontrados") : "Confrontos";
+    var hasSelectedTeam = historySelectedKeys(false).length > 0;
+    var waitingState = !hasSelectedTeam
+      ? emptyState("Selecione o seu time", "Os confrontos mais recentes aparecerão automaticamente.", false)
+      : history.filters.year && !historyYearIsValid(history)
+        ? emptyState("Ano fora do período disponível", "Informe um ano entre " + history.yearStart + " e " + history.yearEnd + ".", false)
+        : history.requiresSearch
+          ? emptyState("Filtros alterados", "Toque em Pesquisar para atualizar os confrontos.", false)
+          : emptyState("Filtros prontos", "Os confrontos serão atualizados automaticamente.", false);
+    var rows = history.mode !== "pesquisa" ? waitingState : history.rows.length ? "<div class=\"ie-history-table\">" + history.rows.map(renderHistoryRow).join("") + "</div>" : emptyState("Nenhum confronto encontrado", "Revise os filtros informados ou envie um confronto que ainda não está na base.", false);
+    var pager = history.totalPages > 1 ? "<nav class=\"ie-history-pager\" aria-label=\"Paginação dos confrontos\"><button type=\"button\" data-history-action=\"previous\"" + (history.page <= 1 || history.loading ? " disabled" : "") + ">Anterior</button><span>Página " + escapeHtml(history.page) + " de " + escapeHtml(history.totalPages) + "</span><button type=\"button\" data-history-action=\"next\"" + (!history.hasMore || history.loading ? " disabled" : "") + ">Próxima</button></nav>" : "";
+    return "<section class=\"ie-history-results\"><header><div><strong>" + escapeHtml(listTitle) + "</strong><span>Toque em um confronto para sugerir correção ou no + ao lado para incluir algum.</span></div><button class=\"ie-history-add\" type=\"button\" data-history-action=\"new\" aria-label=\"Enviar um confronto não localizado\">+</button></header>" + (history.loading ? "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>" : rows + pager) + "</section>";
+  }
+
   function renderHistoryContributionPage() {
     var history = state.historyContribution;
     captureHistorySuggestionScroll("team");
@@ -2256,16 +2272,7 @@
     byId("detailTitle").textContent = "Colabore com nossa base de dados";
     var totalPartidas = numberOf(state.baseSummary && state.baseSummary.total_registros, 0);
     byId("detailSubtitle").textContent = "Futebol do Brasil" + (totalPartidas > 0 ? " · " + totalPartidas.toLocaleString("pt-BR") + " partidas" : "");
-    var listTitle = history.mode === "pesquisa" ? history.totalRows.toLocaleString("pt-BR") + (history.totalRows === 1 ? " confronto encontrado" : " confrontos encontrados") : "Confrontos";
-    var hasSelectedTeam = historySelectedKeys(false).length > 0;
-    var waitingState = !hasSelectedTeam
-      ? emptyState("Selecione o seu time", "Os confrontos mais recentes aparecerão automaticamente.", false)
-      : history.filters.year && !historyYearIsValid(history)
-        ? emptyState("Ano fora do período disponível", "Informe um ano entre " + history.yearStart + " e " + history.yearEnd + ".", false)
-        : emptyState("Filtros prontos", "Os confrontos serão atualizados automaticamente.", false);
-    var rows = history.mode !== "pesquisa" ? waitingState : history.rows.length ? "<div class=\"ie-history-table\">" + history.rows.map(renderHistoryRow).join("") + "</div>" : emptyState("Nenhum confronto encontrado", "Revise os filtros informados ou envie um confronto que ainda não está na base.", false);
-    var pager = history.totalPages > 1 ? "<nav class=\"ie-history-pager\" aria-label=\"Paginação dos confrontos\"><button type=\"button\" data-history-action=\"previous\"" + (history.page <= 1 || history.loading ? " disabled" : "") + ">Anterior</button><span>Página " + escapeHtml(history.page) + " de " + escapeHtml(history.totalPages) + "</span><button type=\"button\" data-history-action=\"next\"" + (!history.hasMore || history.loading ? " disabled" : "") + ">Próxima</button></nav>" : "";
-    byId("detailContent").innerHTML = renderHistoryFilters() + "<section class=\"ie-history-results\"><header><div><strong>" + escapeHtml(listTitle) + "</strong><span>Toque em um confronto para sugerir correção ou no + ao lado para incluir algum.</span></div><button class=\"ie-history-add\" type=\"button\" data-history-action=\"new\" aria-label=\"Enviar um confronto não localizado\">+</button></header>" + (history.loading ? "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>" : rows + pager) + "</section>";
+    byId("detailContent").innerHTML = renderHistoryFilters() + renderHistoryResults(history);
     updateHistorySearchControls();
     renderHistoryTeamSuggestions("team");
     renderHistoryTeamSuggestions("opponent");
@@ -2392,6 +2399,7 @@
   function loadHistoryAutomatically() {
     var history = state.historyContribution;
     if (!historyRequiredFiltersReady(history) || history.loading) return;
+    history.requiresSearch = false;
     history.mode = "pesquisa";
     history.cursor = null;
     history.nextCursor = null;
@@ -3101,9 +3109,6 @@
     var updateHistoryFacets = debounce(function () {
       loadHistoryFacets();
     }, 120);
-    var updateHistoryRowsAutomatically = debounce(function () {
-      loadHistoryAutomatically();
-    }, 220);
     document.addEventListener("focusin", function (event) {
       var isTeamInput = event.target.id === "historyTeamInput";
       var isOpponentInput = event.target.id === "historyOpponentInput";
@@ -3132,8 +3137,11 @@
         var digits = String(event.target.value || "").replace(/\D/g, "").slice(0, 4);
         event.target.value = digits;
         state.historyContribution.filters.year = digits;
+        state.historyContribution.requiresSearch = true;
+        resetHistorySearchResults();
         updateHistorySearchControls();
-        if (!digits || digits.length === 4) updateHistoryRowsAutomatically();
+        var results = document.querySelector("#detailContent .ie-history-results");
+        if (results) results.outerHTML = renderHistoryResults(state.historyContribution);
         return;
       }
       if (event.target.id !== "historyTeamInput" && event.target.id !== "historyOpponentInput") return;
@@ -3161,24 +3169,24 @@
       if (event.target.id === "historyYearInput") {
         var history = state.historyContribution;
         history.filters.year = String(event.target.value || "").trim();
+        history.requiresSearch = true;
         resetHistoryOptionalFilters();
         resetHistorySearchResults();
         renderHistoryContributionPage();
         if ((!history.filters.year || historyYearIsValid(history)) && historySelectedKeys(false).length) {
           updateHistoryFacets();
-          updateHistoryRowsAutomatically();
         }
         return;
       }
       var historyFilter = event.target.getAttribute && event.target.getAttribute("data-history-filter");
       if (!historyFilter) return;
       state.historyContribution.filters[historyFilter] = String(event.target.value || "");
+      state.historyContribution.requiresSearch = true;
       if (historyFilter === "scope") {
         if (state.historyContribution.filters.scope !== "estadual") state.historyContribution.filters.uf = "";
       }
       resetHistorySearchResults();
       renderHistoryContributionPage();
-      updateHistoryRowsAutomatically();
     });
     document.addEventListener("submit", function (event) {
       var form = event.target.closest && event.target.closest("[data-history-contribution-form]");
