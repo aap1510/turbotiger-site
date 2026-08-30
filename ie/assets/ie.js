@@ -2257,7 +2257,13 @@
     var totalPartidas = numberOf(state.baseSummary && state.baseSummary.total_registros, 0);
     byId("detailSubtitle").textContent = "Futebol do Brasil" + (totalPartidas > 0 ? " · " + totalPartidas.toLocaleString("pt-BR") + " partidas" : "");
     var listTitle = history.mode === "pesquisa" ? history.totalRows.toLocaleString("pt-BR") + (history.totalRows === 1 ? " confronto encontrado" : " confrontos encontrados") : "Confrontos";
-    var rows = history.mode !== "pesquisa" ? emptyState("Selecione o seu time", "Os confrontos mais recentes aparecerão automaticamente.", false) : history.rows.length ? "<div class=\"ie-history-table\">" + history.rows.map(renderHistoryRow).join("") + "</div>" : emptyState("Nenhum confronto encontrado", "Revise os filtros informados ou envie um confronto que ainda não está na base.", false);
+    var hasSelectedTeam = historySelectedKeys(false).length > 0;
+    var waitingState = !hasSelectedTeam
+      ? emptyState("Selecione o seu time", "Os confrontos mais recentes aparecerão automaticamente.", false)
+      : history.filters.year && !historyYearIsValid(history)
+        ? emptyState("Ano fora do período disponível", "Informe um ano entre " + history.yearStart + " e " + history.yearEnd + ".", false)
+        : emptyState("Filtros prontos", "Os confrontos serão atualizados automaticamente.", false);
+    var rows = history.mode !== "pesquisa" ? waitingState : history.rows.length ? "<div class=\"ie-history-table\">" + history.rows.map(renderHistoryRow).join("") + "</div>" : emptyState("Nenhum confronto encontrado", "Revise os filtros informados ou envie um confronto que ainda não está na base.", false);
     var pager = history.totalPages > 1 ? "<nav class=\"ie-history-pager\" aria-label=\"Paginação dos confrontos\"><button type=\"button\" data-history-action=\"previous\"" + (history.page <= 1 || history.loading ? " disabled" : "") + ">Anterior</button><span>Página " + escapeHtml(history.page) + " de " + escapeHtml(history.totalPages) + "</span><button type=\"button\" data-history-action=\"next\"" + (!history.hasMore || history.loading ? " disabled" : "") + ">Próxima</button></nav>" : "";
     byId("detailContent").innerHTML = renderHistoryFilters() + "<section class=\"ie-history-results\"><header><div><strong>" + escapeHtml(listTitle) + "</strong><span>Toque em um confronto para sugerir correção ou no + ao lado para incluir algum.</span></div><button class=\"ie-history-add\" type=\"button\" data-history-action=\"new\" aria-label=\"Enviar um confronto não localizado\">+</button></header>" + (history.loading ? "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>" : rows + pager) + "</section>";
     updateHistorySearchControls();
@@ -2344,14 +2350,14 @@
     var history = state.historyContribution;
     var filters = history.filters;
     return {
-      p_modo: history.mode,
-      p_ano: history.mode === "pesquisa" && historyYearIsValid(history) ? Number(filters.year) : null,
-      p_times_chave: history.mode === "pesquisa" ? historySelectedKeys(false) : [],
-      p_times_adversarios_chave: history.mode === "pesquisa" ? historySelectedKeys(true) : [],
-      p_competicao_chave: history.mode === "pesquisa" && filters.competitionKey ? filters.competitionKey : null,
-      p_temporada: history.mode === "pesquisa" && filters.season ? filters.season : null,
-      p_abrangencia: history.mode === "pesquisa" && filters.scope ? filters.scope : null,
-      p_uf: history.mode === "pesquisa" && filters.uf ? filters.uf : null,
+      p_modo: "pesquisa",
+      p_ano: historyYearIsValid(history) ? Number(filters.year) : null,
+      p_times_chave: historySelectedKeys(false),
+      p_times_adversarios_chave: historySelectedKeys(true),
+      p_competicao_chave: filters.competitionKey || null,
+      p_temporada: filters.season || null,
+      p_abrangencia: filters.scope || null,
+      p_uf: filters.uf || null,
       p_cursor: cursor || null,
       p_limite: 20
     };
