@@ -3078,6 +3078,20 @@
     var updateHistoryRowsAutomatically = debounce(function () {
       loadHistoryAutomatically();
     }, 220);
+    document.addEventListener("focusin", function (event) {
+      if (event.target.id !== "historyTeamInput" && event.target.id !== "historyOpponentInput") return;
+      var history = state.historyContribution;
+      var targetToClear = event.target.id === "historyOpponentInput" ? "team" : "opponent";
+      var queryField = targetToClear === "opponent" ? "opponentQuery" : "teamQuery";
+      var suggestionsField = targetToClear === "opponent" ? "opponentSuggestions" : "teamSuggestions";
+      var otherInput = byId(targetToClear === "opponent" ? "historyOpponentInput" : "historyTeamInput");
+      if (String(history.filters[queryField] || "") !== "") history.filterRequestId += 1;
+      history.filters[queryField] = "";
+      history[suggestionsField] = [];
+      if (history.suggestionScroll) history.suggestionScroll[targetToClear] = 0;
+      if (otherInput) otherInput.value = "";
+      hideHistoryTeamSuggestions(targetToClear);
+    });
     document.addEventListener("input", function (event) {
       if (event.target.id === "historyYearInput") {
         var digits = String(event.target.value || "").replace(/\D/g, "").slice(0, 4);
