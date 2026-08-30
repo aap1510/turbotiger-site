@@ -2257,10 +2257,12 @@ body.ie-reordering-favorites {
   font-size: 12px;
 }
 
+.ie-history-search select,
+.ie-history-form select,
 .ie-history-field select,
 .ie-history-form-field select {
-  padding-right: 58px;
-  background-position: calc(100% - 25px) center;
+  padding-right: 72px;
+  background-position: right 32px center;
 }
 
 .ie-history-field input:focus,
