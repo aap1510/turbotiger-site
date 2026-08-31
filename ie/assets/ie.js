@@ -2299,6 +2299,14 @@
     return match ? match[1] + ":" + match[2] : "";
   }
 
+  function historyWeekday(value) {
+    var match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!match) return "";
+    var date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12, 0, 0, 0);
+    if (Number.isNaN(date.getTime())) return "";
+    return ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"][date.getDay()];
+  }
+
   function historySelectOptions(items, selected, placeholder, valueOf, labelOf) {
     return "<option value=\"\">" + escapeHtml(placeholder) + "</option>" + arrayOf(items).map(function (item) {
       var value = valueOf ? valueOf(item) : item;
@@ -2486,10 +2494,10 @@
     var busy = !!state.historyContribution.experienceBusy[String(id)];
     function option(form, iconName, label) {
       var active = selected === form;
-      return "<button type=\"button\" data-history-action=\"experience-toggle\" data-history-row-id=\"" + escapeHtml(id) + "\" data-experience-form=\"" + form + "\" aria-label=\"" + escapeHtml(label) + "\" aria-pressed=\"" + (active ? "true" : "false") + "\"" + (busy ? " disabled" : "") + ">" + icon(iconName) + "<span>" + escapeHtml(form === "local" ? "No local" : "TV/outro") + "</span></button>";
+      return "<button type=\"button\" data-history-action=\"experience-toggle\" data-history-row-id=\"" + escapeHtml(id) + "\" data-experience-form=\"" + form + "\" aria-label=\"" + escapeHtml(label) + "\" aria-pressed=\"" + (active ? "true" : "false") + "\"" + (busy ? " disabled" : "") + ">" + icon(iconName) + "</button>";
     }
     var companions = selected
-      ? "<button type=\"button\" class=\"ie-history-companions-button\" data-history-action=\"experience-companions\" data-history-row-id=\"" + escapeHtml(id) + "\" aria-label=\"Conte com quem você assistiu\"" + (busy ? " disabled" : "") + ">" + icon("group") + (numberOf(experience.total_acompanhantes, 0) > 0 ? "<b>" + escapeHtml(numberOf(experience.total_acompanhantes, 0)) + "</b>" : "") + "<span>Com quem</span></button>"
+      ? "<button type=\"button\" class=\"ie-history-companions-button\" data-history-action=\"experience-companions\" data-history-row-id=\"" + escapeHtml(id) + "\" aria-label=\"Conte com quem você assistiu\"" + (busy ? " disabled" : "") + ">" + icon("group") + (numberOf(experience.total_acompanhantes, 0) > 0 ? "<b>" + escapeHtml(numberOf(experience.total_acompanhantes, 0)) + "</b>" : "") + "<span>Com quem?</span></button>"
       : "";
     return "<div class=\"ie-history-experience-actions\" role=\"group\" aria-label=\"Como você acompanhou este confronto\">" + option("local", "stadium", "Marcar que assistiu no local do evento") + option("remoto", "tv", "Marcar que assistiu pela TV ou outro meio") + companions + "</div>";
   }
@@ -2514,6 +2522,42 @@
     };
     var code = String(value || "").toLowerCase();
     return labels[code] || "Confronto de título";
+  }
+
+  function historyTitleDefinitionLabel(value) {
+    var labels = {
+      final_unica: "Final única",
+      final_ida_volta: "Final em ida e volta",
+      quadrangular: "Quadrangular",
+      quadrangular_final: "Quadrangular final",
+      triangular: "Triangular",
+      triangular_final: "Triangular final",
+      pontos_corridos: "Pontos corridos",
+      mata_mata: "Mata-mata",
+      fase_final: "Fase final"
+    };
+    var code = String(value || "").toLowerCase().trim();
+    if (!code) return "";
+    if (labels[code]) return labels[code];
+    var text = displayText(code.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim());
+    return text ? text.charAt(0).toLocaleUpperCase("pt-BR") + text.slice(1) : "";
+  }
+
+  function historyTitleGameTypeText(item) {
+    item = item || {};
+    var role = String(item.papel_confronto || item.papel || item.tipo_relacao || item.funcao || "").toLowerCase();
+    var parts = [
+      historyTitleRoleLabel(role),
+      historyTitleDefinitionLabel(item.tipo_confronto || item.tipo_jogo || item.formato || item.forma_definicao),
+      titleFlag(item.confronto_principal) ? "Principal" : ""
+    ];
+    var seen = {};
+    return parts.filter(function (part) {
+      var key = normalizeSearchText(part);
+      if (!key || seen[key]) return false;
+      seen[key] = true;
+      return true;
+    }).join(" · ");
   }
 
   function titleEntityNames(plural, singular) {
@@ -2567,16 +2611,9 @@
     var contexts = historyTitleContexts(id);
     if (!contexts.length) return "";
     var visible = contexts.slice(0, 2).map(function (item) {
-      var role = String(item.papel_confronto || item.papel || item.tipo_relacao || item.funcao || "").toLowerCase();
-      var competition = competitionDisplayName(item.competicao || item.competicao_nome || item.titulo_nome || "Título");
-      var season = item.temporada || item.edicao || "";
       var participants = titleParticipantsText(item);
-      var badges = [
-        "<b" + (role === "confirmacao_titulo" ? " class=\"is-confirmed\"" : "") + ">" + escapeHtml(historyTitleRoleLabel(role)) + "</b>",
-        titleFlag(item.confronto_principal) ? "<b class=\"is-primary\">Confronto principal</b>" : "",
-        participants.shared ? "<b>Título compartilhado</b>" : ""
-      ].filter(Boolean).join("");
-      return "<span class=\"ie-history-title-item\"><span class=\"ie-history-title-name\">" + icon("trophy") + "<strong>" + escapeHtml([competition, season].filter(Boolean).join(" · ")) + "</strong></span><span class=\"ie-history-title-badges\">" + badges + "</span>" + (participants.text ? "<small>" + escapeHtml(participants.text) + "</small>" : "") + "</span>";
+      var badges = participants.shared ? "<b>Título compartilhado</b>" : "";
+      return "<span class=\"ie-history-title-item\"><span class=\"ie-history-title-name\">" + icon("trophy") + "<strong>" + escapeHtml(historyTitleGameTypeText(item)) + "</strong></span>" + (badges ? "<span class=\"ie-history-title-badges\">" + badges + "</span>" : "") + (participants.text ? "<small>" + escapeHtml(participants.text) + "</small>" : "") + "</span>";
     }).join("");
     var remaining = contexts.length > 2 ? "<small class=\"ie-history-title-more\">+" + escapeHtml(contexts.length - 2) + " contexto" + (contexts.length - 2 === 1 ? "" : "s") + " de título</small>" : "";
     return "<span class=\"ie-history-title-contexts\">" + visible + remaining + "</span>";
@@ -2588,12 +2625,13 @@
     var meta = [competitionDisplayName(row.competicao || ""), row.temporada, row.fase, row.rodada].filter(Boolean).join(" · ");
     var place = [row.cidade, row.estadio].filter(Boolean).join(" · ");
     var label = [historyDate(row.data_partida), row.time_casa, score, row.time_fora, meta].filter(Boolean).join(" · ");
+    var dayAndTime = [historyWeekday(row.data_partida), historyTime(row.hora_partida)].filter(Boolean).join(" ");
     var collaborators = row.colaboradores || {};
     var totalCollaborators = Number(collaborators.total_colaboradores || 0);
     var collaboratorHtml = totalCollaborators > 0
       ? "<div class=\"ie-history-row-contributors\"><span>Contribuído por <strong>" + escapeHtml(collaborators.primeiro_codinome || "Anônimo") + "</strong></span>" + (totalCollaborators > 1 ? "<button type=\"button\" data-history-action=\"contributors\" data-history-row-id=\"" + escapeHtml(id) + "\">e mais " + escapeHtml(totalCollaborators - 1) + (totalCollaborators - 1 === 1 ? " usuário" : " usuários") + "</button>" : "") + "</div>"
       : "";
-    return "<article class=\"ie-history-row-wrap\"><button type=\"button\" class=\"ie-history-row\" data-history-action=\"correct\" data-history-row-id=\"" + escapeHtml(id) + "\" aria-label=\"Conferir " + escapeHtml(label) + "\"><time datetime=\"" + escapeHtml(row.data_partida || "") + "\"><strong>" + escapeHtml(historyDate(row.data_partida)) + "</strong><span>" + escapeHtml(historyTime(row.hora_partida) || "horário não informado") + "</span></time><span class=\"ie-history-row-copy\"><strong><span>" + escapeHtml(row.time_casa || "Casa") + "</span><b>" + escapeHtml(score) + "</b><span>" + escapeHtml(row.time_fora || "Visitante") + "</span></strong><small>" + escapeHtml(meta || "Competição não informada") + "</small>" + (place ? "<small>" + escapeHtml(place) + "</small>" : "") + renderHistoryTitleContexts(row) + "</span>" + icon("chevron") + "</button>" + renderHistoryExperienceActions(row) + collaboratorHtml + "</article>";
+    return "<article class=\"ie-history-row-wrap\"><button type=\"button\" class=\"ie-history-row\" data-history-action=\"correct\" data-history-row-id=\"" + escapeHtml(id) + "\" aria-label=\"Conferir " + escapeHtml(label) + "\"><time datetime=\"" + escapeHtml(row.data_partida || "") + "\"><strong>" + escapeHtml(historyDate(row.data_partida)) + "</strong>" + (dayAndTime ? "<span>" + escapeHtml(dayAndTime) + "</span>" : "") + "</time><span class=\"ie-history-row-copy\"><strong><span>" + escapeHtml(row.time_casa || "Casa") + "</span><b>" + escapeHtml(score) + "</b><span>" + escapeHtml(row.time_fora || "Visitante") + "</span></strong><small>" + escapeHtml(meta || "Competição não informada") + "</small>" + (place ? "<small>" + escapeHtml(place) + "</small>" : "") + renderHistoryTitleContexts(row) + "</span>" + icon("chevron") + "</button>" + renderHistoryExperienceActions(row) + collaboratorHtml + "</article>";
   }
 
   function renderHistoryResults(history) {
