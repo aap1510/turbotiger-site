@@ -5,8 +5,6 @@
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
     sessionTimeoutMs: 15000,
-    cachePrefix: "tt_ie_cache_v2_",
-    cacheContractVersion: 2,
     liveFallbackMaxAgeMs: 5 * 60 * 1000,
     liveFutureToleranceMs: 5 * 60 * 1000
   };
@@ -61,6 +59,12 @@
       hasMore: false,
       requiresSearch: false,
       loading: false,
+      experiences: {},
+      titles: {},
+      experienceBusy: {},
+      pendingConflict: null,
+      companions: [],
+      story: null,
       requestId: 0,
       filterRequestId: 0,
       currentRow: null
@@ -105,11 +109,57 @@
     settingsSaveStatusTimer: null,
     settingsSaveQueue: Promise.resolve(),
     openingReadySent: false,
-    toastTimer: null
+    toastTimer: null,
+    sessionEpoch: 0,
+    activeRequests: [],
+    sessionTimers: [],
+    debouncedTasks: [],
+    detailReturnFocus: null
   };
 
   function byId(id) { return document.getElementById(id); }
   function all(selector, root) { return Array.prototype.slice.call((root || document).querySelectorAll(selector)); }
+
+  function sessionWorkIsCurrent(epoch, userId) {
+    if (Number(epoch) !== state.sessionEpoch) return false;
+    if (userId == null) return true;
+    return !!state.session && String(state.session.user_id || "") === String(userId || "");
+  }
+
+  function cancelSessionTimeout(timer) {
+    window.clearTimeout(timer);
+    state.sessionTimers = state.sessionTimers.filter(function (item) { return item !== timer; });
+  }
+
+  function scheduleSessionTimeout(callback, delay) {
+    var epoch = state.sessionEpoch;
+    var timer = window.setTimeout(function () {
+      state.sessionTimers = state.sessionTimers.filter(function (item) { return item !== timer; });
+      if (sessionWorkIsCurrent(epoch)) callback();
+    }, delay);
+    state.sessionTimers.push(timer);
+    return timer;
+  }
+
+  function cancelSessionWork() {
+    state.sessionEpoch += 1;
+    state.loadGeneration += 1;
+    state.sportRequestId += 1;
+    state.newsRequestId += 1;
+    state.gameCompetitionRequestId += 1;
+    state.catalogRequestId += 1;
+    state.activeRequests.forEach(function (request) {
+      try { if (request.controller) request.controller.abort(); } catch (error) {}
+    });
+    state.activeRequests = [];
+    state.sessionTimers.forEach(function (timer) { window.clearTimeout(timer); });
+    state.sessionTimers = [];
+    state.debouncedTasks.forEach(function (task) { if (task && typeof task.cancel === "function") task.cancel(); });
+    state.settingsSaveQueue = Promise.resolve();
+    state.settingsSavePending = 0;
+    state.settingsSaveStatusTimer = null;
+    state.toastTimer = null;
+  }
 
   var WINDOWS_1252_BYTES = {
     "\u20ac": 0x80, "\u201a": 0x82, "\u0192": 0x83, "\u201e": 0x84,
@@ -365,6 +415,7 @@
     var messages = {
       app_session_timeout: "O aplicativo demorou para validar sua sessão.",
       app_session_unavailable: "Não foi possível validar sua sessão pelo aplicativo.",
+      session_context_invalidated: "",
       sessao_expirada: "Sua sessão expirou. Volte ao aplicativo e tente novamente.",
       nao_autenticado: "Sua sessão não está disponível.",
       Failed_to_fetch: "Não foi possível acessar a central. Verifique sua conexão."
@@ -388,17 +439,33 @@
       ,nenhuma_correcao_informada: "Altere pelo menos uma informação ou escreva uma observação."
       ,confronto_historico_nao_encontrado: "Este confronto não foi localizado na base."
       ,chave_idempotencia_invalida: "Não foi possível identificar este envio. Tente novamente."
+      ,forma_experiencia_invalida: "Escolha se acompanhou no local ou pela TV/outro meio."
+      ,experiencia_nao_encontrada: "Esta experiência não foi localizada."
+      ,experiencia_presencial_conflitante: "Este horário coincide com outro confronto marcado no local."
+      ,sobreposicao_horario: "Este horário coincide com outro confronto marcado no local."
+      ,horario_indisponivel: "Não há horário suficiente para validar a presença no local."
+      ,acompanhante_nome_invalido: "Informe o nome da pessoa que assistiu com você."
+      ,nome_acompanhante_invalido: "Informe o nome da pessoa que assistiu com você."
+      ,acompanhante_email_invalido: "Informe um e-mail válido."
+      ,email_acompanhante_invalido: "Informe um e-mail válido."
+      ,autorizacao_envio_obrigatoria: "Confirme a autorização antes de enviar o convite."
+      ,consentimento_envio_obrigatorio: "Confirme a autorização antes de enviar o convite."
+      ,destinatario_optout: "Esta pessoa pediu para não receber novos convites."
+      ,historia_esportiva_privada: "Sua história esportiva está privada."
+      ,historia_publica_indisponivel: "Esta história esportiva não está disponível."
+      ,codigo_historia_invalido: "Não foi possível gerar um código seguro para esta história."
     };
     return messages[raw] || messages[raw.replace(/\s+/g, "_")] || raw || "Não foi possível carregar as informações.";
   }
 
   function showToast(message, isError) {
     var toast = byId("toast");
-    window.clearTimeout(state.toastTimer);
+    if (!String(message || "").trim()) return;
+    cancelSessionTimeout(state.toastTimer);
     toast.textContent = displayText(message);
     toast.classList.toggle("is-error", !!isError);
     toast.hidden = false;
-    state.toastTimer = window.setTimeout(function () { toast.hidden = true; }, 3600);
+    state.toastTimer = scheduleSessionTimeout(function () { toast.hidden = true; state.toastTimer = null; }, 3600);
   }
 
   function hasBridge() {
@@ -440,6 +507,58 @@
   var sessionReject = null;
   var sessionTimer = null;
 
+  function purgeLegacyWebCache(userId) {
+    var id = String(userId || "").trim();
+    if (!id) return;
+    try {
+      sessionStorage.removeItem("tt_ie_cache_v1_" + id);
+      sessionStorage.removeItem("tt_ie_cache_v2_" + id);
+    } catch (error) {}
+  }
+
+  function resetPersonalizedState(blocked) {
+    state.bootstrap = null;
+    state.card = null;
+    state.baseSummary = null;
+    state.games = { forYou: [], live: [], upcoming: [], results: [] };
+    state.favoriteCompetitions = [];
+    state.news = [];
+    state.activeSportId = null;
+    state.sportFavoriteOrder = [];
+    state.newsFilters = { participantId: null, competitionId: null };
+    state.activeTab = "home";
+    state.previousTab = "home";
+    state.homeSectionFilter = "";
+    state.settingsContext = "";
+    state.gameFilter = "live";
+    state.gameCompetitionId = null;
+    state.gameCompetitionGames = { live: [], upcoming: [], results: [] };
+    state.gameCompetitionLoading = false;
+    state.catalog = { participants: [], competitions: [] };
+    state.catalogKnown = { participants: {}, competitions: {} };
+    state.selectionChanges = {};
+    state.selectionBusy = {};
+    state.favorites = [];
+    state.favoriteOrder = [];
+    state.historyContribution = emptyHistoryContributionState();
+    state.detailStack = [];
+    state.preferenceRevision = 0;
+    state.loading = false;
+    state.openingReadySent = false;
+    if (byId("detailModal")) closeDetail(false);
+    if (byId("toast")) byId("toast").hidden = true;
+    if (byId("settingsButton")) activateTab("home");
+    if (byId("gamesContent")) syncGameFilterTabs("live");
+    if (byId("ieApp")) {
+      if (blocked) showApp(false);
+      else {
+        byId("ieApp").hidden = true;
+        byId("accessPanel").hidden = true;
+        byId("loadingPanel").hidden = false;
+      }
+    }
+  }
+
   function finishSession(error, session) {
     window.clearTimeout(sessionTimer);
     sessionTimer = null;
@@ -460,14 +579,22 @@
       var token = String(value.access_token || "").trim();
       if (!token) throw new Error("app_session_unavailable");
       var jwt = jwtPayload(token);
-      var previousCacheKey = state.session && state.session.user_id ? cacheKey() : "";
-      state.session = {
+      var previousUserId = state.session && state.session.user_id || "";
+      var nextSession = {
         access_token: token,
         expires_at: Number(jwt.exp || 0) * 1000,
         user_id: String(jwt.sub || "")
       };
-      if (previousCacheKey && previousCacheKey !== cacheKey()) sessionStorage.removeItem(previousCacheKey);
+      var userChanged = !!previousUserId && previousUserId !== nextSession.user_id;
+      if (userChanged) {
+        purgeLegacyWebCache(previousUserId);
+        cancelSessionWork();
+        resetPersonalizedState(false);
+      }
+      state.session = nextSession;
+      purgeLegacyWebCache(nextSession.user_id);
       finishSession(null, state.session);
+      if (userChanged) scheduleSessionTimeout(function () { if (!state.loading) loadAll(false); }, 0);
     } catch (error) {
       finishSession(error);
     }
@@ -478,43 +605,15 @@
   };
 
   window.TurboTigerIEClearSession = function () {
-    var currentCacheKey = state.session && state.session.user_id ? cacheKey() : "";
-    if (currentCacheKey) sessionStorage.removeItem(currentCacheKey);
-    if (state.session && state.session.user_id) sessionStorage.removeItem("tt_ie_cache_v1_" + state.session.user_id);
-    window.clearTimeout(sessionTimer);
-    sessionTimer = null;
-    sessionPromise = null;
-    sessionResolve = null;
-    sessionReject = null;
+    purgeLegacyWebCache(state.session && state.session.user_id);
+    if (sessionPromise) finishSession(new Error("session_context_invalidated"));
+    else {
+      window.clearTimeout(sessionTimer);
+      sessionTimer = null;
+    }
+    cancelSessionWork();
     state.session = null;
-    state.bootstrap = null;
-    state.card = null;
-    state.baseSummary = null;
-    state.games = { forYou: [], live: [], upcoming: [], results: [] };
-    state.favoriteCompetitions = [];
-    state.news = [];
-    state.activeSportId = null;
-    state.sportFavoriteOrder = [];
-    state.sportRequestId += 1;
-    state.newsRequestId += 1;
-    state.newsFilters = { participantId: null, competitionId: null };
-    state.gameCompetitionId = null;
-    state.gameCompetitionGames = { live: [], upcoming: [], results: [] };
-    state.gameCompetitionLoading = false;
-    state.gameCompetitionRequestId += 1;
-    state.catalog = { participants: [], competitions: [] };
-    state.catalogKnown = { participants: {}, competitions: {} };
-    state.catalogRequestId += 1;
-    state.selectionChanges = {};
-    state.selectionBusy = {};
-    state.favorites = [];
-    state.favoriteOrder = [];
-    state.historyContribution = emptyHistoryContributionState();
-    state.detailStack = [];
-    state.loadGeneration += 1;
-    state.loading = false;
-    if (byId("detailModal")) closeDetail();
-    if (byId("ieApp")) showApp(false);
+    resetPersonalizedState(true);
   };
 
   function requestSession() {
@@ -547,58 +646,56 @@
   async function rpc(name, payload) {
     var session = await requestSession();
     if (!session || !session.access_token) throw new Error("sessao_expirada");
-    var response = await fetch(CONFIG.supabaseUrl + "/rest/v1/rpc/" + name, {
-      method: "POST",
-      headers: {
-        apikey: CONFIG.apiKey,
-        Authorization: "Bearer " + session.access_token,
-        "Content-Type": "application/json; charset=utf-8"
-      },
-      body: JSON.stringify(payload || {})
-    });
-    var result = await parseResponse(response);
-    if (result && result.schema_version && result.data != null) {
-      var envelope = {
-        schema_version: result.schema_version,
-        generated_at: result.generated_at,
-        source_updated_at: result.source_updated_at,
-        atualizado_em_fonte: result.atualizado_em_fonte,
-        freshness: result.freshness,
-        source_status: result.source_status,
-        next_cursor: result.next_cursor,
-        errors: result.errors
-      };
-      if (Array.isArray(result.data)) return Object.assign({ itens: result.data }, envelope);
-      if (typeof result.data === "object") return Object.assign({}, result.data, envelope);
-    }
-    return result;
-  }
-
-  function cacheKey() {
-    return CONFIG.cachePrefix + (state.session && state.session.user_id || "anonymous");
-  }
-
-  function saveCache() {
+    var epoch = state.sessionEpoch;
+    var userId = session.user_id;
+    if (!sessionWorkIsCurrent(epoch, userId)) throw new Error("session_context_invalidated");
+    var controller = typeof AbortController === "function" ? new AbortController() : null;
+    var request = { controller: controller, epoch: epoch, userId: userId };
+    state.activeRequests.push(request);
     try {
-      sessionStorage.setItem(cacheKey(), JSON.stringify({ cache_contract_version: CONFIG.cacheContractVersion, saved_at: new Date().toISOString(), bootstrap: state.bootstrap, baseSummary: state.baseSummary, favoriteCompetitions: state.favoriteCompetitions, news: state.news, favorites: state.favorites, activeSportId: state.activeSportId, sportFavoriteOrder: state.sportFavoriteOrder }));
-    } catch (error) {}
+      var options = {
+        method: "POST",
+        headers: {
+          apikey: CONFIG.apiKey,
+          Authorization: "Bearer " + session.access_token,
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify(payload || {}),
+        cache: "no-store",
+        referrerPolicy: "no-referrer"
+      };
+      if (controller) options.signal = controller.signal;
+      var response = await fetch(CONFIG.supabaseUrl + "/rest/v1/rpc/" + name, options);
+      var result = await parseResponse(response);
+      if (!sessionWorkIsCurrent(epoch, userId)) throw new Error("session_context_invalidated");
+      if (result && result.schema_version && result.data != null) {
+        var envelope = {
+          schema_version: result.schema_version,
+          generated_at: result.generated_at,
+          source_updated_at: result.source_updated_at,
+          atualizado_em_fonte: result.atualizado_em_fonte,
+          freshness: result.freshness,
+          source_status: result.source_status,
+          next_cursor: result.next_cursor,
+          errors: result.errors
+        };
+        if (Array.isArray(result.data)) return Object.assign({ itens: result.data }, envelope);
+        if (typeof result.data === "object") return Object.assign({}, result.data, envelope);
+      }
+      return result;
+    } catch (error) {
+      if (!sessionWorkIsCurrent(epoch, userId) || error && error.name === "AbortError") throw new Error("session_context_invalidated");
+      throw error;
+    } finally {
+      state.activeRequests = state.activeRequests.filter(function (item) { return item !== request; });
+    }
   }
+
+  function saveCache() {}
 
   function loadCache() {
-    try {
-      sessionStorage.removeItem("tt_ie_cache_v1_" + (state.session && state.session.user_id || "anonymous"));
-      var raw = sessionStorage.getItem(cacheKey());
-      if (!raw) return null;
-      var cached = JSON.parse(raw);
-      if (!cached || Number(cached.cache_contract_version) !== CONFIG.cacheContractVersion) {
-        sessionStorage.removeItem(cacheKey());
-        return null;
-      }
-      return cached;
-    } catch (error) {
-      try { sessionStorage.removeItem(cacheKey()); } catch (ignored) {}
-      return null;
-    }
+    purgeLegacyWebCache(state.session && state.session.user_id);
+    return null;
   }
 
   function showApp(show) {
@@ -1876,14 +1973,20 @@
       }
     } finally {
       if (loadIsCurrent(generation)) state.loading = false;
-      if (manual && loadIsCurrent(generation)) window.setTimeout(function () { setPullRefreshState(0, false); }, 220);
+      if (manual && loadIsCurrent(generation)) scheduleSessionTimeout(function () { setPullRefreshState(0, false); }, 220);
     }
   }
 
   function activateTab(tab) {
     if (tab !== "settings") state.previousTab = tab;
     state.activeTab = tab;
-    all("[data-tab]").forEach(function (button) { button.classList.toggle("is-active", button.getAttribute("data-tab") === tab); });
+    all("[data-tab]").forEach(function (button) {
+      var active = button.getAttribute("data-tab") === tab;
+      var keyboardTarget = active || (tab === "settings" && button.getAttribute("data-tab") === state.previousTab);
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", active ? "true" : "false");
+      button.setAttribute("tabindex", keyboardTarget ? "0" : "-1");
+    });
     byId("settingsButton").classList.toggle("is-active", tab === "settings");
     byId("settingsButton").setAttribute("aria-pressed", tab === "settings" ? "true" : "false");
     all("[data-panel]").forEach(function (panel) {
@@ -1915,7 +2018,7 @@
     var target = byId(definition.target);
     if (!target) return;
     target.classList.add("is-context-target");
-    if (scrollToTarget) window.setTimeout(function () { target.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
+    if (scrollToTarget) scheduleSessionTimeout(function () { target.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
   }
 
   function openSettings(context, scrollToTarget) {
@@ -1927,8 +2030,18 @@
     var source = selectedGameCompetitionId() ? state.gameCompetitionGames : state.games;
     var filter = source.live.length ? "live" : source.upcoming.length ? "upcoming" : source.results.length ? "results" : "live";
     state.gameFilter = filter;
-    all("[data-game-filter]").forEach(function (button) { button.classList.toggle("is-active", button.getAttribute("data-game-filter") === filter); });
+    syncGameFilterTabs(filter);
     renderGames();
+  }
+
+  function syncGameFilterTabs(filter) {
+    all("[data-game-filter]").forEach(function (button) {
+      var active = button.getAttribute("data-game-filter") === filter;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-selected", active ? "true" : "false");
+      button.setAttribute("tabindex", active ? "0" : "-1");
+      if (active && byId("gamesContent")) byId("gamesContent").setAttribute("aria-labelledby", button.id);
+    });
   }
 
   function initialRouteDefinition() {
@@ -1963,14 +2076,60 @@
     else if (requested.competitionId > 0) await openCompetitionDetail(requested.competitionId, "Detalhes da competição");
   }
 
-  function closeDetail() {
+  function setDetailBackgroundInert(inert) {
+    var app = byId("ieApp");
+    if (!app) return;
+    if (inert) {
+      app.setAttribute("inert", "");
+      app.setAttribute("aria-hidden", "true");
+    } else {
+      app.removeAttribute("inert");
+      app.removeAttribute("aria-hidden");
+    }
+  }
+
+  function focusDetailDialog() {
+    var sheet = document.querySelector("#detailModal .ie-modal-sheet");
+    if (!sheet) return;
+    try { sheet.focus({ preventScroll: true }); } catch (error) { sheet.focus(); }
+  }
+
+  function detailFocusableElements() {
+    return all("a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex='-1'])", byId("detailModal")).filter(function (element) {
+      return !element.hidden && element.getAttribute("aria-hidden") !== "true" && element.getClientRects().length > 0;
+    });
+  }
+
+  function trapDetailFocus(event) {
+    var focusable = detailFocusableElements();
+    if (!focusable.length) { event.preventDefault(); focusDetailDialog(); return; }
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    var activeIndex = focusable.indexOf(document.activeElement);
+    if (event.shiftKey && (document.activeElement === first || activeIndex < 0)) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && (document.activeElement === last || activeIndex < 0)) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  function closeDetail(restoreFocus) {
+    var returnFocus = state.detailReturnFocus;
     byId("detailModal").hidden = true;
+    byId("detailModal").setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+    setDetailBackgroundInert(false);
     state.detailStack = [];
+    state.detailReturnFocus = null;
     byId("detailContent").removeAttribute("data-detail-view");
     if (state.homeSectionFilter) {
       state.homeSectionFilter = "";
       renderHome();
+    }
+    if (restoreFocus !== false && returnFocus && returnFocus.isConnected && !returnFocus.hidden) {
+      try { returnFocus.focus({ preventScroll: true }); } catch (error) { returnFocus.focus(); }
     }
   }
 
@@ -1981,7 +2140,9 @@
 
   function beginDetail(title, subtitle, pushCurrent) {
     var detailContent = byId("detailContent");
-    if (pushCurrent === true && !byId("detailModal").hidden) {
+    var wasHidden = byId("detailModal").hidden;
+    if (wasHidden) state.detailReturnFocus = document.activeElement;
+    if (pushCurrent === true && !wasHidden) {
       state.detailStack.push({
         title: byId("detailTitle").textContent,
         subtitle: byId("detailSubtitle").textContent,
@@ -1998,7 +2159,10 @@
     detailContent.innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
     detailContent.scrollTop = 0;
     byId("detailModal").hidden = false;
+    byId("detailModal").setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    setDetailBackgroundInert(true);
+    focusDetailDialog();
   }
 
   function backDetail() {
@@ -2012,6 +2176,7 @@
     else detailContent.removeAttribute("data-detail-view");
     if (previous.view === "history-list") renderHistoryContributionPage();
     detailContent.scrollTop = Number(previous.scrollTop) || 0;
+    focusDetailDialog();
   }
 
   function historyDetailView() {
@@ -2310,6 +2475,113 @@
     return "<section class=\"ie-history-search\"><div class=\"ie-history-search-intro\"><strong>Encontre um confronto</strong><span>Os filtros com * são obrigatórios.</span></div><div class=\"ie-history-filters\"><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Seu time *</span><input id=\"historyTeamInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.teamQuery) + "\" placeholder=\"Digite e selecione um ou mais times\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyTeamSuggestions\" aria-expanded=\"false\"><div id=\"historyTeamSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>" + historySelectionChips(false) + "</label><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Time adversário</span><input id=\"historyOpponentInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.opponentQuery) + "\" placeholder=\"Opcional: selecione um ou mais\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyOpponentSuggestions\" aria-expanded=\"false\"" + (!baseReady ? " disabled" : "") + "><div id=\"historyOpponentSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>" + historySelectionChips(true) + "</label><label class=\"ie-history-field\"><span>Ano" + yearPeriod + "</span><input id=\"historyYearInput\" type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]{4}\" maxlength=\"4\" value=\"" + escapeHtml(filters.year) + "\" placeholder=\"Opcional\"" + (!baseReady ? " disabled" : "") + "></label><label class=\"ie-history-field\"><span>Temporada</span><select data-history-filter=\"season\"" + (!baseReady ? " disabled" : "") + ">" + seasonOptions + "</select></label><label class=\"" + scopeFieldClass + "\"><span>Abrangência</span><select data-history-filter=\"scope\"" + (!baseReady ? " disabled" : "") + ">" + scopeOptions + "</select></label>" + ufField + "<label class=\"ie-history-field is-wide\"><span>Competição</span><select data-history-filter=\"competitionKey\"" + (!baseReady ? " disabled" : "") + ">" + competitionOptions + "</select></label></div><span id=\"historySearchHint\" class=\"ie-history-search-hint\" aria-live=\"polite\"></span><div class=\"ie-history-search-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" id=\"historySearchButton\" data-history-action=\"search\"" + (!historyRequiredFiltersReady(history) || history.loading ? " disabled" : "") + ">Pesquisar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"clear\">Limpar filtros</button></div></section>";
   }
 
+  function historyExperience(id) {
+    return state.historyContribution.experiences[String(id)] || null;
+  }
+
+  function renderHistoryExperienceActions(row) {
+    var id = row.id || row.cod_confronto || "";
+    var experience = historyExperience(id) || {};
+    var selected = String(experience.forma || "");
+    var busy = !!state.historyContribution.experienceBusy[String(id)];
+    function option(form, iconName, label) {
+      var active = selected === form;
+      return "<button type=\"button\" data-history-action=\"experience-toggle\" data-history-row-id=\"" + escapeHtml(id) + "\" data-experience-form=\"" + form + "\" aria-label=\"" + escapeHtml(label) + "\" aria-pressed=\"" + (active ? "true" : "false") + "\"" + (busy ? " disabled" : "") + ">" + icon(iconName) + "<span>" + escapeHtml(form === "local" ? "No local" : "TV/outro") + "</span></button>";
+    }
+    var companions = selected
+      ? "<button type=\"button\" class=\"ie-history-companions-button\" data-history-action=\"experience-companions\" data-history-row-id=\"" + escapeHtml(id) + "\" aria-label=\"Conte com quem você assistiu\"" + (busy ? " disabled" : "") + ">" + icon("group") + (numberOf(experience.total_acompanhantes, 0) > 0 ? "<b>" + escapeHtml(numberOf(experience.total_acompanhantes, 0)) + "</b>" : "") + "<span>Com quem</span></button>"
+      : "";
+    return "<div class=\"ie-history-experience-actions\" role=\"group\" aria-label=\"Como você acompanhou este confronto\">" + option("local", "stadium", "Marcar que assistiu no local do evento") + option("remoto", "tv", "Marcar que assistiu pela TV ou outro meio") + companions + "</div>";
+  }
+
+  function historyTitleContexts(id) {
+    return arrayOf(state.historyContribution.titles[String(id)]).filter(function (item) {
+      return String(item && (item.papel_confronto || item.papel || item.tipo_relacao || item.funcao) || "").toLowerCase() !== "candidato_final";
+    });
+  }
+
+  function historyTitleRoleLabel(value) {
+    var labels = {
+      final_unica: "Final",
+      final_ida: "Final · ida",
+      final_volta: "Final · volta",
+      desempate: "Desempate da decisão",
+      confirmacao_titulo: "Título confirmado",
+      rodada_decisiva: "Rodada decisiva",
+      entrega_taca: "Entrega da taça",
+      final_fase: "Final da fase",
+      relacionado: "Relacionado ao título"
+    };
+    var code = String(value || "").toLowerCase();
+    return labels[code] || "Confronto de título";
+  }
+
+  function titleEntityNames(plural, singular) {
+    var values = arrayOf(plural);
+    if (!values.length && singular !== null && singular !== undefined && singular !== "") values = [singular];
+    var seen = {};
+    return values.map(function (item) {
+      var name = typeof item === "string" || typeof item === "number"
+        ? displayText(item)
+        : displayText(item && (item.nome || item.nome_clube || item.clube_nome || item.time_nome || item.label) || "");
+      name = String(name || "").trim();
+      var key = normalizeSearchText(name);
+      if (!name || seen[key]) return "";
+      seen[key] = true;
+      return name;
+    }).filter(Boolean);
+  }
+
+  function titleNaturalList(values) {
+    values = arrayOf(values);
+    if (values.length < 2) return values[0] || "";
+    if (values.length === 2) return values[0] + " e " + values[1];
+    return values.slice(0, -1).join(", ") + " e " + values[values.length - 1];
+  }
+
+  function titleParticipantsText(item) {
+    item = item || {};
+    var champions = titleEntityNames(item.campeoes, item.campeao || item.campeao_nome);
+    var runnersUp = titleEntityNames(item.vices, item.vice || item.vice_nome || item.vice_campeao);
+    var shared = titleFlag(item.titulo_compartilhado) || champions.length > 1;
+    var parts = [];
+    if (champions.length) parts.push((champions.length > 1 ? "Campeões: " : "Campeão: ") + titleNaturalList(champions));
+    if (runnersUp.length) parts.push((runnersUp.length > 1 ? "Vices: " : "Vice: ") + titleNaturalList(runnersUp));
+    return { champions: champions, runnersUp: runnersUp, shared: shared, text: parts.join(" · ") };
+  }
+
+  function titleFlag(value) {
+    return value === true || String(value || "").toLowerCase() === "true";
+  }
+
+  function titleDecisionStatus(item, required) {
+    var status = String(item && item.decisao_status || "").toLowerCase();
+    if (["completa", "incompleta", "nao_aplicavel"].indexOf(status) >= 0) return status;
+    if (item && item.decisao_completa === true) return "completa";
+    if (item && item.decisao_completa === false && required > 0) return "incompleta";
+    return "nao_aplicavel";
+  }
+
+  function renderHistoryTitleContexts(row) {
+    var id = row.id || row.cod_confronto || "";
+    var contexts = historyTitleContexts(id);
+    if (!contexts.length) return "";
+    var visible = contexts.slice(0, 2).map(function (item) {
+      var role = String(item.papel_confronto || item.papel || item.tipo_relacao || item.funcao || "").toLowerCase();
+      var competition = competitionDisplayName(item.competicao || item.competicao_nome || item.titulo_nome || "Título");
+      var season = item.temporada || item.edicao || "";
+      var participants = titleParticipantsText(item);
+      var badges = [
+        "<b" + (role === "confirmacao_titulo" ? " class=\"is-confirmed\"" : "") + ">" + escapeHtml(historyTitleRoleLabel(role)) + "</b>",
+        titleFlag(item.confronto_principal) ? "<b class=\"is-primary\">Confronto principal</b>" : "",
+        participants.shared ? "<b>Título compartilhado</b>" : ""
+      ].filter(Boolean).join("");
+      return "<span class=\"ie-history-title-item\"><span class=\"ie-history-title-name\">" + icon("trophy") + "<strong>" + escapeHtml([competition, season].filter(Boolean).join(" · ")) + "</strong></span><span class=\"ie-history-title-badges\">" + badges + "</span>" + (participants.text ? "<small>" + escapeHtml(participants.text) + "</small>" : "") + "</span>";
+    }).join("");
+    var remaining = contexts.length > 2 ? "<small class=\"ie-history-title-more\">+" + escapeHtml(contexts.length - 2) + " contexto" + (contexts.length - 2 === 1 ? "" : "s") + " de título</small>" : "";
+    return "<span class=\"ie-history-title-contexts\">" + visible + remaining + "</span>";
+  }
+
   function renderHistoryRow(row) {
     var id = row.id || row.cod_confronto || "";
     var score = String(row.placar_casa == null ? "—" : row.placar_casa) + " – " + String(row.placar_fora == null ? "—" : row.placar_fora);
@@ -2321,7 +2593,7 @@
     var collaboratorHtml = totalCollaborators > 0
       ? "<div class=\"ie-history-row-contributors\"><span>Contribuído por <strong>" + escapeHtml(collaborators.primeiro_codinome || "Anônimo") + "</strong></span>" + (totalCollaborators > 1 ? "<button type=\"button\" data-history-action=\"contributors\" data-history-row-id=\"" + escapeHtml(id) + "\">e mais " + escapeHtml(totalCollaborators - 1) + (totalCollaborators - 1 === 1 ? " usuário" : " usuários") + "</button>" : "") + "</div>"
       : "";
-    return "<article class=\"ie-history-row-wrap\"><button type=\"button\" class=\"ie-history-row\" data-history-action=\"correct\" data-history-row-id=\"" + escapeHtml(id) + "\" aria-label=\"Conferir " + escapeHtml(label) + "\"><time datetime=\"" + escapeHtml(row.data_partida || "") + "\"><strong>" + escapeHtml(historyDate(row.data_partida)) + "</strong><span>" + escapeHtml(historyTime(row.hora_partida) || "horário não informado") + "</span></time><span class=\"ie-history-row-copy\"><strong><span>" + escapeHtml(row.time_casa || "Casa") + "</span><b>" + escapeHtml(score) + "</b><span>" + escapeHtml(row.time_fora || "Visitante") + "</span></strong><small>" + escapeHtml(meta || "Competição não informada") + "</small>" + (place ? "<small>" + escapeHtml(place) + "</small>" : "") + "</span>" + icon("chevron") + "</button>" + collaboratorHtml + "</article>";
+    return "<article class=\"ie-history-row-wrap\"><button type=\"button\" class=\"ie-history-row\" data-history-action=\"correct\" data-history-row-id=\"" + escapeHtml(id) + "\" aria-label=\"Conferir " + escapeHtml(label) + "\"><time datetime=\"" + escapeHtml(row.data_partida || "") + "\"><strong>" + escapeHtml(historyDate(row.data_partida)) + "</strong><span>" + escapeHtml(historyTime(row.hora_partida) || "horário não informado") + "</span></time><span class=\"ie-history-row-copy\"><strong><span>" + escapeHtml(row.time_casa || "Casa") + "</span><b>" + escapeHtml(score) + "</b><span>" + escapeHtml(row.time_fora || "Visitante") + "</span></strong><small>" + escapeHtml(meta || "Competição não informada") + "</small>" + (place ? "<small>" + escapeHtml(place) + "</small>" : "") + renderHistoryTitleContexts(row) + "</span>" + icon("chevron") + "</button>" + renderHistoryExperienceActions(row) + collaboratorHtml + "</article>";
   }
 
   function renderHistoryResults(history) {
@@ -2336,7 +2608,7 @@
           : emptyState("Filtros prontos", "Os confrontos serão atualizados automaticamente.", false);
     var rows = history.mode !== "pesquisa" ? waitingState : history.rows.length ? "<div class=\"ie-history-table\">" + history.rows.map(renderHistoryRow).join("") + "</div>" : emptyState("Nenhum confronto encontrado", "Revise os filtros informados ou envie um confronto que ainda não está na base.", false);
     var pager = history.totalPages > 1 ? "<nav class=\"ie-history-pager\" aria-label=\"Paginação dos confrontos\"><button type=\"button\" data-history-action=\"previous\"" + (history.page <= 1 || history.loading ? " disabled" : "") + ">Anterior</button><span>Página " + escapeHtml(history.page) + " de " + escapeHtml(history.totalPages) + "</span><button type=\"button\" data-history-action=\"next\"" + (!history.hasMore || history.loading ? " disabled" : "") + ">Próxima</button></nav>" : "";
-    return "<section class=\"ie-history-results\"><header><div><strong>" + escapeHtml(listTitle) + "</strong><span>Toque em um confronto para sugerir correção ou no + ao lado para incluir algum.</span></div><button class=\"ie-history-add\" type=\"button\" data-history-action=\"new\" aria-label=\"Enviar um confronto não localizado\">+</button></header>" + (history.loading ? "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>" : rows + pager) + "</section>";
+    return "<section class=\"ie-history-results\"><header><div><strong>" + escapeHtml(listTitle) + "</strong><span>Toque em um confronto para sugerir correção ou no + ao lado para incluir algum. Também marque se assistiu no local " + icon("stadium") + " ou pela TV/outro meio " + icon("tv") + ".</span></div><button class=\"ie-history-add\" type=\"button\" data-history-action=\"new\" aria-label=\"Enviar um confronto não localizado\">+</button></header>" + (history.loading ? "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>" : rows + pager) + "</section>";
   }
 
   function renderHistoryContributionPage() {
@@ -2346,7 +2618,7 @@
     byId("detailContent").setAttribute("data-detail-view", "history-list");
     byId("detailTitle").textContent = "Colabore com nossa base";
     var totalPartidas = numberOf(state.baseSummary && state.baseSummary.total_registros, 0);
-    byId("detailSubtitle").innerHTML = "<span>Futebol do Brasil" + (totalPartidas > 0 ? " · " + totalPartidas.toLocaleString("pt-BR") + " partidas" : "") + "</span><button type=\"button\" class=\"ie-history-ranking-link\" data-history-action=\"ranking\">Top 10 dos colaboradores</button>";
+    byId("detailSubtitle").innerHTML = "<span>Futebol do Brasil" + (totalPartidas > 0 ? " · " + totalPartidas.toLocaleString("pt-BR") + " partidas" : "") + "</span><span class=\"ie-history-header-links\"><button type=\"button\" class=\"ie-history-ranking-link\" data-history-action=\"ranking\">Top 10 dos colaboradores</button><button type=\"button\" class=\"ie-history-ranking-link\" data-history-action=\"experience-ranking\">Top 10 dos que assistiram ao vivo</button><button type=\"button\" class=\"ie-history-ranking-link\" data-history-action=\"sports-story\">Minha história esportiva</button></span>";
     byId("detailContent").innerHTML = renderHistoryFilters() + renderHistoryResults(history);
     updateHistorySearchControls();
     renderHistoryTeamSuggestions("team");
@@ -2445,6 +2717,49 @@
     };
   }
 
+  async function loadHistoryExperienceSummaries(confrontationIds, history, requestId) {
+    if (!confrontationIds.length) return;
+    try {
+      var result = await rpc("ie_experiencias_confrontos_resumo_rpc", { p_ids_confrontos: confrontationIds });
+      if (history !== state.historyContribution || requestId !== history.requestId) return;
+      var visible = {};
+      confrontationIds.forEach(function (id) { visible[String(id)] = true; });
+      Object.keys(history.experiences).forEach(function (id) {
+        if (visible[id]) delete history.experiences[id];
+      });
+      arrayOf(result).forEach(function (item) {
+        if (Number(item.id_confronto || 0) > 0) history.experiences[String(item.id_confronto)] = item;
+      });
+    } catch (error) {
+      /* Experiências não bloqueiam a consulta da base histórica. */
+    }
+  }
+
+  async function loadHistoryTitleContexts(confrontationIds, history, requestId) {
+    if (!confrontationIds.length) return;
+    try {
+      var result = await rpc("ie_titulos_confrontos_resumo_rpc", { p_ids_confrontos: confrontationIds, p_codigo_publico: null, p_id_esporte: state.activeSportId || null });
+      if (history !== state.historyContribution || requestId !== history.requestId) return;
+      var visible = {};
+      confrontationIds.forEach(function (id) { visible[String(id)] = true; });
+      Object.keys(history.titles).forEach(function (id) {
+        if (visible[id]) delete history.titles[id];
+      });
+      var rows = arrayOf(result && (result.items || result.itens || result.confrontos || result.resultados));
+      if (!rows.length && Array.isArray(result)) rows = result;
+      rows.forEach(function (item) {
+        var id = Number(item.id_confronto || item.id || item.cod_confronto || 0);
+        if (!id || !visible[String(id)]) return;
+        var titles = arrayOf(item.titulos || item.contextos || item.items).filter(function (title) {
+          return String(title && (title.papel_confronto || title.papel || title.tipo_relacao || title.funcao) || "").toLowerCase() !== "candidato_final";
+        });
+        if (titles.length) history.titles[String(id)] = titles;
+      });
+    } catch (error) {
+      /* Títulos enriquecem a linha, mas não bloqueiam a pesquisa histórica. */
+    }
+  }
+
   async function loadHistoryRows(cursor) {
     var history = state.historyContribution;
     var requestId = ++history.requestId;
@@ -2456,13 +2771,20 @@
       history.rows = arrayOf(result);
       var confrontationIds = history.rows.map(function (row) { return Number(row.id || row.cod_confronto || 0); }).filter(function (id) { return id > 0; });
       if (confrontationIds.length) {
-        try {
-          var collaboratorResult = await rpc("ie_hist_futebol_brasil_colaboradores_resumo_rpc", { p_ids_confrontos: confrontationIds });
-          if (history !== state.historyContribution || requestId !== history.requestId) return false;
-          var collaboratorMap = {};
-          arrayOf(collaboratorResult).forEach(function (item) { collaboratorMap[String(item.id_confronto)] = item; });
-          history.rows.forEach(function (row) { row.colaboradores = collaboratorMap[String(row.id || row.cod_confronto)] || null; });
-        } catch (collaboratorError) { /* autoria nao bloqueia a listagem de confrontos */ }
+        await Promise.all([
+          (async function () {
+            try {
+              var collaboratorResult = await rpc("ie_hist_futebol_brasil_colaboradores_resumo_rpc", { p_ids_confrontos: confrontationIds });
+              if (history !== state.historyContribution || requestId !== history.requestId) return;
+              var collaboratorMap = {};
+              arrayOf(collaboratorResult).forEach(function (item) { collaboratorMap[String(item.id_confronto)] = item; });
+              history.rows.forEach(function (row) { row.colaboradores = collaboratorMap[String(row.id || row.cod_confronto)] || null; });
+            } catch (collaboratorError) { /* autoria nao bloqueia a listagem de confrontos */ }
+          }()),
+          loadHistoryExperienceSummaries(confrontationIds, history, requestId),
+          loadHistoryTitleContexts(confrontationIds, history, requestId)
+        ]);
+        if (history !== state.historyContribution || requestId !== history.requestId) return false;
       }
       history.cursor = cursor || null;
       history.nextCursor = result && result.next_cursor || null;
@@ -2603,10 +2925,27 @@
     byId("detailContent").setAttribute("data-detail-view", "history-form");
   }
 
-  function openHistoryCorrection(id) {
-    var row = state.historyContribution.rows.find(function (item) { return Number(item.id || item.cod_confronto) === Number(id); });
+  function historyConflictCorrectionRow(item) {
+    if (!item) return null;
+    var official = item.partida_oficial;
+    if (official === "true") official = true;
+    else if (official === "false") official = false;
+    return Object.assign({}, item, {
+      id: Number(item.id_confronto || item.id || item.cod_confronto || 0),
+      data_partida: item.data_partida || item.data || "",
+      hora_partida: item.hora_partida || item.hora || "",
+      partida_oficial: official
+    });
+  }
+
+  function openHistoryCorrection(id, fallbackRow) {
+    var row = state.historyContribution.rows.find(function (item) { return Number(item.id || item.cod_confronto) === Number(id); }) || historyConflictCorrectionRow(fallbackRow);
     if (!row) {
-      showToast("Este confronto não está mais na página atual.", true);
+      showToast("Não foi possível carregar os dados deste confronto.", true);
+      return;
+    }
+    if (!row.time_casa || !row.time_fora || row.placar_casa == null || row.placar_fora == null || !row.competicao || !row.temporada || typeof row.partida_oficial !== "boolean") {
+      showToast("Este confronto não pertence à base histórica editável.", true);
       return;
     }
     state.historyContribution.currentRow = row;
@@ -2659,6 +2998,372 @@
       byId("detailContent").innerHTML = "<section class=\"ie-history-ranking-top\"><header><strong>Top 10</strong><span>Quem mais ajudou a fortalecer nossa base</span></header><div>" + top + "</div></section><section class=\"ie-history-ranking-all\"><header><strong>Todos os colaboradores</strong><span>Contribuições aprovadas</span></header>" + allContributors + "</section>";
     } catch (error) {
       if (historyDetailView() === "history-ranking") byId("detailContent").innerHTML = emptyState("Não foi possível carregar", friendlyError(error), false);
+    }
+  }
+
+  function historyRowById(id) {
+    return state.historyContribution.rows.find(function (item) {
+      return Number(item.id || item.cod_confronto) === Number(id);
+    }) || {};
+  }
+
+  function historyMatchCompactHtml(row) {
+    row = row || {};
+    var score = row.placar_casa == null || row.placar_fora == null ? "" : row.placar_casa + " × " + row.placar_fora;
+    var date = row.data_partida || row.data || "";
+    var time = row.hora_partida || row.hora || "";
+    var title = row.titulo || ((row.time_casa || "Casa") + (score ? " " + score + " " : " × ") + (row.time_fora || "Visitante"));
+    return "<article class=\"ie-exp-match-summary\"><time>" + escapeHtml(historyDate(date)) + (historyTime(time) ? " · " + escapeHtml(historyTime(time)) : "") + "</time><strong>" + escapeHtml(title) + "</strong><span>" + escapeHtml([competitionDisplayName(row.competicao || ""), row.estadio || row.local, row.cidade].filter(Boolean).join(" · ")) + "</span></article>";
+  }
+
+  async function refreshHistoryExperiences(ids, history) {
+    history = history || state.historyContribution;
+    var requestedIds = arrayOf(ids).map(Number).filter(function (id, index, values) { return id > 0 && values.indexOf(id) === index; });
+    if (!requestedIds.length) return;
+    var result = await rpc("ie_experiencias_confrontos_resumo_rpc", { p_ids_confrontos: requestedIds });
+    if (history !== state.historyContribution) return;
+    requestedIds.forEach(function (id) { delete history.experiences[String(id)]; });
+    arrayOf(result).forEach(function (item) {
+      var id = Number(item && item.id_confronto || 0);
+      if (id > 0 && requestedIds.indexOf(id) >= 0) history.experiences[String(id)] = item;
+    });
+  }
+
+  function refreshHistoryExperience(id) {
+    return refreshHistoryExperiences([Number(id)], state.historyContribution);
+  }
+
+  function renderHistoryExperienceConflict(conflict, requestedRow) {
+    var items = arrayOf(conflict && conflict.itens);
+    var reason = String(conflict && conflict.motivo || "");
+    byId("detailTitle").textContent = "Horários coincidentes";
+    byId("detailSubtitle").textContent = "Você só pode estar em um local por vez";
+    byId("detailContent").setAttribute("data-detail-view", "experience-conflict");
+    byId("detailContent").innerHTML = "<section class=\"ie-exp-conflict\"><div class=\"ie-exp-conflict-heading\">" + icon("warning") + "<div><strong>Confira onde você estava</strong><p>" + escapeHtml(reason === "horario_indisponivel" ? "Um dos confrontos não tem horário suficiente para validar a presença no local." : "A margem de deslocamento deste confronto coincide com outro já marcado no local.") + "</p></div></div><div class=\"ie-exp-conflict-matches\">" + historyMatchCompactHtml(requestedRow) + items.map(historyMatchCompactHtml).join("") + "</div><div class=\"ie-exp-conflict-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" data-history-action=\"experience-conflict-replace\">Marcar este confronto</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"experience-conflict-keep\">Manter o que já estava</button><button type=\"button\" class=\"ie-text-action\" data-history-action=\"experience-conflict-correct\">Sugerir correção do confronto em conflito</button><button type=\"button\" class=\"ie-text-action\" data-history-action=\"experience-conflict-cancel\">Cancelar</button></div></section>";
+  }
+
+  async function toggleHistoryExperience(id, form) {
+    id = Number(id || 0);
+    if (!id || (form !== "local" && form !== "remoto")) return;
+    var history = state.historyContribution;
+    if (history.experienceBusy[String(id)]) return;
+    var current = historyExperience(id);
+    var wanted = current && current.forma === form ? null : form;
+    history.experienceBusy[String(id)] = true;
+    renderHistoryContributionPage();
+    try {
+      var result = await rpc("ie_experiencia_marcar_rpc", { p_id_confronto: id, p_forma: wanted });
+      if (history !== state.historyContribution) return;
+      if (result && result.salvo === false && result.conflito) {
+        history.pendingConflict = { id: id, forma: form, conflict: result.conflito, row: historyRowById(id) };
+        beginDetail("Horários coincidentes", "Validando sua presença", true);
+        renderHistoryExperienceConflict(result.conflito, history.pendingConflict.row);
+        return;
+      }
+      await refreshHistoryExperience(id);
+      if (historyDetailView() === "history-list") renderHistoryContributionPage();
+      showToast(wanted ? (wanted === "local" ? "Marcado: você assistiu no local." : "Marcado: você assistiu pela TV/outro meio.") : "Marcação removida.", false);
+    } catch (error) {
+      showToast(friendlyError(error), true);
+    } finally {
+      if (history === state.historyContribution) {
+        delete history.experienceBusy[String(id)];
+        if (historyDetailView() === "history-list") renderHistoryContributionPage();
+      }
+    }
+  }
+
+  async function resolveHistoryExperienceConflict(action) {
+    var history = state.historyContribution;
+    var pending = history.pendingConflict;
+    if (!pending) { backDetail(); return; }
+    try {
+      await rpc("ie_experiencia_conflito_resolver_rpc", {
+        p_id_confronto: Number(pending.id),
+        p_forma: pending.forma,
+        p_acao: action
+      });
+      var affectedIds = [Number(pending.id)];
+      if (action === "substituir_pelo_atual") {
+        affectedIds = affectedIds.concat(arrayOf(pending.conflict && pending.conflict.itens).map(function (item) { return Number(item && item.id_confronto || 0); }));
+      }
+      await refreshHistoryExperiences(affectedIds, history);
+      if (history !== state.historyContribution) return;
+      history.pendingConflict = null;
+      backDetail();
+      if (historyDetailView() === "history-list") renderHistoryContributionPage();
+      showToast(action === "substituir_pelo_atual" ? "Presença atualizada para este confronto." : action === "cancelar" ? "Nenhuma alteração foi feita." : "A marcação anterior foi mantida.", false);
+    } catch (error) {
+      showToast(friendlyError(error), true);
+    }
+  }
+
+  function renderHistoryCompanions(row, companions) {
+    var id = row.id || row.cod_confronto || "";
+    var experience = historyExperience(id) || {};
+    var experienceId = Number(experience.id_experiencia || 0);
+    var list = arrayOf(companions);
+    var listHtml = list.length ? "<div class=\"ie-exp-companion-list\">" + list.map(function (item) {
+      var status = item.status_label || item.status || "Convite registrado";
+      return "<article><span><strong>" + escapeHtml(item.nome || "Acompanhante") + "</strong><small>" + escapeHtml(item.email_mascarado || status) + "</small></span><em>" + escapeHtml(status) + "</em>" + (item.id_acompanhante ? "<button type=\"button\" data-history-action=\"experience-companion-remove\" data-companion-id=\"" + escapeHtml(item.id_acompanhante) + "\" aria-label=\"Remover acompanhante\">×</button>" : "") + "</article>";
+    }).join("") + "</div>" : "<p class=\"ie-exp-companion-empty\">Você ainda não informou com quem assistiu.</p>";
+    byId("detailTitle").textContent = "Com quem você assistiu?";
+    byId("detailSubtitle").textContent = historyDate(row.data_partida) + " · " + (row.time_casa || "Casa") + " × " + (row.time_fora || "Visitante");
+    byId("detailContent").setAttribute("data-detail-view", "experience-companions");
+    byId("detailContent").innerHTML = "<section class=\"ie-exp-companions\">" + listHtml + "<form data-experience-companion-form><input type=\"hidden\" name=\"confrontation_id\" value=\"" + escapeHtml(id) + "\"><input type=\"hidden\" name=\"experience_id\" value=\"" + escapeHtml(experienceId) + "\"><input type=\"hidden\" name=\"idempotency_key\" value=\"" + escapeHtml(historyIdempotencyKey()) + "\"><h3>Nos conte com quem você assistiu</h3><label><span>Nome</span><input name=\"name\" type=\"text\" maxlength=\"120\" autocomplete=\"name\" required></label><label><span>E-mail <small>(opcional)</small></span><input name=\"email\" type=\"email\" maxlength=\"254\" autocomplete=\"email\" placeholder=\"nome@exemplo.com\"></label><label class=\"ie-exp-consent\"><input name=\"consent\" type=\"checkbox\"><span>Se informar o e-mail, confirme que conhece esta pessoa e autoriza o Turbo Tiger a enviar um único convite relacionado a este confronto.</span></label><small>Sem e-mail, o nome fica apenas na sua lembrança privada. Com e-mail, a pessoa poderá confirmar, contestar ou recusar o registro. O endereço nunca será exibido publicamente.</small><button type=\"submit\" class=\"ie-button ie-button-primary\">Salvar acompanhante</button></form></section>";
+  }
+
+  async function openHistoryCompanions(id) {
+    var row = historyRowById(id);
+    if (!row.id && !row.cod_confronto) return;
+    var experienceId = Number((historyExperience(id) || {}).id_experiencia || 0);
+    if (!experienceId) { showToast("Marque primeiro como você acompanhou este confronto.", true); return; }
+    beginDetail("Com quem você assistiu?", "Carregando...", true);
+    byId("detailContent").setAttribute("data-detail-view", "experience-companions-loading");
+    try {
+      var result = await rpc("ie_experiencia_acompanhantes_listar_rpc", { p_id_experiencia: experienceId });
+      if (historyDetailView() !== "experience-companions-loading") return;
+      state.historyContribution.currentRow = row;
+      state.historyContribution.companions = arrayOf(result);
+      renderHistoryCompanions(row, state.historyContribution.companions);
+    } catch (error) {
+      if (historyDetailView() === "experience-companions-loading") byId("detailContent").innerHTML = emptyState("Não foi possível carregar", friendlyError(error), false);
+    }
+  }
+
+  async function submitHistoryCompanion(form) {
+    var button = form.querySelector("button[type=submit]");
+    var values = new FormData(form);
+    button.disabled = true;
+    button.textContent = "Salvando...";
+    try {
+      var email = String(values.get("email") || "").trim();
+      var consent = values.get("consent") === "on";
+      if (email && !consent) throw new Error("consentimento_envio_obrigatorio");
+      await rpc("ie_experiencia_acompanhante_salvar_rpc", {
+        p_id_experiencia: Number(values.get("experience_id")),
+        p_nome: String(values.get("name") || "").trim(),
+        p_email: email || null,
+        p_consentimento: consent,
+        p_chave_idempotencia: String(values.get("idempotency_key") || "")
+      });
+      if (!form.isConnected || historyDetailView() !== "experience-companions") return;
+      showToast(email ? "Acompanhante salvo e convite registrado para envio." : "Acompanhante salvo na sua lembrança.", false);
+      await refreshHistoryExperience(Number(values.get("confrontation_id")));
+      var companions = await rpc("ie_experiencia_acompanhantes_listar_rpc", { p_id_experiencia: Number(values.get("experience_id")) });
+      if (historyDetailView() === "experience-companions") renderHistoryCompanions(state.historyContribution.currentRow || {}, companions);
+    } catch (error) {
+      showToast(friendlyError(error), true);
+      if (button.isConnected) { button.disabled = false; button.textContent = "Salvar acompanhante"; }
+    }
+  }
+
+  async function removeHistoryCompanion(id) {
+    var row = state.historyContribution.currentRow || {};
+    try {
+      await rpc("ie_experiencia_acompanhante_remover_rpc", { p_id_acompanhante: Number(id) });
+      var confrontationId = Number(row.id || row.cod_confronto || 0);
+      var experienceId = Number((historyExperience(confrontationId) || {}).id_experiencia || 0);
+      var companions = experienceId ? await rpc("ie_experiencia_acompanhantes_listar_rpc", { p_id_experiencia: experienceId }) : [];
+      await refreshHistoryExperience(confrontationId);
+      if (historyDetailView() === "experience-companions") renderHistoryCompanions(row, companions);
+      showToast("Acompanhante removido.", false);
+    } catch (error) {
+      showToast(friendlyError(error), true);
+    }
+  }
+
+  async function openExperienceRanking() {
+    beginDetail("Top 10 dos que assistiram ao vivo", "Registros declarados pelos membros", true);
+    byId("detailContent").setAttribute("data-detail-view", "experience-ranking");
+    try {
+      var result = await rpc("ie_experiencias_ranking_rpc", { p_id_esporte: state.activeSportId || null, p_limite: 10 });
+      if (historyDetailView() !== "experience-ranking") return;
+      var ranking = arrayOf(result);
+      if (!ranking.length) {
+        byId("detailContent").innerHTML = emptyState("Ranking em formação", "Os primeiros registros de quem acompanhou confrontos aparecerão aqui.", false);
+        return;
+      }
+      byId("detailContent").innerHTML = "<p class=\"ie-exp-ranking-note\">O ranking considera registros declarados. A presença no local recebe peso maior que TV/outro meio.</p><div class=\"ie-exp-ranking-list\">" + ranking.map(function (item, index) {
+        var position = Number(item.posicao || index + 1);
+        return "<article class=\"" + (position <= 3 ? "is-top" : "") + "\"><b>" + position + "º</b><span><strong>" + escapeHtml(item.codinome || item.nome_publico || "Membro") + "</strong><small>" + escapeHtml(numberOf(item.total_local || item.presenciais, 0)) + " no local · " + escapeHtml(numberOf(item.total_remoto || item.remotos, 0)) + " por TV/outro</small></span><em>" + escapeHtml(numberOf(item.pontos, 0)) + " pts</em></article>";
+      }).join("") + "</div>";
+    } catch (error) {
+      if (historyDetailView() === "experience-ranking") byId("detailContent").innerHTML = emptyState("Não foi possível carregar", friendlyError(error), false);
+    }
+  }
+
+  function sportsStoryPublicUrl(story) {
+    var profile = story && story.perfil || {};
+    var code = String(profile.codigo_publico || story && (story.codigo_publico || story.codigo) || "").trim();
+    if (!code) return "";
+    var configured = safeUrl(profile.historia_publica_url || story && (story.url_publica || story.url) || "https://turbotiger.com.br/historia-esportiva/");
+    try {
+      var parsed = new URL(configured);
+      if ((parsed.hostname === "turbotiger.com.br" || parsed.hostname.endsWith(".turbotiger.com.br")) && parsed.pathname.indexOf("/historia-esportiva/") === 0) {
+        parsed.search = "";
+        parsed.searchParams.set("codigo", code);
+        return parsed.href;
+      }
+    } catch (error) {}
+    return "https://turbotiger.com.br/historia-esportiva/?codigo=" + encodeURIComponent(code);
+  }
+
+  function renderMySportsStory(data) {
+    data = data || {};
+    var profile = data.perfil || {};
+    var summary = data.resumo || {};
+    var contributions = arrayOf(data.colaboracoes);
+    var publicUrl = sportsStoryPublicUrl(data);
+    var sportId = Number(profile.id_esporte || data.id_esporte || state.activeSportId || 0) || "";
+    var titleData = data.titulos_resumo || data.title_summary || data._titleSummary || {};
+    var titleSummary = titleData.resumo || titleData.summary || {};
+    var followedTitles = arrayOf(titleData.titulos || titleData.items || titleData.edicoes);
+    state.historyContribution.story = data;
+    byId("detailTitle").textContent = "Minha história esportiva";
+    byId("detailSubtitle").textContent = displayText(profile.esporte || data.esporte_nome || "Esporte");
+    byId("detailContent").setAttribute("data-detail-view", "sports-story");
+    byId("detailContent").innerHTML = "<section class=\"ie-exp-story-owner\"><div class=\"ie-exp-story-preview\"><span>Prévia privada</span><strong>" + escapeHtml(profile.codinome || "Sua história") + "</strong><small>" + escapeHtml(numberOf(summary.total, 0)) + " confrontos · " + escapeHtml(numberOf(summary.total_local, 0)) + " no local · " + escapeHtml(numberOf(summary.total_remoto, 0)) + " por TV/outro · " + escapeHtml(contributions.length) + " contribuições</small></div>" + renderMySportsStoryTitles(titleSummary, followedTitles) + "<p class=\"ie-exp-story-declaration\">História formada por registros declarados pelo membro. Você controla o que fica visível.</p><form data-sports-story-form><input type=\"hidden\" name=\"sport_id\" value=\"" + escapeHtml(sportId) + "\"><label class=\"ie-switch-row\"><span><strong>Página pública</strong><small>Você decide quando sua história pode ser vista pelo código seguro.</small></span><span class=\"ie-switch\"><input type=\"checkbox\" name=\"active\"" + (profile.ativo === true ? " checked" : "") + "><span aria-hidden=\"true\"></span></span></label><fieldset><legend>Informações visíveis</legend><label><input type=\"checkbox\" name=\"show_codename\"" + (profile.exibir_codinome !== false ? " checked" : "") + "><span>Meu codinome</span></label><label><input type=\"checkbox\" name=\"show_matches\"" + (profile.exibir_confrontos !== false ? " checked" : "") + "><span>Confrontos e linha do tempo</span></label><label><input type=\"checkbox\" name=\"show_places\"" + (profile.exibir_locais !== false ? " checked" : "") + "><span>Locais dos eventos</span></label><label><input type=\"checkbox\" name=\"show_companions\"" + (profile.exibir_acompanhantes !== false ? " checked" : "") + "><span>Acompanhantes confirmados</span></label><label><input type=\"checkbox\" name=\"show_contributions\"" + (profile.exibir_colaboracoes !== false ? " checked" : "") + "><span>Colaborações aprovadas</span></label><label><input type=\"checkbox\" name=\"show_ranking\"" + (profile.exibir_ranking !== false ? " checked" : "") + "><span>Participação no ranking</span></label></fieldset><button type=\"submit\" class=\"ie-button ie-button-primary\">Salvar privacidade</button></form><div class=\"ie-exp-story-share\"><strong>Código público revogável</strong><code>" + escapeHtml(profile.codigo_publico || "Ainda não gerado") + "</code><div><button type=\"button\" class=\"ie-button ie-button-primary\" data-history-action=\"sports-story-share\"" + (!publicUrl || profile.ativo !== true ? " disabled" : "") + ">" + icon("share") + " Compartilhar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"sports-story-renew\">Gerar novo código</button></div><small>Ao gerar outro código, o anterior deixa de funcionar. IDs internos e dados privados nunca fazem parte do link.</small></div></section>";
+  }
+
+  function renderMySportsStoryTitles(summary, titles) {
+    summary = summary || {};
+    titles = arrayOf(titles);
+    var totalTitles = numberOf(summary.titulos_acompanhados, titles.length);
+    var totalTitleMatches = numberOf(summary.confrontos_titulo_assistidos, 0);
+    if (!totalTitles && !totalTitleMatches && !titles.length) return "";
+    var metrics = [
+      ["Títulos acompanhados", totalTitles],
+      ["Confrontos de título", totalTitleMatches],
+      ["Decisões completas", numberOf(summary.decisoes_completas, 0)],
+      ["Confirmações assistidas", numberOf(summary.confirmacoes_titulo_assistidas, 0)],
+      ["Principais no local", numberOf(summary.confrontos_principais_local, 0)],
+      ["Clubes campeões", numberOf(summary.clubes_campeoes, 0)],
+      ["Competições", numberOf(summary.competicoes, 0)]
+    ];
+    var metricsHtml = metrics.map(function (item) {
+      return "<span><strong>" + escapeHtml(item[1]) + "</strong><small>" + escapeHtml(item[0]) + "</small></span>";
+    }).join("");
+    var titlesHtml = titles.length ? "<div class=\"ie-exp-story-title-list\">" + titles.map(function (item) {
+      var competition = competitionDisplayName(item.competicao || item.competicao_nome || "Título");
+      var season = item.temporada || item.edicao || "";
+      var participants = titleParticipantsText(item);
+      var watched = item.confrontos_titulo_assistidos !== null && item.confrontos_titulo_assistidos !== undefined
+        ? numberOf(item.confrontos_titulo_assistidos, 0)
+        : numberOf(item.confrontos_assistidos, 0);
+      var decisionWatched = numberOf(item.confrontos_decisao_assistidos, 0);
+      var required = item.confrontos_decisao_total !== null && item.confrontos_decisao_total !== undefined
+        ? numberOf(item.confrontos_decisao_total, 0)
+        : numberOf(item.confrontos_necessarios, 0);
+      var decisionStatus = titleDecisionStatus(item, required);
+      var complete = decisionStatus === "completa";
+      var decisionApplies = decisionStatus !== "nao_aplicavel" && required > 0;
+      var principalLocal = titleFlag(item.confronto_principal_local) || titleFlag(item.assistiu_principal_local);
+      var countText = decisionApplies
+        ? decisionWatched + " de " + required + (required === 1 ? " confronto da decisão acompanhado" : " confrontos da decisão acompanhados")
+        : watched + (watched === 1 ? " confronto de título acompanhado" : " confrontos de título acompanhados");
+      var participantText = participants.text || "Campeão não informado";
+      if (participants.shared) participantText += " · Título compartilhado";
+      var statusText = complete ? "Decisão completa" : decisionStatus === "incompleta" ? "Decisão incompleta" : principalLocal ? "Principal no local" : "Acompanhado";
+      return "<article><span class=\"ie-exp-story-title-icon\">" + icon("trophy") + "</span><span><strong>" + escapeHtml([competition, season].filter(Boolean).join(" · ")) + "</strong><small>" + escapeHtml(participantText) + "</small><small>" + escapeHtml(countText) + "</small></span><b class=\"" + (complete ? "is-complete" : "") + "\">" + escapeHtml(statusText) + "</b></article>";
+    }).join("") + "</div>" : "";
+    return "<section class=\"ie-exp-story-titles\"><header><span>" + icon("trophy") + "</span><div><strong>Títulos na sua história</strong><small>Somente edições e confrontos confirmados na base.</small></div></header><div class=\"ie-exp-story-title-metrics\">" + metricsHtml + "</div>" + titlesHtml + "</section>";
+  }
+
+  async function loadMySportsStoryData(sportId) {
+    var wantedSportId = Number(sportId || state.activeSportId || 0) || null;
+    var results = await Promise.all([
+      rpc("ie_experiencia_historia_bootstrap_rpc", { p_codigo_publico: null, p_id_esporte: wantedSportId }),
+      rpc("ie_experiencia_titulos_resumo_rpc", { p_codigo_publico: null, p_id_esporte: wantedSportId }).catch(function () { return null; })
+    ]);
+    var story = results[0] || {};
+    story._titleSummary = results[1] || null;
+    return story;
+  }
+
+  async function reloadMySportsStory(sportId) {
+    var result = await loadMySportsStoryData(sportId);
+    renderMySportsStory(result || {});
+  }
+
+  async function openMySportsStory() {
+    beginDetail("Minha história esportiva", "Carregando sua história...", true);
+    byId("detailContent").setAttribute("data-detail-view", "sports-story-loading");
+    try {
+      var result = await loadMySportsStoryData(state.activeSportId);
+      if (historyDetailView() === "sports-story-loading") renderMySportsStory(result || {});
+    } catch (error) {
+      if (historyDetailView() === "sports-story-loading") byId("detailContent").innerHTML = emptyState("Não foi possível carregar", friendlyError(error), false);
+    }
+  }
+
+  async function saveMySportsStory(form) {
+    var values = new FormData(form);
+    var config = {
+      id_esporte: Number(values.get("sport_id")) || state.activeSportId || null,
+      ativo: values.get("active") === "on",
+      exibir_codinome: values.get("show_codename") === "on",
+      exibir_confrontos: values.get("show_matches") === "on",
+      exibir_locais: values.get("show_places") === "on",
+      exibir_acompanhantes: values.get("show_companions") === "on",
+      exibir_colaboracoes: values.get("show_contributions") === "on",
+      exibir_ranking: values.get("show_ranking") === "on"
+    };
+    var button = form.querySelector("button[type=submit]");
+    button.disabled = true;
+    button.textContent = "Salvando...";
+    try {
+      await rpc("ie_experiencia_historia_config_salvar_rpc", { p_config: config });
+      await reloadMySportsStory(config.id_esporte);
+      showToast("Privacidade da história atualizada.", false);
+    } catch (error) {
+      showToast(friendlyError(error), true);
+      if (button.isConnected) { button.disabled = false; button.textContent = "Salvar privacidade"; }
+    }
+  }
+
+  async function renewMySportsStoryCode() {
+    try {
+      var profile = state.historyContribution.story && state.historyContribution.story.perfil || {};
+      var sportId = Number(profile.id_esporte || state.activeSportId || 0) || null;
+      await rpc("ie_experiencia_historia_codigo_renovar_rpc", { p_id_esporte: sportId });
+      await reloadMySportsStory(sportId);
+      showToast("Novo código público gerado.", false);
+    } catch (error) {
+      showToast(friendlyError(error), true);
+    }
+  }
+
+  async function copyTransientText(value) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+      try { await navigator.clipboard.writeText(value); return true; } catch (error) {}
+    }
+    var field = document.createElement("textarea");
+    field.value = value;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.top = "-1000px";
+    field.style.opacity = "0";
+    document.body.appendChild(field);
+    field.select();
+    field.setSelectionRange(0, field.value.length);
+    var copied = false;
+    try { copied = document.execCommand("copy"); } catch (error) { copied = false; }
+    field.remove();
+    return copied;
+  }
+
+  async function shareMySportsStory() {
+    var story = state.historyContribution.story || {};
+    var url = sportsStoryPublicUrl(story);
+    if (!url) { showToast("Ative a página pública antes de compartilhar.", true); return; }
+    var payload = { title: "Minha história esportiva no Turbo Tiger", text: "Veja minha história com o esporte no Turbo Tiger.", url: url };
+    try {
+      if (!await copyTransientText(url)) throw new Error("compartilhamento_indisponivel");
+      showToast("Link seguro copiado. Agora é só compartilhar.", false);
+      postNative("share_sports_story", payload);
+    } catch (error) {
+      showToast("Não foi possível copiar o link agora.", true);
     }
   }
 
@@ -2891,26 +3596,31 @@
   function setSettingsSaveStatus(text, error) {
     var status = byId("settingsSaveStatus");
     if (!status) return;
-    window.clearTimeout(state.settingsSaveStatusTimer);
+    cancelSessionTimeout(state.settingsSaveStatusTimer);
     status.textContent = text;
     status.classList.toggle("is-saving", text === "Salvando...");
     status.classList.toggle("is-error", !!error);
     if (!error && text === "Salvo.") {
-      state.settingsSaveStatusTimer = window.setTimeout(function () {
+      state.settingsSaveStatusTimer = scheduleSessionTimeout(function () {
         if (!state.settingsSavePending && status) status.textContent = "Alterações salvas automaticamente.";
       }, 1400);
     }
   }
 
   function runSettingsAutosave(work, rollback) {
+    var epoch = state.sessionEpoch;
+    var userId = state.session && state.session.user_id || "";
     state.settingsSavePending += 1;
     setSettingsSaveStatus("Salvando...", false);
     var execute = async function () {
+      if (!sessionWorkIsCurrent(epoch, userId)) return false;
       try {
         await work();
+        if (!sessionWorkIsCurrent(epoch, userId)) return false;
         postNative("preferences_changed", {});
         saveCache();
       } catch (error) {
+        if (!sessionWorkIsCurrent(epoch, userId)) return false;
         if (rollback) {
           try { await rollback(); } catch (rollbackError) {}
         }
@@ -2918,9 +3628,9 @@
         showToast(friendlyError(error), true);
         return false;
       } finally {
-        state.settingsSavePending = Math.max(0, state.settingsSavePending - 1);
+        if (sessionWorkIsCurrent(epoch, userId)) state.settingsSavePending = Math.max(0, state.settingsSavePending - 1);
       }
-      if (!state.settingsSavePending) setSettingsSaveStatus("Salvo.", false);
+      if (sessionWorkIsCurrent(epoch, userId) && !state.settingsSavePending) setSettingsSaveStatus("Salvo.", false);
       return true;
     };
     state.settingsSaveQueue = state.settingsSaveQueue.then(execute, execute);
@@ -3043,6 +3753,8 @@
     var targetType = parts[0];
     var targetId = Number(parts[1]);
     if ((targetType !== "participant" && targetType !== "competition") || !targetId) return;
+    var epoch = state.sessionEpoch;
+    var userId = state.session && state.session.user_id || "";
 
     var selected = selectionMap();
     var base = state.selectionChanges[key] || selected[key] || { acompanhar: false, notificar: false };
@@ -3077,6 +3789,7 @@
         p_acompanhar: next.acompanhar,
         p_notificar: targetType === "participant" && next.notificar
       });
+      if (!sessionWorkIsCurrent(epoch, userId)) return;
       updateBootstrapSelection(key, next);
       if (targetType === "competition" && !next.acompanhar && Number(state.gameCompetitionId) === targetId) resetGameCompetitionFilter();
       if (targetType === "competition") renderGames();
@@ -3099,12 +3812,14 @@
       postNative("preferences_changed", {});
       showToast(kind === "notify" ? "Notificações atualizadas." : "Favoritos atualizados.", false);
     } catch (error) {
+      if (!sessionWorkIsCurrent(epoch, userId)) return;
       if (previousPending) state.selectionChanges[key] = previousPending;
       else delete state.selectionChanges[key];
       state.favoriteOrder = previousFavoriteOrder;
       setSettingsSaveStatus("Não foi possível salvar.", true);
       showToast(friendlyError(error), true);
     } finally {
+      if (!sessionWorkIsCurrent(epoch, userId)) return;
       state.settingsSavePending = Math.max(0, state.settingsSavePending - 1);
       delete state.selectionBusy[key];
       renderEntities();
@@ -3115,11 +3830,14 @@
 
   function debounce(fn, delay) {
     var timer = null;
-    return function () {
+    var debounced = function () {
       var args = arguments;
-      window.clearTimeout(timer);
-      timer = window.setTimeout(function () { fn.apply(null, args); }, delay);
+      cancelSessionTimeout(timer);
+      timer = scheduleSessionTimeout(function () { timer = null; fn.apply(null, args); }, delay);
     };
+    debounced.cancel = function () { cancelSessionTimeout(timer); timer = null; };
+    state.debouncedTasks.push(debounced);
+    return debounced;
   }
 
   function setupPullToRefresh() {
@@ -3174,7 +3892,7 @@
         activateTab(tab);
       });
     });
-    all("[data-game-filter]").forEach(function (button) { button.addEventListener("click", function () { state.gameFilter = button.getAttribute("data-game-filter"); all("[data-game-filter]").forEach(function (item) { item.classList.toggle("is-active", item === button); }); renderGames(); }); });
+    all("[data-game-filter]").forEach(function (button) { button.addEventListener("click", function () { state.gameFilter = button.getAttribute("data-game-filter"); syncGameFilterTabs(state.gameFilter); renderGames(); }); });
     byId("gamesCompetitionFilter").addEventListener("change", function () {
       state.gameCompetitionId = byId("gamesCompetitionFilter").value ? Number(byId("gamesCompetitionFilter").value) : null;
       state.gameCompetitionGames = { live: [], upcoming: [], results: [] };
@@ -3316,6 +4034,18 @@
       renderHistoryContributionPage();
     });
     document.addEventListener("submit", function (event) {
+      var companionForm = event.target.closest && event.target.closest("[data-experience-companion-form]");
+      if (companionForm) {
+        event.preventDefault();
+        submitHistoryCompanion(companionForm);
+        return;
+      }
+      var storyForm = event.target.closest && event.target.closest("[data-sports-story-form]");
+      if (storyForm) {
+        event.preventDefault();
+        saveMySportsStory(storyForm);
+        return;
+      }
       var form = event.target.closest && event.target.closest("[data-history-contribution-form]");
       if (!form) return;
       event.preventDefault();
@@ -3360,7 +4090,7 @@
         requestAnimationFrame(function () {
           row.style.transition = "transform 170ms cubic-bezier(.22,.8,.3,1)";
           row.style.transform = "translate3d(0,0,0)";
-          window.setTimeout(function () {
+          scheduleSessionTimeout(function () {
             if (row.classList.contains("is-dragging")) return;
             row.style.removeProperty("transition");
             row.style.removeProperty("transform");
@@ -3414,7 +4144,7 @@
       document.body.classList.remove("ie-reordering-favorites");
       favoriteDrag = null;
       var settledRevision = state.preferenceRevision;
-      window.setTimeout(function () {
+      scheduleSessionTimeout(function () {
         drag.row.classList.remove("is-settling");
         drag.row.style.removeProperty("transition");
         drag.row.style.removeProperty("transform");
@@ -3536,7 +4266,7 @@
           renderHistoryContributionPage();
           loadHistoryFacets();
           loadHistoryAutomatically();
-          window.setTimeout(function () {
+          scheduleSessionTimeout(function () {
             var opponentInput = byId("historyOpponentInput");
             if (opponentInput) opponentInput.focus();
           }, 0);
@@ -3579,6 +4309,32 @@
           openHistoryContributors(historyAction.getAttribute("data-history-row-id"));
         } else if (action === "ranking") {
           openHistoryContributorRanking();
+        } else if (action === "experience-ranking") {
+          openExperienceRanking();
+        } else if (action === "sports-story") {
+          openMySportsStory();
+        } else if (action === "sports-story-share") {
+          shareMySportsStory();
+        } else if (action === "sports-story-renew") {
+          renewMySportsStoryCode();
+        } else if (action === "experience-toggle") {
+          toggleHistoryExperience(historyAction.getAttribute("data-history-row-id"), historyAction.getAttribute("data-experience-form"));
+        } else if (action === "experience-companions") {
+          openHistoryCompanions(historyAction.getAttribute("data-history-row-id"));
+        } else if (action === "experience-companion-remove") {
+          removeHistoryCompanion(historyAction.getAttribute("data-companion-id"));
+        } else if (action === "experience-conflict-replace") {
+          resolveHistoryExperienceConflict("substituir_pelo_atual");
+        } else if (action === "experience-conflict-keep") {
+          resolveHistoryExperienceConflict("manter_existente");
+        } else if (action === "experience-conflict-cancel") {
+          resolveHistoryExperienceConflict("cancelar");
+        } else if (action === "experience-conflict-correct") {
+          var pendingConflict = state.historyContribution.pendingConflict;
+          var conflictingRow = pendingConflict && arrayOf(pendingConflict.conflict && pendingConflict.conflict.itens)[0];
+          var conflictingId = Number(conflictingRow && conflictingRow.id_confronto || 0);
+          if (!conflictingId) { showToast("Este confronto não pertence à base histórica editável.", true); return; }
+          openHistoryCorrection(conflictingId, conflictingRow);
         } else if (action === "correct") {
           openHistoryCorrection(historyAction.getAttribute("data-history-row-id"));
         } else if (action === "new") {
@@ -3691,6 +4447,36 @@
       }
     });
     document.addEventListener("keydown", function (event) {
+      if (!byId("detailModal").hidden) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          dismissDetailFrame();
+          return;
+        }
+        if (event.key === "Tab") {
+          trapDetailFocus(event);
+          return;
+        }
+      }
+      var navigationTab = event.target.closest("[data-tab], [data-game-filter]");
+      if (navigationTab && ["ArrowLeft", "ArrowRight", "Home", "End"].indexOf(event.key) >= 0) {
+        var selector = navigationTab.hasAttribute("data-tab") ? "[data-tab]" : "[data-game-filter]";
+        var navigationTabs = all(selector);
+        var navigationIndex = navigationTabs.indexOf(navigationTab);
+        if (navigationIndex >= 0) {
+          event.preventDefault();
+          var targetIndex = event.key === "Home" ? 0 : event.key === "End" ? navigationTabs.length - 1 : (navigationIndex + (event.key === "ArrowLeft" ? -1 : 1) + navigationTabs.length) % navigationTabs.length;
+          var targetTab = navigationTabs[targetIndex];
+          targetTab.focus();
+          if (targetTab.hasAttribute("data-tab")) activateTab(targetTab.getAttribute("data-tab"));
+          else {
+            state.gameFilter = targetTab.getAttribute("data-game-filter");
+            syncGameFilterTabs(state.gameFilter);
+            renderGames();
+          }
+        }
+        return;
+      }
       var sportDragHandle = event.target.closest("[data-sport-favorite-drag-id]");
       var dragHandle = sportDragHandle || event.target.closest("[data-favorite-drag-id]");
       if (dragHandle && (event.key === "ArrowUp" || event.key === "ArrowDown")) {

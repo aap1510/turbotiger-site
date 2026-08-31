@@ -24,7 +24,9 @@ O token não é colocado na URL, no armazenamento do navegador ou em logs. Fora 
 
 ## Backend esperado
 
-A página usa exclusivamente as fachadas públicas `ie_*`: resumo do card, bootstrap, catálogo, seleções, filtros, esporte favorito, alertas, partidas, detalhe de partida e notícias. IDs e nomes específicos de provedores nunca chegam à interface.
+A página usa exclusivamente as fachadas públicas `ie_*`: resumo do card, bootstrap, catálogo, seleções, filtros, esporte favorito, alertas, partidas, detalhe de partida, notícias, experiência esportiva e títulos confirmados. IDs e nomes específicos de provedores nunca chegam à interface.
+
+Para a experiência esportiva, a central usa as RPCs autenticadas de marcação, conflito, acompanhantes, configuração do perfil e ranking. A interface nunca lê diretamente as tabelas `mod_ie.tbl_ie_exp_*` nem chama as rotinas internas de fila, hash, manutenção ou registro de origem.
 
 ## Segurança das WebViews
 
@@ -62,9 +64,64 @@ Ao receber logout, sessão inválida ou troca de usuário, a página deve:
 
 O cache persistente do card pertence ao aplicativo nativo e é separado por usuário. Esta página não deve gravar token nem snapshot autenticado em `localStorage`, `sessionStorage`, cookies próprios ou IndexedDB.
 
+## Experiência esportiva e títulos
+
+O usuário pode marcar um confronto como assistido no `local` do evento ou de forma `remoto` por TV, streaming ou outro meio. As opções são mutuamente exclusivas. Marcações locais conflitantes são resolvidas pelas RPCs do backend com duração e margens configuradas por esporte; a página apenas apresenta o conflito e a escolha do usuário.
+
+Acompanhantes e convites seguem estes limites:
+
+- o nome e o e-mail não são publicados por padrão;
+- o destinatário pode confirmar, contestar, recusar ou bloquear novos convites;
+- limites e intervalo mínimo por destinatário são aplicados no backend sem revelar bloqueio ou existência do endereço;
+- a vinculação a uma conta exige correspondência com o e-mail verificado;
+- a central exibe somente o estado autorizado e nunca recebe o pepper HMAC, o e-mail completo de terceiros ou o segredo do worker;
+- o envio é executado pela Edge `ie-experiencia-convites`, não pelo navegador.
+
+O perfil público pertence a um usuário e esporte, é localizado por código opaco e respeita controles independentes para codinome, confrontos, locais, acompanhantes, colaborações e ranking. Sua referência MMN vem do fluxo oficial de indicação; abrir um link não contabiliza indicação sem o cadastro/vínculo exigido pelo MMN.
+
+Os títulos exibidos usam os arrays autoritativos `campeoes` e `vices`, inclusive quando `titulo_compartilhado=true`. A página deve preservar todos os campeões e a ausência real de vice, sem reduzir o dado aos campos singulares de compatibilidade.
+
+Estados de decisão:
+
+- `completa`: o usuário assistiu a todos os confrontos confirmados exigidos pelo formato da decisão;
+- `incompleta`: existe formato aplicável, mas falta ao menos um confronto obrigatório;
+- `nao_aplicavel`: não há estrutura confirmada suficiente de final única, ida/volta ou desempate; nesse caso `decisao_completa` é `null`.
+
+O selo `Título confirmado` só pode aparecer quando o próprio vínculo do confronto tiver `papel_confronto='confirmacao_titulo'`. Um título confirmado na edição não autoriza aplicar o selo a todos os confrontos relacionados.
+
+RPCs adicionais consumidas pela interface:
+
+- `ie_experiencias_confrontos_resumo_rpc`
+- `ie_experiencia_marcar_rpc`
+- `ie_exp_experiencia_origem_marcar_rpc`
+- `ie_experiencia_conflito_resolver_rpc`
+- `ie_exp_experiencia_origem_conflito_resolver_rpc`
+- `ie_experiencia_acompanhantes_listar_rpc`
+- `ie_experiencia_acompanhante_salvar_rpc`
+- `ie_experiencia_acompanhante_remover_rpc`
+- `ie_experiencia_historia_config_salvar_rpc`
+- `ie_experiencia_historia_codigo_renovar_rpc`
+- `ie_experiencias_ranking_rpc`
+- `ie_titulos_confrontos_resumo_rpc`
+- `ie_experiencia_titulos_resumo_rpc`
+
+## História pública por código
+
+`turbotiger-site/historia-esportiva` é uma superfície separada da central. Ela pode ser aberta por código público de perfil ou token de convite e consome somente as RPCs públicas limitadas:
+
+- `ie_experiencia_historia_bootstrap_rpc`
+- `ie_experiencia_historia_itens_rpc`
+- `ie_experiencia_convite_publico_rpc`
+- `ie_experiencia_convite_responder_rpc`
+- `ie_experiencia_email_optout_rpc`
+
+Essa página pública não recebe sessão da central, não cria um modo navegador para `turbotiger-site/ie` e não pode ampliar a visibilidade além das preferências do dono.
+
 ## Publicação e validação
 
 Codex altera somente esta pasta local. O proprietário publica manualmente.
+
+A integração de experiência e títulos altera somente banco, Edge e arquivos locais do site. Não muda Delphi, JNI, Java, JAR ou DEX e não exige recompilação desses artefatos por si só.
 
 Antes da publicação/teste final:
 
