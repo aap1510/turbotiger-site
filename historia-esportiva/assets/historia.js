@@ -253,8 +253,14 @@
       relacionado:"Relacionado ao título"
     };
     var role = String(item && (item.papel_confronto || item.papel || item.tipo_vinculo || item.role) || "").toLowerCase();
-    if (item && item.confronto_principal === true) return role === "confirmacao_titulo" ? "Título confirmado" : "Confronto principal";
+    if (item && item.confronto_principal === true) return role === "confirmacao_titulo" ? "Título confirmado" : "Principal";
     return roles[role] || "Confronto de título";
+  }
+
+  function namesInPortuguese(names) {
+    names = arrayOf(names).filter(Boolean);
+    if (names.length < 2) return names[0] || "";
+    return names.slice(0, -1).join(", ") + " e " + names[names.length - 1];
   }
 
   function titleBadges(item) {
@@ -280,8 +286,9 @@
     var formatted = formatDate(rawDate);
     var parts = formatted.split(" ");
     var companions = arrayOf(item.acompanhantes).map(function (person) { return person && person.nome; }).filter(Boolean);
-    var subline = [item.competicao, detail, companions.length ? "Assistiu com: " + companions.join(", ") : ""].filter(Boolean).join(" · ");
-    return "<article class=\"hs-timeline-item\"><time datetime=\"" + escapeHtml(String(rawDate || "").slice(0,10)) + "\"><strong>" + escapeHtml(parts[0] || "") + "</strong><span>" + escapeHtml(parts.slice(1).join(" ")) + "</span></time><span class=\"hs-timeline-node\"></span><div class=\"hs-timeline-copy\"><strong>" + escapeHtml(title || "Confronto") + "</strong><span>" + escapeHtml(subline) + "</span>" + titleBadges(item) + "</div>" + icon(form === "local" ? "stadium" : "tv") + "</article>";
+    var subline = [item.competicao, detail].filter(Boolean).join(" · ");
+    var companionsLine = companions.length ? "<small class=\"hs-timeline-companions\">Assistiu com " + escapeHtml(namesInPortuguese(companions)) + "</small>" : "";
+    return "<article class=\"hs-timeline-item\"><time datetime=\"" + escapeHtml(String(rawDate || "").slice(0,10)) + "\"><strong>" + escapeHtml(parts[0] || "") + "</strong><span>" + escapeHtml(parts.slice(1).join(" ")) + "</span></time><span class=\"hs-timeline-node\"></span><div class=\"hs-timeline-copy\"><strong>" + escapeHtml(title || "Confronto") + "</strong><span>" + escapeHtml(subline) + "</span>" + companionsLine + titleBadges(item) + "</div>" + icon(form === "local" ? "stadium" : "tv") + "</article>";
   }
 
   async function loadTitleContexts(items) {

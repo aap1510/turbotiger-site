@@ -86,6 +86,7 @@ button:focus-visible, a:focus-visible, [tabindex="-1"]:focus-visible { outline: 
 .hs-timeline-copy { min-width:0; display:grid; gap:5px; }
 .hs-timeline-copy strong { overflow:hidden; color:var(--hs-text); font-size:13px; text-overflow:ellipsis; white-space:nowrap; }
 .hs-timeline-copy span { overflow:hidden; color:var(--hs-muted); font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+.hs-timeline-copy .hs-timeline-companions { display:block; overflow:visible; color:var(--hs-gold); font-size:11px; line-height:1.35; white-space:normal; }
 .hs-timeline-item > svg { width:23px; height:23px; fill:none; stroke:var(--hs-gold); stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
 .hs-title-badges { display:flex; flex-wrap:wrap; gap:4px; margin-top:2px; overflow:visible; white-space:normal; }
 .hs-title-badge { max-width:100%; display:inline-flex; align-items:center; gap:4px; padding:3px 6px; border:1px solid rgba(244,191,67,.3); border-radius:999px; background:rgba(244,191,67,.07); color:var(--hs-gold); font-size:9px; line-height:1.2; }
