@@ -2607,6 +2607,9 @@ body.ie-reordering-favorites {
 .ie-history-row-copy > strong span:last-child {
   text-align: right;
 }
+.ie-history-row-copy > strong .is-wo,
+.ie-history-wo { color:#ff5b61; }
+.ie-history-wo { font-size:11px; font-style:normal; font-weight:800; }
 
 .ie-history-row-copy > strong b {
   color: #fff;
@@ -2838,6 +2841,9 @@ body.ie-reordering-favorites {
   min-height: 82px;
   resize: vertical;
 }
+.ie-history-base-observation { padding:12px 14px; border:1px solid var(--ie-border); border-radius:12px; background:rgba(255,255,255,.025); }
+.ie-history-base-observation > span { display:block; margin-bottom:6px; color:var(--ie-muted); font-size:12px; font-weight:700; }
+.ie-history-base-observation p { margin:0; color:var(--ie-text); font-size:13px; line-height:1.45; }
 
 .ie-history-match-type {
   min-width: 0;

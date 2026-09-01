@@ -281,15 +281,22 @@
 
   function timelineItem(item) {
     var form = String(item.forma || item.modo || "remoto") === "local" ? "local" : "remoto";
-    var title = item.titulo || [item.time_casa, item.placar_casa != null && item.placar_fora != null ? item.placar_casa + " × " + item.placar_fora : "×", item.time_fora].filter(Boolean).join(" ");
+    var home = item.time_casa || item.participante_casa || "";
+    var away = item.time_fora || item.participante_fora || "";
+    var hasScore = item.placar_casa != null && item.placar_fora != null;
+    var title = home && away ? [home, hasScore ? item.placar_casa : "", "×", hasScore ? item.placar_fora : "", away].filter(function (value) { return value !== ""; }).join(" ") : item.titulo;
     var detail = form === "local" ? [item.local, item.cidade].filter(Boolean).join(" · ") || "No local do evento" : "TV/outro meio";
     var rawDate = item.data_partida || item.data || item.inicio_em;
     var formatted = formatDate(rawDate);
     var parts = formatted.split(" ");
     var companions = arrayOf(item.acompanhantes).map(function (person) { return person && person.nome; }).filter(Boolean);
-    var subline = [item.competicao, detail].filter(Boolean).join(" · ");
+    var competition = item.competicao || "";
+    if (item.temporada && competition.toLowerCase().indexOf(String(item.temporada).toLowerCase()) < 0) competition += " " + item.temporada;
+    var subline = [competition, detail].filter(Boolean).join(" · ");
     var companionsLine = companions.length ? "<small class=\"hs-timeline-companions\">Assistiu com " + escapeHtml(namesInPortuguese(companions)) + "</small>" : "";
-    return "<article class=\"hs-timeline-item\"><time datetime=\"" + escapeHtml(String(rawDate || "").slice(0,10)) + "\"><strong>" + escapeHtml(parts[0] || "") + "</strong><span>" + escapeHtml(parts.slice(1).join(" ")) + "</span></time><span class=\"hs-timeline-node\"></span><div class=\"hs-timeline-copy\"><strong>" + escapeHtml(title || "Confronto") + "</strong><span>" + escapeHtml(subline) + "</span>" + companionsLine + titleBadges(item) + "</div>" + icon(form === "local" ? "stadium" : "tv") + "</article>";
+    var wo = item.wo_time_casa === true || item.wo_time_fora === true;
+    var titleHtml = home && away ? "<span" + (item.wo_time_casa === true ? " class=\"is-wo\"" : "") + ">" + escapeHtml(home) + "</span> " + (hasScore ? escapeHtml(item.placar_casa) + " " : "") + "×" + (hasScore ? " " + escapeHtml(item.placar_fora) : "") + " <span" + (item.wo_time_fora === true ? " class=\"is-wo\"" : "") + ">" + escapeHtml(away) + "</span>" : escapeHtml(title || "Confronto");
+    return "<article class=\"hs-timeline-item\"><time datetime=\"" + escapeHtml(String(rawDate || "").slice(0,10)) + "\"><strong>" + escapeHtml(parts[0] || "") + "</strong><span>" + escapeHtml(parts.slice(1).join(" ")) + "</span>" + (wo ? "<em class=\"hs-wo\">W.O.</em>" : "") + "</time><span class=\"hs-timeline-node\"></span><div class=\"hs-timeline-copy\"><strong>" + titleHtml + "</strong><span>" + escapeHtml(subline) + "</span>" + companionsLine + titleBadges(item) + "</div>" + icon(form === "local" ? "stadium" : "tv") + "</article>";
   }
 
   async function loadTitleContexts(items) {
