@@ -280,7 +280,7 @@
     var formatted = formatDate(rawDate);
     var parts = formatted.split(" ");
     var companions = arrayOf(item.acompanhantes).map(function (person) { return person && person.nome; }).filter(Boolean);
-    var subline = [item.competicao, detail, companions.length ? "Com " + companions.join(", ") : ""].filter(Boolean).join(" · ");
+    var subline = [item.competicao, detail, companions.length ? "Assistiu com: " + companions.join(", ") : ""].filter(Boolean).join(" · ");
     return "<article class=\"hs-timeline-item\"><time datetime=\"" + escapeHtml(String(rawDate || "").slice(0,10)) + "\"><strong>" + escapeHtml(parts[0] || "") + "</strong><span>" + escapeHtml(parts.slice(1).join(" ")) + "</span></time><span class=\"hs-timeline-node\"></span><div class=\"hs-timeline-copy\"><strong>" + escapeHtml(title || "Confronto") + "</strong><span>" + escapeHtml(subline) + "</span>" + titleBadges(item) + "</div>" + icon(form === "local" ? "stadium" : "tv") + "</article>";
   }
 
@@ -499,6 +499,12 @@
     var detail = [formatDate(match.data), match.hora ? String(match.hora).slice(0,5) : "", match.competicao, match.local, match.cidade].filter(Boolean).join(" · ");
     var panel = byId("invitePanel");
     var heading = byId("storyPage").hidden ? "h1" : "h2";
+    if (invitation.status === "confirmado" || invitation.respondido === true) {
+      panel.innerHTML = "<" + heading + ">Lembrança confirmada</" + heading + "><p>Você confirmou que assistiram juntos. A história compartilhada continua disponível abaixo.</p>";
+      if (byId("storyPage").hidden) byId("statePanel").hidden = true;
+      panel.hidden = false;
+      return;
+    }
     panel.innerHTML = "<" + heading + ">" + escapeHtml(addressee + member) + " disse que assistiu com você</" + heading + "><p>Confirme apenas se reconhecer esta lembrança. O Turbo Tiger não considera a informação comprovada até sua resposta.</p><div class=\"hs-invite-match\"><strong>" + escapeHtml(title) + "</strong><span>" + escapeHtml(detail) + "</span></div><label class=\"hs-invite-consent\"><input id=\"inviteNameConsent\" type=\"checkbox\"><span>Se eu confirmar, autorizo que o nome informado no convite apareça nesta lembrança pública.</span></label><div class=\"hs-invite-actions\"><button type=\"button\" data-invite-response=\"confirmar\">Sim, assistimos juntos</button><button type=\"button\" data-invite-response=\"contestar\">Não reconheço</button><button type=\"button\" data-invite-response=\"recusar\">Prefiro não responder</button></div><button type=\"button\" class=\"hs-invite-optout\" data-invite-response=\"optout\">Não quero receber novos convites</button>";
     if (byId("storyPage").hidden) byId("statePanel").hidden = true;
     panel.hidden = false;
