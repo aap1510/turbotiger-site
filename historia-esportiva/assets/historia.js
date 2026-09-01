@@ -253,11 +253,13 @@
       relacionado:"Relacionado ao título"
     };
     var role = String(item && (item.papel_confronto || item.papel || item.tipo_vinculo || item.role) || "").toLowerCase();
-    if (item && item.confronto_principal === true) {
-      if (role === "confirmacao_titulo") return "Título confirmado";
-      return (roles[role] ? roles[role] + " · " : "") + "Principal";
-    }
     return roles[role] || "Confronto de título";
+  }
+
+  function titleRoleLabels(item) {
+    var labels = [titleRoleLabel(item)];
+    if (item && item.confronto_principal === true) labels.push("Principal");
+    return labels;
   }
 
   function namesInPortuguese(names) {
@@ -272,8 +274,9 @@
     if (!titles.length) return "";
     var visible = titles.slice(0,2).map(function (title) {
       title = title || {};
-      var context = titleRoleLabel(title);
-      return "<span class=\"hs-title-badge\">" + icon("trophy") + "<span>" + escapeHtml(context) + "</span></span>";
+      return titleRoleLabels(title).map(function (context, index) {
+        return "<span class=\"hs-title-badge\">" + (index === 0 ? icon("trophy") : "") + "<span>" + escapeHtml(context) + "</span></span>";
+      }).join("");
     });
     if (titles.length > visible.length) visible.push("<span class=\"hs-title-badge hs-title-badge-more\">+" + escapeHtml(titles.length - visible.length) + "</span>");
     return "<span class=\"hs-title-badges\">" + visible.join("") + "</span>";
