@@ -460,8 +460,11 @@
     state.code = String(profile.codigo_publico || data.codigo_publico || data.codigo || state.code);
     resetTitleData();
     resetPagination(data);
-    var name = profile.codinome || "Membro Turbo Tiger";
+    var name = profile.nome_exibicao || profile.codinome || "Membro Turbo Tiger";
     byId("profileName").textContent = name;
+    var codename = profile.exibir_codinome === false || !profile.codinome || profile.codinome === name ? "" : profile.codinome;
+    byId("profileCodename").textContent = codename;
+    byId("profileCodename").hidden = !codename;
     byId("profileSport").textContent = profile.esporte || data.esporte_nome || "Esporte";
     byId("profileAvatar").textContent = initials(name);
     if (summary.contribuicoes == null) summary.contribuicoes = arrayOf(data.colaboracoes).length;

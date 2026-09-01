@@ -3352,6 +3352,14 @@ body.ie-reordering-favorites {
   font-style: normal;
 }
 
+.ie-exp-public-preview-frame {
+  display: block;
+  width: 100%;
+  min-height: calc(100dvh - 190px);
+  border: 0;
+  background: #050607;
+}
+
 .ie-exp-public-preview {
   display: grid;
   gap: 15px;
