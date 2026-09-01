@@ -41,7 +41,8 @@
         competitionKey: "",
         season: "",
         scope: "",
-        uf: ""
+        uf: "",
+        titleFilter: ""
       },
       teams: [],
       teamSuggestions: [],
@@ -2321,6 +2322,7 @@
     filters.season = "";
     filters.scope = "";
     filters.uf = "";
+    filters.titleFilter = "";
     state.historyContribution.facets = { competitions: [], seasons: [], scopes: [], ufs: [] };
   }
 
@@ -2476,11 +2478,11 @@
     var seasonOptions = historySelectOptions(facets.seasons, filters.season, "Todas", null, null);
     var scopeOptions = historySelectOptions(facets.scopes, filters.scope, "Todas", null, function (value) { return value === "nacional" ? "Nacional" : value === "estadual" ? "Estadual" : value; });
     var ufOptions = historySelectOptions(facets.ufs, filters.uf, "Selecione", null, null);
+    var titleOptions = "<option value=\"\"" + (filters.titleFilter ? "" : " selected") + ">Não selecionado</option><option value=\"todos\"" + (filters.titleFilter === "todos" ? " selected" : "") + ">Todos</option><option value=\"campeao\"" + (filters.titleFilter === "campeao" ? " selected" : "") + ">Campeão</option><option value=\"vice\"" + (filters.titleFilter === "vice" ? " selected" : "") + ">Vice</option>";
     var baseReady = historySelectedKeys(false).length > 0 && (!filters.year || historyYearIsValid(history));
-    var scopeFieldClass = filters.scope === "estadual" ? "ie-history-field" : "ie-history-field is-wide";
     var ufField = filters.scope === "estadual" ? "<label class=\"ie-history-field\"><span>UF *</span><select data-history-filter=\"uf\"" + (!baseReady ? " disabled" : "") + ">" + ufOptions + "</select></label>" : "";
     var yearPeriod = history.yearStart && history.yearEnd ? " <small class=\"ie-history-year-period\">(" + history.yearStart + " - " + history.yearEnd + ")</small>" : "";
-    return "<section class=\"ie-history-search\"><div class=\"ie-history-search-intro\"><strong>Encontre um confronto</strong><span>Os filtros com * são obrigatórios.</span></div><div class=\"ie-history-filters\"><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Seu time *</span><input id=\"historyTeamInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.teamQuery) + "\" placeholder=\"Digite e selecione um ou mais times\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyTeamSuggestions\" aria-expanded=\"false\"><div id=\"historyTeamSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>" + historySelectionChips(false) + "</label><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Time adversário</span><input id=\"historyOpponentInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.opponentQuery) + "\" placeholder=\"Opcional: selecione um ou mais\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyOpponentSuggestions\" aria-expanded=\"false\"" + (!baseReady ? " disabled" : "") + "><div id=\"historyOpponentSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>" + historySelectionChips(true) + "</label><label class=\"ie-history-field\"><span>Ano" + yearPeriod + "</span><input id=\"historyYearInput\" type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]{4}\" maxlength=\"4\" value=\"" + escapeHtml(filters.year) + "\" placeholder=\"Opcional\"" + (!baseReady ? " disabled" : "") + "></label><label class=\"ie-history-field\"><span>Temporada</span><select data-history-filter=\"season\"" + (!baseReady ? " disabled" : "") + ">" + seasonOptions + "</select></label><label class=\"" + scopeFieldClass + "\"><span>Abrangência</span><select data-history-filter=\"scope\"" + (!baseReady ? " disabled" : "") + ">" + scopeOptions + "</select></label>" + ufField + "<label class=\"ie-history-field is-wide\"><span>Competição</span><select data-history-filter=\"competitionKey\"" + (!baseReady ? " disabled" : "") + ">" + competitionOptions + "</select></label></div><span id=\"historySearchHint\" class=\"ie-history-search-hint\" aria-live=\"polite\"></span><div class=\"ie-history-search-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" id=\"historySearchButton\" data-history-action=\"search\"" + (!historyRequiredFiltersReady(history) || history.loading ? " disabled" : "") + ">Pesquisar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"clear\">Limpar filtros</button></div></section>";
+    return "<section class=\"ie-history-search\"><div class=\"ie-history-search-intro\"><strong>Encontre um confronto</strong><span>Os filtros com * são obrigatórios.</span></div><div class=\"ie-history-filters\"><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Seu time *</span><input id=\"historyTeamInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.teamQuery) + "\" placeholder=\"Digite e selecione um ou mais times\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyTeamSuggestions\" aria-expanded=\"false\"><div id=\"historyTeamSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>" + historySelectionChips(false) + "</label><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Time adversário</span><input id=\"historyOpponentInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.opponentQuery) + "\" placeholder=\"Opcional: selecione um ou mais\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyOpponentSuggestions\" aria-expanded=\"false\"" + (!baseReady ? " disabled" : "") + "><div id=\"historyOpponentSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>" + historySelectionChips(true) + "</label><label class=\"ie-history-field\"><span>Ano" + yearPeriod + "</span><input id=\"historyYearInput\" type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]{4}\" maxlength=\"4\" value=\"" + escapeHtml(filters.year) + "\" placeholder=\"Opcional\"" + (!baseReady ? " disabled" : "") + "></label><label class=\"ie-history-field\"><span>Temporada</span><select data-history-filter=\"season\"" + (!baseReady ? " disabled" : "") + ">" + seasonOptions + "</select></label><label class=\"ie-history-field\"><span>Abrangência</span><select data-history-filter=\"scope\"" + (!baseReady ? " disabled" : "") + ">" + scopeOptions + "</select></label><label class=\"ie-history-field\"><span>Títulos</span><select data-history-filter=\"titleFilter\"" + (!baseReady ? " disabled" : "") + ">" + titleOptions + "</select></label>" + ufField + "<label class=\"ie-history-field is-wide\"><span>Competição</span><select data-history-filter=\"competitionKey\"" + (!baseReady ? " disabled" : "") + ">" + competitionOptions + "</select></label></div><span id=\"historySearchHint\" class=\"ie-history-search-hint\" aria-live=\"polite\"></span><div class=\"ie-history-search-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" id=\"historySearchButton\" data-history-action=\"search\"" + (!historyRequiredFiltersReady(history) || history.loading ? " disabled" : "") + ">Pesquisar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"clear\">Limpar filtros</button></div></section>";
   }
 
   function historyExperience(id) {
@@ -2526,8 +2528,8 @@
 
   function historyTitleDefinitionLabel(value) {
     var labels = {
-      final_unica: "Final única",
-      final_ida_volta: "Final em ida e volta",
+      final_unica: "",
+      final_ida_volta: "",
       quadrangular: "Quadrangular",
       quadrangular_final: "Quadrangular final",
       triangular: "Triangular",
@@ -2538,7 +2540,7 @@
     };
     var code = String(value || "").toLowerCase().trim();
     if (!code) return "";
-    if (labels[code]) return labels[code];
+    if (Object.prototype.hasOwnProperty.call(labels, code)) return labels[code];
     var text = displayText(code.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim());
     return text ? text.charAt(0).toLocaleUpperCase("pt-BR") + text.slice(1) : "";
   }
@@ -2546,9 +2548,12 @@
   function historyTitleGameTypeText(item) {
     item = item || {};
     var role = String(item.papel_confronto || item.papel || item.tipo_relacao || item.funcao || "").toLowerCase();
+    var definitionCode = String(item.tipo_confronto || item.tipo_jogo || item.formato || item.forma_definicao || "").toLowerCase().trim();
+    var definition = historyTitleDefinitionLabel(definitionCode);
+    if (["final_unica", "final_ida_volta"].indexOf(definitionCode) >= 0 && ["final_unica", "final_ida", "final_volta"].indexOf(role) >= 0) definition = "";
     var parts = [
       historyTitleRoleLabel(role),
-      historyTitleDefinitionLabel(item.tipo_confronto || item.tipo_jogo || item.formato || item.forma_definicao),
+      definition,
       titleFlag(item.confronto_principal) ? "Principal" : ""
     ];
     var seen = {};
@@ -2750,6 +2755,7 @@
       p_temporada: filters.season || null,
       p_abrangencia: filters.scope || null,
       p_uf: filters.uf || null,
+      p_titulos: filters.titleFilter || null,
       p_cursor: cursor || null,
       p_limite: 20
     };
@@ -2894,7 +2900,8 @@
       competitionKey: "",
       season: "",
       scope: "",
-      uf: ""
+      uf: "",
+      titleFilter: ""
     };
     history.teams = [];
     history.teamSuggestions = [];
@@ -3262,6 +3269,8 @@
     byId("detailSubtitle").textContent = displayText(profile.esporte || data.esporte_nome || "Esporte");
     byId("detailContent").setAttribute("data-detail-view", "sports-story");
     byId("detailContent").innerHTML = "<section class=\"ie-exp-story-owner\"><div class=\"ie-exp-story-preview\"><span>Prévia privada</span><strong>" + escapeHtml(profile.codinome || "Sua história") + "</strong><small>" + escapeHtml(numberOf(summary.total, 0)) + " confrontos · " + escapeHtml(numberOf(summary.total_local, 0)) + " no local · " + escapeHtml(numberOf(summary.total_remoto, 0)) + " por TV/outro · " + escapeHtml(contributions.length) + " contribuições</small></div>" + renderMySportsStoryTitles(titleSummary, followedTitles) + "<p class=\"ie-exp-story-declaration\">História formada por registros declarados pelo membro. Você controla o que fica visível.</p><form data-sports-story-form><input type=\"hidden\" name=\"sport_id\" value=\"" + escapeHtml(sportId) + "\"><label class=\"ie-switch-row\"><span><strong>Página pública</strong><small>Você decide quando sua história pode ser vista pelo código seguro.</small></span><span class=\"ie-switch\"><input type=\"checkbox\" name=\"active\"" + (profile.ativo === true ? " checked" : "") + "><span aria-hidden=\"true\"></span></span></label><fieldset><legend>Informações visíveis</legend><label><input type=\"checkbox\" name=\"show_codename\"" + (profile.exibir_codinome !== false ? " checked" : "") + "><span>Meu codinome</span></label><label><input type=\"checkbox\" name=\"show_matches\"" + (profile.exibir_confrontos !== false ? " checked" : "") + "><span>Confrontos e linha do tempo</span></label><label><input type=\"checkbox\" name=\"show_places\"" + (profile.exibir_locais !== false ? " checked" : "") + "><span>Locais dos eventos</span></label><label><input type=\"checkbox\" name=\"show_companions\"" + (profile.exibir_acompanhantes !== false ? " checked" : "") + "><span>Acompanhantes confirmados</span></label><label><input type=\"checkbox\" name=\"show_contributions\"" + (profile.exibir_colaboracoes !== false ? " checked" : "") + "><span>Colaborações aprovadas</span></label><label><input type=\"checkbox\" name=\"show_ranking\"" + (profile.exibir_ranking !== false ? " checked" : "") + "><span>Participação no ranking</span></label></fieldset><button type=\"submit\" class=\"ie-button ie-button-primary\">Salvar privacidade</button></form><div class=\"ie-exp-story-share\"><strong>Código público revogável</strong><code>" + escapeHtml(profile.codigo_publico || "Ainda não gerado") + "</code><div><button type=\"button\" class=\"ie-button ie-button-primary\" data-history-action=\"sports-story-share\"" + (!publicUrl || profile.ativo !== true ? " disabled" : "") + ">" + icon("share") + " Compartilhar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"sports-story-renew\">Gerar novo código</button></div><small>Ao gerar outro código, o anterior deixa de funcionar. IDs internos e dados privados nunca fazem parte do link.</small></div></section>";
+    var preview = byId("detailContent").querySelector(".ie-exp-story-preview");
+    if (preview) { preview.setAttribute("role", "button"); preview.setAttribute("tabindex", "0"); preview.setAttribute("aria-label", "Visualizar como seus amigos verão sua história"); }
   }
 
   function renderMySportsStoryTitles(summary, titles) {
@@ -3372,6 +3381,26 @@
     }
   }
 
+  function openMySportsStoryPreview() {
+    var data = state.historyContribution.story || {};
+    var profile = data.perfil || {};
+    var summary = data.resumo || {};
+    var titleData = data.titulos_resumo || data.title_summary || data._titleSummary || {};
+    var codename = profile.exibir_codinome === false ? "Membro Turbo Tiger" : profile.codinome || "Membro Turbo Tiger";
+    var experiences = profile.exibir_confrontos === false ? [] : arrayOf(data.experiencias).slice(0, 12);
+    var contributions = profile.exibir_colaboracoes === false ? [] : arrayOf(data.colaboracoes).slice(0, 8);
+    var timeline = experiences.length ? "<section class=\"ie-exp-preview-list\"><h3>Linha do tempo</h3>" + experiences.map(function (item) {
+      var where = item.forma === "local" ? (profile.exibir_locais === false ? "No local do evento" : [item.local, item.cidade].filter(Boolean).join(" · ") || "No local do evento") : "TV/outro meio";
+      return "<article><strong>" + escapeHtml(item.titulo || "Confronto") + "</strong><small>" + escapeHtml([historyDate(item.data), where].filter(Boolean).join(" · ")) + "</small></article>";
+    }).join("") + "</section>" : "";
+    var contributionList = contributions.length ? "<section class=\"ie-exp-preview-list\"><h3>Colaborações aprovadas</h3>" + contributions.map(function (item) {
+      return "<article><strong>" + escapeHtml([item.time_casa, item.time_fora].filter(Boolean).join(" × ") || "Confronto") + "</strong><small>" + escapeHtml([historyDate(item.data), competitionDisplayName(item.competicao || "")].filter(Boolean).join(" · ")) + "</small></article>";
+    }).join("") + "</section>" : "";
+    beginDetail("Prévia da sua história", "Como seus amigos verão", true);
+    byId("detailContent").setAttribute("data-detail-view", "sports-story-preview");
+    byId("detailContent").innerHTML = "<section class=\"ie-exp-public-preview\"><header>" + icon("trophy") + "<span><small>História esportiva</small><strong>" + escapeHtml(codename) + "</strong><em>" + escapeHtml(displayText(profile.esporte || data.esporte_nome || "Esporte")) + "</em></span></header><dl><div><dt>Confrontos</dt><dd>" + escapeHtml(numberOf(summary.total, 0)) + "</dd></div><div><dt>No local</dt><dd>" + escapeHtml(numberOf(summary.total_local, 0)) + "</dd></div><div><dt>TV/outro</dt><dd>" + escapeHtml(numberOf(summary.total_remoto, 0)) + "</dd></div><div><dt>Contribuições</dt><dd>" + escapeHtml(numberOf(summary.contribuicoes, arrayOf(data.colaboracoes).length)) + "</dd></div></dl>" + renderMySportsStoryTitles(titleData.resumo || titleData.summary || {}, arrayOf(titleData.titulos || titleData.items || titleData.edicoes)) + timeline + contributionList + "<p>Esta é uma prévia privada. O conteúdo público respeitará as opções de privacidade salvas.</p></section>";
+  }
+
   async function copyTransientText(value) {
     if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
       try { await navigator.clipboard.writeText(value); return true; } catch (error) {}
@@ -3396,13 +3425,11 @@
     var url = sportsStoryPublicUrl(story);
     if (!url) { showToast("Ative a página pública antes de compartilhar.", true); return; }
     var payload = { title: "Minha história esportiva no Turbo Tiger", text: "Veja minha história com o esporte no Turbo Tiger.", url: url };
+    if (postNative("share_sports_story", payload)) return;
     try {
       if (!await copyTransientText(url)) throw new Error("compartilhamento_indisponivel");
       showToast("Link seguro copiado. Agora é só compartilhar.", false);
-      postNative("share_sports_story", payload);
-    } catch (error) {
-      showToast("Não foi possível copiar o link agora.", true);
-    }
+    } catch (error) { showToast("Não foi possível compartilhar agora.", true); }
   }
 
   function historyFormPayload(form) {
@@ -4285,6 +4312,14 @@
         }
       }
 
+      var storyPreview = event.target.closest(".ie-exp-story-preview");
+      if (storyPreview && historyDetailView() === "sports-story") {
+        event.preventDefault();
+        event.stopPropagation();
+        openMySportsStoryPreview();
+        return;
+      }
+
       var historyAction = event.target.closest("[data-history-action]");
       if (historyAction) {
         event.preventDefault();
@@ -4482,6 +4517,13 @@
         state.preferenceRevision += 1;
         persistEntitySelection(key, kind);
         return;
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Enter" || event.key === " ") && event.target.classList && event.target.classList.contains("ie-exp-story-preview") && historyDetailView() === "sports-story") {
+        event.preventDefault();
+        openMySportsStoryPreview();
       }
     });
     document.addEventListener("keydown", function (event) {
