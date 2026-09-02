@@ -102,7 +102,7 @@
     favorites: [],
     favoriteOrder: [],
     historyContribution: emptyHistoryContributionState(),
-    simulator: { context: null, result: null, form: null, eventId: null, simulationId: null, busy: false, resultStale: false },
+    simulator: { context: null, result: null, form: null, eventId: null, simulationId: null, busy: false, resultStale: false, resultValidated: false },
     detailStack: [],
     loading: false,
     loadGeneration: 0,
@@ -512,6 +512,9 @@
       ,versao_regras_alterada: "As regras verificadas mudaram. Recalcule a simulação antes de reativar o sino."
       ,lista_autorizada_desatualizada: "A lista oficial brasileira precisa ser atualizada antes de novos cálculos."
       ,cotacoes_alteradas_durante_calculo: "As cotações mudaram durante o cálculo. Confira os dados e calcule novamente."
+      ,cotacoes_brasileiras_indisponiveis: "Não há cotações brasileiras atuais e completas, com regras e limites verificados, para esta seleção."
+      ,casas_sem_cotacoes_elegiveis: "Uma das casas não possui mais cotações elegíveis para este confronto. Atualize antes de calcular."
+      ,sem_cotacoes_brasileiras_elegiveis: "Sem dados brasileiros elegíveis, não é possível salvar uma simulação calculável."
     };
     return messages[raw] || messages[raw.replace(/\s+/g, "_")] || raw || "Não foi possível carregar as informações.";
   }
@@ -600,7 +603,7 @@
     state.favoriteOrder = [];
     state.historyContribution = emptyHistoryContributionState();
     simulatorOpenRevision += 1;
-    state.simulator = { context: null, result: null, form: null, eventId: null, simulationId: null, busy: false, resultStale: false };
+    state.simulator = { context: null, result: null, form: null, eventId: null, simulationId: null, busy: false, resultStale: false, resultValidated: false };
     state.detailStack = [];
     state.preferenceRevision = 0;
     state.loading = false;
@@ -2184,6 +2187,7 @@
     state.detailStack = [];
     state.detailReturnFocus = null;
     byId("detailContent").removeAttribute("data-detail-view");
+    byId("detailContent").replaceChildren();
     if (state.homeSectionFilter) {
       state.homeSectionFilter = "";
       renderHome();
@@ -2281,9 +2285,9 @@
     return { short: code || "Resultado", name: code || "Resultado", help: "Resultado do mercado" };
   }
 
-  function renderGlobalReference(markets, sides, compact) {
+  function renderGlobalReference(markets, sides, compact, availability) {
     var rows = arrayOf(markets);
-    if (!rows.length) return "<div class=\"ie-reference-empty\"><strong>Referência global indisponível</strong><span>Nenhuma cotação global atual e completa foi confirmada para este confronto.</span></div>";
+    if (!rows.length) return "<div class=\"ie-reference-empty\"><strong>Referência global indisponível</strong><span>" + escapeHtml(availability && availability.mensagem || "Nenhuma cotação global atual e completa foi confirmada para este confronto.") + "</span></div>";
     return "<div class=\"ie-global-reference" + (compact ? " is-compact" : "") + "\">" + rows.map(function (market) {
       var selections = arrayOf(market.selecoes);
       var sources = numberOf(market.fontes, 0);
@@ -2295,7 +2299,7 @@
     }).join("") + "<p class=\"ie-reference-note\">A estimativa sem margem resume o mercado; não é chance real nem previsão. A máxima global nunca entra na distribuição do simulador.</p></div>";
   }
 
-  function renderBrazilianOdds(items, sides) {
+  function renderBrazilianOdds(items, sides, availability) {
     var rows = arrayOf(items).filter(function (group) {
       var values = {};
       arrayOf(group && group.selecoes).forEach(function (selection) {
@@ -2303,7 +2307,7 @@
       });
       return ["casa", "empate", "fora"].every(function (code) { return Number.isFinite(values[code]) && values[code] > 1; });
     });
-    if (!rows.length) return "<div class=\"ie-local-odds-empty\"><strong>Aguardando cotações brasileiras verificadas</strong><p>As referências globais continuam visíveis, mas não são usadas no cálculo. Você pode escolher casas autorizadas e salvar um monitoramento.</p></div>";
+    if (!rows.length) return "<div class=\"ie-local-odds-empty\"><strong>Sem cotações brasileiras disponíveis</strong><p>" + escapeHtml(availability && availability.mensagem || "Ainda não recebemos um conjunto brasileiro atual e completo para este confronto.") + " A autorização de uma casa não significa que a fonte forneça suas cotações. Sem dados verificados, não há seleção nem cálculo.</p></div>";
     return "<div class=\"ie-odds-providers\">" + rows.map(function (group) {
       var selections = arrayOf(group.selecoes);
       var values = {};
@@ -2322,32 +2326,50 @@
     var globalReference = arrayOf(data.odds_referencia_global || data.referencia_global);
     var brazilianOdds = arrayOf(data.odds_casas_brasil || data.cotacoes_brasil);
     var simulator = data.simulador || {};
+    var availability = data.odds_status || {};
     var event = data.evento || {};
     var eventId = event.id_evento || event.id || data.id_evento || "";
     var home = sides && sides.home && sides.home.name || "time da casa";
     var away = sides && sides.away && sides.away.name || "time visitante";
     var explanation = "<div class=\"ie-odds-help\"><strong>Como interpretar</strong><span><b>Casa</b> vitória de " + escapeHtml(home) + "</span><span><b>Empate</b> nenhum time vence</span><span><b>Fora</b> vitória de " + escapeHtml(away) + "</span></div>";
-    var buttonDisabled = simulator.disponivel === false || !eventId;
-    var simulatorAction = "<section class=\"ie-simulator-entry\"><div><span>Simulador de Impacto Financeiro</span><strong>Veja o pior e o melhor resultado financeiro calculável antes de decidir.</strong><p>Somente nomes e cotações de operações brasileiras autorizadas e verificadas entram na distribuição.</p></div><button type=\"button\" class=\"ie-button ie-button-primary\" data-simulator-action=\"open\" data-event-id=\"" + escapeHtml(eventId) + "\"" + (buttonDisabled ? " disabled" : "") + ">Simular impacto financeiro</button>" + (buttonDisabled ? "<small>Disponível somente antes do início confirmado do confronto.</small>" : "") + "</section>";
+    var buttonDisabled = simulator.disponivel !== true || !eventId;
+    var simulatorAction = "<section class=\"ie-simulator-entry\"><div><span>Simulador de Impacto Financeiro</span><strong>Entenda os cenários de perda e exposição financeira.</strong><p>O cálculo exige cotações brasileiras completas, atuais, com regras e limites verificados.</p></div><button type=\"button\" class=\"ie-button ie-button-primary\" data-simulator-action=\"open\" data-event-id=\"" + escapeHtml(eventId) + "\"" + (buttonDisabled ? " disabled" : "") + ">Simular impacto financeiro</button>" + (buttonDisabled ? "<small>" + escapeHtml(simulator.mensagem || "Ainda não há dados elegíveis para simular este confronto.") + "</small>" : "") + "</section>";
     return explanation
-      + detailSection("Referência global anônima", renderGlobalReference(globalReference, sides, false))
-      + detailSection("Casas brasileiras autorizadas", renderBrazilianOdds(brazilianOdds, sides))
+      + detailSection("Referência global anônima", renderGlobalReference(globalReference, sides, false, availability.referencia_global))
+      + detailSection("Casas brasileiras autorizadas", renderBrazilianOdds(brazilianOdds, sides, availability.brasil))
       + simulatorAction
       + "<p class=\"ie-odds-notice\">" + escapeHtml(data.odds_aviso || "Referências informativas, sem recomendação ou garantia de resultado.") + " O Turbo Tiger não abre casas, não usa links afiliados e não executa apostas.</p>";
   }
 
+  function simulatorAvailableHouses(context) {
+    if (!context || context.autorizacao_snapshot_valido !== true) return [];
+    return arrayOf(context.casas_disponiveis).filter(function (house) {
+      return house.elegivel_para_calculo === true && Number(house.id_bet) > 0;
+    });
+  }
+
+  function simulatorMarketAvailable(market) {
+    return !!market && market.habilitado_simulacao === true && market.elegivel_para_calculo === true;
+  }
+
+  function simulatorCanOperate(context) {
+    return !!context && !!context.simulador && context.simulador.disponivel === true
+      && simulatorEventIsFuture(context) && simulatorAvailableHouses(context).length > 0
+      && arrayOf(context.mercados).some(simulatorMarketAvailable);
+  }
+
   function simulatorDefaultForm(context) {
     var simulation = context && context.simulacao || {};
-    var houses = arrayOf(context && context.casas_autorizadas);
-    var selectedHouses = arrayOf(simulation.ids_bets).map(Number).filter(function (id) { return id > 0; });
+    var houses = simulatorAvailableHouses(context);
+    var selectedHouses = arrayOf(simulation.ids_bets).map(Number).filter(function (id) { return houses.some(function (house) { return Number(house.id_bet) === id; }); });
     if (!selectedHouses.length && !simulation.id_simulacao) {
       selectedHouses = houses.filter(function (house) { return house.favorita === true; }).map(function (house) { return Number(house.id_bet); }).filter(function (id) { return id > 0; });
     }
     var markets = arrayOf(simulation.mercados).map(function (market) {
       return { codigo_mercado: String(market.codigo_mercado || ""), periodo_codigo: String(market.periodo_codigo || "90_minutos"), linha: String(market.linha || "") };
-    }).filter(function (market) { return market.codigo_mercado; });
+    }).filter(function (market) { return arrayOf(context && context.mercados).some(function (available) { return simulatorMarketAvailable(available) && available.codigo_mercado === market.codigo_mercado; }); });
     if (!markets.length) {
-      var first = arrayOf(context && context.mercados).find(function (market) { return market.habilitado_simulacao === true; });
+      var first = arrayOf(context && context.mercados).find(simulatorMarketAvailable);
       if (first) markets.push({ codigo_mercado: String(first.codigo_mercado), periodo_codigo: String(first.periodo_codigo || "90_minutos"), linha: "" });
     }
     return {
@@ -2415,8 +2437,11 @@
     return "<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty is-stale\" tabindex=\"-1\" aria-live=\"polite\"><strong>Parâmetros alterados</strong><p>O resultado anterior não corresponde mais às escolhas atuais. Calcule novamente antes de interpretar os valores.</p></section>";
   }
 
-  function renderSimulatorAuthorizationExpiredResult() {
-    return "<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty is-stale\" tabindex=\"-1\" aria-live=\"polite\"><strong>Resultado histórico não revalidado</strong><p>A verificação da lista oficial brasileira venceu ou está indisponível. Os valores anteriores ficam ocultos até uma nova validação.</p></section>";
+  function renderSimulatorUnverifiedResult(context) {
+    var message = simulatorCanOperate(context)
+      ? "Recalcule para conferir o cenário com os dados disponíveis agora."
+      : context && context.simulador && context.simulador.mensagem || "Os dados atuais não permitem revalidar este cálculo.";
+    return "<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty is-stale\" tabindex=\"-1\" aria-live=\"polite\"><strong>Resultado anterior não revalidado</strong><p>" + escapeHtml(message) + " Os valores anteriores ficam ocultos até uma nova validação.</p></section>";
   }
 
   function invalidateSimulatorResult() {
@@ -2428,15 +2453,13 @@
     if (current) current.outerHTML = renderSimulatorStaleResult();
   }
 
-  function renderSavedSimulations(items, currentId, authorizationValid) {
+  function renderSavedSimulations(items, currentId) {
     var rows = arrayOf(items);
     if (!rows.length) return "<div class=\"ie-simulator-saved-empty\">Nenhuma simulação salva para este confronto.</div>";
     return "<div class=\"ie-simulator-saved-list\">" + rows.map(function (item) {
-      var metrics = item.resultado && item.resultado.metricas || {};
       var current = Number(item.id_simulacao) === Number(currentId);
-      var summary = authorizationValid
-        ? escapeHtml(formatMoneyFromCents(item.valor_comprometido_centavos)) + " · impacto máximo " + escapeHtml(formatPercent(metrics.perda_maxima_pct))
-        : "Resultado histórico não revalidado";
+      var calculatedAt = formatDateTime(item.calculado_em);
+      var summary = (calculatedAt ? "Calculada em " + escapeHtml(calculatedAt) + " · " : "") + "Requer nova validação";
       return "<article class=\"" + (current ? "is-current" : "") + "\"><button type=\"button\" data-simulator-action=\"load\" data-simulation-id=\"" + escapeHtml(item.id_simulacao) + "\"" + (current ? " aria-current=\"true\"" : "") + "><span><strong>" + escapeHtml(item.nome || "Simulação") + "</strong><small>" + summary + "</small></span>" + (item.sino_ativo === true ? icon("bell") : icon("chevron")) + "</button><button type=\"button\" class=\"ie-simulator-archive\" data-simulator-action=\"archive\" data-simulation-id=\"" + escapeHtml(item.id_simulacao) + "\" aria-label=\"Arquivar " + escapeHtml(item.nome || "simulação") + "\">Arquivar</button></article>";
     }).join("") + "</div>";
   }
@@ -2448,41 +2471,42 @@
     var sides = matchSides(event);
     var future = simulatorEventIsFuture(context);
     var authorizationValid = context.autorizacao_snapshot_valido === true;
-    var houses = authorizationValid ? arrayOf(context.casas_autorizadas) : [];
+    var houses = simulatorAvailableHouses(context);
     var availableHouseIds = houses.map(function (house) { return Number(house.id_bet || 0); });
     var selectedCount = formState.houseIds.filter(function (id) { return availableHouseIds.indexOf(Number(id)) >= 0; }).length;
     var housesHtml = houses.length ? houses.map(function (house) {
       var id = Number(house.id_bet || 0);
       var checked = formState.houseIds.indexOf(id) >= 0;
-      var status = house.tem_cotacao_elegivel === true ? "Alguma cotação nacional verificada foi observada" : "Aguardando cotação nacional verificada";
+      var status = "Cotações completas, regras e limites verificados para este confronto";
       return "<label class=\"ie-simulator-house\" data-simulator-house-row data-house-search-name=\"" + escapeHtml(normalizeSearchText(house.bet || "")) + "\"><input type=\"checkbox\" name=\"simulator_bet\" value=\"" + escapeHtml(id) + "\"" + (checked ? " checked" : "") + "><span><strong>" + escapeHtml(house.bet || "Casa autorizada") + "</strong><small>" + escapeHtml(status) + "</small></span>" + (house.favorita === true ? "<em>Favorita</em>" : "") + "</label>";
-    }).join("") : "<div class=\"ie-simulator-inline-empty\">" + escapeHtml(authorizationValid ? "Nenhuma operação brasileira autorizada está disponível para seleção." : "A lista oficial brasileira precisa ser atualizada antes de novos cálculos.") + "</div>";
+    }).join("") : "<div class=\"ie-simulator-inline-empty\">" + escapeHtml(authorizationValid ? "Nenhuma casa possui dados elegíveis para este confronto. A lista regulatória não será oferecida como se tivesse cotações disponíveis." : "A lista oficial brasileira precisa ser atualizada antes de novos cálculos.") + "</div>";
     var marketsHtml = arrayOf(context.mercados).map(function (market) {
-      var enabled = market.habilitado_simulacao === true;
+      var enabled = simulatorMarketAvailable(market);
       var selected = enabled && simulatorMarketSelected(formState, market.codigo_mercado);
-      var availability = enabled ? (market.disponivel_cotacao_brasil === true ? "Conjunto completo verificado observado" : "Pode ser salvo para monitoramento") : market.motivo_indisponibilidade || "Em preparação";
-      return "<label class=\"ie-simulator-market-option" + (enabled ? "" : " is-disabled") + "\"><input type=\"checkbox\" name=\"simulator_market\" value=\"" + escapeHtml(market.codigo_mercado) + "\" data-period=\"" + escapeHtml(market.periodo_codigo || "90_minutos") + "\" data-line=\"\"" + (selected ? " checked" : "") + (enabled ? "" : " disabled") + "><span><strong>" + escapeHtml(market.nome_mercado || market.codigo_mercado) + "</strong><small>" + escapeHtml((market.periodo_codigo === "90_minutos" ? "90 minutos · " : "") + availability) + "</small></span>" + (enabled ? "<em>Habilitado no simulador</em>" : "<em>Em preparação</em>") + "</label>";
+      var availability = enabled ? "Conjunto completo, regras e limites verificados" : market.mensagem || "Sem conjunto brasileiro elegível para cálculo";
+      return "<label class=\"ie-simulator-market-option" + (enabled ? "" : " is-disabled") + "\"><input type=\"checkbox\" name=\"simulator_market\" value=\"" + escapeHtml(market.codigo_mercado) + "\" data-period=\"" + escapeHtml(market.periodo_codigo || "90_minutos") + "\" data-line=\"\"" + (selected ? " checked" : "") + (enabled ? "" : " disabled") + "><span><strong>" + escapeHtml(market.nome_mercado || market.codigo_mercado) + "</strong><small>" + escapeHtml((market.periodo_codigo === "90_minutos" ? "90 minutos · " : "") + availability) + "</small></span>" + (enabled ? "<em>Habilitado no simulador</em>" : "<em>Indisponível para cálculo</em>") + "</label>";
     }).join("");
     var authorizationDate = context.autorizacao_snapshot_verificado_em ? formatDateTime(context.autorizacao_snapshot_verificado_em) : "verificação ainda não informada";
-    var canOperate = future && authorizationValid;
+    var canOperate = simulatorCanOperate(context);
     var currentId = formState.idSimulation || null;
     var result = state.simulator.result || context.simulacao && context.simulacao.resultado || null;
     byId("detailTitle").textContent = "Simulador de Impacto Financeiro";
     byId("detailSubtitle").textContent = displayText(sides.home.name + " × " + sides.away.name);
     byId("detailContent").setAttribute("data-detail-view", "financial-simulator:" + Number(state.simulator.eventId || 0));
-    byId("detailContent").innerHTML = "<div class=\"ie-financial-simulator\"><section class=\"ie-simulator-intro\"><span>Decisão mais consciente</span><strong>Compare consequências financeiras, não promessas de resultado.</strong><p>Referências globais ajudam a entender o mercado. Somente casas brasileiras da lista vigente podem ser escolhidas no cálculo.</p></section>"
-      + detailSection("Referência global anônima", renderGlobalReference(context.referencia_global, sides, true))
+    byId("detailContent").innerHTML = "<div class=\"ie-financial-simulator\"><section class=\"ie-simulator-intro\"><span>Decisão mais consciente</span><strong>Compare consequências financeiras, não promessas de resultado.</strong><p>Referências globais são informativas. O cálculo exige casas autorizadas com cotações atuais, regras e limites verificados para este confronto.</p></section>"
+      + detailSection("Referência global anônima", renderGlobalReference(context.referencia_global, sides, true, context.odds_status && context.odds_status.referencia_global))
       + "<form data-financial-simulator-form data-event-id=\"" + escapeHtml(state.simulator.eventId) + "\"><section class=\"ie-simulator-fields\"><label><span>Nome da simulação</span><input type=\"text\" name=\"simulator_name\" maxlength=\"120\" value=\"" + escapeHtml(formState.name) + "\"></label><label><span>Valor total a considerar</span><div class=\"ie-money-input\"><b>R$</b><input type=\"number\" name=\"simulator_value\" min=\"0.01\" max=\"1000000000\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(Number(formState.value).toFixed(2)) + "\" required></div></label><label><span>Limite pessoal de perda</span><div class=\"ie-percent-input\"><input type=\"number\" name=\"simulator_loss_limit\" min=\"0\" max=\"100\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(formState.lossLimit) + "\" required><b>%</b></div><small>É um limite escolhido por você; não torna o cenário seguro.</small></label></section>"
-      + "<fieldset class=\"ie-simulator-choice\"><legend>Casas brasileiras autorizadas <span id=\"simulatorHouseCount\" aria-live=\"polite\">" + escapeHtml(selectedCount) + " selecionada" + (selectedCount === 1 ? "" : "s") + "</span></legend><p>Escolha até 20 nomes verificados na listagem brasileira; sem links, logotipos ou direcionamento.</p><label class=\"ie-simulator-search\">" + icon("search") + "<input type=\"search\" data-simulator-house-search aria-label=\"Buscar casa brasileira autorizada\" placeholder=\"Buscar pelo nome da casa\" autocomplete=\"off\"" + (authorizationValid ? "" : " disabled") + "></label><div class=\"ie-simulator-house-list\">" + housesHtml + "</div><button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"favorites\"" + (authorizationValid ? "" : " disabled data-simulator-locked") + ">Salvar seleção como minhas favoritas</button><small>Lista autorizada verificada em " + escapeHtml(authorizationDate) + ". Autorização regulatória não significa ausência de risco ou reclamações.</small></fieldset>"
+      + "<fieldset class=\"ie-simulator-choice\"><legend>Casas brasileiras autorizadas <span id=\"simulatorHouseCount\" aria-live=\"polite\">" + escapeHtml(selectedCount) + " selecionada" + (selectedCount === 1 ? "" : "s") + "</span></legend><p>Somente casas com dados elegíveis aparecem para seleção, até 20 por cálculo; sem links, logotipos ou direcionamento.</p><label class=\"ie-simulator-search\">" + icon("search") + "<input type=\"search\" data-simulator-house-search aria-label=\"Buscar casa brasileira autorizada\" placeholder=\"Buscar pelo nome da casa\" autocomplete=\"off\"" + (authorizationValid ? "" : " disabled") + "></label><div class=\"ie-simulator-house-list\">" + housesHtml + "</div><button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"favorites\"" + (authorizationValid ? "" : " disabled data-simulator-locked") + ">Salvar seleção como minhas favoritas</button><small>Lista autorizada verificada em " + escapeHtml(authorizationDate) + ". Autorização regulatória não significa ausência de risco ou reclamações.</small></fieldset>"
       + "<fieldset class=\"ie-simulator-choice\"><legend>Mercados</legend><p>Você pode escolher um ou mais mercados quando suas regras estiverem normalizadas. O orçamento é dividido entre eles; probabilidades nunca são somadas.</p><div class=\"ie-simulator-market-options\">" + marketsHtml + "</div></fieldset>"
       + "<section class=\"ie-simulator-bell\"><div>" + icon("bell") + "<span><strong>Sino exclusivo desta simulação</strong><small>A avaliação segue a frequência dos provedores e não é em tempo real.</small></span></div><label class=\"ie-switch\"><input type=\"checkbox\" name=\"simulator_bell\" aria-label=\"Ativar sino desta simulação\"" + (formState.bell ? " checked" : "") + "><span aria-hidden=\"true\"></span></label><label class=\"ie-simulator-alert-margin\"><span>Avisar quando a perda máxima mudar pelo menos</span><div class=\"ie-percent-input\"><input type=\"number\" name=\"simulator_alert_margin\" min=\"0.01\" max=\"100\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(formState.alertMargin) + "\"" + (formState.bell ? "" : " disabled") + "><b>p.p.</b></div><small>Ao salvar novamente, o cenário atual passa a ser a nova referência.</small></label></section>"
       + (future ? "" : "<div class=\"ie-simulator-closed\">O horário de início não está confirmado no futuro. Novos cálculos e salvamentos ficam bloqueados.</div>")
       + (authorizationValid ? "" : "<div class=\"ie-simulator-closed\">A verificação da lista oficial brasileira está vencida ou indisponível. O simulador permanece bloqueado preventivamente até a atualização.</div>")
       + "<div class=\"ie-simulator-actions\"><button type=\"submit\" class=\"ie-button ie-button-primary\" data-simulator-working" + (canOperate ? "" : " disabled data-simulator-locked") + ">Calcular impacto</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"save\" data-simulator-working" + (canOperate ? "" : " disabled data-simulator-locked") + ">Salvar simulação</button><span class=\"ie-simulator-busy-status\" data-simulator-busy-label aria-live=\"polite\"></span></div></form>"
-      + (!authorizationValid && result ? renderSimulatorAuthorizationExpiredResult() : state.simulator.resultStale ? renderSimulatorStaleResult() : renderSimulatorResult(result))
-      + detailSection("Simulações deste confronto", renderSavedSimulations(context.simulacoes_salvas, currentId, authorizationValid))
+      + (state.simulator.resultStale ? renderSimulatorStaleResult() : result && (!canOperate || state.simulator.resultValidated !== true) ? renderSimulatorUnverifiedResult(context) : result ? renderSimulatorResult(result) : canOperate ? renderSimulatorResult(null) : "<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty\" aria-live=\"polite\"><strong>Cálculo indisponível</strong><p>" + escapeHtml(context.simulador && context.simulador.mensagem || "Aguardando dados brasileiros atuais e completos, com regras e limites verificados para este confronto.") + "</p></section>")
+      + detailSection("Simulações deste confronto", renderSavedSimulations(context.simulacoes_salvas, currentId))
       + "</div>";
     if (state.simulator.busy) setSimulatorBusy(true);
+    else updateSimulatorAvailability();
   }
 
   function readSimulatorForm() {
@@ -2493,8 +2517,8 @@
     var bell = form.elements.simulator_bell.checked;
     var alertMargin = parseNumericInput(form.elements.simulator_alert_margin.value);
     if (!bell && !(alertMargin >= .01 && alertMargin <= 100)) alertMargin = 1;
-    var houseIds = all("input[name=simulator_bet]:checked", form).map(function (input) { return Number(input.value); }).filter(function (id, index, values) { return id > 0 && values.indexOf(id) === index; });
-    var markets = all("input[name=simulator_market]:checked", form).map(function (input) {
+    var houseIds = all("input[name=simulator_bet]:checked:not(:disabled)", form).map(function (input) { return Number(input.value); }).filter(function (id, index, values) { return id > 0 && values.indexOf(id) === index; });
+    var markets = all("input[name=simulator_market]:checked:not(:disabled)", form).map(function (input) {
       return { codigo_mercado: input.value, periodo_codigo: input.getAttribute("data-period") || "90_minutos", linha: input.getAttribute("data-line") || "" };
     });
     return {
@@ -2510,11 +2534,14 @@
   }
 
   function collectSimulatorForm() {
+    if (!simulatorCanOperate(state.simulator.context)) throw new Error("cotacoes_brasileiras_indisponiveis");
     var values = readSimulatorForm();
     if (!(values.value > 0 && values.value <= 1000000000)) throw new Error("valor_comprometido_invalido");
     if (!(values.lossLimit >= 0 && values.lossLimit <= 100)) throw new Error("limite_perda_invalido");
     if (!values.houseIds.length || values.houseIds.length > 20) throw new Error("casas_selecionadas_invalidas");
     if (!values.markets.length) throw new Error("mercados_invalidos");
+    if (!values.houseIds.every(function (id) { return simulatorAvailableHouses(state.simulator.context).some(function (house) { return Number(house.id_bet) === id; }); })) throw new Error("cotacoes_brasileiras_indisponiveis");
+    if (!values.markets.every(function (selected) { return arrayOf(state.simulator.context.mercados).some(function (market) { return simulatorMarketAvailable(market) && market.codigo_mercado === selected.codigo_mercado; }); })) throw new Error("cotacoes_brasileiras_indisponiveis");
     if (values.bell && !(values.alertMargin >= .01 && values.alertMargin <= 100)) throw new Error("margem_alerta_invalida");
     return values;
   }
@@ -2546,10 +2573,37 @@
         control.disabled = true;
       } else {
         var wasDisabled = control.getAttribute("data-simulator-disabled-before");
-        control.disabled = wasDisabled === "1" || control.hasAttribute("data-simulator-locked");
+        control.disabled = (wasDisabled === null ? control.disabled : wasDisabled === "1") || control.hasAttribute("data-simulator-locked");
         control.removeAttribute("data-simulator-disabled-before");
       }
     });
+    if (!busy) updateSimulatorAvailability();
+  }
+
+  function updateSimulatorAvailability() {
+    if (state.simulator.busy) return;
+    var form = document.querySelector("[data-financial-simulator-form]");
+    if (!form) return;
+    var context = state.simulator.context || {};
+    var availableIds = simulatorAvailableHouses(context).map(function (house) { return Number(house.id_bet); });
+    all("input[name=simulator_bet]", form).forEach(function (input) {
+      input.disabled = availableIds.indexOf(Number(input.value)) < 0;
+      if (input.disabled) input.checked = false;
+    });
+    all("input[name=simulator_market]", form).forEach(function (input) {
+      input.disabled = !arrayOf(context.mercados).some(function (market) { return simulatorMarketAvailable(market) && market.codigo_mercado === input.value; });
+      if (input.disabled) input.checked = false;
+    });
+    var count = all("input[name=simulator_bet]:checked:not(:disabled)", form).length;
+    var selectedMarkets = all("input[name=simulator_market]:checked:not(:disabled)", form).length;
+    var ready = simulatorCanOperate(context) && count > 0 && count <= 20 && selectedMarkets > 0;
+    all("[data-simulator-working]", form).forEach(function (button) { button.disabled = !ready; });
+    var favorites = form.querySelector("[data-simulator-action=favorites]");
+    if (favorites) favorites.disabled = availableIds.length === 0;
+    var search = form.querySelector("[data-simulator-house-search]");
+    if (search) search.disabled = availableIds.length === 0;
+    form.elements.simulator_bell.disabled = !simulatorCanOperate(context);
+    form.elements.simulator_alert_margin.disabled = !simulatorCanOperate(context) || !form.elements.simulator_bell.checked;
   }
 
   function simulatorOperationIsCurrent(operationState, view) {
@@ -2564,6 +2618,11 @@
     beginDetail("Simulador de Impacto Financeiro", "Carregando casas e mercados...", mode);
     var view = "financial-simulator:" + eventId;
     byId("detailContent").setAttribute("data-detail-view", view);
+    state.simulator = {
+      context: null, result: null, form: null, eventId: eventId,
+      simulationId: simulationId ? Number(simulationId) : null,
+      busy: true, resultStale: false, resultValidated: false
+    };
     try {
       var context = await rpc("ie_simulador_contexto_rpc", { p_id_evento: eventId, p_id_simulacao: simulationId ? Number(simulationId) : null });
       if (openRevision !== simulatorOpenRevision || byId("detailContent").getAttribute("data-detail-view") !== view) return;
@@ -2574,7 +2633,8 @@
         eventId: eventId,
         simulationId: simulationId ? Number(simulationId) : null,
         busy: false,
-        resultStale: false
+        resultStale: false,
+        resultValidated: false
       };
       renderFinancialSimulator();
     } catch (error) {
@@ -2595,6 +2655,7 @@
       if (!simulatorOperationIsCurrent(operationState, view)) return;
       state.simulator.result = result || null;
       state.simulator.resultStale = false;
+      state.simulator.resultValidated = true;
       if (result && result.referencia_global) state.simulator.context.referencia_global = result.referencia_global;
       renderFinancialSimulator();
       var summary = byId("simulatorResult");
@@ -2603,7 +2664,12 @@
         try { summary.focus({ preventScroll: true }); } catch (_) { summary.focus(); }
       }
     } catch (error) {
-      if (simulatorOperationIsCurrent(operationState, view)) showToast(friendlyError(error), true);
+      if (simulatorOperationIsCurrent(operationState, view)) {
+        state.simulator.resultValidated = false;
+        var previousResult = byId("simulatorResult");
+        if (previousResult && state.simulator.result) previousResult.outerHTML = renderSimulatorUnverifiedResult(state.simulator.context);
+        showToast(friendlyError(error), true);
+      }
     } finally {
       if (simulatorOperationIsCurrent(operationState, view)) setSimulatorBusy(false);
     }
@@ -2633,10 +2699,16 @@
       state.simulator.form = simulatorDefaultForm(context || {});
       state.simulator.result = context && context.simulacao && context.simulacao.resultado || saved && saved.resultado || null;
       state.simulator.resultStale = false;
+      state.simulator.resultValidated = true;
       renderFinancialSimulator();
       showToast(formState.bell ? "Simulação salva com sino independente ativo." : "Simulação salva.", false);
     } catch (error) {
-      if (simulatorOperationIsCurrent(operationState, view)) showToast(friendlyError(error), true);
+      if (simulatorOperationIsCurrent(operationState, view)) {
+        state.simulator.resultValidated = false;
+        var previousResult = byId("simulatorResult");
+        if (previousResult && state.simulator.result) previousResult.outerHTML = renderSimulatorUnverifiedResult(state.simulator.context);
+        showToast(friendlyError(error), true);
+      }
     } finally {
       if (simulatorOperationIsCurrent(operationState, view)) setSimulatorBusy(false);
     }
@@ -2647,13 +2719,18 @@
     var operationState = state.simulator;
     var view = "financial-simulator:" + Number(operationState.eventId || 0);
     try {
+      if (!simulatorAvailableHouses(state.simulator.context).length) throw new Error("cotacoes_brasileiras_indisponiveis");
       var formState = readSimulatorForm();
-      if (formState.houseIds.length > 80) throw new Error("casas_selecionadas_invalidas");
+      var availableIds = simulatorAvailableHouses(state.simulator.context).map(function (house) { return Number(house.id_bet); });
+      var savedIds = formState.houseIds.concat(arrayOf(state.simulator.context.casas_autorizadas).filter(function (house) {
+        return house.favorita === true && availableIds.indexOf(Number(house.id_bet)) < 0;
+      }).map(function (house) { return Number(house.id_bet); })).filter(function (id, index, ids) { return id > 0 && ids.indexOf(id) === index; });
+      if (savedIds.length > 80) throw new Error("casas_selecionadas_invalidas");
       state.simulator.form = formState;
       setSimulatorBusy(true);
-      await rpc("ie_sim_casas_favoritas_salvar_rpc", { p_ids_bets: formState.houseIds });
+      await rpc("ie_sim_casas_favoritas_salvar_rpc", { p_ids_bets: savedIds });
       if (!simulatorOperationIsCurrent(operationState, view)) return;
-      arrayOf(state.simulator.context && state.simulator.context.casas_autorizadas).forEach(function (house) { house.favorita = formState.houseIds.indexOf(Number(house.id_bet)) >= 0; });
+      arrayOf(state.simulator.context.casas_autorizadas).concat(arrayOf(state.simulator.context.casas_disponiveis)).forEach(function (house) { house.favorita = savedIds.indexOf(Number(house.id_bet)) >= 0; });
       renderFinancialSimulator();
       showToast("Casas favoritas atualizadas.", false);
     } catch (error) {
@@ -2681,8 +2758,10 @@
         state.simulator.form = simulatorDefaultForm(context || {});
         state.simulator.result = null;
         state.simulator.resultStale = false;
+        state.simulator.resultValidated = false;
       } else {
         state.simulator.result = context && context.simulacao && context.simulacao.resultado || state.simulator.result;
+        state.simulator.resultValidated = false;
       }
       renderFinancialSimulator();
       showToast("Simulação arquivada e sino desativado.", false);
@@ -2700,7 +2779,14 @@
     var homeA = data && data.mando_time_a || {};
     var homeB = data && data.mando_time_b || {};
     var total = numberOf(summary.jogos, 0);
-    if (!total) return emptyState("Histórico ainda indisponível", "Ainda não há confrontos históricos organizados para estas equipes.", false);
+    var historyStatus = String(data && data.status_historico || "");
+    var unavailableCopy = historyStatus === "identidade_pendente"
+      ? ["Identificação histórica em revisão", "O vínculo de uma das equipes com o acervo ainda precisa ser confirmado. Isso não significa que elas nunca se enfrentaram."]
+      : historyStatus === "fora_da_cobertura"
+        ? ["Histórico fora da cobertura atual", "O acervo histórico disponível ainda não cobre este confronto ou esporte."]
+        : historyStatus === "sem_confrontos"
+          ? ["Nenhum confronto neste recorte", "As equipes foram identificadas, mas não há confrontos no recorte histórico disponível. A base pode não reunir todos os jogos já realizados."]
+          : ["Histórico temporariamente indisponível", "Não foi possível confirmar os dados históricos deste confronto agora."];
     function resultGrid(values, label) {
       return "<section class=\"ie-h2h-block\"><h4>" + escapeHtml(label) + " <small>" + escapeHtml(numberOf(values.jogos, 0)) + " jogos</small></h4><div class=\"ie-h2h-results\"><div><strong>" + escapeHtml(numberOf(values.vitorias_time_a, 0)) + "</strong><span>Vitórias<br>" + escapeHtml(teamA.nome || "Time A") + "</span></div><div><strong>" + escapeHtml(numberOf(values.empates, 0)) + "</strong><span>Empates</span></div><div><strong>" + escapeHtml(numberOf(values.vitorias_time_b, 0)) + "</strong><span>Vitórias<br>" + escapeHtml(teamB.nome || "Time B") + "</span></div></div></section>";
     }
@@ -2715,18 +2801,21 @@
     var competitions = arrayOf(data.competicoes);
     var competitionsHtml = competitions.length ? "<div class=\"ie-h2h-competitions\">" + competitions.map(function (item) { return "<div><span>" + escapeHtml(competitionDisplayName(item.competicao || "Competição")) + "</span><strong>" + escapeHtml(numberOf(item.jogos, 0)) + " jogos</strong></div>"; }).join("") + "</div>" : "";
     var games = arrayOf(data.jogos);
-    var gamesHtml = games.length ? "<div class=\"ie-h2h-games\">" + games.map(function (game) { return "<div><time>" + escapeHtml(formatDate(game.data)) + "</time><span><b>" + escapeHtml(game.time_casa) + "</b> " + escapeHtml(game.placar_casa) + " – " + escapeHtml(game.placar_fora) + " <b>" + escapeHtml(game.time_fora) + "</b><small>" + escapeHtml(competitionDisplayName(game.competicao || "")) + "</small></span></div>"; }).join("") + "</div>" : "";
+    var gamesHtml = games.length ? "<div class=\"ie-h2h-games\">" + games.map(function (game) { return "<div><time>" + escapeHtml(historyDate(game.data)) + "</time><span><b>" + escapeHtml(game.time_casa) + "</b> " + escapeHtml(game.placar_casa) + " – " + escapeHtml(game.placar_fora) + " <b>" + escapeHtml(game.time_fora) + "</b><small>" + escapeHtml(competitionDisplayName(game.competicao || "")) + "</small></span></div>"; }).join("") + "</div>" : "";
     var performanceHtml = data.desempenho_time_a && data.desempenho_time_b ? "<div class=\"ie-performance-compare\">" + performanceBlock(teamA, data.desempenho_time_a) + performanceBlock(teamB, data.desempenho_time_b) + "</div>" : "";
     var general = data.desempenho_geral || {};
     var generalHtml = general.desempenho_time_a && general.desempenho_time_b ? "<p class=\"ie-performance-scope\">" + escapeHtml(general.escopo || "Todos os jogos oficiais disponíveis, independentemente do adversário.") + "</p><div class=\"ie-performance-compare\">" + performanceBlock(teamA, general.desempenho_time_a) + performanceBlock(teamB, general.desempenho_time_b) + "</div>" : "";
-    return "<div class=\"ie-h2h\">" + overall + resultGrid(homeA, "Com mando de " + (teamA.nome || "Time A")) + resultGrid(homeB, "Com mando de " + (teamB.nome || "Time B")) + (performanceHtml ? detailSection("Somente neste confronto: casa e fora", performanceHtml) : "") + (generalHtml ? detailSection("Desempenho geral: casa e fora", generalHtml) : "") + (competitionsHtml ? detailSection("Competições", competitionsHtml) : "") + (gamesHtml ? detailSection("Confrontos mais recentes", gamesHtml) : "") + "<p class=\"ie-h2h-notice\">" + escapeHtml(data.aviso || "Resultados passados não garantem resultados futuros.") + "</p></div>";
+    if (!total) return emptyState(unavailableCopy[0], unavailableCopy[1], false) + (generalHtml ? detailSection("Desempenho geral: casa e fora", generalHtml) : "");
+    var scopeNotice = data.cobertura && data.cobertura.oficialidade_auditada === false
+      ? "<p class=\"ie-performance-scope\">Acervo parcial em revisão: categoria e oficialidade dos jogos ainda não foram totalmente verificadas. As contagens abaixo não representam um total oficial certificado.</p>" : "";
+    return "<div class=\"ie-h2h\">" + scopeNotice + overall + resultGrid(homeA, "Com mando de " + (teamA.nome || "Time A")) + resultGrid(homeB, "Com mando de " + (teamB.nome || "Time B")) + (performanceHtml ? detailSection("Somente neste confronto: casa e fora", performanceHtml) : "") + (generalHtml ? detailSection("Desempenho geral: casa e fora", generalHtml) : "") + (competitionsHtml ? detailSection("Competições", competitionsHtml) : "") + (gamesHtml ? detailSection("Confrontos mais recentes", gamesHtml) : "") + "<p class=\"ie-h2h-notice\">" + escapeHtml(data.aviso || "Resultados passados não garantem resultados futuros.") + "</p></div>";
   }
 
   function renderBrazilDatabaseSummary(data) {
     if (!data || data.pais !== "Brasil" || data.modalidade !== "Futebol") return "";
     function total(value) { return numberOf(value, 0).toLocaleString("pt-BR"); }
     var period = formatDatabasePeriod(data);
-    return "<section class=\"ie-database-summary\"><div><span>Base própria</span><strong>Futebol do Brasil</strong><small>Acervo histórico organizado pelo Turbo Tiger" + (period ? " · " + escapeHtml(period) : "") + "</small></div><dl><div><dt>Partidas</dt><dd>" + escapeHtml(total(data.total_registros)) + "</dd></div><div><dt>Competições</dt><dd>" + escapeHtml(total(data.total_competicoes)) + "</dd></div><div><dt>Times</dt><dd>" + escapeHtml(total(data.total_times)) + "</dd></div></dl>" + historyContributionLinkHtml() + "</section>";
+    return "<section class=\"ie-database-summary\"><div><span>Base própria</span><strong>Futebol do Brasil</strong><small>Acervo histórico organizado pelo Turbo Tiger" + (period ? " · " + escapeHtml(period) : "") + "</small></div><dl><div><dt>Partidas</dt><dd>" + escapeHtml(total(data.total_registros)) + "</dd></div><div><dt>Competições</dt><dd>" + escapeHtml(total(data.total_competicoes)) + "</dd></div><div><dt>" + escapeHtml(data.total_times_rotulo || "Times catalogados") + "</dt><dd>" + escapeHtml(total(data.total_times)) + "</dd></div></dl>" + historyContributionLinkHtml() + "</section>";
   }
 
   function historyContributionLinkHtml() {
@@ -2874,8 +2963,9 @@
     var suggestionTeams = arrayOf(opponent ? history.opponentSuggestions : history.teamSuggestions).filter(function (team) { return !opponent || ownKeys.indexOf(String(team.time_chave)) < 0; });
     container.innerHTML = suggestionTeams.length ? suggestionTeams.map(function (team) {
       var period = [team.primeiro_jogo_em ? historyDate(team.primeiro_jogo_em) : "", team.ultimo_jogo_em ? historyDate(team.ultimo_jogo_em) : ""].filter(Boolean).join(" a ");
+      var name = team.nome_exibicao || team.nome || "Time";
       var checked = selectedKeys.indexOf(String(team.time_chave)) >= 0;
-      return "<div class=\"ie-history-suggestion\" role=\"option\" aria-selected=\"" + (checked ? "true" : "false") + "\"><button type=\"button\" data-history-action=\"" + (opponent ? "select-opponent" : "select-team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(team.nome || "Time") + "\"><strong>" + escapeHtml(team.nome || "Time") + "</strong>" + (team.uf || period ? "<small>" + escapeHtml([team.uf, period].filter(Boolean).join(" · ")) + "</small>" : "") + "</button><input type=\"checkbox\" class=\"ie-history-suggestion-check\" data-history-action=\"toggle-" + (opponent ? "opponent" : "team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(team.nome || "Time") + "\" aria-label=\"" + (checked ? "Desmarcar " : "Marcar ") + escapeHtml(team.nome || "Time") + "\"" + (checked ? " checked" : "") + "></div>";
+      return "<div class=\"ie-history-suggestion\" role=\"option\" aria-selected=\"" + (checked ? "true" : "false") + "\"><button type=\"button\" data-history-action=\"" + (opponent ? "select-opponent" : "select-team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(name) + "\"><strong>" + escapeHtml(name) + "</strong>" + (team.uf || period ? "<small>" + escapeHtml([team.cidade, team.uf, period].filter(Boolean).join(" · ")) + "</small>" : "") + "</button><input type=\"checkbox\" class=\"ie-history-suggestion-check\" data-history-action=\"toggle-" + (opponent ? "opponent" : "team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(name) + "\" aria-label=\"" + (checked ? "Desmarcar " : "Marcar ") + escapeHtml(name) + "\"" + (checked ? " checked" : "") + "></div>";
     }).join("") : "<span>Nenhum time encontrado.</span>";
     container.hidden = false;
     container.scrollTop = numberOf(history.suggestionScroll && history.suggestionScroll[target], 0);
@@ -2988,7 +3078,7 @@
     return text ? text.charAt(0).toLocaleUpperCase("pt-BR") + text.slice(1) : "";
   }
 
-  function historyTitleGameTypeText(item) {
+  function historyTitleGameTypeParts(item) {
     item = item || {};
     var role = String(item.papel_confronto || item.papel || item.tipo_relacao || item.funcao || "").toLowerCase();
     var definitionCode = String(item.tipo_confronto || item.tipo_jogo || item.formato || item.forma_definicao || "").toLowerCase().trim();
@@ -3005,7 +3095,23 @@
       if (!key || seen[key]) return false;
       seen[key] = true;
       return true;
-    }).join(" · ");
+    });
+  }
+
+  function historyTitleGameTypeText(item) {
+    return historyTitleGameTypeParts(item).join(" · ");
+  }
+
+  function historyMatchPhaseBadges(row) {
+    var phase = displayText(row.fase || "").trim();
+    var round = displayText(row.rodada || "").trim();
+    if (/^\d+$/.test(round)) round = "Rodada " + round;
+    if (phase && normalizeSearchText(round).indexOf(normalizeSearchText(phase)) >= 0) phase = "";
+    var parts = [phase, round].filter(Boolean);
+    if (!parts.length) return "";
+    return "<span class=\"ie-history-title-badges\">" + parts.map(function (part) {
+      return "<b>" + escapeHtml(part.replace(/\s+[-–]\s+/g, " · ")) + "</b>";
+    }).join("") + "</span>";
   }
 
   function titleEntityNames(plural, singular) {
@@ -3057,11 +3163,13 @@
   function renderHistoryTitleContexts(row) {
     var id = row.id || row.cod_confronto || "";
     var contexts = historyTitleContexts(id);
-    if (!contexts.length) return "";
+    if (!contexts.length) return historyMatchPhaseBadges(row);
     var visible = contexts.slice(0, 2).map(function (item) {
       var participants = titleParticipantsText(item);
-      var badges = participants.shared ? "<b>Título compartilhado</b>" : "";
-      return "<span class=\"ie-history-title-item\"><span class=\"ie-history-title-name\">" + icon("trophy") + "<strong>" + escapeHtml(historyTitleGameTypeText(item)) + "</strong></span>" + (badges ? "<span class=\"ie-history-title-badges\">" + badges + "</span>" : "") + (participants.text ? "<small>" + escapeHtml(participants.text) + "</small>" : "") + "</span>";
+      var badges = historyTitleGameTypeParts(item).map(function (part) {
+        return "<b>" + escapeHtml(part) + "</b>";
+      }).join("") + (participants.shared ? "<b>Título compartilhado</b>" : "");
+      return "<span class=\"ie-history-title-item\"><span class=\"ie-history-title-name\">" + icon("trophy") + "<span class=\"ie-history-title-badges\">" + badges + "</span></span>" + (participants.text ? "<small>" + escapeHtml(participants.text) + "</small>" : "") + "</span>";
     }).join("");
     var remaining = contexts.length > 2 ? "<small class=\"ie-history-title-more\">+" + escapeHtml(contexts.length - 2) + " contexto" + (contexts.length - 2 === 1 ? "" : "s") + " de título</small>" : "";
     return "<span class=\"ie-history-title-contexts\">" + visible + remaining + "</span>";
@@ -3070,7 +3178,7 @@
   function renderHistoryRow(row) {
     var id = row.id || row.cod_confronto || "";
     var score = String(row.placar_casa == null ? "—" : row.placar_casa) + " – " + String(row.placar_fora == null ? "—" : row.placar_fora);
-    var meta = [competitionDisplayName(row.competicao || ""), row.temporada, row.fase, row.rodada].filter(Boolean).join(" · ");
+    var meta = [competitionDisplayName(row.competicao || ""), row.temporada].filter(Boolean).join(" · ");
     var place = [row.cidade, row.estadio].filter(Boolean).join(" · ");
     var label = [historyDate(row.data_partida), row.time_casa, score, row.time_fora, meta].filter(Boolean).join(" · ");
     var dayAndTime = [historyWeekday(row.data_partida), historyTime(row.hora_partida)].filter(Boolean).join(" ");
@@ -4021,13 +4129,17 @@
     try {
       var data = await rpc("ie_confronto_evento_rpc", { p_id_evento: Number(id), p_limite: 20, p_offset: 0 });
       if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
-      try { data.desempenho_geral = await rpc("ie_desempenho_geral_evento_rpc", { p_id_evento: Number(id) }); } catch (generalError) { /* desempenho geral pode não estar mapeado */ }
+      if (data.recurso_suportado === true && data.status_historico !== "identidade_pendente") {
+        try { data.desempenho_geral = await rpc("ie_desempenho_geral_evento_rpc", { p_id_evento: Number(id) }); } catch (generalError) { /* desempenho geral pode não estar mapeado */ }
+      }
       if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       var baseSummary = null;
-      try { baseSummary = await rpc("ie_base_futebol_brasil_resumo_rpc", {}); } catch (baseError) { /* selo da base não bloqueia as estatísticas */ }
+      if (data.recurso_suportado === true) {
+        try { baseSummary = await rpc("ie_base_futebol_brasil_resumo_rpc", {}); } catch (baseError) { /* selo da base não bloqueia as estatísticas */ }
+      }
       if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       byId("detailTitle").textContent = displayText((data.time_a && data.time_a.nome || "Time A") + " × " + (data.time_b && data.time_b.nome || "Time B"));
-      byId("detailSubtitle").textContent = "Histórico completo do confronto";
+      byId("detailSubtitle").textContent = "Histórico disponível do confronto";
       byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + renderBrazilDatabaseSummary(baseSummary) + renderHistoricalComparison(data);
     } catch (error) {
       if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + emptyState("Análise indisponível", friendlyError(error), false);
@@ -4036,8 +4148,11 @@
 
   async function openCompetitionDetail(id, title, pushCurrent) {
     beginDetail(title || "Detalhes da competição", "Carregando informações...", !!pushCurrent);
+    var view = "competition:" + Number(id);
+    byId("detailContent").setAttribute("data-detail-view", view);
     try {
       var data = await rpc("ie_competicao_detalhe_rpc", { p_id_competicao: Number(id) });
+      if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       var competition = data && data.competicao || {};
       var teams = arrayOf(data && data.times_classificados);
       byId("detailTitle").textContent = competitionDisplayName(competition.nome || title || "Competição");
@@ -4055,14 +4170,17 @@
       }).join("") + "</div>" : "<p>Os classificados ainda não foram disponibilizados pela fonte.</p>";
       byId("detailContent").innerHTML = detailSection("Informações da competição", overview) + detailSection("Times classificados na fase", teamHtml);
     } catch (error) {
-      byId("detailContent").innerHTML = emptyState("Detalhes indisponíveis", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState("Detalhes indisponíveis", friendlyError(error), false);
     }
   }
 
   async function openParticipantDetail(id, title, pushCurrent) {
     beginDetail(title || "Time ou participante", "Carregando competições...", !!pushCurrent);
+    var view = "participant:" + Number(id);
+    byId("detailContent").setAttribute("data-detail-view", view);
     try {
       var data = await rpc("ie_participante_competicoes_rpc", { p_id_participante: Number(id), p_id_esporte: state.activeSportId ? Number(state.activeSportId) : null, p_limite: 50, p_offset: 0 });
+      if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       var participant = data && data.participante || followedSelections("participant", state.activeSportId).find(function (item) { return Number(selectionIdentity(item).id) === Number(id); }) || {};
       var competitions = arrayOf(data);
       byId("detailTitle").textContent = displayText(participant.nome || title || "Time ou participante");
@@ -4073,21 +4191,24 @@
         return "<article class=\"ie-entity-row\"" + detailAttributes("participant-competition", competitionId, "", name) + " data-participant-id=\"" + escapeHtml(id) + "\" data-competition-id=\"" + escapeHtml(competitionId) + "\" data-phase=\"" + escapeHtml(competition.fase_atual || "") + "\">" + logoHtml(competition.imagem_url || competition.logo_url, name, "ie-entity-logo", competition.sigla) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(name) + "</strong><span>" + escapeHtml(competition.fase_atual || competition.temporada || "") + "</span></div>" + icon("chevron") + "</article>";
       }).join("") + "</div>" : emptyState("Nenhuma competição disponível", "Ainda não há competições relacionadas a este participante.", false);
     } catch (error) {
-      byId("detailContent").innerHTML = emptyState("Competições indisponíveis", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState("Competições indisponíveis", friendlyError(error), false);
     }
   }
 
   async function openParticipantCompetitionMatches(participantId, competitionId, phase, title, pushCurrent) {
     beginDetail(title || "Confrontos", phase || "Próximos confrontos", !!pushCurrent);
+    var view = "participant-competition:" + Number(participantId) + ":" + Number(competitionId);
+    byId("detailContent").setAttribute("data-detail-view", view);
     try {
       var phaseFilter = normalizeSearchText(phase) === "temporada regular" ? null : (phase || null);
       var result = await rpc("ie_partidas_listar_rpc", { p_secao: "proximos", p_id_esporte: state.activeSportId ? Number(state.activeSportId) : null, p_id_competicao: Number(competitionId), p_id_participante: Number(participantId), p_fase: phaseFilter, p_limite: 50, p_offset: 0 });
+      if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       var matches = orderMatchesByFavorites(arrayOf(result), state.activeSportId, "upcoming");
       byId("detailTitle").textContent = displayText(title || "Confrontos");
       byId("detailSubtitle").textContent = displayText(phase || "Próximos confrontos");
       byId("detailContent").innerHTML = matches.length ? "<div class=\"ie-feed\">" + matches.map(function (item) { return renderMatchCard(item); }).join("") + "</div>" : emptyState("Nenhum confronto programado", "Ainda não há confrontos futuros disponíveis nesta fase.", false);
     } catch (error) {
-      byId("detailContent").innerHTML = emptyState("Confrontos indisponíveis", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState("Confrontos indisponíveis", friendlyError(error), false);
     }
   }
 
@@ -4534,6 +4655,7 @@
       if (event.target.name === "simulator_bell") {
         var alertMarginInput = document.querySelector("[data-financial-simulator-form] [name=simulator_alert_margin]");
         if (alertMarginInput) alertMarginInput.disabled = !event.target.checked;
+        updateSimulatorAvailability();
         return;
       }
       if (event.target.name === "simulator_bet") {
@@ -4547,10 +4669,12 @@
         var countLabel = byId("simulatorHouseCount");
         if (countLabel) countLabel.textContent = selectedCount + " selecionada" + (selectedCount === 1 ? "" : "s");
         invalidateSimulatorResult();
+        updateSimulatorAvailability();
         return;
       }
       if (event.target.name === "simulator_market") {
         invalidateSimulatorResult();
+        updateSimulatorAvailability();
         return;
       }
       if (event.target.id === "historyYearInput") {

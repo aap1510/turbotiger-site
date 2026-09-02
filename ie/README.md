@@ -134,3 +134,18 @@ Antes da publicação/teste final:
 - validar a interface funcional somente dentro da WebView dedicada do app Turbo Tiger.
 
 Referência técnica completa: `docs/_referencias/inteligencia_esportiva/README.md`.
+
+## Revisão de integridade — 02/09/2026
+
+- Na colaboração, a linha da competição contém somente nome e temporada. Fase/ida/volta e papel do confronto aparecem em etiquetas separadas; `Principal` não é incorporado ao nome da competição.
+- A busca de times usa `nome_exibicao` tanto na sugestão quanto na seleção. O catálogo ativo e os vínculos confirmados de identidade vêm do backend; a interface não une homônimos por apelido.
+- As análises distinguem `status_historico`: `disponivel`, `identidade_pendente`, `sem_confrontos` e `fora_da_cobertura`. `recurso_suportado` controla a consulta do resumo brasileiro. Acervo parcial em revisão não é apresentado como total oficial certificado.
+- O resumo da base usa a dimensão ativa de times e os totais atualizados pelo backend, sem calcular o acervo no navegador. Datas históricas sem horário não sofrem conversão de fuso.
+- `odds_status` informa ausência de cobertura, atraso, ausência de publicação ou mercado encerrado. A lista de casas autorizadas não equivale a uma lista com cotações disponíveis.
+- O contrato do card nativo foi corrigido no backend para entregar `casa`, `empate`, `fora` e `fonte`, conforme o Delphi existente. Trios incompletos não produzem linhas vazias. A referência derivada é identificada como `Referência global sem margem`, sem confundi-la com média bruta de cotações.
+- O simulador exige `simulador.disponivel=true`, evento futuro, verificação regulatória válida, `casas_disponiveis` e mercados explicitamente `elegivel_para_calculo=true`. Sem isso, a interface não oferece casas indisponíveis como selecionáveis nem permite calcular/salvar. O backend repete a validação.
+- Valores de simulações salvas ficam ocultos até recálculo nesta abertura. Falhas ao calcular/salvar invalidam valores anteriores; reabrir o mesmo confronto invalida operações pendentes da abertura anterior.
+- Modais dimensionam a área rolável descontando a altura real do cabeçalho. Respostas atrasadas de detalhes não podem substituir outra tela; fechar remove o conteúdo privado retido.
+- Regressões locais: `node --test tests/ie/central-contracts.test.cjs` (a partir da raiz do projeto). São testes isolados de funções, sem navegador, sessão ou ponte simulada. O teste de navegador da central verifica apenas o bloqueio fora do app.
+
+Os assets desta revisão usam `20260902-06`. Publicação manual do site e validação funcional na WebView do aplicativo continuam a cargo do proprietário. Esta revisão não altera Delphi, Java, JNI, JAR ou DEX.

@@ -88,7 +88,7 @@ button:focus-visible, a:focus-visible, [tabindex="-1"]:focus-visible { outline: 
 .hs-timeline-copy strong .is-wo,
 .hs-wo { color:#ff5b61; }
 .hs-wo { font-size:10px; font-style:normal; font-weight:800; }
-.hs-timeline-copy span { overflow:hidden; color:var(--hs-muted); font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+.hs-timeline-copy > .hs-timeline-meta { overflow:hidden; color:var(--hs-muted); font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
 .hs-timeline-copy .hs-timeline-meta { overflow:visible; line-height:1.35; text-overflow:clip; white-space:normal; overflow-wrap:anywhere; }
 .hs-timeline-copy .hs-timeline-companions { display:block; overflow:visible; color:var(--hs-gold); font-size:11px; line-height:1.35; white-space:normal; overflow-wrap:anywhere; }
 .hs-timeline-item > svg { width:23px; height:23px; fill:none; stroke:var(--hs-gold); stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
