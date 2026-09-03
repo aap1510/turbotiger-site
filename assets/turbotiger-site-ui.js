@@ -127,7 +127,6 @@
   function isInsideTurboTigerApp() {
     var surface = document.body ? document.body.getAttribute("data-tt-surface") : "";
     if (surface === "app") return true;
-    if (surface === "site") return false;
 
     if (
       hasTurboTigerBridge("TurboTigerHistoricoBridge") ||
@@ -138,7 +137,36 @@
       return true;
     }
 
+    if (surface === "site") return false;
+
     return /TurboTiger/i.test(navigator.userAgent || "");
+  }
+
+  function isPublicHomeUrl(value) {
+    try {
+      var url = new URL(value, window.location.href);
+      return url.origin === window.location.origin &&
+        (url.pathname === "/" || url.pathname.toLowerCase() === "/index.html") &&
+        !url.searchParams.has("pagamento");
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async function applyConfiguredAppHome() {
+    if (!isInsideTurboTigerApp()) return;
+
+    var configuredHome = await fetchConfig("turbotiger_urls", "index_app");
+    if (!configuredHome) return;
+
+    document.querySelectorAll("a[href]").forEach(function (link) {
+      if (isPublicHomeUrl(link.href)) link.href = configuredHome;
+    });
+
+    if (isPublicHomeUrl(window.location.href) &&
+        window.location.href !== configuredHome) {
+      window.location.replace(configuredHome);
+    }
   }
 
   function propagateTurboTigerAppMarker() {
@@ -278,7 +306,7 @@
       fetchConfig("turbotiger_site", "menu_btn2_icone"),
       fetchConfig("turbotiger_site", "menu_btn2_url"),
       fetchConfig("turbotiger_site", "menu_btn3_icone"),
-      fetchConfig("turbotiger_site", "menu_btn3_url"),
+      fetchConfig("turbotiger_urls", "index_app"),
       fetchConfig("turbotiger_site", "menu_btn4_icone"),
       fetchConfig("turbotiger_site", "menu_btn4_url"),
       fetchConfig("turbotiger_site", "menu_btn5_icone"),
@@ -414,12 +442,14 @@
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
+      applyConfiguredAppHome();
       updateTurboTigerContacts();
       updateAppMenu();
       setupFixedFooterCopyright();
       setupAgeNotice();
     });
   } else {
+    applyConfiguredAppHome();
     updateTurboTigerContacts();
     updateAppMenu();
     setupFixedFooterCopyright();
