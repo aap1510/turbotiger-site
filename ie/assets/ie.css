@@ -2437,6 +2437,21 @@ body.ie-reordering-favorites {
   font-size: 9px;
 }
 
+/* Keep the label readable before interaction, including disabled WebView controls. */
+.ie-simulator-entry > .ie-button-primary {
+  -webkit-appearance: none;
+  appearance: none;
+  color: #17130b;
+  -webkit-text-fill-color: currentColor;
+}
+
+.ie-simulator-entry > .ie-button-primary:disabled {
+  background: #bca36b;
+  color: #17130b;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
 .ie-financial-simulator {
   display: grid;
   gap: 18px;

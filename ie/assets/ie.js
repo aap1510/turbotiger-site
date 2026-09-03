@@ -2894,7 +2894,7 @@
         return "<div><span class=\"ie-odds-label\">" + escapeHtml(copy.short) + "</span><small>" + escapeHtml(copy.help) + "</small><b>" + escapeHtml(copy.name) + "</b><strong>" + escapeHtml(formatOdd(values[code])) + "</strong></div>";
       }).join("");
       var limits = group.limites_stake_conhecidos === true ? "Limites informados pela fonte" : "Limites individuais ainda precisam ser conferidos";
-      return "<article class=\"ie-odds-provider ie-odds-brazil\"><header><div><strong>" + escapeHtml(group.bet || "Casa autorizada") + "</strong><span>Operação brasileira autorizada · " + escapeHtml(group.codigo_mercado === "resultado_1x2" ? "Resultado da partida" : group.codigo_mercado || "Mercado") + "</span></div><small>Conjunto nacional verificado</small></header><div class=\"ie-odds-grid\">" + selectionHtml + "</div><footer>" + escapeHtml(relativeFreshness(group.observado_em) || "Horário da fonte indisponível") + " · " + escapeHtml(limits) + "</footer></article>";
+      return "<article class=\"ie-odds-provider ie-odds-brazil\"><header><div><strong>" + escapeHtml(group.bet || "Casa autorizada") + "</strong><span>Operação brasileira autorizada · " + escapeHtml(group.codigo_mercado === "resultado_1x2" ? "Resultado da partida" : group.codigo_mercado || "Mercado") + "</span></div><small>" + (group.modo_teste === true ? "Teste: origem declarada pela fonte" : "Conjunto nacional verificado") + "</small></header><div class=\"ie-odds-grid\">" + selectionHtml + "</div><footer>" + escapeHtml(relativeFreshness(group.observado_em) || "Horário da fonte indisponível") + " · " + escapeHtml(limits) + "</footer></article>";
     }).join("") + "</div>";
   }
 
@@ -2909,8 +2909,9 @@
     var home = sides && sides.home && sides.home.name || "time da casa";
     var away = sides && sides.away && sides.away.name || "time visitante";
     var explanation = "<div class=\"ie-odds-help\"><strong>Como interpretar</strong><span><b>Casa</b> vitória de " + escapeHtml(home) + "</span><span><b>Empate</b> nenhum time vence</span><span><b>Fora</b> vitória de " + escapeHtml(away) + "</span></div>";
-    var buttonDisabled = simulator.disponivel !== true || !eventId;
-    var simulatorAction = "<section class=\"ie-simulator-entry\"><div><span>Simulador de Impacto Financeiro</span><strong>Entenda os cenários de perda e exposição financeira.</strong><p>O cálculo exige cotações brasileiras completas, atuais, com regras e limites verificados.</p></div><button type=\"button\" class=\"ie-button ie-button-primary\" data-simulator-action=\"open\" data-event-id=\"" + escapeHtml(eventId) + "\"" + (buttonDisabled ? " disabled" : "") + ">Simular impacto financeiro</button>" + (buttonDisabled ? "<small>" + escapeHtml(simulator.mensagem || "Ainda não há dados elegíveis para simular este confronto.") + "</small>" : "") + "</section>";
+    // Abrir o formulario nao libera calculo sem cotacoes atuais no backend.
+    var buttonDisabled = !eventId;
+    var simulatorAction = "<section class=\"ie-simulator-entry\"><div><span>Simulador de Impacto Financeiro</span><strong>Entenda os cenários de perda e exposição financeira.</strong><p>O cálculo usa cotações brasileiras atuais. No modo de teste, a origem declarada pela fonte é aceita e limites desconhecidos geram avisos.</p></div><button type=\"button\" class=\"ie-button ie-button-primary\" data-simulator-action=\"open\" data-event-id=\"" + escapeHtml(eventId) + "\"" + (buttonDisabled ? " disabled" : "") + ">Simular Impacto Financeiro</button>" + (buttonDisabled ? "<small>" + escapeHtml(simulator.mensagem || "Ainda não há dados elegíveis para simular este confronto.") + "</small>" : "") + "</section>";
     return explanation
       + detailSection("Referência global anônima", renderGlobalReference(globalReference, sides, false, availability.referencia_global))
       + detailSection("Casas brasileiras autorizadas", renderBrazilianOdds(brazilianOdds, sides, availability.brasil))
@@ -3019,6 +3020,7 @@
   function renderSimulatorResult(result) {
     if (!result || result.ok !== true) return "<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty\" tabindex=\"-1\" aria-live=\"polite\"><strong>Pronto para simular</strong><p>Selecione as casas, o mercado e informe o valor. Nenhuma aposta será aberta ou executada.</p></section>";
     var metrics = result.metricas || {};
+    var testWarning = result.modo_teste === true ? "<p class=\"ie-simulator-closed\"><strong>Modo de teste.</strong> Origem brasileira declarada pelo provedor, sem confirmação independente. Limites desconhecidos não impedem este cálculo. Regras de liquidação e aceitação não foram verificadas; os valores abaixo são apenas cenários teóricos, não limites garantidos de perda.</p>" : "";
     var status = String(result.status || "");
     var unavailable = status === "indisponivel";
     var partial = status === "parcial";
@@ -3039,6 +3041,7 @@
     var precision = metrics.risco_combinado_preciso === true
       ? "O pior cenário é exato para o único mercado calculado, antes de taxas e mudanças operacionais."
       : "Há mais de um mercado ou parte indisponível: o resultado usa um limite conservador. Probabilidades não foram somadas.";
+    availability = testWarning + availability;
     return "<section id=\"simulatorResult\" class=\"ie-simulator-result" + riskClass + "\" tabindex=\"-1\" aria-live=\"polite\"><header><span>Resultado da simulação</span><strong>" + escapeHtml(simulatorRiskLabel(metrics, status)) + "</strong><p>" + escapeHtml(unavailable ? "Não há dados brasileiros elegíveis suficientes para calcular agora." : partial ? "Somente parte da configuração pôde ser calculada." : "Dentro do limite significa apenas o limite escolhido por você; não significa que seja seguro.") + "</p></header>" + overview + availability + "<div class=\"ie-simulator-market-list\">" + markets + "</div><div class=\"ie-simulator-warnings\"><strong>Antes de qualquer decisão</strong><p>" + escapeHtml(precision) + "</p><ul><li>As odds podem mudar antes da confirmação.</li><li>A probabilidade implícita vem da cotação e não prevê o resultado.</li><li>A casa pode limitar, recusar ou anular uma aposta.</li><li>Prorrogação, pênaltis, abandono e devolução precisam seguir regras equivalentes.</li><li>Taxas, impostos, limites e arredondamentos podem alterar o impacto.</li></ul><p>O menor risco financeiro é não apostar. O Turbo Tiger não executa nem encaminha apostas.</p></div></section>";
   }
 
@@ -3075,6 +3078,7 @@
 
   function renderFinancialSimulator() {
     var context = state.simulator.context || {};
+    var testMode = context.simulador && context.simulador.modo_teste === true;
     var formState = state.simulator.form || simulatorDefaultForm(context);
     var event = context.evento || {};
     var sides = matchSides(event);
@@ -3086,13 +3090,13 @@
     var housesHtml = houses.length ? houses.map(function (house) {
       var id = Number(house.id_bet || 0);
       var checked = formState.houseIds.indexOf(id) >= 0;
-      var status = "Cotações completas, regras e limites verificados para este confronto";
+      var status = testMode ? "Teste: origem brasileira declarada pela fonte; limites desconhecidos não bloqueiam" : "Cotações completas, regras e limites verificados para este confronto";
       return "<label class=\"ie-simulator-house\" data-simulator-house-row data-house-search-name=\"" + escapeHtml(normalizeSearchText(house.bet || "")) + "\"><input type=\"checkbox\" name=\"simulator_bet\" value=\"" + escapeHtml(id) + "\"" + (checked ? " checked" : "") + "><span><strong>" + escapeHtml(house.bet || "Casa autorizada") + "</strong><small>" + escapeHtml(status) + "</small></span>" + (house.favorita === true ? "<em>Favorita</em>" : "") + "</label>";
     }).join("") : "<div class=\"ie-simulator-inline-empty\">" + escapeHtml(authorizationValid ? "Nenhuma casa possui dados elegíveis para este confronto. A lista regulatória não será oferecida como se tivesse cotações disponíveis." : "A lista oficial brasileira precisa ser atualizada antes de novos cálculos.") + "</div>";
     var marketsHtml = arrayOf(context.mercados).map(function (market) {
       var enabled = simulatorMarketAvailable(market);
       var selected = enabled && simulatorMarketSelected(formState, market.codigo_mercado);
-      var availability = enabled ? "Conjunto completo, regras e limites verificados" : market.mensagem || "Sem conjunto brasileiro elegível para cálculo";
+      var availability = enabled ? (testMode ? "Teste teórico com dados da fonte, sem confirmação de aceitação" : "Conjunto completo, regras e limites verificados") : market.mensagem || "Sem conjunto brasileiro elegível para cálculo";
       return "<label class=\"ie-simulator-market-option" + (enabled ? "" : " is-disabled") + "\"><input type=\"checkbox\" name=\"simulator_market\" value=\"" + escapeHtml(market.codigo_mercado) + "\" data-period=\"" + escapeHtml(market.periodo_codigo || "90_minutos") + "\" data-line=\"\"" + (selected ? " checked" : "") + (enabled ? "" : " disabled") + "><span><strong>" + escapeHtml(market.nome_mercado || market.codigo_mercado) + "</strong><small>" + escapeHtml((market.periodo_codigo === "90_minutos" ? "90 minutos · " : "") + availability) + "</small></span>" + (enabled ? "<em>Habilitado no simulador</em>" : "<em>Indisponível para cálculo</em>") + "</label>";
     }).join("");
     var authorizationDate = context.autorizacao_snapshot_verificado_em ? formatDateTime(context.autorizacao_snapshot_verificado_em) : "verificação ainda não informada";
@@ -3102,7 +3106,7 @@
     byId("detailTitle").textContent = "Simulador de Impacto Financeiro";
     byId("detailSubtitle").textContent = displayText(sides.home.name + " × " + sides.away.name);
     byId("detailContent").setAttribute("data-detail-view", "financial-simulator:" + Number(state.simulator.eventId || 0));
-    byId("detailContent").innerHTML = "<div class=\"ie-financial-simulator\"><section class=\"ie-simulator-intro\"><span>Decisão mais consciente</span><strong>Compare consequências financeiras, não promessas de resultado.</strong><p>Referências globais são informativas. O cálculo exige casas autorizadas com cotações atuais, regras e limites verificados para este confronto.</p></section>"
+    byId("detailContent").innerHTML = "<div class=\"ie-financial-simulator\"><section class=\"ie-simulator-intro\"><span>Decisão mais consciente</span><strong>Compare consequências financeiras, não promessas de resultado.</strong><p>Referências globais são informativas. O cálculo usa casas autorizadas e cotações atuais. No modo de teste, origem declarada e limites desconhecidos são indicados sem impedir a simulação.</p></section>"
       + detailSection("Referência global anônima", renderGlobalReference(context.referencia_global, sides, true, context.odds_status && context.odds_status.referencia_global))
       + "<form data-financial-simulator-form data-event-id=\"" + escapeHtml(state.simulator.eventId) + "\"><section class=\"ie-simulator-fields\"><label><span>Nome da simulação</span><input type=\"text\" name=\"simulator_name\" maxlength=\"120\" value=\"" + escapeHtml(formState.name) + "\"></label><label><span>Valor total a considerar</span><div class=\"ie-money-input\"><b>R$</b><input type=\"number\" name=\"simulator_value\" min=\"0.01\" max=\"1000000000\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(Number(formState.value).toFixed(2)) + "\" required></div></label><label><span>Limite pessoal de perda</span><div class=\"ie-percent-input\"><input type=\"number\" name=\"simulator_loss_limit\" min=\"0\" max=\"100\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(formState.lossLimit) + "\" required><b>%</b></div><small>É um limite escolhido por você; não torna o cenário seguro.</small></label></section>"
       + "<fieldset class=\"ie-simulator-choice\"><legend>Casas brasileiras autorizadas <span id=\"simulatorHouseCount\" aria-live=\"polite\">" + escapeHtml(selectedCount) + " selecionada" + (selectedCount === 1 ? "" : "s") + "</span></legend><p>Somente casas com dados elegíveis aparecem para seleção, até 20 por cálculo; sem links, logotipos ou direcionamento.</p><label class=\"ie-simulator-search\">" + icon("search") + "<input type=\"search\" data-simulator-house-search aria-label=\"Buscar casa brasileira autorizada\" placeholder=\"Buscar pelo nome da casa\" autocomplete=\"off\"" + (authorizationValid ? "" : " disabled") + "></label><div class=\"ie-simulator-house-list\">" + housesHtml + "</div><button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"favorites\"" + (authorizationValid ? "" : " disabled data-simulator-locked") + ">Salvar seleção como minhas favoritas</button><small>Lista autorizada verificada em " + escapeHtml(authorizationDate) + ". Autorização regulatória não significa ausência de risco ou reclamações.</small></fieldset>"
