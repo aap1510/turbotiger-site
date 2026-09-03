@@ -1753,10 +1753,17 @@ body.ie-reordering-favorites {
   stroke-linecap: round;
   stroke-linejoin: round;
   transform: rotate(var(--ie-pull-rotation, 0deg));
+  transform-origin: 50% 50%;
+  transform-box: view-box;
 }
 
 .ie-pull-refresh.is-refreshing svg {
-  animation: ie-spin .8s linear infinite;
+  animation: ie-pull-spin .8s linear infinite;
+}
+
+@keyframes ie-pull-spin {
+  from { transform: rotate(var(--ie-pull-rotation, 0deg)); }
+  to { transform: rotate(calc(var(--ie-pull-rotation, 0deg) + 360deg)); }
 }
 
 .ie-modal {

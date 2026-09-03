@@ -658,6 +658,8 @@
   }
 
   function resetPersonalizedState(blocked) {
+    if (compareSelection) compareSelection.reset();
+    if (compareConfrontos) compareConfrontos.reset();
     serverClock = { epoch: NaN, tick: 0 };
     state.bootstrap = null;
     state.card = null;
@@ -1278,7 +1280,10 @@
     if ((hasScore || live) && statusText) center += "<span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>";
     if (dateText) center += "<span class=\"ie-match-date\">" + escapeHtml(dateText) + "</span>";
     var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Confronto", 25);
-    var actions = interactive === false || !id ? "" : "<div class=\"ie-match-actions\"><button type=\"button\" data-match-action=\"odds\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir cotações de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("chart") + "</button><button type=\"button\" data-match-action=\"analysis\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir análises de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("analysis") + "</button></div>";
+    var compareAction = typeof compareSelection !== "undefined" && compareSelection && String(item.esporte || "").toLowerCase() === "futebol"
+      && (scheduledStatus || status === "adiada") && !item.ao_vivo && startTimestamp > serverNow()
+      ? compareSelection.button(id, sides.home.name + " e " + sides.away.name, startTimestamp) : "";
+    var actions = interactive === false || !id ? "" : "<div class=\"ie-match-actions\"><button type=\"button\" data-match-action=\"odds\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir cotações de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("chart") + "</button>" + compareAction + "<button type=\"button\" data-match-action=\"analysis\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir análises de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("analysis") + "</button></div>";
     return "<article class=\"ie-feed-card ie-wide ie-match-card" + (live ? " is-live" : "") + (live && item.relogio && item.relogio.alem_regulamentar === true ? " is-regulation-exceeded" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "trophy") + "</span>" + escapeHtml(competition) + "</span>" + actions + "</div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name, "", sides.home.abbreviation) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name, "", sides.away.abbreviation) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div>" + renderScorePeriods(item, currentScoreShown) + "</article>";
   }
 
@@ -1499,6 +1504,7 @@
         html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-history-action=\"" + entry[0] + "\"><span class=\"ie-feed-icon\">" + icon(entry[3]) + "</span><span class=\"ie-entity-copy\"><strong>" + entry[1] + "</strong><span>" + entry[2] + "</span></span>" + icon("chevron") + "</button>");
       });
       html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-simulator-action=\"list\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span><span class=\"ie-entity-copy\"><strong>Simulações salvas</strong><span>Consulte as simulações da sua conta</span></span>" + icon("chevron") + "</button>");
+      html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-compare-open><span class=\"ie-feed-icon\">" + icon("chart") + "</span><span class=\"ie-entity-copy\"><strong>Comparar Confrontos</strong><span>Teste os cenários de até três jogos</span></span>" + icon("chevron") + "</button>");
     }
     var content = html.join("") || emptyState(filteredSection ? "Nenhuma informação disponível" : "Nenhum favorito neste esporte", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Acompanhe times ou competições deste esporte para montar o seu espaço.", false);
     byId("homeContent").innerHTML = modeSwitcher + content;
@@ -2712,6 +2718,7 @@
 
   function closeDetail(restoreFocus) {
     if (restoreFocus !== false && !automaticSaveNavigationAllowed()) return;
+    if (compareConfrontos && historyDetailView() === "compare") compareConfrontos.reset();
     var returnFocus = state.detailReturnFocus;
     byId("detailModal").hidden = true;
     byId("detailModal").setAttribute("aria-hidden", "true");
@@ -2738,6 +2745,7 @@
 
   function beginDetail(title, subtitle, pushCurrent) {
     var detailContent = byId("detailContent");
+    if (compareConfrontos && historyDetailView() === "compare") compareConfrontos.reset();
     var wasHidden = byId("detailModal").hidden;
     if (wasHidden) state.detailReturnFocus = document.activeElement;
     if (pushCurrent === true && !wasHidden) {
@@ -2927,6 +2935,7 @@
       + detailSection("Referência global anônima", renderGlobalReference(globalReference, sides, false, availability.referencia_global))
       + detailSection("Casas brasileiras autorizadas", renderBrazilianOdds(brazilianOdds, sides, availability.brasil))
       + simulatorAction
+      + "<section class=\"ie-simulator-entry\"><div><strong>Comparar Confrontos</strong><p>Distribuição e cenários combinados de até três jogos, com odds editáveis.</p></div><button type=\"button\" class=\"ie-button ie-button-secondary\" data-compare-open data-event-id=\"" + escapeHtml(eventId) + "\">Comparar Confrontos</button></section>"
       + "<p class=\"ie-odds-notice\">" + escapeHtml(data.odds_aviso || "Referências informativas, sem recomendação ou garantia de resultado.") + " O Turbo Tiger não abre casas, não usa links afiliados e não executa apostas.</p>";
   }
 
@@ -5231,7 +5240,22 @@
     document.addEventListener("touchcancel", release, { passive: true });
   }
 
+  var compareConfrontos = null;
+  var compareSelection = null;
+  function openCompareConfrontos(eventId) {
+    if (!compareConfrontos) compareConfrontos = window.TurboTigerCompare({
+      host: byId("detailContent"), rpc: rpc, now: serverNow,
+      active: function () { return !!state.session && !byId("detailModal").hidden; },
+      title: function (item) { var sides = matchSides(item); return item.titulo || item.nome_evento || ((sides.home.name || "Casa") + " × " + (sides.away.name || "Fora")); },
+      error: function (error) { return error && error.message && !/^[a-z_]+$/.test(error.message) ? error.message : friendlyError(error); },
+      begin: function () { beginDetail("Comparar Confrontos", "Simulação de impacto — apostas simples, pré-jogo", false); }
+    });
+    compareConfrontos.open(eventId || null);
+  }
+
   function setupEvents() {
+    compareSelection = window.TurboTigerCompareSelection({ root: document, now: serverNow,
+      active: function () { return !!state.session; }, open: openCompareConfrontos });
     // Prevent navigation/sharing from racing a pending privacy change.
     document.addEventListener("click", function (event) {
       if (event.target.closest("[data-autosave-retry]")) {
@@ -5689,6 +5713,12 @@
     }
 
     document.addEventListener("click", function (event) {
+      var compareButton = event.target.closest("[data-compare-open]");
+      if (compareButton) {
+        event.preventDefault(); event.stopPropagation(); detailGesture = null;
+        openCompareConfrontos(compareButton.getAttribute("data-event-id"));
+        return;
+      }
       var simulatorAction = event.target.closest("[data-simulator-action]");
       if (simulatorAction) {
         event.preventDefault();
