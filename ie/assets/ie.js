@@ -2939,17 +2939,22 @@
       + "<p class=\"ie-odds-notice\">" + escapeHtml(data.odds_aviso || "Referências informativas, sem recomendação ou garantia de resultado.") + " O Turbo Tiger não abre casas, não usa links afiliados e não executa apostas.</p>";
   }
 
-  function simulatorAvailableHouses(context) {
-    if (!context || context.autorizacao_snapshot_valido !== true) return [];
-    if (context.entrada_manual_habilitada === true && context.entrada_manual_ativa === true) return arrayOf(context.casas_autorizadas);
-    return arrayOf(context.casas_disponiveis).filter(function (house) {
+  function simulatorProviderHouses(context) {
+    return arrayOf(context && context.casas_disponiveis).filter(function (house) {
       return house.elegivel_para_calculo === true && Number(house.id_bet) > 0;
     });
   }
 
+  function simulatorAvailableHouses(context) {
+    if (!context || context.autorizacao_snapshot_valido !== true) return [];
+    if (context.entrada_manual_habilitada === true) return arrayOf(context.casas_autorizadas).filter(function (house) { return Number(house.id_bet) > 0; });
+    return simulatorProviderHouses(context);
+  }
+
   function simulatorMarketAvailable(market) {
-    if (market && market.entrada_manual_ativa === true) return market.codigo_mercado === "resultado_1x2" && market.habilitado_simulacao === true;
-    return !!market && market.habilitado_simulacao === true && market.elegivel_para_calculo === true;
+    if (!market || market.habilitado_simulacao !== true) return false;
+    if ((market.entrada_manual_habilitada === true || market.entrada_manual_ativa === true) && market.codigo_mercado === "resultado_1x2") return true;
+    return market.elegivel_para_calculo === true;
   }
 
   function simulatorCanOperate(context) {
@@ -2994,7 +2999,10 @@
     var simulation = context && context.simulacao || {};
     if (context && context.entrada_manual_habilitada === true) {
       context.entrada_manual_ativa = !!(simulation.resultado && simulation.resultado.modo_manual);
-      arrayOf(context.mercados).forEach(function (m) { m.entrada_manual_ativa = context.entrada_manual_ativa; });
+      arrayOf(context.mercados).forEach(function (m) {
+        m.entrada_manual_habilitada = true;
+        m.entrada_manual_ativa = context.entrada_manual_ativa;
+      });
     }
     var houses = simulatorAvailableHouses(context);
     var selectedHouses = arrayOf(simulation.ids_bets).map(Number).filter(function (id) { return houses.some(function (house) { return Number(house.id_bet) === id; }); });
@@ -3098,6 +3106,8 @@
     state.simulator.resultStale = true;
     var current = byId("simulatorResult");
     if (current) current.outerHTML = renderSimulatorStaleResult();
+    var saveButton = document.querySelector('[data-simulator-action="save"]');
+    if (saveButton) saveButton.hidden = true;
   }
 
   function renderSavedSimulations(items, currentId) {
@@ -3121,26 +3131,29 @@
     var future = simulatorEventIsFuture(context);
     var authorizationValid = context.autorizacao_snapshot_valido === true;
     var houses = simulatorAvailableHouses(context);
+    var providerHouses = simulatorProviderHouses(context);
     var availableHouseIds = houses.map(function (house) { return Number(house.id_bet || 0); });
     var selectedCount = formState.houseIds.filter(function (id) { return availableHouseIds.indexOf(Number(id)) >= 0; }).length;
     var housesHtml = houses.length ? houses.map(function (house) {
       var id = Number(house.id_bet || 0);
       var checked = formState.houseIds.indexOf(id) >= 0;
-      var status = testMode ? "Teste: origem brasileira declarada pela fonte; limites desconhecidos não bloqueiam" : "Cotações completas, regras e limites verificados para este confronto";
-      if (manualMode) status = house.tem_cotacao_elegivel ? "Odds da fonte disponíveis para editar" : "Sem integração de odds: preencha manualmente";
+      var hasProviderOdds = providerHouses.some(function (available) { return Number(available.id_bet) === id; });
+      var status = hasProviderOdds ? (testMode ? "Teste: origem brasileira declarada pela fonte; limites desconhecidos não bloqueiam" : "Odds da fonte disponíveis para este confronto") : "Sem cotação da fonte: você pode informar as odds observadas";
       if (!manualMode && testMode && context.simulador.cotacoes_desatualizadas === true) status += ". Cotações desatualizadas: usando a última coleta para teste";
       return "<label class=\"ie-simulator-house\" data-simulator-house-row data-house-search-name=\"" + escapeHtml(normalizeSearchText(house.bet || "")) + "\"><input type=\"checkbox\" name=\"simulator_bet\" value=\"" + escapeHtml(id) + "\"" + (checked ? " checked" : "") + "><span><strong>" + escapeHtml(house.bet || "Casa autorizada") + "</strong><small>" + escapeHtml(status) + "</small></span>" + (house.favorita === true ? "<em>Favorita</em>" : "") + "</label>";
     }).join("") : "<div class=\"ie-simulator-inline-empty\">" + escapeHtml(authorizationValid ? "Nenhuma casa possui dados elegíveis para este confronto. A lista regulatória não será oferecida como se tivesse cotações disponíveis." : "A lista oficial brasileira precisa ser atualizada antes de novos cálculos.") + "</div>";
     var marketsHtml = arrayOf(context.mercados).map(function (market) {
       var enabled = simulatorMarketAvailable(market);
       var selected = enabled && simulatorMarketSelected(formState, market.codigo_mercado);
-      var availability = enabled ? (manualMode ? "Dados informados pelo usuário · regras não verificadas" : testMode ? "Teste teórico com dados da fonte, sem confirmação de aceitação" : "Conjunto completo, regras e limites verificados") : market.mensagem || "Sem conjunto brasileiro elegível para cálculo";
+      var availability = enabled ? (market.elegivel_para_calculo === true ? (testMode ? "Teste teórico com dados da fonte, sem confirmação de aceitação" : "Dados da fonte disponíveis") : "Pode ser preenchido com odds observadas por você") : market.mensagem || "Sem conjunto brasileiro elegível para cálculo";
       return "<label class=\"ie-simulator-market-option" + (enabled ? "" : " is-disabled") + "\"><input type=\"checkbox\" name=\"simulator_market\" value=\"" + escapeHtml(market.codigo_mercado) + "\" data-period=\"" + escapeHtml(market.periodo_codigo || "90_minutos") + "\" data-line=\"\"" + (selected ? " checked" : "") + (enabled ? "" : " disabled") + "><span><strong>" + escapeHtml(market.nome_mercado || market.codigo_mercado) + "</strong><small>" + escapeHtml((market.periodo_codigo === "90_minutos" ? "90 minutos · " : "") + availability) + "</small></span>" + (enabled ? "<em>Habilitado no simulador</em>" : "<em>Indisponível para cálculo</em>") + "</label>";
     }).join("");
     var authorizationDate = context.autorizacao_snapshot_verificado_em ? formatDateTime(context.autorizacao_snapshot_verificado_em) : "verificação ainda não informada";
     var canOperate = simulatorCanOperate(context);
+    var canPrepare = canOperate || context.entrada_manual_habilitada === true && future && authorizationValid && houses.length > 0 && arrayOf(context.mercados).some(simulatorMarketAvailable);
     var currentId = formState.idSimulation || null;
     var result = state.simulator.result || context.simulacao && context.simulacao.resultado || null;
+    var canSave = state.simulator.resultValidated === true && !state.simulator.resultStale && !!result;
     if (manualMode) formState.bell = false;
     byId("detailTitle").textContent = "Simulador de Impacto Financeiro";
     byId("detailSubtitle").textContent = displayText(sides.home.name + " × " + sides.away.name);
@@ -3148,22 +3161,18 @@
     byId("detailContent").innerHTML = "<div class=\"ie-financial-simulator\"><section class=\"ie-simulator-intro\"><span>Decisão mais consciente</span><strong>Compare consequências financeiras, não promessas de resultado.</strong><p>Referências globais são informativas. O cálculo usa casas autorizadas e odds da fonte ou informadas por você. No modo de teste, origem declarada e limites desconhecidos são indicados sem impedir a simulação.</p></section>"
       + detailSection("Referência global anônima", renderGlobalReference(context.referencia_global, sides, true, context.odds_status && context.odds_status.referencia_global))
       + "<form data-financial-simulator-form data-event-id=\"" + escapeHtml(state.simulator.eventId) + "\"><section class=\"ie-simulator-fields\"><label><span>Nome da simulação</span><input type=\"text\" name=\"simulator_name\" maxlength=\"120\" value=\"" + escapeHtml(formState.name) + "\"></label><label><span>Valor total a considerar</span><div class=\"ie-money-input\"><b>R$</b><input type=\"number\" name=\"simulator_value\" min=\"0.01\" max=\"1000000000\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(Number(formState.value).toFixed(2)) + "\" required></div></label><label><span>Limite pessoal de perda</span><div class=\"ie-percent-input\"><input type=\"number\" name=\"simulator_loss_limit\" min=\"0\" max=\"100\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(formState.lossLimit) + "\" required><b>%</b></div><small>É um limite escolhido por você; não torna o cenário seguro.</small></label></section>"
-      + "<fieldset class=\"ie-simulator-choice\"><legend>Casas brasileiras autorizadas <span id=\"simulatorHouseCount\" aria-live=\"polite\">" + escapeHtml(selectedCount) + " selecionada" + (selectedCount === 1 ? "" : "s") + "</span></legend><p>" + (manualMode ? "Escolha até 20 casas autorizadas, inclusive sem integração de odds." : "Somente casas com dados elegíveis aparecem para seleção, até 20 por cálculo.") + " Sem links, logotipos ou direcionamento.</p><label class=\"ie-simulator-search\">" + icon("search") + "<input type=\"search\" data-simulator-house-search aria-label=\"Buscar casa brasileira autorizada\" placeholder=\"Buscar pelo nome da casa\" autocomplete=\"off\"" + (authorizationValid ? "" : " disabled") + "></label><div class=\"ie-simulator-house-list\">" + housesHtml + "</div><button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"favorites\"" + (authorizationValid ? "" : " disabled data-simulator-locked") + ">Salvar seleção como minhas favoritas</button><small>Lista autorizada verificada em " + escapeHtml(authorizationDate) + ". Autorização regulatória não significa ausência de risco ou reclamações.</small></fieldset>"
+      + "<fieldset class=\"ie-simulator-choice\"><legend>Casas brasileiras autorizadas <span id=\"simulatorHouseCount\" aria-live=\"polite\">" + escapeHtml(selectedCount) + " selecionada" + (selectedCount === 1 ? "" : "s") + "</span></legend><p>Escolha até 20 casas. As cotações disponíveis serão exibidas automaticamente e as ausentes poderão ser informadas por você. Sem links, logotipos ou direcionamento.</p><label class=\"ie-simulator-search\">" + icon("search") + "<input type=\"search\" data-simulator-house-search aria-label=\"Buscar casa brasileira autorizada\" placeholder=\"Buscar pelo nome da casa\" autocomplete=\"off\"" + (authorizationValid ? "" : " disabled") + "></label><div class=\"ie-simulator-house-list\">" + housesHtml + "</div><button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"favorites\"" + (authorizationValid ? "" : " disabled data-simulator-locked") + ">Salvar seleção como minhas favoritas</button><small>Lista autorizada verificada em " + escapeHtml(authorizationDate) + ". Autorização regulatória não significa ausência de risco ou reclamações.</small></fieldset>"
       + "<fieldset class=\"ie-simulator-choice\"><legend>Mercados</legend><p>Você pode escolher um ou mais mercados quando suas regras estiverem normalizadas. O orçamento é dividido entre eles; probabilidades nunca são somadas.</p><div class=\"ie-simulator-market-options\">" + marketsHtml + "</div></fieldset>"
-      + "<section class=\"ie-simulator-bell\"><div>" + icon("bell") + "<span><strong>Sino exclusivo desta simulação</strong><small>A avaliação segue a frequência dos provedores e não é em tempo real.</small></span></div><label class=\"ie-switch\"><input type=\"checkbox\" name=\"simulator_bell\" aria-label=\"Ativar sino desta simulação\"" + (formState.bell ? " checked" : "") + "><span aria-hidden=\"true\"></span></label><label class=\"ie-simulator-alert-margin\"><span>Avisar quando a perda máxima mudar pelo menos</span><div class=\"ie-percent-input\"><input type=\"number\" name=\"simulator_alert_margin\" min=\"0.01\" max=\"100\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(formState.alertMargin) + "\"" + (formState.bell ? "" : " disabled") + "><b>p.p.</b></div><small>Ao salvar novamente, o cenário atual passa a ser a nova referência.</small></label></section>"
+      + "<section class=\"ie-simulator-bell\"><label class=\"ie-simulator-bell-toggle\"><span class=\"ie-simulator-bell-copy\">" + icon("bell") + "<span><strong>Sino exclusivo desta simulação</strong><small data-simulator-bell-help>" + (manualMode ? "Odds alteradas manualmente não podem ser monitoradas automaticamente." : "Toque nesta área para ativar ou desativar o aviso desta simulação.") + "</small></span></span><span class=\"ie-switch\"><input type=\"checkbox\" name=\"simulator_bell\" aria-label=\"Ativar sino desta simulação\"" + (formState.bell ? " checked" : "") + (manualMode ? " disabled" : "") + "><span aria-hidden=\"true\"></span></span></label><label class=\"ie-simulator-alert-margin\"><span>Avisar quando a perda máxima mudar pelo menos</span><div class=\"ie-percent-input\"><input type=\"number\" name=\"simulator_alert_margin\" min=\"0.01\" max=\"100\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(formState.alertMargin) + "\"" + (formState.bell && !manualMode ? "" : " disabled") + "><b>p.p.</b></div><small>Ao salvar novamente, o cenário atual passa a ser a nova referência.</small></label></section>"
       + (future ? "" : "<div class=\"ie-simulator-closed\">O horário de início não está confirmado no futuro. Novos cálculos e salvamentos ficam bloqueados.</div>")
       + (authorizationValid ? "" : "<div class=\"ie-simulator-closed\">A verificação da lista oficial brasileira está vencida ou indisponível. O simulador permanece bloqueado preventivamente até a atualização.</div>")
-      + "<div class=\"ie-simulator-actions\"><button type=\"submit\" class=\"ie-button ie-button-primary\" data-simulator-working" + (canOperate ? "" : " disabled data-simulator-locked") + ">Calcular impacto</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"save\" data-simulator-working" + (canOperate ? "" : " disabled data-simulator-locked") + ">Salvar simulação</button><span class=\"ie-simulator-busy-status\" data-simulator-busy-label aria-live=\"polite\"></span></div></form>"
-      + (state.simulator.resultStale ? renderSimulatorStaleResult() : result && (!canOperate || state.simulator.resultValidated !== true) ? renderSimulatorUnverifiedResult(context) : result ? renderSimulatorResult(result) : canOperate ? renderSimulatorResult(null) : "<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty\" aria-live=\"polite\"><strong>Cálculo indisponível</strong><p>" + escapeHtml(context.simulador && context.simulador.mensagem || "Aguardando dados brasileiros atuais e completos, com regras e limites verificados para este confronto.") + "</p></section>")
+      + "<div class=\"ie-simulator-actions\"><button type=\"submit\" class=\"ie-button ie-button-primary\" data-simulator-working" + (canOperate ? "" : " disabled data-simulator-locked") + ">Calcular impacto</button>" + (canSave ? "<button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"save\" data-simulator-working>Salvar simulação</button>" : "") + "<span class=\"ie-simulator-busy-status\" data-simulator-busy-label aria-live=\"polite\"></span></div></form>"
+      + (state.simulator.resultStale ? renderSimulatorStaleResult() : result && (!canOperate || state.simulator.resultValidated !== true) ? renderSimulatorUnverifiedResult(context) : result ? renderSimulatorResult(result) : canPrepare ? renderSimulatorResult(null) : "<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty\" aria-live=\"polite\"><strong>Cálculo indisponível</strong><p>" + escapeHtml(context.simulador && context.simulador.mensagem || "Aguardando dados brasileiros atuais e completos, com regras e limites verificados para este confronto.") + "</p></section>")
       + detailSection("Simulações deste confronto", renderSavedSimulations(context.simulacoes_salvas, currentId))
       + "</div>";
     var renderedForm = context.entrada_manual_habilitada === true ? document.querySelector("[data-financial-simulator-form]") : null;
     if (context.entrada_manual_habilitada === true && renderedForm) {
-      renderedForm.insertAdjacentHTML("afterbegin", '<label class="ie-simulator-choice"><span>Origem das odds</span><select name="simulator_input_mode"><option value="provider"' + (!manualMode ? ' selected' : '') + '>Dados do provedor</option><option value="manual"' + (manualMode ? ' selected' : '') + '>Editar ou digitar odds</option></select></label>');
-      if (manualMode) {
-        renderedForm.querySelector(".ie-simulator-bell").hidden = true;
-        renderedForm.querySelector(".ie-simulator-actions").insertAdjacentHTML("beforebegin", renderSimulatorManualOdds(context, formState));
-      }
+      renderedForm.querySelector(".ie-simulator-actions").insertAdjacentHTML("beforebegin", renderSimulatorManualOdds(context, formState));
     }
     if (state.simulator.busy) setSimulatorBusy(true);
     else updateSimulatorAvailability();
@@ -3172,31 +3181,47 @@
   function renderSimulatorManualOdds(context, formState) {
     var houses = simulatorAvailableHouses(context).filter(function (h) { return formState.houseIds.indexOf(Number(h.id_bet)) >= 0; });
     var sides = matchSides(context.evento || {});
+    var bestBySelection = {};
+    houses.forEach(function (house) {
+      var group = arrayOf(context.cotacoes_brasil).find(function (g) { return Number(g.id_bet) === Number(house.id_bet) && g.codigo_mercado === "resultado_1x2"; }) || {};
+      arrayOf(group.selecoes).forEach(function (source) {
+        var code = String(source.codigo_selecao || "");
+        var odd = Number(source.valor);
+        if (odd > 1 && (!bestBySelection[code] || odd > bestBySelection[code])) bestBySelection[code] = odd;
+      });
+    });
     var rows = houses.map(function (house) {
       var group = arrayOf(context.cotacoes_brasil).find(function (g) { return Number(g.id_bet) === Number(house.id_bet) && g.codigo_mercado === "resultado_1x2"; }) || {};
-      return '<article class="ie-manual-house"><strong>' + escapeHtml(house.bet) + '</strong><div class="ie-manual-grid">' + ["casa", "empate", "fora"].map(function (code) {
+      return '<article class="ie-manual-house"><div class="ie-manual-grid">' + ["casa", "empate", "fora"].map(function (code) {
         var saved = arrayOf(formState.manualOdds).find(function (r) { return Number(r.id_bet) === Number(house.id_bet) && r.codigo_selecao === code; });
         var source = arrayOf(group.selecoes).find(function (s) { return s.codigo_selecao === code; }) || {};
         if (!saved && context.simulacao && context.simulacao.resultado && context.simulacao.resultado.modo_manual === true && arrayOf(context.simulacao.ids_bets).map(Number).indexOf(Number(house.id_bet)) >= 0) source = {};
-        var value = saved ? saved.odd : source.valor == null ? "" : source.valor;
+        var value = saved && saved.informada_usuario !== false ? saved.odd : "";
         var reference = saved ? saved.id_cotacao_referencia : source.id_cotacao;
         var base = saved ? saved.odd_referencia : source.valor;
         var observed = saved ? saved.observado_em_fonte : source.observado_em;
-        var origin = !reference ? "Manual" : Number(String(value).replace(',', '.')) === Number(base) ? "Provedor (cópia)" : "Editada pelo usuário";
-        return '<label><span>' + escapeHtml(outcomeCopy(code, sides).name) + '</span><input type="text" inputmode="decimal" maxlength="12" autocomplete="off" data-manual-odd data-bet="' + escapeHtml(house.id_bet) + '" data-selection="' + code + '" data-reference="' + escapeHtml(reference || "") + '" data-base="' + escapeHtml(base == null ? "" : base) + '" data-observed="' + escapeHtml(observed || "") + '" value="' + escapeHtml(value) + '" placeholder="Ex.: 3,25"><small data-manual-origin>' + origin + '</small>' + (observed ? '<small>Coleta: ' + escapeHtml(formatDateTime(observed)) + '</small>' : '') + '</label>';
+        var sourceOdd = Number(base) > 1 ? formatOdd(base) : "Sem cotação";
+        var best = Number(base) > 1 && Number(base) === Number(bestBySelection[code]);
+        return '<label class="ie-manual-odd' + (best ? ' is-best' : '') + '"><span>' + escapeHtml(outcomeCopy(code, sides).name) + '</span><small class="ie-manual-house-name">' + escapeHtml(house.bet || "Casa autorizada") + '</small><strong>' + escapeHtml(sourceOdd) + (best ? '<em>Melhor odd</em>' : '') + '</strong><input type="text" inputmode="decimal" maxlength="12" autocomplete="off" aria-label="Informar outra odd para ' + escapeHtml(outcomeCopy(code, sides).name) + ' em ' + escapeHtml(house.bet || "casa autorizada") + '" data-manual-odd data-bet="' + escapeHtml(house.id_bet) + '" data-selection="' + code + '" data-reference="' + escapeHtml(reference || "") + '" data-base="' + escapeHtml(base == null ? "" : base) + '" data-observed="' + escapeHtml(observed || "") + '" value="' + escapeHtml(value) + '" placeholder="Digite para substituir"><small data-manual-origin>' + (value === "" ? "Usando a odd exibida" : "Odd informada por você") + '</small>' + (observed ? '<small>Coleta: ' + escapeHtml(formatDateTime(observed)) + '</small>' : '') + '</label>';
       }).join("") + '</div></article>';
     }).join("");
-    return '<fieldset class="ie-simulator-choice" data-manual-odds><legend>Odds para simular antes de apostar</legend><p>Edite as cotações ou digite os números. Campos vazios não entram no cálculo; informe ao menos uma odd para Casa, Empate e Fora no conjunto das casas selecionadas.</p>' +
-      (rows || '<p>Selecione as casas acima, mesmo que não tenham integração de odds.</p>') +
-      '<label class="ie-manual-confirm"><input type="checkbox" name="simulator_manual_rules"' + (formState.manualRules ? ' checked' : '') + '>Confirmo que os dados correspondem a este confronto e ao resultado em 90 minutos, incluindo acréscimos e excluindo prorrogação e pênaltis.</label>' +
-      '<p>Condições de liquidação, limites e aceitação não foram verificados. O sino fica desativado porque números digitados não são monitorados automaticamente.</p></fieldset>';
+    var hasOverrides = arrayOf(formState.manualOdds).some(function (row) { return row.informada_usuario !== false && String(row.odd == null ? "" : row.odd).trim() !== ""; });
+    return '<fieldset class="ie-simulator-choice" data-manual-odds><legend>Odds das casas selecionadas</legend><p>As maiores cotações recebidas estão destacadas. Se alguma estiver diferente no momento, digite a nova odd no campo logo abaixo.</p>' +
+      (rows || '<p>Selecione uma ou mais casas acima para visualizar ou informar as odds.</p>') +
+      '<label class="ie-manual-confirm" data-manual-confirmation' + (hasOverrides ? '' : ' hidden') + '><input type="checkbox" name="simulator_manual_rules"' + (formState.manualRules ? ' checked' : '') + '>Confirmo que os dados informados correspondem a este confronto e ao resultado em 90 minutos, incluindo acréscimos e excluindo prorrogação e pênaltis.</label>' +
+      '<p>Condições de liquidação, limites e aceitação não foram verificadas. Ao informar uma odd manualmente, o sino fica indisponível porque esse número não pode ser monitorado automaticamente.</p></fieldset>';
   }
 
   function readSimulatorManualOdds(form) {
     return all("[data-manual-odd]", form).map(function (input) {
-      return { id_bet: Number(input.getAttribute("data-bet")), codigo_selecao: input.getAttribute("data-selection"), odd: input.value.trim(),
+      var informed = input.value.trim();
+      return { id_bet: Number(input.getAttribute("data-bet")), codigo_selecao: input.getAttribute("data-selection"), odd: informed || input.getAttribute("data-base"), informada_usuario: informed !== "",
         id_cotacao_referencia: Number(input.getAttribute("data-reference")) || null, odd_referencia: input.getAttribute("data-base"), observado_em_fonte: input.getAttribute("data-observed") || null };
     });
+  }
+
+  function simulatorHasManualOverrides(form) {
+    return !!form && all("[data-manual-odd]", form).some(function (input) { return input.value.trim() !== ""; });
   }
 
   function readSimulatorForm() {
@@ -3220,6 +3245,7 @@
       houseIds: houseIds,
       manualOdds: form.querySelector("[data-manual-odds]") ? readSimulatorManualOdds(form) : arrayOf(state.simulator.form && state.simulator.form.manualOdds),
       manualRules: !!(form.elements.simulator_manual_rules && form.elements.simulator_manual_rules.checked),
+      manualOverride: simulatorHasManualOverrides(form),
       markets: markets,
       bell: bell,
       alertMargin: alertMargin
@@ -3236,7 +3262,9 @@
     if (!values.houseIds.every(function (id) { return simulatorAvailableHouses(state.simulator.context).some(function (house) { return Number(house.id_bet) === id; }); })) throw new Error("cotacoes_brasileiras_indisponiveis");
     if (!values.markets.every(function (selected) { return arrayOf(state.simulator.context.mercados).some(function (market) { return simulatorMarketAvailable(market) && market.codigo_mercado === selected.codigo_mercado; }); })) throw new Error("cotacoes_brasileiras_indisponiveis");
     if (values.bell && !(values.alertMargin >= .01 && values.alertMargin <= 100)) throw new Error("margem_alerta_invalida");
-    if (state.simulator.context.entrada_manual_ativa === true) {
+    state.simulator.context.entrada_manual_ativa = values.manualOverride;
+    arrayOf(state.simulator.context.mercados).forEach(function (market) { market.entrada_manual_ativa = values.manualOverride; });
+    if (values.manualOverride) {
       if (!values.manualRules) throw new Error("confirme_regras_simulacao");
       var rows = values.manualOdds.filter(function (row) { return values.houseIds.indexOf(row.id_bet) >= 0 && String(row.odd).trim() !== ""; });
       if (!rows.every(function (row) { return /^\d+(?:[.,]\d{1,4})?$/.test(String(row.odd)) && Number(String(row.odd).replace(',', '.')) > 1 && Number(String(row.odd).replace(',', '.')) <= 100000; })) throw new Error("cotacao_invalida");
@@ -3245,6 +3273,10 @@
       values.markets = [{ codigo_mercado: "resultado_1x2", periodo_codigo: "90_minutos", linha: "", regras_declaradas_usuario: true,
         cotacoes_informadas: rows.map(function (row) { return { id_bet: row.id_bet, codigo_selecao: row.codigo_selecao, odd: Number(String(row.odd).replace(',', '.')), id_cotacao_referencia: row.id_cotacao_referencia || null }; }) }];
       values.bell = false;
+    } else {
+      var providerHouses = simulatorProviderHouses(state.simulator.context);
+      if (!values.houseIds.every(function (id) { return providerHouses.some(function (house) { return Number(house.id_bet) === id; }); })) throw new Error("cotacoes_brasileiras_indisponiveis");
+      if (!values.markets.every(function (selected) { return arrayOf(state.simulator.context.mercados).some(function (market) { return market.habilitado_simulacao === true && market.elegivel_para_calculo === true && market.codigo_mercado === selected.codigo_mercado; }); })) throw new Error("cotacoes_brasileiras_indisponiveis");
     }
     return values;
   }
@@ -3299,14 +3331,22 @@
     });
     var count = all("input[name=simulator_bet]:checked:not(:disabled)", form).length;
     var selectedMarkets = all("input[name=simulator_market]:checked:not(:disabled)", form).length;
-    var ready = simulatorCanOperate(context) && count > 0 && count <= 20 && selectedMarkets > 0;
+    var selectedHouseIds = all("input[name=simulator_bet]:checked:not(:disabled)", form).map(function (input) { return Number(input.value); });
+    var selectedMarketCodes = all("input[name=simulator_market]:checked:not(:disabled)", form).map(function (input) { return input.value; });
+    var manual = simulatorHasManualOverrides(form);
+    context.entrada_manual_ativa = manual;
+    arrayOf(context.mercados).forEach(function (market) { market.entrada_manual_ativa = manual; });
+    var providerHouses = simulatorProviderHouses(context);
+    var providerReady = !!context.simulador && context.simulador.disponivel === true && selectedHouseIds.every(function (id) { return providerHouses.some(function (house) { return Number(house.id_bet) === id; }); }) && selectedMarketCodes.every(function (code) { return arrayOf(context.mercados).some(function (market) { return market.codigo_mercado === code && market.habilitado_simulacao === true && market.elegivel_para_calculo === true; }); });
+    var manualReady = manual && selectedMarketCodes.length === 1 && selectedMarketCodes[0] === "resultado_1x2";
+    var ready = simulatorCanOperate(context) && count > 0 && count <= 20 && selectedMarkets > 0 && (manual ? manualReady : providerReady);
     all("[data-simulator-working]", form).forEach(function (button) { button.disabled = !ready; });
     var favorites = form.querySelector("[data-simulator-action=favorites]");
     if (favorites) favorites.disabled = availableIds.length === 0;
     var search = form.querySelector("[data-simulator-house-search]");
     if (search) search.disabled = availableIds.length === 0;
-    form.elements.simulator_bell.disabled = context.entrada_manual_ativa === true || !simulatorCanOperate(context);
-    form.elements.simulator_alert_margin.disabled = context.entrada_manual_ativa === true || !simulatorCanOperate(context) || !form.elements.simulator_bell.checked;
+    form.elements.simulator_bell.disabled = manual || !simulatorCanOperate(context);
+    form.elements.simulator_alert_margin.disabled = manual || !simulatorCanOperate(context) || !form.elements.simulator_bell.checked;
   }
 
   function simulatorOperationIsCurrent(operationState, view) {
@@ -3403,7 +3443,7 @@
   }
 
   async function saveFinancialSimulation() {
-    if (state.simulator.busy) return;
+    if (state.simulator.busy || state.simulator.resultValidated !== true || state.simulator.resultStale || !state.simulator.result) return;
     var operationState = state.simulator;
     var view = "financial-simulator:" + Number(operationState.eventId || 0);
     try {
@@ -5386,9 +5426,26 @@
     document.addEventListener("input", function (event) {
       if (event.target.matches && event.target.matches("[data-manual-odd]")) {
         var manualInput = event.target;
-        var origin = !manualInput.getAttribute("data-reference") ? "Manual" : Number(manualInput.value.replace(',', '.')) === Number(manualInput.getAttribute("data-base")) ? "Provedor (cópia)" : "Editada pelo usuário";
+        var origin = manualInput.value.trim() === "" ? "Usando a odd exibida" : "Odd informada por você";
         manualInput.parentNode.querySelector("[data-manual-origin]").textContent = origin;
+        var simulatorForm = manualInput.closest("[data-financial-simulator-form]");
+        var manual = simulatorHasManualOverrides(simulatorForm);
+        state.simulator.context.entrada_manual_ativa = manual;
+        arrayOf(state.simulator.context.mercados).forEach(function (market) { market.entrada_manual_ativa = manual; });
+        var confirmation = simulatorForm.querySelector("[data-manual-confirmation]");
+        if (confirmation) {
+          confirmation.hidden = !manual;
+          if (!manual) confirmation.querySelector("input").checked = false;
+        }
+        if (manual) {
+          all('input[name="simulator_market"]', simulatorForm).forEach(function (input) { input.checked = input.value === "resultado_1x2"; });
+          simulatorForm.elements.simulator_bell.checked = false;
+        }
+        var bellHelp = simulatorForm.querySelector("[data-simulator-bell-help]");
+        if (bellHelp) bellHelp.textContent = manual ? "Odds alteradas manualmente não podem ser monitoradas automaticamente." : "Toque nesta área para ativar ou desativar o aviso desta simulação.";
         invalidateSimulatorResult();
+        updateSimulatorSuggestedName();
+        updateSimulatorAvailability();
         return;
       }
       if (event.target.name === "simulator_name" && state.simulator.form) {
@@ -5440,19 +5497,6 @@
       else updateHistoryTeamSearch(query);
     });
     document.addEventListener("change", function (event) {
-      if (event.target.name === "simulator_input_mode") {
-        var draft = readSimulatorForm();
-        var manual = event.target.value === "manual";
-        state.simulator.context.entrada_manual_ativa = manual;
-        arrayOf(state.simulator.context.mercados).forEach(function (m) { m.entrada_manual_ativa = manual; });
-        draft.houseIds = draft.houseIds.filter(function (id) { return simulatorAvailableHouses(state.simulator.context).some(function (h) { return Number(h.id_bet) === id; }); });
-        draft.markets = arrayOf(state.simulator.context.mercados).filter(simulatorMarketAvailable).slice(0, 1).map(function (m) { return { codigo_mercado: m.codigo_mercado, periodo_codigo: m.periodo_codigo, linha: "" }; });
-        if (manual) draft.bell = false;
-        state.simulator.form = draft;
-        invalidateSimulatorResult();
-        renderFinancialSimulator();
-        return;
-      }
       if (event.target.name === "simulator_manual_rules") { invalidateSimulatorResult(); return; }
       var storyForm = event.target.closest && event.target.closest("[data-sports-story-form]");
       if (storyForm) { saveMySportsStory(storyForm); return; }
@@ -5473,7 +5517,7 @@
         var countLabel = byId("simulatorHouseCount");
         if (countLabel) countLabel.textContent = selectedCount + " selecionada" + (selectedCount === 1 ? "" : "s");
         invalidateSimulatorResult();
-        if (state.simulator.context.entrada_manual_ativa === true) {
+        if (state.simulator.context.entrada_manual_habilitada === true) {
           state.simulator.form = readSimulatorForm();
           var manualPanel = document.querySelector("[data-manual-odds]");
           if (manualPanel) manualPanel.outerHTML = renderSimulatorManualOdds(state.simulator.context, state.simulator.form);

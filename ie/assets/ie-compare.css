@@ -5,7 +5,8 @@
 .ie-compare p { margin:0; line-height:1.6; color:#b8bfc8; }
 .ie-compare [data-cmp-result] { display:grid; gap:14px; }
 .ie-compare label { display:grid; gap:8px; font-size:13px; min-width:0; }
-.ie-compare input:not([type=checkbox]),.ie-compare select { box-sizing:border-box; width:100%; min-width:0; padding:12px; border:1px solid #3b414a; border-radius:10px; background:#161a20; color:#fff; font:inherit; }
+.ie-compare input:not([type=checkbox]),.ie-compare select { box-sizing:border-box; width:100%; min-width:0; padding:12px; border:1px solid #3b414a; border-radius:10px; background-color:#161a20; color:#fff; font:inherit; }
+.ie-compare select { padding-right:46px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m7 9 5 5 5-5' fill='none' stroke='%239b9da3' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; background-size:14px 14px; -webkit-appearance:none; appearance:none; }
 .ie-compare input[type=checkbox] { accent-color:#efbc62; width:18px; height:18px; }
 .ie-compare-settings { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
 .ie-compare-auto,.ie-compare-games,.ie-compare-save { display:grid; gap:14px; }

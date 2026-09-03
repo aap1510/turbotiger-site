@@ -2701,8 +2701,6 @@ body.ie-reordering-favorites {
 
 .ie-simulator-bell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
   gap: 12px;
   padding: 14px;
   border: 1px solid var(--ie-border);
@@ -2710,21 +2708,39 @@ body.ie-reordering-favorites {
   background: var(--ie-surface-raised);
 }
 
-.ie-simulator-bell > div:first-child {
+.ie-simulator-bell-toggle {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.ie-simulator-bell-toggle:has(input:disabled) {
+  cursor: not-allowed;
+}
+
+.ie-simulator-bell-copy {
   min-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.ie-simulator-bell > div:first-child > svg {
+.ie-simulator-bell-copy > svg {
   flex: 0 0 auto;
   width: 20px;
   height: 20px;
   color: var(--ie-gold);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.ie-simulator-bell > div:first-child > span {
+.ie-simulator-bell-copy > span {
   display: grid;
   gap: 3px;
 }

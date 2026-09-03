@@ -16,11 +16,13 @@
   button.hidden = true;
   close.parentNode.insertBefore(button, close);
 
-  function isSimulator() {
-    return !modal.hidden && /^financial-simulator:\d+$/.test(content.getAttribute("data-detail-view") || "");
+  function supportsSplitView() {
+    var view = content.getAttribute("data-detail-view") || "";
+    return !modal.hidden &&
+      (/^financial-simulator:\d+$/.test(view) || view === "compare");
   }
   function render() {
-    button.hidden = !isSimulator();
+    button.hidden = !supportsSplitView();
     button.disabled = pending;
     button.setAttribute("aria-pressed", String(active));
     button.setAttribute("aria-label", active ? "Ocultar navegador das bets" : "Mostrar navegador das bets em tela dividida");
@@ -38,17 +40,17 @@
     }, 5000);
   }
   button.addEventListener("click", function () {
-    if (isSimulator() && !pending) request(!active);
+    if (supportsSplitView() && !pending) request(!active);
   });
   window.addEventListener("turbotiger:simulator-bets", function (event) {
     clearTimeout(timeout);
     pending = false;
     active = !!(event.detail && event.detail.visible === true);
-    if (active && !isSimulator()) request(false);
+    if (active && !supportsSplitView()) request(false);
     else render();
   });
   new MutationObserver(function () {
-    if (!isSimulator() && (active || pending)) request(false);
+    if (!supportsSplitView() && (active || pending)) request(false);
     render();
   }).observe(content, { attributes: true, attributeFilter: ["data-detail-view"] });
   new MutationObserver(function () {
