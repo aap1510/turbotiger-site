@@ -22,6 +22,22 @@
 
   var ALERT_TIMES = [15, 30, 60, 120];
 
+  // Somente respostas autenticadas do servidor ajustam este relogio.
+  // performance.now mede duracao, sem depender da data/fuso do aparelho.
+  var serverClock = { epoch: NaN, tick: 0 };
+  function syncServerClock(value) {
+    if (!/(?:Z|[+-]\d{2}:\d{2})$/i.test(String(value || ""))) return;
+    var epoch = Date.parse(String(value || ""));
+    if (!Number.isFinite(epoch)) return;
+    if (Number.isFinite(serverClock.epoch) && epoch < serverClock.epoch) return;
+    serverClock.epoch = Number.isFinite(serverClock.epoch) ? Math.max(epoch, serverNow()) : epoch;
+    serverClock.tick = performance.now();
+  }
+  function serverNow() {
+    if (!Number.isFinite(serverClock.epoch)) return NaN;
+    return serverClock.epoch + Math.max(0, performance.now() - serverClock.tick);
+  }
+
   function emptyHistoryContributionState() {
     return {
       yearStart: null,
@@ -317,22 +333,25 @@
     if (!value) return "";
     var date = new Date(value);
     if (Number.isNaN(date.getTime())) return String(value);
-    if (withDate === false) return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-    return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }) + " · " + date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    if (withDate === false) return date.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric" }) + " · " + date.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
   }
 
   function formatDate(value) {
     if (!value) return "";
+    var calendar = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (calendar) return calendar[3] + "/" + calendar[2] + "/" + calendar[1];
     var date = new Date(value);
     if (Number.isNaN(date.getTime())) return "";
-    return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+    return date.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric" });
   }
 
   function relativeFreshness(value) {
     if (!value) return "";
     var date = new Date(value);
     if (Number.isNaN(date.getTime())) return "";
-    var seconds = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+    if (!Number.isFinite(serverNow())) return "Sincronizando horário";
+    var seconds = Math.max(0, Math.round((serverNow() - date.getTime()) / 1000));
     if (seconds < 60) return "Atualizado agora";
     var minutes = Math.round(seconds / 60);
     if (minutes < 60) return "Atualizado há " + minutes + " min";
@@ -362,8 +381,13 @@
       }
       if (typeof node !== "object" || visited.indexOf(node) >= 0) return;
       visited.push(node);
-      consider(node.source_updated_at);
-      consider(node.atualizado_em_fonte);
+      var lastScore = lastObservedScore(node);
+      if (lastScore) consider(lastScore.observado_em);
+      if (!lastScore || (liveSourceIsAuthorized(node) && liveSourceIsFresh(node))
+        || (finalSourceIsAuthorized(node) && node.resultado_confirmado === true)) {
+        consider(node.source_updated_at);
+        consider(node.atualizado_em_fonte);
+      }
       Object.keys(node).forEach(function (key) { visit(node[key], depth + 1); });
     }
 
@@ -412,11 +436,12 @@
   function liveSourceIsFresh(value) {
     var authority = sourceAuthority(value);
     if (!authority) return false;
-    var sourceUpdatedAt = authority.informado_em_fonte || authority.reported_at || "";
+    var sourceUpdatedAt = authority.referencia_validacao_em || authority.informado_em_fonte || authority.reported_at || "";
     if (!sourceUpdatedAt) return false;
     var sourceTime = new Date(sourceUpdatedAt).getTime();
     if (Number.isNaN(sourceTime)) return false;
-    var now = Date.now();
+    var now = serverNow();
+    if (!Number.isFinite(now)) return false;
     if (sourceTime > now + CONFIG.liveFutureToleranceMs) return false;
     var validUntilValue = authority.valid_until || authority.valido_ate || value && (value.valid_until || value.valido_ate) || "";
     if (validUntilValue) {
@@ -424,6 +449,26 @@
       return !Number.isNaN(validUntil) && validUntil >= sourceTime && now <= validUntil;
     }
     return now - sourceTime <= CONFIG.liveFallbackMaxAgeMs;
+  }
+
+  function usableScore(value) {
+    if ((typeof value !== "number" && typeof value !== "string") || String(value).trim() === "") return null;
+    var parsed = Number(value);
+    return Number.isFinite(parsed) && parsed >= 0 && Number.isInteger(parsed) ? parsed : null;
+  }
+
+  function lastObservedScore(value) {
+    // Este retrato vem de um placar previamente validado pelo backend.
+    // Conserva a exibicao, sem autorizar tempo real, resultado final ou calculos.
+    var observation = value && value.placar_ultima_observacao;
+    if (!observation || typeof observation !== "object") return null;
+    var home = usableScore(observation.casa);
+    var away = usableScore(observation.fora);
+    var observedAt = String(observation.observado_em || "");
+    var timestamp = Date.parse(observedAt);
+    if (home === null || away === null || !/(?:Z|[+-]\d{2}:\d{2})$/i.test(observedAt) || !Number.isFinite(timestamp)) return null;
+    if (Number.isFinite(serverNow()) && timestamp > serverNow() + CONFIG.liveFutureToleranceMs) return null;
+    return { casa: home, fora: away, observado_em: observedAt };
   }
 
   function initials(name) {
@@ -578,6 +623,7 @@
   }
 
   function resetPersonalizedState(blocked) {
+    serverClock = { epoch: NaN, tick: 0 };
     state.bootstrap = null;
     state.card = null;
     state.baseSummary = null;
@@ -681,7 +727,7 @@
 
   function requestSession() {
     if (!hasBridge()) return Promise.reject(new Error("app_session_unavailable"));
-    if (state.session && state.session.access_token && state.session.expires_at > Date.now() + 60000) return Promise.resolve(state.session);
+    if (state.session && state.session.access_token && state.session.expires_at > serverNow() + 60000) return Promise.resolve(state.session);
     if (sessionPromise) return sessionPromise;
     sessionPromise = new Promise(function (resolve, reject) {
       sessionResolve = resolve;
@@ -731,6 +777,7 @@
       var response = await fetch(CONFIG.supabaseUrl + "/rest/v1/rpc/" + name, options);
       var result = await parseResponse(response);
       if (!sessionWorkIsCurrent(epoch, userId)) throw new Error("session_context_invalidated");
+      if (result && result.generated_at) syncServerClock(result.generated_at);
       if (result && result.schema_version && result.data != null) {
         var envelope = {
           schema_version: result.schema_version,
@@ -947,7 +994,7 @@
   function matchIsFuture(item) {
     var timestamp = matchStartTimestamp(item);
     var status = String(item && (item.status || item.status_canonico || item.status_normalizado) || "").toLowerCase();
-    return timestamp !== null && timestamp >= Date.now()
+    return timestamp !== null && timestamp >= serverNow()
       && ["encerrada", "finished", "cancelada", "cancelled", "abandonada", "abandoned"].indexOf(status) < 0;
   }
 
@@ -986,9 +1033,13 @@
       var timestamp = matchStartTimestamp(item);
       return { item: item, index: index, id: matchCanonicalId(item), groupType: groupType, timestamp: timestamp };
     }).sort(function (a, b) {
-      if (a.groupType !== b.groupType) return a.groupType - b.groupType;
       var aValid = a.timestamp !== null;
       var bValid = b.timestamp !== null;
+      if (filter === "results") {
+        if (aValid !== bValid) return aValid ? -1 : 1;
+        if (aValid && a.timestamp !== b.timestamp) return b.timestamp - a.timestamp;
+      }
+      if (a.groupType !== b.groupType) return a.groupType - b.groupType;
       if (aValid !== bValid) return aValid ? -1 : 1;
       if (aValid && a.timestamp !== b.timestamp) return a.timestamp - b.timestamp;
       var idOrder = a.id.localeCompare(b.id, "pt-BR", { numeric: true });
@@ -1008,7 +1059,7 @@
     var terminalStatus = ["encerrada", "encerrado", "finished", "finalizada", "finalizado"].indexOf(status) >= 0;
     var liveStatus = ["ao_vivo", "live", "em_andamento", "intervalo", "prorrogacao", "penaltis"].indexOf(status) >= 0;
     var scheduledStatus = ["agendado", "agendada", "scheduled", "timed", "not_started", "nao_iniciado", "nao_iniciada", "ns"].indexOf(status) >= 0;
-    var futureSchedule = !terminalStatus && !liveStatus && (scheduledStatus || (!Number.isNaN(startTimestamp) && startTimestamp > Date.now()));
+    var futureSchedule = !terminalStatus && !liveStatus && (scheduledStatus || (!Number.isNaN(startTimestamp) && startTimestamp > serverNow()));
     var pendingResult = !futureSchedule && (["pendente", "confirmando", "em_confirmacao", "aguardando_confirmacao", "pending", "pending_confirmation", "awaiting_confirmation"].indexOf(resultState) >= 0
       || ["aguardando_confirmacao", "confirmando", "em_confirmacao"].indexOf(status) >= 0
       || (terminalStatus && !(["confirmado", "confirmed"].indexOf(resultState) >= 0 && confirmationFlag && finalSourceIsAuthorized(item))));
@@ -1021,20 +1072,23 @@
     var scoreHome = item.placar_casa == null ? (sides.home.score == null ? (result.casa == null ? "" : result.casa) : sides.home.score) : item.placar_casa;
     var scoreAway = item.placar_fora == null ? (sides.away.score == null ? (result.fora == null ? "" : result.fora) : sides.away.score) : item.placar_fora;
     var scoreCanBeShown = confirmedResult || (provisionalResult && live);
-    if (!scoreCanBeShown) {
-      scoreHome = "";
-      scoreAway = "";
+    scoreHome = scoreCanBeShown ? usableScore(scoreHome) : null;
+    scoreAway = scoreCanBeShown ? usableScore(scoreAway) : null;
+    var lastScore = !futureSchedule ? lastObservedScore(item) : null;
+    if ((scoreHome === null || scoreAway === null) && lastScore) {
+      scoreHome = lastScore.casa;
+      scoreAway = lastScore.fora;
     }
+    var hasScore = scoreHome !== null && scoreAway !== null;
     var rawStatusText = String(item.minuto || item.status_texto || item.status_detalhado || "").trim();
     var technicalStatus = /^(TIMED|SCHEDULED|NOT_STARTED|NS)$/i.test(rawStatusText) || /^[A-Z_]+$/.test(rawStatusText);
     var statusText = technicalStatus ? "" : rawStatusText;
-    if (pendingResult) statusText = String(item.aviso_resultado || "Resultado aguardando confirmação da fonte.");
-    else if (staleLive) statusText = "Status aguardando atualização da fonte.";
+    if (pendingResult || staleLive) statusText = "";
     else if (!statusText && confirmedResult && ["encerrada", "finished", "finalizada"].indexOf(status) >= 0) statusText = "Encerrado";
-    else if (live && (scoreHome === "" || scoreAway === "")) statusText = "Ao vivo — placar indisponível";
     else if (!statusText) statusText = live ? "Ao vivo" : formatDateTime(startAt, false);
     var dateText = formatDate(startAt);
-    var center = scoreCanBeShown && scoreHome !== "" && scoreAway !== "" ? "<span class=\"ie-score\">" + escapeHtml(scoreHome) + " – " + escapeHtml(scoreAway) + "</span><span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>" : "<span class=\"ie-match-time\">" + escapeHtml((pendingResult || staleLive || live) ? statusText : formatDateTime(startAt, false) || "A definir") + "</span>";
+    var center = hasScore ? "<span class=\"ie-score\">" + escapeHtml(scoreHome) + " – " + escapeHtml(scoreAway) + "</span>" : (pendingResult || staleLive || live) ? "<span class=\"ie-score\">×</span>" : "<span class=\"ie-match-time\">" + escapeHtml(formatDateTime(startAt, false) || "A definir") + "</span>";
+    if (hasScore && statusText) center += "<span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>";
     if (dateText) center += "<span class=\"ie-match-date\">" + escapeHtml(dateText) + "</span>";
     var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Confronto", 25);
     var actions = interactive === false || !id ? "" : "<div class=\"ie-match-actions\"><button type=\"button\" data-match-action=\"odds\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir cotações de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("chart") + "</button><button type=\"button\" data-match-action=\"analysis\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir análises de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("analysis") + "</button></div>";
@@ -1159,14 +1213,21 @@
         });
       });
     } else {
-      orderMatchesByFavorites(state.games.forYou.filter(matchIsFuture), state.activeSportId, "forYou").forEach(function (item) { html.push(renderMatchCard(item)); });
-      state.favoriteCompetitions.forEach(function (item) { html.push(renderCompetitionCard(item)); });
+      [
+        ["sports-story", "Minha história esportiva", "Seus registros e sua privacidade", "team"],
+        ["ranking", "Top 10 dos colaboradores", "Colaborações aprovadas para nossa base", "trophy"],
+        ["experience-ranking", "Top 10 dos que assistiram ao vivo", "Histórias compartilhadas pelos membros", "stadium"]
+      ].forEach(function (entry) {
+        html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-history-action=\"" + entry[0] + "\"><span class=\"ie-feed-icon\">" + icon(entry[3]) + "</span><span class=\"ie-entity-copy\"><strong>" + entry[1] + "</strong><span>" + entry[2] + "</span></span>" + icon("chevron") + "</button>");
+      });
+      html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-simulator-action=\"list\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span><span class=\"ie-entity-copy\"><strong>Simulações salvas</strong><span>Consulte as simulações da sua conta</span></span>" + icon("chevron") + "</button>");
     }
     var content = html.join("") || emptyState(filteredSection ? "Nenhuma informação disponível" : "Nenhum favorito neste esporte", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Acompanhe times ou competições deste esporte para montar o seu espaço.", false);
     byId("homeContent").innerHTML = modeSwitcher + content;
   }
 
   function renderGames() {
+    if (state.activeTab === "games") setSourceFreshness();
     var filter = byId("gamesCompetitionFilter");
     var toolbar = filter.closest(".ie-games-filter-toolbar");
     if (!activeSport()) {
@@ -1311,7 +1372,7 @@
       var current = state.selectionChanges[key] || selected[key] || item;
       var follow = !!current.acompanhar;
       var notify = targetType === "participant" && !!current.notificar;
-      var name = targetType === "competition" ? competitionDisplayName(item.nome || item.nome_exibicao || "") : (item.nome || item.nome_exibicao || "");
+      var name = targetType === "competition" ? catalogCompetitionDisplayName(item) : (item.nome || item.nome_exibicao || "");
       var busy = !!state.selectionBusy[key];
       var canReorder = targetType === "participant" && follow;
       var reorderControl = canReorder
@@ -1319,6 +1380,13 @@
         : "<span class=\"ie-drag-placeholder\" aria-hidden=\"true\"></span>";
       return "<div class=\"ie-selection-row" + (busy ? " is-saving" : "") + "\"" + (canReorder ? " data-favorite-row-id=\"" + escapeHtml(id) + "\"" : "") + ">" + reorderControl + logoHtml(item.imagem_url || item.logo_url || item.logo, name, "ie-entity-logo") + "<strong>" + escapeHtml(name) + "</strong><div class=\"ie-selection-actions\"><button class=\"ie-selection-action" + (follow ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"follow\" aria-label=\"Acompanhar\" aria-pressed=\"" + follow + "\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button>" + (targetType === "participant" ? "<button class=\"ie-selection-action" + (notify ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"notify\" aria-label=\"Notificar\" aria-pressed=\"" + notify + "\"" + (busy ? " disabled" : "") + ">" + icon("bell") + "</button>" : "") + "</div></div>";
     }).join("");
+  }
+
+  function catalogCompetitionDisplayName(item) {
+    var name = competitionDisplayName(item.nome || item.nome_exibicao || "").replace(/\bSerie (?=[AB]\b)/g, "Série ");
+    var countries = arrayOf(state.bootstrap && state.bootstrap.catalogo && state.bootstrap.catalogo.paises);
+    var country = countries.find(function (value) { return String(value.id || value.id_pais) === String(item.id_pais); });
+    return name + (country && country.nome ? " · " + displayText(country.nome) : "");
   }
 
   function rememberCatalogItems(targetType, items) {
@@ -1484,6 +1552,10 @@
     var catalog = state.bootstrap && state.bootstrap.catalogo || {};
     var countries = arrayOf(catalog.paises).filter(function (item) {
       return !continentId || String(item.id_continente || item.continente_id || "") === String(continentId);
+    }).sort(function (a, b) {
+      var brazilA = normalizeSearchText(a.nome) === "brasil";
+      var brazilB = normalizeSearchText(b.nome) === "brasil";
+      return brazilA !== brazilB ? (brazilA ? -1 : 1) : displayText(a.nome).localeCompare(displayText(b.nome), "pt-BR", { sensitivity: "base" });
     });
     fillSelect(byId("countrySelect"), countries, "Todos", countryId);
   }
@@ -1503,11 +1575,12 @@
     var prefs = state.bootstrap && state.bootstrap.preferencias || {};
     var filters = state.bootstrap && state.bootstrap.filtros || {};
     var alerts = normalizeAlerts(state.bootstrap && state.bootstrap.alertas, prefs);
-    if (!state.settingsSavePending) setSettingsSaveStatus("Alterações salvas automaticamente.", false);
+    if (!state.settingsSavePending) setSettingsSaveStatus("", false);
     renderSportFavoriteSettings();
     var selectedContinent = arrayOf(filters.ids_continentes)[0];
-    fillSelect(byId("continentSelect"), catalog.continentes, "Todos", selectedContinent);
-    fillCountrySelect(selectedContinent, arrayOf(filters.ids_paises)[0]);
+    var continents = arrayOf(catalog.continentes).filter(function (item) { return normalizeSearchText(item.nome) !== "global"; });
+    fillSelect(byId("continentSelect"), continents, "Todos", selectedContinent);
+    fillCountrySelect(byId("continentSelect").value, arrayOf(filters.ids_paises)[0]);
     fillSelect(byId("sportSelect"), catalog.esportes, "Todos", arrayOf(filters.ids_esportes)[0]);
     byId("notificationsEnabled").checked = alerts.ativo === true || prefs.notificacoes_ativas === true;
     var chosen = arrayOf(alerts.antecedencias_minutos);
@@ -2058,6 +2131,7 @@
       panel.classList.toggle("is-active", active);
     });
     renderSportsNav();
+    setSourceFreshness();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -2392,7 +2466,7 @@
     var event = context && context.evento || {};
     var value = event.inicio_em || event.data_inicio || event.data_partida;
     var timestamp = value ? new Date(value).getTime() : NaN;
-    return Number.isFinite(timestamp) && timestamp > Date.now();
+    return Number.isFinite(timestamp) && timestamp > serverNow();
   }
 
   function simulatorRiskLabel(metrics, status) {
@@ -2608,6 +2682,30 @@
 
   function simulatorOperationIsCurrent(operationState, view) {
     return state.simulator === operationState && byId("detailContent").getAttribute("data-detail-view") === view;
+  }
+
+  async function openSavedSimulations(offset) {
+    offset = Math.max(0, Number(offset) || 0);
+    beginDetail("Simulações salvas", "Somente as simulações da sua conta", "replace");
+    var view = "saved-simulations:" + offset;
+    var revision = state.savedSimulationsRevision = (state.savedSimulationsRevision || 0) + 1;
+    byId("detailContent").setAttribute("data-detail-view", view);
+    try {
+      var result = await rpc("ie_simulacoes_listar_rpc", { p_limite: 20, p_offset: offset });
+      if (revision !== state.savedSimulationsRevision || historyDetailView() !== view) return;
+      var rows = arrayOf(result);
+      var labels = { salva: "Salva", monitorando: "Monitorando", revisao_necessaria: "Revisão necessária", expirada: "Expirada" };
+      var html = rows.map(function (item) {
+        return "<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-simulator-action=\"open-saved\" data-event-id=\"" + escapeHtml(item.id_evento) + "\" data-simulation-id=\"" + escapeHtml(item.id_simulacao) + "\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span><span class=\"ie-entity-copy\"><strong>" + escapeHtml(item.nome || "Simulação") + "</strong><span>" + escapeHtml(item.evento_nome || "Confronto") + "</span><span>" + escapeHtml(labels[item.status] || "Salva") + " · " + escapeHtml(formatDateTime(item.atualizado_em)) + "</span></span>" + icon("chevron") + "</button>";
+      }).join("");
+      if (!html) html = emptyState("Nenhuma simulação salva", "As simulações que você salvar aparecerão aqui.", false);
+      if (offset > 0 || result.tem_mais) {
+        html += "<nav class=\"ie-history-pager\" aria-label=\"Páginas de simulações\">" + (offset > 0 ? "<button type=\"button\" data-simulator-action=\"list-more\" data-offset=\"" + Math.max(0, offset - 20) + "\">Anterior</button>" : "") + (result.tem_mais ? "<button type=\"button\" data-simulator-action=\"list-more\" data-offset=\"" + (offset + 20) + "\">Próxima</button>" : "") + "</nav>";
+      }
+      byId("detailContent").innerHTML = "<div class=\"ie-feed\">" + html + "</div>";
+    } catch (error) {
+      if (revision === state.savedSimulationsRevision && historyDetailView() === view) byId("detailContent").innerHTML = emptyState("Não foi possível carregar", friendlyError(error), false);
+    }
   }
 
   async function openFinancialSimulator(eventId, simulationId, navigationMode) {
@@ -3215,7 +3313,7 @@
     byId("detailContent").setAttribute("data-detail-view", "history-list");
     byId("detailTitle").textContent = "Colabore com nossa base";
     var totalPartidas = numberOf(state.baseSummary && state.baseSummary.total_registros, 0);
-    byId("detailSubtitle").innerHTML = "<span>Futebol do Brasil" + (totalPartidas > 0 ? " · " + totalPartidas.toLocaleString("pt-BR") + " partidas" : "") + "</span><span class=\"ie-history-header-links\"><button type=\"button\" class=\"ie-history-ranking-link\" data-history-action=\"ranking\">Top 10 dos colaboradores</button><button type=\"button\" class=\"ie-history-ranking-link\" data-history-action=\"experience-ranking\">Top 10 dos que assistiram ao vivo</button><button type=\"button\" class=\"ie-history-ranking-link\" data-history-action=\"sports-story\">Minha história esportiva</button></span>";
+    byId("detailSubtitle").textContent = "Futebol do Brasil" + (totalPartidas > 0 ? " · " + totalPartidas.toLocaleString("pt-BR") + " partidas" : "");
     byId("detailContent").innerHTML = renderHistoryFilters() + renderHistoryResults(history);
     updateHistorySearchControls();
     renderHistoryTeamSuggestions("team");
@@ -4232,7 +4330,7 @@
     status.classList.toggle("is-error", !!error);
     if (!error && text === "Salvo.") {
       state.settingsSaveStatusTimer = scheduleSessionTimeout(function () {
-        if (!state.settingsSavePending && status) status.textContent = "Alterações salvas automaticamente.";
+        if (!state.settingsSavePending && status) status.textContent = "";
       }, 1400);
     }
   }
@@ -4909,7 +5007,13 @@
         event.stopPropagation();
         detailGesture = null;
         var simulatorCommand = simulatorAction.getAttribute("data-simulator-action");
-        if (simulatorCommand === "open") {
+        if (simulatorCommand === "list") {
+          openSavedSimulations();
+        } else if (simulatorCommand === "list-more") {
+          openSavedSimulations(Number(simulatorAction.getAttribute("data-offset")) || 0);
+        } else if (simulatorCommand === "open-saved") {
+          openFinancialSimulator(simulatorAction.getAttribute("data-event-id"), simulatorAction.getAttribute("data-simulation-id"), true);
+        } else if (simulatorCommand === "open") {
           openFinancialSimulator(simulatorAction.getAttribute("data-event-id"), null, true);
         } else if (simulatorCommand === "load") {
           openFinancialSimulator(state.simulator.eventId, simulatorAction.getAttribute("data-simulation-id"), "replace");

@@ -1,0 +1,18 @@
+/* Personal navigation, isolated from confrontation and competition layouts. */
+.ie-personal-link {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.ie-personal-link .ie-entity-copy strong {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.ie-personal-link:focus-visible {
+  outline: 2px solid var(--ie-gold);
+  outline-offset: 3px;
+}
+.ie-settings-save-status:empty {
+  display: none;
+}
