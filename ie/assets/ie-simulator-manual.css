@@ -1,0 +1,8 @@
+.ie-manual-house { padding: 14px 0; border-bottom: 1px solid var(--ie-border); }
+.ie-manual-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.ie-manual-grid label { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.ie-manual-grid input { width: 100%; min-width: 0; min-height: 44px; box-sizing: border-box; padding: 9px; border: 1px solid var(--ie-border); border-radius: 9px; background: #101318; color: #fff; }
+.ie-manual-grid small { color: var(--ie-muted); font-size: 11px; overflow-wrap: anywhere; }
+.ie-manual-confirm { display: flex; align-items: flex-start; gap: 10px; margin-top: 18px; line-height: 1.5; }
+.ie-manual-confirm input { flex: 0 0 auto; width: 20px; height: 20px; margin-top: 3px; }
+[name="simulator_input_mode"] { display: block; width: 100%; min-height: 44px; margin-top: 8px; }
