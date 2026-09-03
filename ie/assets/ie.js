@@ -5,7 +5,6 @@
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
     sessionTimeoutMs: 15000,
-    liveRefreshMs: 30000,
     liveFallbackMaxAgeMs: 5 * 60 * 1000,
     liveFutureToleranceMs: 5 * 60 * 1000
   };
@@ -106,6 +105,9 @@
     liveRefreshTimer: null,
     liveRefreshRequest: null,
     liveRefreshRevision: 0,
+    liveRefreshPolicy: null,
+    liveRefreshChannel: null,
+    liveRefreshDirty: false,
     liveTouchActive: false,
     livePageSuspended: false,
     newsRequestId: 0,
@@ -135,6 +137,7 @@
     settingsSavePending: 0,
     settingsSaveStatusTimer: null,
     settingsSaveQueue: Promise.resolve(),
+    automaticSaves: [],
     openingReadySent: false,
     toastTimer: null,
     sessionEpoch: 0,
@@ -170,6 +173,8 @@
   }
 
   function cancelSessionWork() {
+    (state.automaticSaves || []).forEach(function (entry) { entry.job.cancel(); });
+    state.automaticSaves = [];
     pauseLiveRefresh();
     state.sportLoadingContext = null;
     state.sportSectionPending = {};
@@ -1534,6 +1539,10 @@
 
   function pauseLiveRefresh() {
     state.liveRefreshRevision += 1;
+    if (state.liveRefreshChannel) state.liveRefreshChannel.close();
+    state.liveRefreshChannel = null;
+    state.liveRefreshPolicy = null;
+    state.liveRefreshDirty = false;
     if (state.liveRefreshTimer !== null) cancelSessionTimeout(state.liveRefreshTimer);
     state.liveRefreshTimer = null;
   }
@@ -1542,10 +1551,39 @@
     if (state.liveRefreshTimer !== null) cancelSessionTimeout(state.liveRefreshTimer);
     state.liveRefreshTimer = null;
     if (!liveRefreshIsVisible()) return;
+    if (delay == null) {
+      // Before metadata arrives, retry only the failed/bootstrap request; never assume a provider cadence.
+      delay = state.liveRefreshPolicy ? state.liveRefreshPolicy.intervalo_segundos * 1000 : CONFIG.sessionTimeoutMs;
+      if (state.liveRefreshPolicy && !state.liveRefreshPolicy.intervalo_segundos) return;
+    }
     state.liveRefreshTimer = scheduleSessionTimeout(function () {
       state.liveRefreshTimer = null;
       runLiveRefresh();
-    }, delay == null ? CONFIG.liveRefreshMs : delay);
+    }, delay);
+  }
+
+  function applyLiveRefreshPolicy(policy) {
+    if (!policy || Number(policy.id_esporte) !== Number(state.activeSportId)) return;
+    var seconds = Number(policy.intervalo_segundos);
+    state.liveRefreshPolicy = { intervalo_segundos: Number.isInteger(seconds) && seconds > 0 ? seconds : null };
+    if (state.liveRefreshChannel || policy.privado !== true || policy.topico !== 'ie:ao_vivo:' + state.activeSportId
+      || typeof window.TurboIELiveChannel !== 'function') return;
+    var epoch = state.sessionEpoch, userId = state.session.user_id, revision = state.liveRefreshRevision;
+    function current() { return sessionWorkIsCurrent(epoch, userId) && revision === state.liveRefreshRevision && liveRefreshIsVisible(); }
+    state.liveRefreshChannel = window.TurboIELiveChannel({
+      url: CONFIG.supabaseUrl, apiKey: CONFIG.apiKey, topic: policy.topico,
+      getSession: async function () { var session = await requestSession(); return current() ? session : null; },
+      onChange: function () {
+        if (!current()) return;
+        state.liveRefreshDirty = true;
+        if (!state.liveRefreshRequest) scheduleLiveRefresh(0);
+      },
+      onDisconnect: function () {
+        if (!current()) return;
+        state.liveRefreshChannel = null;
+        scheduleLiveRefresh(state.liveRefreshPolicy.intervalo_segundos ? undefined : CONFIG.sessionTimeoutMs);
+      }
+    });
   }
 
   function liveRefreshContextIsCurrent(request) {
@@ -1599,12 +1637,21 @@
       sectionRequest: state.sportSectionRequests.live = (state.sportSectionRequests.live || 0) + 1
     };
     state.liveRefreshRequest = request;
+    state.liveRefreshDirty = false;
     try {
-      var result = await rpc("ie_partidas_listar_rpc", {
+      var responses = await Promise.all([rpc("ie_partidas_listar_rpc", {
         p_secao: "ao_vivo", p_id_esporte: request.sport, p_id_competicao: request.competition,
         p_fase: null, p_limite: 30, p_offset: 0
-      }, { timeoutMs: 15000 });
-      if (!liveRefreshContextIsCurrent(request)) return;
+      }, { timeoutMs: 15000 }), rpc("ie_ao_vivo_atualizacao_rpc", {
+        p_id_esporte: request.sport, p_id_competicao: request.competition
+      }, { timeoutMs: 15000 }).catch(function () { return null; })]);
+      var result = responses[0];
+      if (!liveRefreshContextIsCurrent(request)) {
+        if (sessionWorkIsCurrent(request.epoch, request.userId) && request.revision === state.liveRefreshRevision
+          && (state.liveTouchActive || !byId("detailModal").hidden)) state.liveRefreshDirty = true;
+        return;
+      }
+      applyLiveRefreshPolicy(responses[1]);
       if (request.competition) state.gameCompetitionGames.live = arrayOf(result);
       else state.games.live = arrayOf(result);
       renderLiveGameUpdates();
@@ -1614,7 +1661,7 @@
       if (liveRefreshContextIsCurrent(request)) setSourceFreshness();
     } finally {
       if (state.liveRefreshRequest === request) state.liveRefreshRequest = null;
-      if (sessionWorkIsCurrent(request.epoch, request.userId)) scheduleLiveRefresh();
+      if (sessionWorkIsCurrent(request.epoch, request.userId)) scheduleLiveRefresh(state.liveRefreshDirty ? 0 : undefined);
     }
   }
 
@@ -2654,6 +2701,7 @@
   }
 
   function closeDetail(restoreFocus) {
+    if (restoreFocus !== false && !automaticSaveNavigationAllowed()) return;
     var returnFocus = state.detailReturnFocus;
     byId("detailModal").hidden = true;
     byId("detailModal").setAttribute("aria-hidden", "true");
@@ -2670,6 +2718,7 @@
     if (restoreFocus !== false && returnFocus && returnFocus.isConnected && !returnFocus.hidden) {
       try { returnFocus.focus({ preventScroll: true }); } catch (error) { returnFocus.focus(); }
     }
+    if (state.liveRefreshDirty) scheduleLiveRefresh(0);
   }
 
   function dismissDetailFrame() {
@@ -2705,6 +2754,7 @@
   }
 
   function backDetail() {
+    if (!automaticSaveNavigationAllowed()) return;
     var previous = state.detailStack.pop();
     if (!previous) { closeDetail(); return; }
     var detailContent = byId("detailContent");
@@ -2714,6 +2764,7 @@
     if (previous.view) detailContent.setAttribute("data-detail-view", previous.view);
     else detailContent.removeAttribute("data-detail-view");
     if (previous.view === "history-list") renderHistoryContributionPage();
+    if (previous.view === "sports-story" && state.historyContribution.story) renderMySportsStory(state.historyContribution.story);
     detailContent.scrollTop = Number(previous.scrollTop) || 0;
     focusDetailDialog();
   }
@@ -2723,6 +2774,7 @@
   }
 
   window.TurboTigerIEHandleBack = function () {
+    if (!automaticSaveNavigationAllowed()) return true;
     if (!byId("detailModal").hidden) {
       if (state.detailStack.length) backDetail(); else closeDetail();
       return true;
@@ -2749,6 +2801,56 @@
   function detailSection(title, body) {
     if (!body) return "";
     return "<section class=\"ie-detail-section\"><h3>" + escapeHtml(title) + "</h3>" + body + "</section>";
+  }
+
+  function automaticSaveStatusHtml() {
+    return '<div class="ie-autosave-status" role="status" aria-live="polite"><span data-autosave-status></span><button type="button" class="ie-text-action" data-autosave-retry hidden>Tentar novamente</button></div>';
+  }
+
+  function formAutosave(form, save) {
+    if (form._ieAutosave) return form._ieAutosave;
+    var epoch = state.sessionEpoch;
+    var userId = state.session && state.session.user_id || "";
+    var job = window.TurboIEAutosave({
+      schedule: scheduleSessionTimeout, unschedule: cancelSessionTimeout,
+      current: function () { return sessionWorkIsCurrent(epoch, userId); },
+      save: save,
+      status: function (status, error) {
+        if (!form.isConnected) return;
+        var label = form.querySelector("[data-autosave-status]");
+        var retry = form.querySelector("[data-autosave-retry]");
+        if (label) {
+          label.textContent = status === "saved" ? "Salvo." : status === "invalid" ? "Complete os campos válidos para salvar." : status === "error" ? "Não foi possível confirmar o salvamento. " + friendlyError(error) : "Salvando...";
+          label.classList.toggle("is-error", status === "error" || status === "invalid");
+        }
+        if (retry) retry.hidden = status !== "error";
+      }
+    });
+    form._ieAutosave = job;
+    state.automaticSaves = state.automaticSaves.filter(function (entry) {
+      if (entry.form.isConnected || entry.job.busy()) return true;
+      entry.job.cancel();
+      return false;
+    });
+    state.automaticSaves.push({ form: form, job: job });
+    return job;
+  }
+
+  function automaticSaveNavigationAllowed(requireConfirmed) {
+    var jobs = state.automaticSaves || [];
+    if (jobs.some(function (entry) { return entry.job.busy(); })) {
+      jobs.forEach(function (entry) { if (entry.job.busy()) entry.job.flush(); });
+      showToast("Aguarde a confirmação do salvamento antes de sair.", false);
+      return false;
+    }
+    var unsaved = jobs.filter(function (entry) { return entry.form.isConnected && entry.job.unsaved(); });
+    if (unsaved.length) {
+      if (requireConfirmed) { showToast("Confirme o salvamento usando Tentar novamente antes de compartilhar ou abrir a prévia.", true); return false; }
+      if (!window.confirm("Há alterações sem confirmação de salvamento. Sair mesmo assim e conferir ao reabrir?")) return false;
+      unsaved.forEach(function (entry) { entry.job.cancel(); });
+      if (historyDetailView() === "sports-story" && state.historyContribution.story) renderMySportsStory(state.historyContribution.story);
+    }
+    return true;
   }
 
   function outcomeCopy(code, sides) {
@@ -2833,6 +2935,37 @@
       && arrayOf(context.mercados).some(simulatorMarketAvailable);
   }
 
+  function simulatorSuggestedName(context, markets) {
+    var event = context && context.evento || {};
+    var sides = matchSides(event);
+    var home = String(sides.home.abbreviation || sides.home.name).trim().toUpperCase();
+    var away = String(sides.away.abbreviation || sides.away.name).trim().toUpperCase();
+    var date = formatDate(event.inicio_em || event.data_inicio || event.data_partida).replace(/\//g, "-");
+    var labels = { resultado_1x2: "1X2", total_gols: "TG", ambas_marcam: "AM", handicap: "HC" };
+    var codes = arrayOf(markets).map(function (market) {
+      var available = arrayOf(context && context.mercados).find(function (item) { return item.codigo_mercado === market.codigo_mercado; }) || {};
+      return String(available.sigla || labels[market.codigo_mercado] || market.codigo_mercado).toUpperCase();
+    }).filter(function (code, index, values) { return code && values.indexOf(code) === index; });
+    var base = ["Simulação", home + "x" + away, date, codes.join("+")].filter(Boolean).join("  ").slice(0, 120);
+    var usedNames = arrayOf(context && context.simulacoes_salvas).map(function (simulation) { return String(simulation.nome || "").trim(); });
+    var name = base;
+    var increment = 0;
+    while (usedNames.indexOf(name) >= 0) {
+      var suffix = " (" + (++increment) + ")";
+      name = base.slice(0, 120 - suffix.length).trimEnd() + suffix;
+    }
+    return name;
+  }
+
+  function updateSimulatorSuggestedName() {
+    var form = document.querySelector("[data-financial-simulator-form]");
+    if (!form || !state.simulator.form || state.simulator.form.nameCustomized) return;
+    var values = readSimulatorForm();
+    var name = simulatorSuggestedName(state.simulator.context, values.markets);
+    form.elements.simulator_name.value = name;
+    state.simulator.form.name = name;
+  }
+
   function simulatorDefaultForm(context) {
     var simulation = context && context.simulacao || {};
     var houses = simulatorAvailableHouses(context);
@@ -2849,7 +2982,8 @@
     }
     return {
       idSimulation: Number(simulation.id_simulacao || 0) || null,
-      name: String(simulation.nome || "Simulação do confronto"),
+      name: String(simulation.nome || simulatorSuggestedName(context, markets)),
+      nameCustomized: !!simulation.nome,
       value: Number(simulation.valor_comprometido_centavos) > 0 ? Number(simulation.valor_comprometido_centavos) / 100 : 100,
       lossLimit: simulation.limite_perda_pct == null ? 10 : Number(simulation.limite_perda_pct),
       houseIds: selectedHouses,
@@ -2998,7 +3132,8 @@
     });
     return {
       idSimulation: state.simulator.form && state.simulator.form.idSimulation || null,
-      name: String(form.elements.simulator_name.value || "").trim() || "Simulação do confronto",
+      name: String(form.elements.simulator_name.value || "").trim() || simulatorSuggestedName(state.simulator.context, markets),
+      nameCustomized: !!(state.simulator.form && state.simulator.form.nameCustomized) && !!String(form.elements.simulator_name.value || "").trim(),
       value: value,
       lossLimit: lossLimit,
       houseIds: houseIds,
@@ -3183,6 +3318,11 @@
       var formState = collectSimulatorForm();
       state.simulator.form = formState;
       setSimulatorBusy(true);
+      if (!formState.idSimulation && formState.nameCustomized === false) {
+        var namingContext = await rpc("ie_simulador_contexto_rpc", { p_id_evento: Number(operationState.eventId), p_id_simulacao: null });
+        if (!simulatorOperationIsCurrent(operationState, view)) return;
+        formState.name = simulatorSuggestedName(namingContext || {}, formState.markets);
+      }
       var payload = simulatorPayload(formState);
       payload.p_id_simulacao = formState.idSimulation;
       payload.p_nome = formState.name;
@@ -4321,7 +4461,7 @@
     byId("detailTitle").textContent = "Minha história esportiva";
     byId("detailSubtitle").textContent = displayText(profile.esporte || data.esporte_nome || "Esporte");
     byId("detailContent").setAttribute("data-detail-view", "sports-story");
-    byId("detailContent").innerHTML = "<section class=\"ie-exp-story-owner\"><div class=\"ie-exp-story-preview\"><span>Prévia privada</span><strong>" + escapeHtml(profile.nome_exibicao || profile.codinome || "Sua história") + "</strong><small>" + escapeHtml(numberOf(summary.total, 0)) + " confrontos · " + escapeHtml(numberOf(summary.total_local, 0)) + " no local · " + escapeHtml(numberOf(summary.total_remoto, 0)) + " por TV/outro · " + escapeHtml(contributions.length) + " contribuições</small></div>" + renderMySportsStoryTitles(titleSummary, followedTitles) + "<p class=\"ie-exp-story-declaration\">História formada por registros declarados pelo membro. Você controla o que fica visível.</p><form data-sports-story-form><input type=\"hidden\" name=\"sport_id\" value=\"" + escapeHtml(sportId) + "\"><label class=\"ie-switch-row\"><span><strong>Página pública</strong><small>Você decide quando sua história pode ser vista pelo código seguro.</small></span><span class=\"ie-switch\"><input type=\"checkbox\" name=\"active\"" + (profile.ativo === true ? " checked" : "") + "><span aria-hidden=\"true\"></span></span></label><fieldset><legend>Informações visíveis</legend><label><input type=\"checkbox\" name=\"show_real_name\"" + (profile.exibir_nome_real === true ? " checked" : "") + "><span>Meu nome real</span></label><label><input type=\"checkbox\" name=\"show_surname\"" + (profile.exibir_sobrenome === true ? " checked" : "") + "><span>Meu sobrenome</span></label><label><input type=\"checkbox\" name=\"show_codename\"" + (profile.exibir_codinome !== false ? " checked" : "") + "><span>Meu codinome</span></label><label><input type=\"checkbox\" name=\"show_matches\"" + (profile.exibir_confrontos !== false ? " checked" : "") + "><span>Linha do tempo</span></label><label><input type=\"checkbox\" name=\"show_places\"" + (profile.exibir_locais !== false ? " checked" : "") + "><span>Locais dos eventos</span></label><label><input type=\"checkbox\" name=\"show_companions\"" + (profile.exibir_acompanhantes !== false ? " checked" : "") + "><span>Com quem assistiu</span></label><label><input type=\"checkbox\" name=\"show_contributions\"" + (profile.exibir_colaboracoes !== false ? " checked" : "") + "><span>Colaborações aprovadas</span></label><label><input type=\"checkbox\" name=\"show_ranking\"" + (profile.exibir_ranking !== false ? " checked" : "") + "><span>Participação no ranking</span></label></fieldset><button type=\"submit\" class=\"ie-button ie-button-primary\">Salvar privacidade</button></form><div class=\"ie-exp-story-share\"><strong>Código público revogável</strong><code>" + escapeHtml(profile.codigo_publico || "Ainda não gerado") + "</code><div><button type=\"button\" class=\"ie-button ie-button-primary\" data-history-action=\"sports-story-share\"" + (!publicUrl || profile.ativo !== true ? " disabled" : "") + ">" + icon("share") + " Compartilhar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"sports-story-renew\">Gerar novo código</button></div><small>Ao gerar outro código, o anterior deixa de funcionar. IDs internos e dados privados nunca fazem parte do link.</small></div></section>";
+    byId("detailContent").innerHTML = "<section class=\"ie-exp-story-owner\"><div class=\"ie-exp-story-preview\"><span>Prévia privada</span><strong>" + escapeHtml(profile.nome_exibicao || profile.codinome || "Sua história") + "</strong><small>" + escapeHtml(numberOf(summary.total, 0)) + " confrontos · " + escapeHtml(numberOf(summary.total_local, 0)) + " no local · " + escapeHtml(numberOf(summary.total_remoto, 0)) + " por TV/outro · " + escapeHtml(contributions.length) + " contribuições</small></div>" + renderMySportsStoryTitles(titleSummary, followedTitles) + "<p class=\"ie-exp-story-declaration\">História formada por registros declarados pelo membro. Você controla o que fica visível.</p><form data-sports-story-form><input type=\"hidden\" name=\"sport_id\" value=\"" + escapeHtml(sportId) + "\"><label class=\"ie-switch-row\"><span><strong>Página pública</strong><small>Você decide quando sua história pode ser vista pelo código seguro.</small></span><span class=\"ie-switch\"><input type=\"checkbox\" name=\"active\"" + (profile.ativo === true ? " checked" : "") + "><span aria-hidden=\"true\"></span></span></label><fieldset><legend>Informações visíveis</legend><label><input type=\"checkbox\" name=\"show_real_name\"" + (profile.exibir_nome_real === true ? " checked" : "") + "><span>Meu nome real</span></label><label><input type=\"checkbox\" name=\"show_surname\"" + (profile.exibir_sobrenome === true ? " checked" : "") + "><span>Meu sobrenome</span></label><label><input type=\"checkbox\" name=\"show_codename\"" + (profile.exibir_codinome !== false ? " checked" : "") + "><span>Meu codinome</span></label><label><input type=\"checkbox\" name=\"show_matches\"" + (profile.exibir_confrontos !== false ? " checked" : "") + "><span>Linha do tempo</span></label><label><input type=\"checkbox\" name=\"show_places\"" + (profile.exibir_locais !== false ? " checked" : "") + "><span>Locais dos eventos</span></label><label><input type=\"checkbox\" name=\"show_companions\"" + (profile.exibir_acompanhantes !== false ? " checked" : "") + "><span>Com quem assistiu</span></label><label><input type=\"checkbox\" name=\"show_contributions\"" + (profile.exibir_colaboracoes !== false ? " checked" : "") + "><span>Colaborações aprovadas</span></label><label><input type=\"checkbox\" name=\"show_ranking\"" + (profile.exibir_ranking !== false ? " checked" : "") + "><span>Participação no ranking</span></label></fieldset>"+ automaticSaveStatusHtml() + "</form><div class=\"ie-exp-story-share\"><strong>Código público revogável</strong><code>" + escapeHtml(profile.codigo_publico || "Ainda não gerado") + "</code><div><button type=\"button\" class=\"ie-button ie-button-primary\" data-history-action=\"sports-story-share\"" + (!publicUrl || profile.ativo !== true ? " disabled" : "") + ">" + icon("share") + " Compartilhar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"sports-story-renew\">Gerar novo código</button></div><small>Ao gerar outro código, o anterior deixa de funcionar. IDs internos e dados privados nunca fazem parte do link.</small></div></section>";
     var preview = byId("detailContent").querySelector(".ie-exp-story-preview");
     if (preview) { preview.setAttribute("role", "button"); preview.setAttribute("tabindex", "0"); preview.setAttribute("aria-label", "Visualizar como seus amigos verão sua história"); }
   }
@@ -4411,17 +4551,18 @@
       exibir_colaboracoes: values.get("show_contributions") === "on",
       exibir_ranking: values.get("show_ranking") === "on"
     };
-    var button = form.querySelector("button[type=submit]");
-    button.disabled = true;
-    button.textContent = "Salvando...";
-    try {
-      await rpc("ie_experiencia_historia_config_salvar_rpc", { p_config: config });
-      await reloadMySportsStory(config.id_esporte);
-      showToast("Privacidade da história atualizada.", false);
-    } catch (error) {
-      showToast(friendlyError(error), true);
-      if (button.isConnected) { button.disabled = false; button.textContent = "Salvar privacidade"; }
-    }
+    var story = state.historyContribution.story;
+    var job = formAutosave(form, async function (next) {
+      var result = await rpc("ie_experiencia_historia_config_salvar_rpc", { p_config: next });
+      if (!result || result.ok !== true) throw new Error("Não foi possível confirmar a privacidade.");
+      if (!form.isConnected || historyDetailView() !== "sports-story" || state.historyContribution.story !== story) return;
+      story.perfil = Object.assign({}, story.perfil || {}, next, result.perfil || {});
+      var share = byId("detailContent").querySelector("[data-history-action=sports-story-share]");
+      if (share) share.disabled = story.perfil.ativo !== true || !sportsStoryPublicUrl(story);
+      var code = byId("detailContent").querySelector(".ie-exp-story-share code");
+      if (code) code.textContent = story.perfil.codigo_publico || "Ainda não gerado";
+    });
+    job.update(config, 150);
   }
 
   async function renewMySportsStoryCode() {
@@ -4443,7 +4584,7 @@
     beginDetail("Prévia da sua história", "Como seus amigos verão", true);
     byId("detailContent").setAttribute("data-detail-view", "sports-story-preview");
     if (!publicUrl || profile.ativo !== true) {
-      byId("detailContent").innerHTML = emptyState("Ative a página pública", "Salve a página como pública para visualizar exatamente como seus amigos verão.", false);
+      byId("detailContent").innerHTML = emptyState("Ative a página pública", "Ative a opção Página pública para visualizar como seus amigos verão.", false);
       return;
     }
     byId("detailContent").innerHTML = "<iframe class=\"ie-exp-public-preview-frame\" title=\"Prévia pública da sua história esportiva\" src=\"" + escapeHtml(publicUrl) + "\" referrerpolicy=\"no-referrer\"></iframe>";
@@ -5004,6 +5145,22 @@
   }
 
   function setupEvents() {
+    // Prevent navigation/sharing from racing a pending privacy change.
+    document.addEventListener("click", function (event) {
+      if (event.target.closest("[data-autosave-retry]")) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        var form = event.target.closest("form");
+        if (form && form._ieAutosave) form._ieAutosave.retry();
+        return;
+      }
+      var requiresConfirmation = !!event.target.closest("[data-history-action=sports-story-share],[data-history-action=sports-story-renew],.ie-exp-story-preview");
+      if (event.target.closest("[data-history-action],.ie-exp-story-preview,[data-close-detail],#closeButton")
+        && !automaticSaveNavigationAllowed(requiresConfirmation)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    }, true);
     document.addEventListener("visibilitychange", function () {
       pauseLiveRefresh();
       state.liveTouchActive = false;
@@ -5014,8 +5171,8 @@
     window.addEventListener("offline", pauseLiveRefresh);
     window.addEventListener("online", function () { scheduleLiveRefresh(0); });
     document.addEventListener("touchstart", function () { state.liveTouchActive = true; }, { passive: true });
-    document.addEventListener("touchend", function () { state.liveTouchActive = false; }, { passive: true });
-    document.addEventListener("touchcancel", function () { state.liveTouchActive = false; }, { passive: true });
+    document.addEventListener("touchend", function () { state.liveTouchActive = false; if (state.liveRefreshDirty) scheduleLiveRefresh(0); }, { passive: true });
+    document.addEventListener("touchcancel", function () { state.liveTouchActive = false; if (state.liveRefreshDirty) scheduleLiveRefresh(0); }, { passive: true });
     byId("retryButton").addEventListener("click", function () { byId("accessPanel").hidden = true; byId("loadingPanel").hidden = false; loadAll(false); });
     setupPullToRefresh();
     byId("settingsButton").addEventListener("click", function () { openSettings("", true); });
@@ -5116,6 +5273,11 @@
       });
     });
     document.addEventListener("input", function (event) {
+      if (event.target.name === "simulator_name" && state.simulator.form) {
+        state.simulator.form.name = event.target.value;
+        state.simulator.form.nameCustomized = !!String(event.target.value || "").trim();
+        return;
+      }
       if (event.target.matches && event.target.matches("[data-simulator-house-search]")) {
         var houseQuery = normalizeSearchText(event.target.value || "");
         all("[data-simulator-house-row]", byId("detailContent")).forEach(function (row) {
@@ -5160,6 +5322,8 @@
       else updateHistoryTeamSearch(query);
     });
     document.addEventListener("change", function (event) {
+      var storyForm = event.target.closest && event.target.closest("[data-sports-story-form]");
+      if (storyForm) { saveMySportsStory(storyForm); return; }
       if (event.target.name === "simulator_bell") {
         var alertMarginInput = document.querySelector("[data-financial-simulator-form] [name=simulator_alert_margin]");
         if (alertMarginInput) alertMarginInput.disabled = !event.target.checked;
@@ -5181,6 +5345,7 @@
         return;
       }
       if (event.target.name === "simulator_market") {
+        updateSimulatorSuggestedName();
         invalidateSimulatorResult();
         updateSimulatorAvailability();
         return;
@@ -5663,6 +5828,7 @@
     document.addEventListener("keydown", function (event) {
       if ((event.key === "Enter" || event.key === " ") && event.target.classList && event.target.classList.contains("ie-exp-story-preview") && historyDetailView() === "sports-story") {
         event.preventDefault();
+        if (!automaticSaveNavigationAllowed(true)) return;
         openMySportsStoryPreview();
       }
     });

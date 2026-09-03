@@ -17,6 +17,18 @@
   display: none;
 }
 
+.ie-autosave-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  font-size: 13px;
+  color: var(--ie-muted);
+}
+.ie-autosave-status .is-error { color: var(--ie-danger, #ff8181); }
+.ie-autosave-status [hidden] { display: none; }
+
 /* Ao vivo não significa tempo regulamentar excedido. A indicação vem da fonte. */
 .ie-feed-card.is-live:not(.is-regulation-exceeded) {
   border-color: var(--ie-border);

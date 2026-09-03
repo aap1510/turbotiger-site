@@ -298,12 +298,10 @@
     var subline = [competition, detail].filter(Boolean).join(" · ");
     var companionsLine = companions.length ? "<small class=\"hs-timeline-companions\">Assistiu com " + escapeHtml(namesInPortuguese(companions)) + "</small>" : "";
     var wo = item.wo_time_casa === true || item.wo_time_fora === true;
-    var titleHtml = home && away ? [
-      { name:home, score:item.placar_casa, wo:item.wo_time_casa === true },
-      { name:away, score:item.placar_fora, wo:item.wo_time_fora === true }
-    ].map(function (team) {
-      return "<span class=\"hs-timeline-team\"><span class=\"hs-timeline-team-name" + (team.wo ? " is-wo" : "") + "\">" + escapeHtml(team.name) + "</span>" + (hasScore ? "<span class=\"hs-timeline-score\">" + escapeHtml(team.score) + "</span>" : "") + "</span>";
-    }).join("") : escapeHtml(title || "Confronto");
+    var titleHtml = home && away ?
+      "<span class=\"hs-timeline-team-name" + (item.wo_time_casa === true ? " is-wo" : "") + "\">" + escapeHtml(home) + "</span> " +
+      (hasScore ? "<span class=\"hs-timeline-score\">" + escapeHtml(item.placar_casa) + " × " + escapeHtml(item.placar_fora) + "</span>" : "×") + " " +
+      "<span class=\"hs-timeline-team-name" + (item.wo_time_fora === true ? " is-wo" : "") + "\">" + escapeHtml(away) + "</span>" : escapeHtml(title || "Confronto");
     return "<article class=\"hs-timeline-item\"><time datetime=\"" + escapeHtml(String(rawDate || "").slice(0,10)) + "\"><strong>" + escapeHtml(parts[0] || "") + "</strong><span>" + escapeHtml(parts.slice(1).join(" ")) + "</span>" + (wo ? "<em class=\"hs-wo\">W.O.</em>" : "") + "</time><span class=\"hs-timeline-node\"></span><div class=\"hs-timeline-copy\"><strong class=\"hs-timeline-match\" aria-label=\"" + escapeHtml(title || "Confronto") + "\">" + titleHtml + "</strong><span class=\"hs-timeline-meta\">" + escapeHtml(subline) + "</span>" + companionsLine + titleBadges(item) + "</div>" + icon(form === "local" ? "stadium" : "tv") + "</article>";
   }
 

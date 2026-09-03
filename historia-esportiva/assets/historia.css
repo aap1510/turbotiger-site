@@ -85,8 +85,7 @@ button:focus-visible, a:focus-visible, [tabindex="-1"]:focus-visible { outline: 
 .hs-timeline-item:first-child .hs-timeline-node { background:var(--hs-gold); }
 .hs-timeline-copy { min-width:0; display:grid; gap:5px; }
 .hs-timeline-copy strong { color:var(--hs-text); font-size:13px; line-height:1.4; }
-.hs-timeline-match { min-width:0; display:grid; gap:3px; overflow-wrap:anywhere; }
-.hs-timeline-team { min-width:0; display:grid; grid-template-columns:minmax(0,1fr) max-content; align-items:baseline; gap:8px; }
+.hs-timeline-match { min-width:0; display:block; white-space:normal; overflow-wrap:anywhere; }
 .hs-timeline-team-name { min-width:0; white-space:normal; overflow-wrap:anywhere; }
 .hs-timeline-score { white-space:nowrap; font-variant-numeric:tabular-nums; }
 .hs-timeline-copy strong .is-wo,
