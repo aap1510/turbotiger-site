@@ -370,12 +370,12 @@
     if (Number.isNaN(date.getTime())) return "";
     if (!Number.isFinite(serverNow())) return "Sincronizando horário";
     var seconds = Math.max(0, Math.round((serverNow() - date.getTime()) / 1000));
-    if (seconds < 60) return "Atualizado agora";
+    if (seconds < 60) return "Dados atualizados agora.";
     var minutes = Math.round(seconds / 60);
-    if (minutes < 60) return "Atualizado há " + minutes + " min";
+    if (minutes < 60) return "Dados atualizados há " + minutes + (minutes === 1 ? " minuto." : " minutos.");
     var hours = Math.round(minutes / 60);
-    if (hours < 24) return "Atualizado há " + hours + " h";
-    return "Atualizado em " + date.toLocaleDateString("pt-BR");
+    if (hours < 24) return "Dados atualizados há " + hours + (hours === 1 ? " hora." : " horas.");
+    return "Dados atualizados em " + date.toLocaleDateString("pt-BR") + ".";
   }
 
   function latestSourceUpdatedAt(value) {
