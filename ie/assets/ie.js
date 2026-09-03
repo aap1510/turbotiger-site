@@ -5,6 +5,7 @@
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
     sessionTimeoutMs: 15000,
+    liveRefreshMs: 30000,
     liveFallbackMaxAgeMs: 5 * 60 * 1000,
     liveFutureToleranceMs: 5 * 60 * 1000
   };
@@ -99,6 +100,14 @@
     activeSportId: null,
     sportFavoriteOrder: [],
     sportRequestId: 0,
+    sportSectionRequests: {},
+    sportSectionPending: {},
+    sportLoadingContext: null,
+    liveRefreshTimer: null,
+    liveRefreshRequest: null,
+    liveRefreshRevision: 0,
+    liveTouchActive: false,
+    livePageSuspended: false,
     newsRequestId: 0,
     newsFilters: { participantId: null, competitionId: null },
     activeTab: "home",
@@ -161,6 +170,10 @@
   }
 
   function cancelSessionWork() {
+    pauseLiveRefresh();
+    state.sportLoadingContext = null;
+    state.sportSectionPending = {};
+    state.liveTouchActive = false;
     state.sessionEpoch += 1;
     state.loadGeneration += 1;
     state.sportRequestId += 1;
@@ -423,8 +436,15 @@
   function liveSourceIsAuthorized(value) {
     var authority = sourceAuthority(value);
     return authorityIsAuthoritative(authority)
-      && (authority.tempo_real_confiavel === true || String(authority.tempo_real_confiavel).toLowerCase() === "true")
+      && ((authority.tempo_real_confiavel === true || String(authority.tempo_real_confiavel).toLowerCase() === "true")
+        || (authority.ao_vivo_publicavel === true && authority.publicavel === true
+          && !!authority.referencia_validacao_em && !!(authority.valido_ate || authority.valid_until)))
       && String(authority.dominio || authority.domain || "").toLowerCase() === "ao_vivo";
+  }
+
+  function liveSourceIsPeriodic(value) {
+    var authority = sourceAuthority(value);
+    return liveSourceIsAuthorized(value) && !(authority.tempo_real_confiavel === true || String(authority.tempo_real_confiavel).toLowerCase() === "true");
   }
 
   function finalSourceIsAuthorized(value) {
@@ -752,7 +772,7 @@
     return data;
   }
 
-  async function rpc(name, payload) {
+  async function rpc(name, payload, requestOptions) {
     var session = await requestSession();
     if (!session || !session.access_token) throw new Error("sessao_expirada");
     var epoch = state.sessionEpoch;
@@ -760,6 +780,11 @@
     if (!sessionWorkIsCurrent(epoch, userId)) throw new Error("session_context_invalidated");
     var controller = typeof AbortController === "function" ? new AbortController() : null;
     var request = { controller: controller, epoch: epoch, userId: userId };
+    var timedOut = false;
+    var timeout = controller && requestOptions && requestOptions.timeoutMs ? scheduleSessionTimeout(function () {
+      timedOut = true;
+      controller.abort();
+    }, requestOptions.timeoutMs) : null;
     state.activeRequests.push(request);
     try {
       var options = {
@@ -794,9 +819,11 @@
       }
       return result;
     } catch (error) {
+      if (timedOut && sessionWorkIsCurrent(epoch, userId)) throw new Error("tempo_de_resposta_excedido");
       if (!sessionWorkIsCurrent(epoch, userId) || error && error.name === "AbortError") throw new Error("session_context_invalidated");
       throw error;
     } finally {
+      if (timeout !== null) cancelSessionTimeout(timeout);
       state.activeRequests = state.activeRequests.filter(function (item) { return item !== request; });
     }
   }
@@ -1049,6 +1076,140 @@
     });
   }
 
+  function eventResultFormat(item) {
+    return String(item && (item.formato_resultado || item.resultado && item.resultado.formato || item.placar && item.placar.formato) || "duelo_placar");
+  }
+
+  function eventCompetitors(item) {
+    var seen = {};
+    return arrayOf(item && item.participantes).filter(function (participant) {
+      var id = usableScore(participant && (participant.id_participante || participant.id));
+      if (!id || seen[id]) return false;
+      seen[id] = true;
+      return true;
+    }).slice().sort(function (a, b) {
+      return numberOf(a.ordem, 0) - numberOf(b.ordem, 0);
+    });
+  }
+
+  function eventDisplayTitle(item) {
+    if (eventResultFormat(item) === "duelo_placar") {
+      var sides = matchSides(item || {});
+      return sides.home.name + " × " + sides.away.name;
+    }
+    if (eventResultFormat(item) === "duelo_decisao") {
+      var names = eventCompetitors(item).map(function (participant) { return participant.nome || participant.nome_curto || ""; }).filter(Boolean);
+      if (names.length === 2) return names.join(" × ");
+    }
+    return String(item && item.titulo || "Evento esportivo");
+  }
+
+  function resultFieldText(value) {
+    return typeof value === "string" || typeof value === "number" && Number.isFinite(value) ? String(value).trim() : "";
+  }
+
+  function scoreUnitLabel(item) {
+    var unit = resultFieldText(item && item.unidade_placar);
+    // O placar de gols conserva a apresentação já usada pelo futebol.
+    return unit.toLowerCase() === "gols" ? "" : unit;
+  }
+
+  function renderScorePeriods(item, authorized) {
+    if (!authorized) return "";
+    var result = item.placar || item.resultado || {};
+    var seen = {};
+    var periods = arrayOf(result.periodos).filter(function (period) {
+      if (!period || typeof period !== "object") return false;
+      var key = resultFieldText(period.codigo);
+      if (!key || seen[key] || usableScore(period.casa) === null || usableScore(period.fora) === null) return false;
+      seen[key] = true;
+      return true;
+    }).slice().sort(function (a, b) { return numberOf(a.ordem, 0) - numberOf(b.ordem, 0); }).slice(0, 100);
+    if (!periods.length) return "";
+    return "<div class=\"ie-score-periods\" aria-label=\"Parciais, na ordem dos participantes\">" + periods.map(function (period) {
+      return "<span><small>" + escapeHtml(resultFieldText(period.nome) || period.codigo) + "</small><b>" + escapeHtml(usableScore(period.casa)) + " – " + escapeHtml(usableScore(period.fora)) + "</b></span>";
+    }).join("") + "</div>";
+  }
+
+  function eventRankingRows(item, result) {
+    if (!result || result.formato !== "classificacao" || result.completa !== true || !Array.isArray(result.classificacao) || !result.classificacao.length || result.classificacao.length > 100) return [];
+    var participants = eventCompetitors(item);
+    var seenIds = {};
+    var seenPositions = {};
+    var rows = [];
+    var valid = result.classificacao.every(function (row, index) {
+      if (!row || typeof row !== "object") return false;
+      var id = usableScore(row.id_participante);
+      var participant = participants.find(function (candidate) { return Number(candidate.id_participante || candidate.id) === id; });
+      var position = row.posicao == null ? null : usableScore(row.posicao);
+      if (!id || !participant || seenIds[id] || row.posicao != null && (!position || seenPositions[position])) return false;
+      seenIds[id] = true;
+      if (position !== null) seenPositions[position] = true;
+      rows.push({ participant: participant, result: row, position: position, index: index });
+      return true;
+    });
+    return valid ? rows.sort(function (a, b) {
+      return (a.position === null ? Infinity : a.position) - (b.position === null ? Infinity : b.position) || a.index - b.index;
+    }) : [];
+  }
+
+  function renderEventRanking(item, result, expanded, confirmed) {
+    var rows = eventRankingRows(item, result);
+    if (!rows.length) return "";
+    var visible = expanded ? rows : rows.slice(0, 3);
+    return "<section class=\"ie-event-ranking\" aria-label=\"Classificação do evento\"><h3>" + (confirmed ? "Classificação final" : "Classificação parcial") + "</h3>" + visible.map(function (entry) {
+      var participant = entry.participant;
+      var row = entry.result;
+      var details = [["Tempo", row.tempo], ["Diferença", row.diferenca], ["Voltas", row.voltas], ["Grid", row.grid], ["Paradas", row.pits], ["Status", row.status]].filter(function (field) {
+        return resultFieldText(field[1]) !== "";
+      }).map(function (field) { return field[0] + ": " + resultFieldText(field[1]); });
+      var name = participant.nome || participant.nome_curto || "Participante";
+      return "<div class=\"ie-event-ranking-row\"><b>" + (entry.position === null ? "—" : escapeHtml(entry.position) + "º") + "</b>" + logoHtml(participant.imagem_url, name, "ie-entity-logo", participant.sigla) + "<span><strong>" + escapeHtml(name) + "</strong>" + (details.length ? "<small>" + escapeHtml(details.join(" · ")) + "</small>" : "") + "</span></div>";
+    }).join("") + (visible.length < rows.length ? "<small class=\"ie-event-ranking-more\">Classificação completa em Detalhes</small>" : "") + "</section>";
+  }
+
+  function renderEventDecision(item, result, confirmed) {
+    if (!confirmed || !result || result.formato !== "duelo_decisao") return "";
+    var participants = eventCompetitors(item);
+    var ids = participants.map(function (participant) { return Number(participant.id_participante || participant.id); });
+    if (ids.length !== 2 || !Array.isArray(result.participantes) || result.participantes.length !== 2
+      || Number(result.participantes[0]) === Number(result.participantes[1])
+      || !result.participantes.every(function (id) { return ids.indexOf(usableScore(id)) >= 0; })) return "";
+    var winner = participants.find(function (participant) { return Number(participant.id_participante || participant.id) === usableScore(result.vencedor_id); });
+    var text = result.situacao === "vitoria" && winner ? "Vitória de " + (winner.nome || winner.nome_curto || "Participante")
+      : result.situacao === "empate" && result.vencedor_id == null ? "Empate"
+        : result.situacao === "sem_resultado" && result.vencedor_id == null ? "Sem resultado" : "";
+    if (!text) return "";
+    var details = [resultFieldText(result.metodo), resultFieldText(result.round) ? "Round " + resultFieldText(result.round) : "", resultFieldText(result.tempo)].filter(Boolean);
+    return "<div class=\"ie-event-decision\"><strong>" + escapeHtml(text) + "</strong>" + (details.length ? "<span>" + escapeHtml(details.join(" · ")) + "</span>" : "") + "</div>";
+  }
+
+  function renderStructuredEventCard(item, label, interactive, visibility) {
+    var format = eventResultFormat(item);
+    var title = eventDisplayTitle(item);
+    var id = matchCanonicalId(item);
+    var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Evento", 25);
+    var result = item.resultado || item.placar || {};
+    var startAt = item.inicio_em || item.data_partida || item.data_inicio;
+    var metadata = [resultFieldText(item.subtipo_evento), visibility.live ? resultFieldText(item.periodo) : "", resultFieldText(item.fase), resultFieldText(item.rodada), [resultFieldText(item.local_nome), resultFieldText(item.local_cidade)].filter(Boolean).join(" · ")].filter(Boolean);
+    var eventStatus = String(item.status_normalizado || item.status || item.status_canonico || "").toLowerCase();
+    var statusLabels = { cancelada: "Cancelado", adiada: "Adiado", abandonada: "Abandonado", suspensa: "Suspenso" };
+    var status = visibility.confirmed ? "Encerrado" : visibility.live ? (liveSourceIsPeriodic(item) ? "Atualização periódica" : "Ao vivo") : statusLabels[eventStatus] || "";
+    var actions = interactive === false || !id ? "" : "<button type=\"button\" class=\"ie-text-action\"" + detailAttributes("event", id, "", title) + ">Detalhes</button>";
+    var body = "<h3 class=\"ie-event-title\">" + escapeHtml(title) + "</h3>";
+    if (format === "duelo_decisao") {
+      var participants = eventCompetitors(item);
+      body += "<div class=\"ie-event-competitors\">" + participants.map(function (participant) {
+        var name = participant.nome || participant.nome_curto || "Participante";
+        return "<div class=\"ie-side\">" + logoHtml(participant.imagem_url, name, "", participant.sigla) + "<strong>" + escapeHtml(name) + "</strong></div>";
+      }).join("") + "</div>";
+      body += renderEventDecision(item, result, visibility.confirmed);
+    }
+    body += "<div class=\"ie-event-meta\">" + (status ? "<strong>" + escapeHtml(status) + "</strong>" : "") + (startAt ? "<span>" + escapeHtml(formatDateTime(startAt)) + "</span>" : "") + metadata.map(function (text) { return "<span>" + escapeHtml(text) + "</span>"; }).join("") + "</div>";
+    if (format === "classificacao" && visibility.resultAllowed) body += renderEventRanking(item, result, interactive === false, visibility.confirmed);
+    return "<article class=\"ie-feed-card ie-wide ie-match-card ie-structured-event" + (visibility.live ? " is-live" : "") + (visibility.live && item.relogio && item.relogio.alem_regulamentar === true ? " is-regulation-exceeded" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(visibility.live ? "live" : "trophy") + "</span>" + escapeHtml(competition) + "</span>" + actions + "</div>" + body + "</article>";
+  }
+
   function renderMatchCard(item, label, interactive) {
     var sides = matchSides(item || {});
     var status = String(item.status_normalizado || item.status || item.status_canonico || "").toLowerCase();
@@ -1067,6 +1228,9 @@
     var staleLive = liveStatus && !pendingResult && (!liveSourceIsAuthorized(item) || !liveSourceIsFresh(item));
     var provisionalResult = !pendingResult && !staleLive && resultState === "provisorio";
     var live = liveStatus && !pendingResult && !staleLive;
+    if (eventResultFormat(item) !== "duelo_placar") return renderStructuredEventCard(item, label, interactive, {
+      confirmed: confirmedResult, live: live, resultAllowed: confirmedResult || (provisionalResult && live)
+    });
     var id = item.id_evento || item.id_partida || item.id || "";
     var result = item.placar || item.resultado || {};
     var scoreHome = item.placar_casa == null ? (sides.home.score == null ? (result.casa == null ? "" : result.casa) : sides.home.score) : item.placar_casa;
@@ -1074,6 +1238,7 @@
     var scoreCanBeShown = confirmedResult || (provisionalResult && live);
     scoreHome = scoreCanBeShown ? usableScore(scoreHome) : null;
     scoreAway = scoreCanBeShown ? usableScore(scoreAway) : null;
+    var currentScoreShown = scoreHome !== null && scoreAway !== null;
     var lastScore = !futureSchedule ? lastObservedScore(item) : null;
     if ((scoreHome === null || scoreAway === null) && lastScore) {
       scoreHome = lastScore.casa;
@@ -1086,13 +1251,20 @@
     if (pendingResult || staleLive) statusText = "";
     else if (!statusText && confirmedResult && ["encerrada", "finished", "finalizada"].indexOf(status) >= 0) statusText = "Encerrado";
     else if (!statusText) statusText = live ? "Ao vivo" : formatDateTime(startAt, false);
+    if (live) {
+      // O backend normaliza o relógio informado na coleta autoritativa; nunca cronometre pelo início previsto.
+      statusText = resultFieldText(item.relogio && item.relogio.texto)
+        || (scoreUnitLabel(item) ? resultFieldText(item.periodo) : "")
+        || (liveSourceIsPeriodic(item) ? "Atualização periódica" : "Ao vivo");
+    }
     var dateText = formatDate(startAt);
     var center = hasScore ? "<span class=\"ie-score\">" + escapeHtml(scoreHome) + " – " + escapeHtml(scoreAway) + "</span>" : (pendingResult || staleLive || live) ? "<span class=\"ie-score\">×</span>" : "<span class=\"ie-match-time\">" + escapeHtml(formatDateTime(startAt, false) || "A definir") + "</span>";
-    if (hasScore && statusText) center += "<span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>";
+    if (hasScore && scoreUnitLabel(item)) center += "<span class=\"ie-score-unit\">" + escapeHtml(scoreUnitLabel(item)) + "</span>";
+    if ((hasScore || live) && statusText) center += "<span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>";
     if (dateText) center += "<span class=\"ie-match-date\">" + escapeHtml(dateText) + "</span>";
     var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Confronto", 25);
     var actions = interactive === false || !id ? "" : "<div class=\"ie-match-actions\"><button type=\"button\" data-match-action=\"odds\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir cotações de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("chart") + "</button><button type=\"button\" data-match-action=\"analysis\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir análises de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("analysis") + "</button></div>";
-    return "<article class=\"ie-feed-card ie-wide ie-match-card" + (live ? " is-live" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "trophy") + "</span>" + escapeHtml(competition) + "</span>" + actions + "</div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name, "", sides.home.abbreviation) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name, "", sides.away.abbreviation) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div></article>";
+    return "<article class=\"ie-feed-card ie-wide ie-match-card" + (live ? " is-live" : "") + (live && item.relogio && item.relogio.alem_regulamentar === true ? " is-regulation-exceeded" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "trophy") + "</span>" + escapeHtml(competition) + "</span>" + actions + "</div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name, "", sides.home.abbreviation) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name, "", sides.away.abbreviation) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div>" + renderScorePeriods(item, currentScoreShown) + "</article>";
   }
 
   function renderNewsCard(item) {
@@ -1147,12 +1319,103 @@
   }
 
   function renderCompetitionCard(item) {
-    var rows = arrayOf(item.classificacao || item.posicoes).slice(0, 4);
     var period = [item.data_inicio ? "Início " + formatDate(item.data_inicio) : "", item.data_fim ? "Fim " + formatDate(item.data_fim) : ""].filter(Boolean).join(" • ");
     var summary = (item.fase_atual ? "<p class=\"ie-news-description\"><strong>" + escapeHtml(item.fase_atual) + "</strong></p>" : "") + (period ? "<span class=\"ie-source\">" + escapeHtml(period) + "</span>" : "");
-    var body = rows.length ? "<div class=\"ie-standings\">" + rows.map(function (row) { return "<div class=\"ie-standing-row\"><span>" + escapeHtml(row.posicao || row.rank || "—") + "</span><strong>" + escapeHtml(row.nome || row.time_nome || row.participante_nome || "") + "</strong><strong>" + escapeHtml(row.pontos == null ? "" : row.pontos) + "</strong></div>"; }).join("") + "</div>" : summary || "<p class=\"ie-news-description\">Calendário em atualização.</p>";
+    var body = summary + renderCompetitionStandings(item.classificacao, item.id_competicao || item.id, item.fase_atual, true);
     var name = competitionDisplayName(item.nome || item.competicao_nome || "Competição");
     return "<article class=\"ie-feed-card\"" + detailAttributes("competition", item.id_competicao || item.id || "", "", name) + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("trophy") + "</span>Competição</span></div><h3 class=\"ie-news-title\">" + escapeHtml(name) + "</h3>" + body + "</article>";
+  }
+
+  function competitionNumber(value, position) {
+    if ((typeof value !== "number" && typeof value !== "string") || String(value).trim() === "") return null;
+    var parsed = Number(value);
+    return Number.isFinite(parsed) && (!position || Number.isInteger(parsed) && parsed > 0) ? parsed : null;
+  }
+
+  function competitionStandingRows(classification) {
+    if (!classification || ["atual", "desatualizada"].indexOf(classification.status) < 0) return [];
+    return arrayOf(classification.itens).filter(function (row) {
+      return row && typeof row === "object" && competitionNumber(row.id_participante, true) !== null && row.nome;
+    }).slice().sort(function (a, b) {
+      var groupOrder = String(a.grupo || "").localeCompare(String(b.grupo || ""), "pt-BR", { numeric: true });
+      var positionA = competitionNumber(a.posicao, true);
+      var positionB = competitionNumber(b.posicao, true);
+      return groupOrder || (positionA === null ? Infinity : positionA) - (positionB === null ? Infinity : positionB);
+    });
+  }
+
+  function competitionSourceHtml(data) {
+    data = data || {};
+    var parts = [data.fonte_dominio ? "Fonte: " + data.fonte_dominio : "", data.atualizado_em ? "Recebido em " + formatDateTime(data.atualizado_em) : ""].filter(Boolean);
+    return parts.length ? "<p class=\"ie-competition-source\">" + escapeHtml(parts.join(" · ")) + "</p>" : "";
+  }
+
+  function competitionParticipantAttributes(team, competitionId, phase) {
+    var participantId = competitionNumber(team && team.id_participante, true);
+    if (participantId === null || !competitionId) return "";
+    return detailAttributes("competition-participant", participantId, "", team.nome || "Participante") + " data-participant-id=\"" + escapeHtml(participantId) + "\" data-competition-id=\"" + escapeHtml(competitionId) + "\" data-phase=\"" + escapeHtml(phase || "") + "\"";
+  }
+
+  function renderCompetitionStandings(classification, competitionId, phase, compact) {
+    classification = classification || {};
+    if (classification.status === "nao_aplicavel") return "";
+    var rows = competitionStandingRows(classification);
+    if (!rows.length) return "<p class=\"ie-competition-notice\">" + (classification.status === "indisponivel" ? "Classificação indisponível nas fontes habilitadas." : "Classificação em atualização. As colocações ainda não foram confirmadas pela fonte.") + "</p>";
+    var status = classification.status === "desatualizada" ? "Última classificação recebida — atualização pendente." : "Classificação recebida da fonte.";
+    var grouped = [];
+    rows.forEach(function (row) {
+      var groupName = String(row.grupo || "");
+      var group = grouped.find(function (item) { return item.name === groupName; });
+      if (!group) { group = { name: groupName, rows: [] }; grouped.push(group); }
+      group.rows.push(row);
+    });
+    var fields = compact ? [["pontos", "Pts", "Pontos"], ["jogos", "J", "Jogos"]] : [["pontos", "Pts", "Pontos"], ["jogos", "J", "Jogos"], ["vitorias", "V", "Vitórias"], ["empates", "E", "Empates"], ["derrotas", "D", "Derrotas"], ["saldo_gols", "SG", "Saldo de gols"]];
+    var tables = grouped.map(function (group) {
+      var shown = compact ? group.rows.slice(0, 4) : group.rows;
+      var heading = "<tr><th scope=\"col\">Pos.</th><th scope=\"col\">Participante</th>" + fields.map(function (field) { return "<th scope=\"col\"><abbr title=\"" + field[2] + "\">" + field[1] + "</abbr></th>"; }).join("") + "</tr>";
+      var body = shown.map(function (team) {
+        var position = competitionNumber(team.posicao, true);
+        var name = "<span>" + escapeHtml(team.nome) + "</span>";
+        var teamHtml = compact ? name : "<button type=\"button\" class=\"ie-competition-team\"" + competitionParticipantAttributes(team, competitionId, phase) + ">" + logoHtml(team.imagem_url, team.nome, "ie-entity-logo", team.sigla) + name + "</button>";
+        return "<tr><td>" + (position === null ? "<span aria-label=\"Colocação não informada\">—</span>" : escapeHtml(position) + "º") + "</td><th scope=\"row\">" + teamHtml + "</th>" + fields.map(function (field) {
+          var value = competitionNumber(team[field[0]], false);
+          return "<td>" + (value === null ? "<span aria-label=\"Não informado\">—</span>" : escapeHtml(value.toLocaleString("pt-BR"))) + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      return "<div class=\"ie-competition-table-wrap\"><table class=\"ie-competition-table" + (compact ? " is-compact" : "") + "\"><caption>" + escapeHtml(group.name || "Classificação geral") + "</caption><thead>" + heading + "</thead><tbody>" + body + "</tbody></table></div>" + (compact && shown.length < group.rows.length ? "<p class=\"ie-competition-source\">Veja todos os participantes em Detalhes.</p>" : "");
+    }).join("");
+    return "<div class=\"ie-competition-standings\"><p class=\"ie-competition-notice" + (classification.status === "desatualizada" ? " is-pending" : "") + "\">" + escapeHtml(status) + "</p>" + competitionSourceHtml(classification) + tables + (compact ? "" : "<p class=\"ie-competition-source\">Pts: pontos · J: jogos · V: vitórias · E: empates · D: derrotas · SG: saldo de gols. Deslize a tabela para ver todas as colunas.</p>") + "</div>";
+  }
+
+  function renderCompetitionParticipants(teams, competitionId, phase, qualified) {
+    return "<div class=\"ie-classified-list\">" + arrayOf(teams).filter(function (team) {
+      return team && competitionNumber(team.id_participante, true) !== null && team.nome;
+    }).map(function (team) {
+      var name = team.nome || "Participante";
+      var status = qualified ? "Classificação confirmada" : "Participante da temporada";
+      var participantPhase = qualified ? team.fase || phase : "";
+      return "<article class=\"ie-classified-row ie-competition-participant\"" + competitionParticipantAttributes(team, competitionId, participantPhase) + ">" + logoHtml(team.imagem_url, name, "ie-entity-logo", team.sigla) + "<span><strong>" + escapeHtml(name) + "</strong><small>" + escapeHtml(status + (participantPhase ? " · " + participantPhase : "")) + "</small></span>" + icon("chevron") + "</article>";
+    }).join("") + "</div>";
+  }
+
+  function renderCompetitionClassification(data, competitionId) {
+    data = data || {};
+    var competition = data.competicao || {};
+    var classification = data.classificacao || {};
+    var qualified = data.classificados || {};
+    var rows = competitionStandingRows(classification);
+    var confirmed = ["confirmado", "parcial"].indexOf(qualified.status) >= 0 ? arrayOf(qualified.itens).filter(function (team) { return team && team.situacao === "classificado" && competitionNumber(team.id_participante, true) !== null && team.nome; }) : [];
+    var html = detailSection("Colocação", renderCompetitionStandings(classification, competitionId, classification.fase || competition.fase_atual, false));
+    if (confirmed.length) {
+      html += detailSection("Classificados confirmados", (qualified.fase ? "<p class=\"ie-competition-notice\">Fase: " + escapeHtml(qualified.fase) + "</p>" : "") + (qualified.status === "parcial" ? "<p class=\"ie-competition-notice is-pending\">Lista parcial: os demais classificados ainda estão em atualização.</p>" : "") + competitionSourceHtml(qualified) + renderCompetitionParticipants(confirmed, competitionId, qualified.fase, true));
+    } else if (classification.status === "nao_aplicavel") {
+      html += detailSection("Avanço de fase", "<p class=\"ie-competition-notice\">Esta fase não usa tabela de colocação. Os classificados serão exibidos quando o avanço estiver confirmado; participar de um confronto não comprova classificação.</p>");
+    }
+    if (!rows.length) {
+      var participants = arrayOf(data.participantes);
+      html += detailSection("Participantes da temporada", participants.length ? renderCompetitionParticipants(participants, competitionId, "", false) : "<p class=\"ie-competition-notice\">Participantes em atualização.</p>");
+    }
+    return html;
   }
 
   function subcardMatchesSection(subcard, section) {
@@ -1243,11 +1506,12 @@
     if (toolbar) toolbar.hidden = false;
     var competitions = gameCompetitionSelections();
     var competitionId = selectedGameCompetitionId();
-    filter.innerHTML = "<option value=\"\">Todas as favoritas</option>" + competitions.map(function (item) {
+    var filterOptions = "<option value=\"\">Todas as favoritas</option>" + competitions.map(function (item) {
       var identity = selectionIdentity(item);
       var name = competitionDisplayName(item.nome || item.nome_exibicao || item.competicao_nome || "Competição");
       return "<option value=\"" + escapeHtml(identity.id) + "\">" + escapeHtml(name) + "</option>";
     }).join("");
+    if (filter.innerHTML !== filterOptions) filter.innerHTML = filterOptions;
     filter.value = competitionId ? String(competitionId) : "";
     filter.disabled = !competitions.length;
     filter.setAttribute("aria-busy", state.gameCompetitionLoading ? "true" : "false");
@@ -1258,7 +1522,100 @@
       byId("gamesContent").innerHTML = emptyState("Carregando confrontos", "Buscando os confrontos desta competição.", false);
       return;
     }
-    byId("gamesContent").innerHTML = rows.length ? rows.map(function (item) { return renderMatchCard(item); }).join("") : emptyState("Nenhum confronto", "Não há confrontos nesta seção para os times e competições acompanhados.", false);
+    var content = rows.length ? rows.map(function (item) { return renderMatchCard(item); }).join("") : emptyState("Nenhum confronto", "Não há confrontos nesta seção para os times e competições acompanhados.", false);
+    if (byId("gamesContent").innerHTML !== content) byId("gamesContent").innerHTML = content;
+  }
+
+  function liveRefreshIsVisible() {
+    return !!state.session && !!state.bootstrap && !state.livePageSuspended && !document.hidden && navigator.onLine !== false
+      && !byId("ieApp").hidden && state.activeTab === "games" && state.gameFilter === "live"
+      && activeSportIsOperational();
+  }
+
+  function pauseLiveRefresh() {
+    state.liveRefreshRevision += 1;
+    if (state.liveRefreshTimer !== null) cancelSessionTimeout(state.liveRefreshTimer);
+    state.liveRefreshTimer = null;
+  }
+
+  function scheduleLiveRefresh(delay) {
+    if (state.liveRefreshTimer !== null) cancelSessionTimeout(state.liveRefreshTimer);
+    state.liveRefreshTimer = null;
+    if (!liveRefreshIsVisible()) return;
+    state.liveRefreshTimer = scheduleSessionTimeout(function () {
+      state.liveRefreshTimer = null;
+      runLiveRefresh();
+    }, delay == null ? CONFIG.liveRefreshMs : delay);
+  }
+
+  function liveRefreshContextIsCurrent(request) {
+    return sessionWorkIsCurrent(request.epoch, request.userId) && liveRefreshIsVisible()
+      && request.revision === state.liveRefreshRevision && request.generation === state.loadGeneration
+      && request.preferenceRevision === state.preferenceRevision
+      && request.sportContext === state.sportRequestId && request.sport === Number(state.activeSportId)
+      && request.competition === (Number(selectedGameCompetitionId()) || null)
+      && request.competitionRequest === state.gameCompetitionRequestId
+      && (request.competition || request.sectionRequest === state.sportSectionRequests.live)
+      && !state.loading && state.sportLoadingContext == null && !state.gameCompetitionLoading && !state.liveTouchActive && byId("detailModal").hidden;
+  }
+
+  function renderLiveGameUpdates() {
+    var container = byId("gamesContent");
+    var active = document.activeElement;
+    var action = active && active.getAttribute("data-match-action");
+    var eventId = active && active.getAttribute("data-event-id");
+    var anchor = all(".ie-match-card", container).find(function (row) { return row.getBoundingClientRect().bottom > 0; });
+    var anchorButton = anchor && anchor.querySelector("[data-event-id]");
+    var anchorId = anchorButton && anchorButton.getAttribute("data-event-id");
+    var anchorTop = anchor && anchor.getBoundingClientRect().top;
+    renderGames();
+    if (anchorId) {
+      var nextAnchor = all("[data-event-id]", container).find(function (button) { return button.getAttribute("data-event-id") === anchorId; });
+      if (nextAnchor) {
+        var delta = nextAnchor.closest(".ie-match-card").getBoundingClientRect().top - anchorTop;
+        if (delta) window.scrollBy(0, delta);
+      }
+    }
+    if (action && eventId && !active.isConnected) {
+      var nextFocus = all("[data-match-action]", container).find(function (button) {
+        return button.getAttribute("data-match-action") === action && button.getAttribute("data-event-id") === eventId;
+      });
+      if (nextFocus) nextFocus.focus({ preventScroll: true });
+    }
+  }
+
+  async function runLiveRefresh() {
+    if (!liveRefreshIsVisible()) return;
+    if (state.liveRefreshRequest || state.loading || state.sportLoadingContext != null
+      || state.sportSectionPending.live != null || state.gameCompetitionLoading || state.settingsSavePending
+      || state.liveTouchActive || !byId("detailModal").hidden) {
+      scheduleLiveRefresh();
+      return;
+    }
+    var request = {
+      epoch: state.sessionEpoch, userId: state.session.user_id, revision: state.liveRefreshRevision,
+      generation: state.loadGeneration, preferenceRevision: state.preferenceRevision, sportContext: state.sportRequestId, sport: Number(state.activeSportId),
+      competition: Number(selectedGameCompetitionId()) || null, competitionRequest: state.gameCompetitionRequestId,
+      sectionRequest: state.sportSectionRequests.live = (state.sportSectionRequests.live || 0) + 1
+    };
+    state.liveRefreshRequest = request;
+    try {
+      var result = await rpc("ie_partidas_listar_rpc", {
+        p_secao: "ao_vivo", p_id_esporte: request.sport, p_id_competicao: request.competition,
+        p_fase: null, p_limite: 30, p_offset: 0
+      }, { timeoutMs: 15000 });
+      if (!liveRefreshContextIsCurrent(request)) return;
+      if (request.competition) state.gameCompetitionGames.live = arrayOf(result);
+      else state.games.live = arrayOf(result);
+      renderLiveGameUpdates();
+      setSourceFreshness();
+    } catch (error) {
+      // Uma falha transitória não apaga o último placar nem simula nova atualização da fonte.
+      if (liveRefreshContextIsCurrent(request)) setSourceFreshness();
+    } finally {
+      if (state.liveRefreshRequest === request) state.liveRefreshRequest = null;
+      if (sessionWorkIsCurrent(request.epoch, request.userId)) scheduleLiveRefresh();
+    }
   }
 
   function renderNews() {
@@ -1672,12 +2029,13 @@
   }
 
   function sportSectionRequest(name, sport, competitionId) {
-    if (name === "forYou") return rpc("ie_partidas_listar_rpc", { p_secao: "para_voce", p_id_esporte: sport, p_fase: null, p_limite: 30, p_offset: 0 });
-    if (name === "live") return rpc("ie_partidas_listar_rpc", { p_secao: "ao_vivo", p_id_esporte: sport, p_id_competicao: competitionId ? Number(competitionId) : null, p_fase: null, p_limite: 30, p_offset: 0 });
-    if (name === "upcoming") return rpc("ie_partidas_listar_rpc", { p_secao: "proximos", p_id_esporte: sport, p_id_competicao: competitionId ? Number(competitionId) : null, p_fase: null, p_limite: 30, p_offset: 0 });
-    if (name === "results") return rpc("ie_partidas_listar_rpc", { p_secao: "resultados", p_id_esporte: sport, p_id_competicao: competitionId ? Number(competitionId) : null, p_fase: null, p_limite: 30, p_offset: 0 });
-    if (name === "competitions") return rpc("ie_competicoes_favoritas_listar_rpc", { p_id_esporte: sport, p_limite: 30, p_offset: 0 });
-    return rpc("ie_noticias_listar_rpc", { p_id_esporte: sport, p_id_participante: state.newsFilters.participantId ? Number(state.newsFilters.participantId) : null, p_id_competicao: state.newsFilters.competitionId ? Number(state.newsFilters.competitionId) : null, p_limite: 30, p_offset: 0 });
+    var requestOptions = { timeoutMs: 15000 };
+    if (name === "forYou") return rpc("ie_partidas_listar_rpc", { p_secao: "para_voce", p_id_esporte: sport, p_fase: null, p_limite: 30, p_offset: 0 }, requestOptions);
+    if (name === "live") return rpc("ie_partidas_listar_rpc", { p_secao: "ao_vivo", p_id_esporte: sport, p_id_competicao: competitionId ? Number(competitionId) : null, p_fase: null, p_limite: 30, p_offset: 0 }, requestOptions);
+    if (name === "upcoming") return rpc("ie_partidas_listar_rpc", { p_secao: "proximos", p_id_esporte: sport, p_id_competicao: competitionId ? Number(competitionId) : null, p_fase: null, p_limite: 30, p_offset: 0 }, requestOptions);
+    if (name === "results") return rpc("ie_partidas_listar_rpc", { p_secao: "resultados", p_id_esporte: sport, p_id_competicao: competitionId ? Number(competitionId) : null, p_fase: null, p_limite: 30, p_offset: 0 }, requestOptions);
+    if (name === "competitions") return rpc("ie_competicoes_favoritas_listar_rpc", { p_id_esporte: sport, p_limite: 30, p_offset: 0 }, requestOptions);
+    return rpc("ie_noticias_listar_rpc", { p_id_esporte: sport, p_id_participante: state.newsFilters.participantId ? Number(state.newsFilters.participantId) : null, p_id_competicao: state.newsFilters.competitionId ? Number(state.newsFilters.competitionId) : null, p_limite: 30, p_offset: 0 }, requestOptions);
   }
 
   function applySportSection(name, value) {
@@ -1706,9 +2064,14 @@
   }
 
   async function loadActiveSportSections(sectionNames, renderAfter, generation, strict) {
-    var requestId = ++state.sportRequestId;
+    var requestId = state.sportRequestId;
+    if (generation == null) generation = state.loadGeneration;
     var sport = state.activeSportId ? Number(state.activeSportId) : null;
     var sections = uniqueSportSections(sectionNames);
+    var sectionRequests = {};
+    sections.forEach(function (name) {
+      sectionRequests[name] = state.sportSectionRequests[name] = (state.sportSectionRequests[name] || 0) + 1;
+    });
     var newsRequestId = sections.indexOf("news") >= 0 ? ++state.newsRequestId : null;
     if (!sport || !sportIsOperational(sportById(sport))) {
       clearSportSections(sections);
@@ -1717,13 +2080,21 @@
       return { errors: [] };
     }
     var results = await Promise.all(sections.map(function (name) {
+      state.sportSectionPending[name] = sectionRequests[name];
       return sportSectionRequest(name, sport).then(function (value) {
+        if (state.sportSectionPending[name] === sectionRequests[name]) delete state.sportSectionPending[name];
         return { name: name, ok: true, value: value };
       }, function (error) {
+        if (state.sportSectionPending[name] === sectionRequests[name]) delete state.sportSectionPending[name];
         return { name: name, ok: false, error: error };
       });
     }));
     if (!loadIsCurrent(generation) || requestId !== state.sportRequestId || sport !== Number(state.activeSportId)) return { stale: true, errors: [] };
+    results = results.filter(function (result) {
+      return sectionRequests[result.name] === state.sportSectionRequests[result.name]
+        && (result.name !== "news" || newsRequestId === state.newsRequestId);
+    });
+    if (!results.length && sections.length) return { stale: true, errors: [] };
     var errors = results.filter(function (result) { return !result.ok; }).map(function (result) { return result.error; });
     results.forEach(function (result) {
       if (!result.ok) {
@@ -1733,7 +2104,7 @@
       if (result.name === "news" && newsRequestId !== state.newsRequestId) return;
       applySportSection(result.name, result.value);
     });
-    if (renderAfter === "partial") renderSportSections(sections);
+    if (renderAfter === "partial") renderSportSections(results.map(function (result) { return result.name; }));
     else if (renderAfter !== false) renderAll();
     if (strict && errors.length) throw errors[0];
     return { errors: errors };
@@ -1779,38 +2150,56 @@
   }
 
   async function loadActiveSportData(renderAfter) {
-    var result = await loadActiveSportSections(ALL_SPORT_DATA_SECTIONS, false, null, true);
-    if (selectedGameCompetitionId()) await loadGameCompetitionData(false, null, true);
-    if (renderAfter !== false) renderAll();
+    var generation = state.loadGeneration;
+    var context = state.sportRequestId;
+    var result = await loadActiveSportSections(ALL_SPORT_DATA_SECTIONS, false, generation, false);
+    if (result.stale || !loadIsCurrent(generation) || context !== state.sportRequestId) return { stale: true, errors: [] };
+    if (selectedGameCompetitionId()) {
+      var competitionResult = await loadGameCompetitionData(false, generation, false);
+      if (competitionResult.stale || context !== state.sportRequestId) return { stale: true, errors: [] };
+      result.errors = result.errors.concat(competitionResult.errors || []);
+    }
+    if (renderAfter !== false) renderSportSections(ALL_SPORT_DATA_SECTIONS);
     return result;
   }
 
   async function changeActiveSport(id) {
-    var next = Number(id || 0);
-    if (!next || next === Number(state.activeSportId)) return;
-    state.sportRequestId += 1;
+    var next = Number(id || 0) || null;
+    if (next && state.sportFavoriteOrder.indexOf(next) < 0) return;
+    if (next === (Number(state.activeSportId) || null)) return;
+    pauseLiveRefresh();
+    var context = ++state.sportRequestId;
+    state.sportLoadingContext = null;
+    state.sportSectionPending = {};
     state.activeSportId = next;
     state.newsFilters = { participantId: null, competitionId: null };
     state.newsRequestId += 1;
     resetGameCompetitionFilter();
-    clearSportSections(["live", "upcoming", "results"]);
+    clearSportSections(ALL_SPORT_DATA_SECTIONS);
     state.homeSectionFilter = "";
     renderSportsNav();
+    renderSportSections(ALL_SPORT_DATA_SECTIONS);
+    setSourceFreshness();
+    window.scrollTo({ top: 0, behavior: "smooth" });
     if (!activeSportIsOperational()) {
-      clearSportSections(ALL_SPORT_DATA_SECTIONS);
-      renderAll();
       saveCache();
-      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    renderGames();
+    state.sportLoadingContext = context;
     try {
-      await loadActiveSportData(true);
+      var result = await loadActiveSportData(true);
+      if (result.stale || context !== state.sportRequestId) return;
       saveCache();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      setSourceFreshness();
+      if (result.errors.length) showToast("Algumas informações deste esporte não puderam ser atualizadas.", true);
     } catch (error) {
-      renderAll();
+      if (context !== state.sportRequestId) return;
       showToast(friendlyError(error), true);
+    } finally {
+      if (context === state.sportRequestId) {
+        state.sportLoadingContext = null;
+        scheduleLiveRefresh();
+      }
     }
   }
 
@@ -2055,6 +2444,7 @@
 
   async function loadAll(manual) {
     if (state.loading) return;
+    pauseLiveRefresh();
     var settingsDraft = manual ? captureSettingsDraft() : null;
     var initialOpening = !manual && !state.bootstrap && byId("ieApp").hidden;
     var route = initialOpening ? initialRouteDefinition() : null;
@@ -2110,10 +2500,12 @@
     } finally {
       if (loadIsCurrent(generation)) state.loading = false;
       if (manual && loadIsCurrent(generation)) scheduleSessionTimeout(function () { setPullRefreshState(0, false); }, 220);
+      if (loadIsCurrent(generation)) scheduleLiveRefresh();
     }
   }
 
   function activateTab(tab) {
+    pauseLiveRefresh();
     if (tab !== "settings") state.previousTab = tab;
     state.activeTab = tab;
     all("[data-tab]").forEach(function (button) {
@@ -2133,6 +2525,16 @@
     renderSportsNav();
     setSourceFreshness();
     window.scrollTo({ top: 0, behavior: "smooth" });
+    scheduleLiveRefresh(0);
+  }
+
+  function navigateToTab(tab) {
+    if (tab === "home") {
+      state.homeSectionFilter = "";
+      changeActiveSport(state.sportFavoriteOrder[0] || null);
+      renderHome();
+    }
+    activateTab(tab);
   }
 
   function settingsContextDefinition(context) {
@@ -2149,7 +2551,6 @@
   function applySettingsContext(context, scrollToTarget) {
     var definition = settingsContextDefinition(context);
     state.settingsContext = definition ? String(context).toLowerCase() : "";
-    byId("settingsTitle").textContent = definition ? "Configurações · " + definition.label : "Configurações";
     all("[data-settings-section]").forEach(function (section) { section.classList.remove("is-context-target"); });
     if (!definition) return;
     var target = byId(definition.target);
@@ -4151,10 +4552,11 @@
       if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       var event = data && data.evento || {};
       var sides = matchSides(event);
-      byId("detailTitle").textContent = displayText(sides.home.name + " × " + sides.away.name);
+      var structuredResult = eventResultFormat(event) !== "duelo_placar";
+      byId("detailTitle").textContent = displayText(eventDisplayTitle(event));
       byId("detailSubtitle").textContent = competitionDisplayName(event.competicao_nome || event.status_texto || "Detalhes da partida");
       var html = renderMatchCard(event, event.status_texto || "Partida", false);
-      var collections = [
+      var collections = structuredResult ? [] : [
         ["Linha do tempo", data.linha_tempo],
         ["Estatísticas", data.estatisticas],
         ["Escalações", data.escalacoes],
@@ -4169,11 +4571,11 @@
           return "<div><span>" + escapeHtml(label) + "</span><strong>" + escapeHtml(value) + "</strong></div>";
         }).join("") + "</div>");
       });
-      var oddsHtml = renderOddsDetail(data, sides);
+      var oddsHtml = structuredResult ? "" : renderOddsDetail(data, sides);
       if (oddsHtml) html += detailSection("Cotações informativas", oddsHtml);
-      byId("detailContent").innerHTML = detailModeSwitch("", id) + html;
+      byId("detailContent").innerHTML = (structuredResult ? "" : detailModeSwitch("", id)) + html;
     } catch (error) {
-      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("", id) + emptyState("Detalhes indisponíveis", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = (structuredResult ? "" : detailModeSwitch("", id)) + emptyState("Detalhes indisponíveis", friendlyError(error), false);
     }
   }
 
@@ -4252,7 +4654,6 @@
       var data = await rpc("ie_competicao_detalhe_rpc", { p_id_competicao: Number(id) });
       if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       var competition = data && data.competicao || {};
-      var teams = arrayOf(data && data.times_classificados);
       byId("detailTitle").textContent = competitionDisplayName(competition.nome || title || "Competição");
       byId("detailSubtitle").textContent = displayText([competition.temporada, competition.pais].filter(Boolean).join(" • ") || "Detalhes da competição");
       var overview = "<div class=\"ie-detail-list\">" + [
@@ -4260,13 +4661,7 @@
         ["Início", competition.data_inicio ? formatDate(competition.data_inicio) : "Em atualização"],
         ["Fim", competition.data_fim ? formatDate(competition.data_fim) : "Em atualização"]
       ].map(function (row) { return "<div><span>" + escapeHtml(row[0]) + "</span><strong>" + escapeHtml(row[1]) + "</strong></div>"; }).join("") + "</div>";
-      var teamHtml = teams.length ? "<div class=\"ie-classified-list\">" + teams.map(function (team) {
-        var teamName = team.nome || "Time";
-        var abbreviation = String(team.sigla || team.abreviacao || "").trim().toUpperCase() || initials(teamName).slice(0, 3);
-        var label = (abbreviation ? abbreviation + " - " : "") + teamName + (team.pontos == null ? "" : " (" + team.pontos + ")");
-        return "<article class=\"ie-classified-row\"" + detailAttributes("competition-participant", team.id_participante || team.id, "", teamName) + " data-participant-id=\"" + escapeHtml(team.id_participante || team.id || "") + "\" data-competition-id=\"" + escapeHtml(competition.id_competicao || id) + "\" data-phase=\"" + escapeHtml(competition.fase_atual || "") + "\"><span class=\"ie-classified-position\">" + escapeHtml(team.posicao ? team.posicao + "º" : team.grupo || "—") + "</span>" + logoHtml(team.imagem_url || team.logo_url, teamName, "ie-entity-logo", abbreviation) + "<strong>" + escapeHtml(label) + "</strong>" + icon("chevron") + "</article>";
-      }).join("") + "</div>" : "<p>Os classificados ainda não foram disponibilizados pela fonte.</p>";
-      byId("detailContent").innerHTML = detailSection("Informações da competição", overview) + detailSection("Times classificados na fase", teamHtml);
+      byId("detailContent").innerHTML = detailSection("Informações da competição", overview) + renderCompetitionClassification(data, competition.id_competicao || id);
     } catch (error) {
       if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState("Detalhes indisponíveis", friendlyError(error), false);
     }
@@ -4443,8 +4838,9 @@
     renderSportFavoriteSettings();
     return persistFavoriteOrder("sport", previous).then(function (saved) {
       if (!saved) return;
-      if (!state.sportFavoriteOrder.length) state.activeSportId = null;
-      else if (!state.activeSportId || state.sportFavoriteOrder.indexOf(Number(state.activeSportId)) < 0) state.activeSportId = state.sportFavoriteOrder[0];
+      if (!state.activeSportId || state.sportFavoriteOrder.indexOf(Number(state.activeSportId)) < 0) {
+        changeActiveSport(state.sportFavoriteOrder[0] || null);
+      }
       renderSportsNav();
       return true;
     }).finally(function () {
@@ -4608,6 +5004,18 @@
   }
 
   function setupEvents() {
+    document.addEventListener("visibilitychange", function () {
+      pauseLiveRefresh();
+      state.liveTouchActive = false;
+      if (!document.hidden) scheduleLiveRefresh(0);
+    });
+    window.addEventListener("pagehide", function () { state.livePageSuspended = true; pauseLiveRefresh(); });
+    window.addEventListener("pageshow", function () { state.livePageSuspended = false; scheduleLiveRefresh(0); });
+    window.addEventListener("offline", pauseLiveRefresh);
+    window.addEventListener("online", function () { scheduleLiveRefresh(0); });
+    document.addEventListener("touchstart", function () { state.liveTouchActive = true; }, { passive: true });
+    document.addEventListener("touchend", function () { state.liveTouchActive = false; }, { passive: true });
+    document.addEventListener("touchcancel", function () { state.liveTouchActive = false; }, { passive: true });
     byId("retryButton").addEventListener("click", function () { byId("accessPanel").hidden = true; byId("loadingPanel").hidden = false; loadAll(false); });
     setupPullToRefresh();
     byId("settingsButton").addEventListener("click", function () { openSettings("", true); });
@@ -4617,16 +5025,18 @@
     all("[data-tab]").forEach(function (button) {
       button.addEventListener("click", function () {
         var tab = button.getAttribute("data-tab");
-        activateTab(tab);
+        navigateToTab(tab);
       });
     });
-    all("[data-game-filter]").forEach(function (button) { button.addEventListener("click", function () { state.gameFilter = button.getAttribute("data-game-filter"); syncGameFilterTabs(state.gameFilter); renderGames(); }); });
+    all("[data-game-filter]").forEach(function (button) { button.addEventListener("click", function () { pauseLiveRefresh(); state.gameFilter = button.getAttribute("data-game-filter"); syncGameFilterTabs(state.gameFilter); renderGames(); scheduleLiveRefresh(0); }); });
     byId("gamesCompetitionFilter").addEventListener("change", function () {
+      pauseLiveRefresh();
       state.gameCompetitionId = byId("gamesCompetitionFilter").value ? Number(byId("gamesCompetitionFilter").value) : null;
       state.gameCompetitionGames = { live: [], upcoming: [], results: [] };
       loadGameCompetitionData(true, null, false).then(function (result) {
         if (result && result.errors && result.errors.length) showToast(friendlyError(result.errors[0]), true);
       }, function (error) { showToast(friendlyError(error), true); });
+      scheduleLiveRefresh();
     });
     all("[data-close-detail]").forEach(function (button) { button.addEventListener("click", dismissDetailFrame); });
     byId("settingsForm").addEventListener("submit", function (event) { event.preventDefault(); });
@@ -5278,11 +5688,13 @@
           var targetIndex = event.key === "Home" ? 0 : event.key === "End" ? navigationTabs.length - 1 : (navigationIndex + (event.key === "ArrowLeft" ? -1 : 1) + navigationTabs.length) % navigationTabs.length;
           var targetTab = navigationTabs[targetIndex];
           targetTab.focus();
-          if (targetTab.hasAttribute("data-tab")) activateTab(targetTab.getAttribute("data-tab"));
+          if (targetTab.hasAttribute("data-tab")) navigateToTab(targetTab.getAttribute("data-tab"));
           else {
+            pauseLiveRefresh();
             state.gameFilter = targetTab.getAttribute("data-game-filter");
             syncGameFilterTabs(state.gameFilter);
             renderGames();
+            scheduleLiveRefresh(0);
           }
         }
         return;

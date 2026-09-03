@@ -16,3 +16,8 @@
 .ie-settings-save-status:empty {
   display: none;
 }
+
+/* Ao vivo não significa tempo regulamentar excedido. A indicação vem da fonte. */
+.ie-feed-card.is-live:not(.is-regulation-exceeded) {
+  border-color: var(--ie-border);
+}

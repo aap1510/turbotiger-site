@@ -84,7 +84,11 @@ button:focus-visible, a:focus-visible, [tabindex="-1"]:focus-visible { outline: 
 .hs-timeline-node { position:relative; z-index:1; width:15px; height:15px; margin-top:2px; border:2px solid var(--hs-gold); border-radius:50%; background:var(--hs-bg); }
 .hs-timeline-item:first-child .hs-timeline-node { background:var(--hs-gold); }
 .hs-timeline-copy { min-width:0; display:grid; gap:5px; }
-.hs-timeline-copy strong { overflow:hidden; color:var(--hs-text); font-size:13px; text-overflow:ellipsis; white-space:nowrap; }
+.hs-timeline-copy strong { color:var(--hs-text); font-size:13px; line-height:1.4; }
+.hs-timeline-match { min-width:0; display:grid; gap:3px; overflow-wrap:anywhere; }
+.hs-timeline-team { min-width:0; display:grid; grid-template-columns:minmax(0,1fr) max-content; align-items:baseline; gap:8px; }
+.hs-timeline-team-name { min-width:0; white-space:normal; overflow-wrap:anywhere; }
+.hs-timeline-score { white-space:nowrap; font-variant-numeric:tabular-nums; }
 .hs-timeline-copy strong .is-wo,
 .hs-wo { color:#ff5b61; }
 .hs-wo { font-size:10px; font-style:normal; font-weight:800; }
