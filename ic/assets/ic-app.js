@@ -15,6 +15,7 @@
   var route = router.parse(root.location && root.location.search || "");
   var screens = {};
   var sessionRequestPending = false;
+  var pullRefreshActive = false;
   var api = IC.Api.create({
     getSession: function () { return store.getState().session; },
     getSessionEpoch: function () { return store.getState().sessionEpoch; }
@@ -169,7 +170,65 @@
     if (!hasAuthorizedSession()) return;
     await loadBootstrap(true);
     var screen = getScreen(route.section);
-    if (screen && route.section !== "visao-geral") screen.load(force !== false);
+    if (screen && route.section !== "visao-geral") await screen.load(force !== false);
+  }
+
+  function setPullRefreshState(progress, refreshing) {
+    var indicator = document.getElementById("icPullRefreshIndicator");
+    if (!indicator) return;
+    var value = Math.max(0, Math.min(1, Number(progress) || 0));
+    indicator.style.setProperty("--ic-pull-rotation", Math.round(value * 240) + "deg");
+    indicator.classList.toggle("is-visible", value > 0 || !!refreshing);
+    indicator.classList.toggle("is-refreshing", !!refreshing);
+  }
+
+  function setupPullToRefresh() {
+    var tracking = false;
+    var startY = 0;
+    var progress = 0;
+    var threshold = 76;
+
+    document.addEventListener("touchstart", function (event) {
+      var sheet = document.getElementById("icSheet");
+      if (pullRefreshActive || !hasAuthorizedSession() || root.scrollY > 0 ||
+          (sheet && !sheet.hidden) || !event.touches || event.touches.length !== 1) {
+        tracking = false;
+        return;
+      }
+      tracking = true;
+      progress = 0;
+      startY = event.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener("touchmove", function (event) {
+      if (!tracking || !event.touches || event.touches.length !== 1) return;
+      progress = Math.min(1, Math.max(0, event.touches[0].clientY - startY) / threshold);
+      setPullRefreshState(progress, false);
+    }, { passive: true });
+
+    function release() {
+      if (!tracking) return;
+      tracking = false;
+      if (progress < 1) {
+        setPullRefreshState(0, false);
+        progress = 0;
+        return;
+      }
+      pullRefreshActive = true;
+      setPullRefreshState(1, true);
+      Promise.resolve(refreshCurrent(true)).catch(function (error) {
+        UI.toast(error && error.message || "Não foi possível atualizar as informações.", true);
+      }).finally(function () {
+        root.setTimeout(function () {
+          pullRefreshActive = false;
+          setPullRefreshState(0, false);
+        }, 220);
+      });
+      progress = 0;
+    }
+
+    document.addEventListener("touchend", release, { passive: true });
+    document.addEventListener("touchcancel", release, { passive: true });
   }
 
   function notificationSheet() {
@@ -293,6 +352,7 @@
   function initialize() {
     UI.bindGlobalSheet();
     bindEvents();
+    setupPullToRefresh();
     Bridge.bind({ onSession: receiveSession, onClear: clearSession, onRefresh: function () { refreshCurrent(true); }, onNativeReady: nativeBridgeReady, onOpenSection: openNativeSection, onBack: function () { if (UI.closeSheet()) return true; if (route.section !== "visao-geral") { navigate({ section: "visao-geral" }); return true; } return false; } });
     if (!Bridge.hasBridge() || !Bridge.isAuthorizedDocument()) { showGate("access"); return; }
     showGate("loading");

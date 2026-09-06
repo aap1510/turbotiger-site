@@ -129,6 +129,48 @@ svg {
 
 @keyframes ic-spin { to { transform: rotate(360deg); } }
 
+.ic-pull-refresh {
+  position: fixed;
+  z-index: 70;
+  top: calc(env(safe-area-inset-top) + 9px);
+  left: 50%;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--ic-border-strong);
+  border-radius: 50%;
+  background: rgba(21, 22, 25, .96);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .38);
+  color: var(--ic-gold);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -18px) scale(.78);
+  transition: opacity .12s ease, transform .12s ease;
+}
+
+.ic-pull-refresh.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.ic-pull-refresh svg {
+  width: 21px;
+  height: 21px;
+  transform: rotate(var(--ic-pull-rotation, 0deg));
+  transform-origin: 50% 50%;
+  transform-box: view-box;
+}
+
+.ic-pull-refresh.is-refreshing svg {
+  animation: ic-pull-spin .8s linear infinite;
+}
+
+@keyframes ic-pull-spin {
+  from { transform: rotate(var(--ic-pull-rotation, 0deg)); }
+  to { transform: rotate(calc(var(--ic-pull-rotation, 0deg) + 360deg)); }
+}
+
 .ic-app { min-height: 100vh; }
 
 .ic-header {
