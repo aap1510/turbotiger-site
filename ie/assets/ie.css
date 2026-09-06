@@ -2376,6 +2376,37 @@ body.ie-reordering-favorites {
   color: #d8bd78;
 }
 
+.ie-global-house-list {
+  display: grid;
+  gap: 1px;
+  padding: 1px 12px 10px;
+}
+
+.ie-global-house-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 1.5fr) repeat(3, minmax(54px, 1fr));
+  align-items: center;
+  gap: 7px;
+  padding: 8px 7px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .025);
+  color: var(--ie-muted);
+  font-size: 9px;
+}
+
+.ie-global-house-row strong {
+  overflow: hidden;
+  color: var(--ie-text);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ie-global-house-row span {
+  text-align: right;
+  white-space: nowrap;
+}
+
 .ie-reference-card > footer {
   display: flex;
   justify-content: space-between;

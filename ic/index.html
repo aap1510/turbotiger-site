@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#050607">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://jzqgudmvquokizvgehow.supabase.co wss://jzqgudmvquokizvgehow.supabase.co; font-src 'self'; media-src 'none'; worker-src 'none'; frame-src 'none'">
+  <title>Inteligência de Cassino — Turbo Tiger</title>
+  <link rel="icon" href="../assets/icone-turbotiger-raio.ico">
+  <link rel="stylesheet" href="assets/ic.css?v=1">
+  <link rel="stylesheet" href="assets/ic-components.css?v=1">
+  <link rel="stylesheet" href="assets/ic-screens.css?v=1">
+</head>
+<body>
+  <svg class="ic-svg-sprite" aria-hidden="true" focusable="false">
+    <symbol id="ic-i-arrow-left" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="ic-i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="ic-i-home" viewBox="0 0 24 24"><path d="M3 11.5L12 4l9 7.5V21h-6v-6H9v6H3z"/></symbol>
+    <symbol id="ic-i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></symbol>
+    <symbol id="ic-i-live" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 000 11.4M17.7 6.3a8 8 0 010 11.4"/></symbol>
+    <symbol id="ic-i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.2 9.2 0 00-6.4 2.6L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></symbol>
+    <symbol id="ic-i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20V7M2 20h22"/></symbol>
+    <symbol id="ic-i-game" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="4"/><path d="M8 10v5M5.5 12.5h5M16.5 11.5h.01M18.5 14.5h.01"/></symbol>
+    <symbol id="ic-i-community" viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20c.4-4 2.2-6 5.5-6s5.1 2 5.5 6M14 14.5c3.8-.6 6.1 1.2 6.8 5.5"/></symbol>
+    <symbol id="ic-i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.2 8-8 10-4.8-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-5"/></symbol>
+    <symbol id="ic-i-coach" viewBox="0 0 24 24"><path d="M5 5h14a2 2 0 012 2v8a2 2 0 01-2 2h-7l-5 4v-4H5a2 2 0 01-2-2V7a2 2 0 012-2z"/><path d="M8 9h8M8 13h5"/></symbol>
+    <symbol id="ic-i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.6v.2h-4V21a1.7 1.7 0 00-1-1.6 1.7 1.7 0 00-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 00.3-1.9A1.7 1.7 0 003 14H2.8v-4H3a1.7 1.7 0 001.6-1 1.7 1.7 0 00-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 009 4.6 1.7 1.7 0 0010 3v-.2h4V3a1.7 1.7 0 001 1.6 1.7 1.7 0 001.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 00-.3 1.9 1.7 1.7 0 001.6 1h.2v4H21a1.7 1.7 0 00-1.6 1z"/></symbol>
+    <symbol id="ic-i-bell" viewBox="0 0 24 24"><path d="M18 9a6 6 0 00-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol>
+    <symbol id="ic-i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M18.5 10a7 7 0 00-12-3L4 9M5.5 14a7 7 0 0012 3l2.5-2"/></symbol>
+    <symbol id="ic-i-alert" viewBox="0 0 24 24"><path d="M12 3L2 21h20z"/><path d="M12 9v5M12 18h.01"/></symbol>
+    <symbol id="ic-i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
+    <symbol id="ic-i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></symbol>
+    <symbol id="ic-i-chevron" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="ic-i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="ic-i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></symbol>
+    <symbol id="ic-i-check" viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></symbol>
+    <symbol id="ic-i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></symbol>
+    <symbol id="ic-i-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></symbol>
+    <symbol id="ic-i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+  </svg>
+
+  <main class="ic-gate" id="icLoadingPanel" aria-live="polite">
+    <img class="ic-gate__brand" src="../assets/icone-turbotiger-raio.webp" alt="">
+    <div class="ic-spinner" aria-hidden="true"></div>
+    <h1>Inteligência de Cassino</h1>
+    <p>Preparando seu ambiente de controle.</p>
+  </main>
+
+  <main class="ic-gate" id="icAccessPanel" hidden>
+    <div class="ic-gate__icon"><svg aria-hidden="true"><use href="#ic-i-lock"></use></svg></div>
+    <h1>Acesso exclusivo <span class="ic-gate-break">pelo aplicativo</span></h1>
+    <p>Esta central protege informações pessoais <span class="ic-gate-break">e funciona somente dentro do Turbo Tiger.</span></p>
+  </main>
+
+  <div class="ic-app" id="icApp" hidden>
+    <header class="ic-header">
+      <div class="ic-header__main">
+        <div class="ic-header__identity">
+          <img src="../assets/icone-turbotiger-raio.webp" alt="" width="34" height="34">
+          <div>
+            <p class="ic-eyebrow" id="icGreeting">Seu controle</p>
+            <h1>Inteligência de Cassino</h1>
+          </div>
+        </div>
+        <div class="ic-header__actions">
+          <button class="ic-icon-button" type="button" data-global-action="notifications" aria-label="Notificações">
+            <svg aria-hidden="true"><use href="#ic-i-bell"></use></svg><span class="ic-notification-dot" id="icNotificationDot" hidden></span>
+          </button>
+          <button class="ic-icon-button" type="button" data-route="coach" aria-label="Abrir Tiger Coach">
+            <svg aria-hidden="true"><use href="#ic-i-coach"></use></svg>
+          </button>
+          <button class="ic-icon-button" type="button" data-global-action="close" aria-label="Fechar central">
+            <svg aria-hidden="true"><use href="#ic-i-close"></use></svg>
+          </button>
+        </div>
+      </div>
+      <div class="ic-status-strip" aria-label="Estado atual">
+        <button class="ic-status-pill" type="button" data-route="ao-vivo" id="icCaptureStatus">
+          <span class="ic-status-dot ic-status-dot--neutral"></span><span>Captura verificando</span>
+        </button>
+        <button class="ic-status-pill" type="button" data-route="ao-vivo" id="icGlobalSessionStatus">
+          <svg aria-hidden="true"><use href="#ic-i-live"></use></svg><span>Nenhuma sessão ativa</span>
+        </button>
+        <span class="ic-updated" id="icLastUpdated">Ainda não sincronizado</span>
+      </div>
+    </header>
+
+    <nav class="ic-tabs" id="icTabs" role="tablist" aria-label="Áreas da Inteligência de Cassino">
+      <button role="tab" id="ic-tab-visao-geral" aria-controls="ic-panel-visao-geral" aria-selected="true" tabindex="0" data-section="visao-geral"><svg aria-hidden="true"><use href="#ic-i-home"></use></svg><span>Visão Geral</span></button>
+      <button role="tab" id="ic-tab-planejar" aria-controls="ic-panel-planejar" aria-selected="false" tabindex="-1" data-section="planejar"><svg aria-hidden="true"><use href="#ic-i-calendar"></use></svg><span>Planejar</span></button>
+      <button role="tab" id="ic-tab-ao-vivo" aria-controls="ic-panel-ao-vivo" aria-selected="false" tabindex="-1" data-section="ao-vivo"><svg aria-hidden="true"><use href="#ic-i-live"></use></svg><span>Ao Vivo</span></button>
+      <button role="tab" id="ic-tab-historico" aria-controls="ic-panel-historico" aria-selected="false" tabindex="-1" data-section="historico"><svg aria-hidden="true"><use href="#ic-i-history"></use></svg><span>Meu Histórico</span></button>
+      <button role="tab" id="ic-tab-estatisticas" aria-controls="ic-panel-estatisticas" aria-selected="false" tabindex="-1" data-section="estatisticas"><svg aria-hidden="true"><use href="#ic-i-chart"></use></svg><span>Estatísticas</span></button>
+      <button role="tab" id="ic-tab-jogos" aria-controls="ic-panel-jogos" aria-selected="false" tabindex="-1" data-section="jogos"><svg aria-hidden="true"><use href="#ic-i-game"></use></svg><span>Jogos</span></button>
+      <button role="tab" id="ic-tab-comunidade" aria-controls="ic-panel-comunidade" aria-selected="false" tabindex="-1" data-section="comunidade"><svg aria-hidden="true"><use href="#ic-i-community"></use></svg><span>Comunidade</span></button>
+      <button role="tab" id="ic-tab-regras-pausas" aria-controls="ic-panel-regras-pausas" aria-selected="false" tabindex="-1" data-section="regras-pausas"><svg aria-hidden="true"><use href="#ic-i-shield"></use></svg><span>Regras e Pausas</span></button>
+      <button role="tab" id="ic-tab-coach" aria-controls="ic-panel-coach" aria-selected="false" tabindex="-1" data-section="coach"><svg aria-hidden="true"><use href="#ic-i-coach"></use></svg><span>Tiger Coach</span></button>
+      <button role="tab" id="ic-tab-configuracoes" aria-controls="ic-panel-configuracoes" aria-selected="false" tabindex="-1" data-section="configuracoes"><svg aria-hidden="true"><use href="#ic-i-settings"></use></svg><span>Configurações</span></button>
+    </nav>
+
+    <div class="ic-main" id="icMain">
+      <section role="tabpanel" id="ic-panel-visao-geral" aria-labelledby="ic-tab-visao-geral" data-panel="visao-geral"></section>
+      <section role="tabpanel" id="ic-panel-planejar" aria-labelledby="ic-tab-planejar" data-panel="planejar" hidden></section>
+      <section role="tabpanel" id="ic-panel-ao-vivo" aria-labelledby="ic-tab-ao-vivo" data-panel="ao-vivo" hidden></section>
+      <section role="tabpanel" id="ic-panel-historico" aria-labelledby="ic-tab-historico" data-panel="historico" hidden></section>
+      <section role="tabpanel" id="ic-panel-estatisticas" aria-labelledby="ic-tab-estatisticas" data-panel="estatisticas" hidden></section>
+      <section role="tabpanel" id="ic-panel-jogos" aria-labelledby="ic-tab-jogos" data-panel="jogos" hidden></section>
+      <section role="tabpanel" id="ic-panel-comunidade" aria-labelledby="ic-tab-comunidade" data-panel="comunidade" hidden></section>
+      <section role="tabpanel" id="ic-panel-regras-pausas" aria-labelledby="ic-tab-regras-pausas" data-panel="regras-pausas" hidden></section>
+      <section role="tabpanel" id="ic-panel-coach" aria-labelledby="ic-tab-coach" data-panel="coach" hidden></section>
+      <section role="tabpanel" id="ic-panel-configuracoes" aria-labelledby="ic-tab-configuracoes" data-panel="configuracoes" hidden></section>
+    </div>
+  </div>
+
+  <div class="ic-sheet-backdrop" id="icSheetBackdrop" hidden></div>
+  <section class="ic-sheet" id="icSheet" role="dialog" aria-modal="true" aria-labelledby="icSheetTitle" hidden>
+    <div class="ic-sheet__handle" aria-hidden="true"></div>
+    <header class="ic-sheet__header">
+      <div><p class="ic-eyebrow" id="icSheetEyebrow"></p><h2 id="icSheetTitle">Detalhes</h2></div>
+      <button class="ic-icon-button" type="button" data-sheet-close aria-label="Fechar detalhes"><svg aria-hidden="true"><use href="#ic-i-close"></use></svg></button>
+    </header>
+    <div class="ic-sheet__body" id="icSheetBody"></div>
+  </section>
+
+  <div class="ic-toast-region" id="icToastRegion" aria-live="polite" aria-atomic="true"></div>
+  <div class="ic-sr-only" id="icA11yStatus" aria-live="polite"></div>
+
+  <script src="assets/ic-core.js?v=1"></script>
+  <script src="assets/ic-store.js?v=1"></script>
+  <script src="assets/ic-router.js?v=1"></script>
+  <script src="assets/ic-bridge.js?v=1"></script>
+  <script src="assets/ic-api.js?v=1"></script>
+  <script src="assets/ic-components.js?v=1"></script>
+  <script src="assets/ic-live-channel.js?v=1"></script>
+  <script src="assets/ic-clock.js?v=1"></script>
+  <script src="assets/screens/ic-overview.js?v=1"></script>
+  <script src="assets/screens/ic-planning.js?v=1"></script>
+  <script src="assets/screens/ic-live.js?v=1"></script>
+  <script src="assets/screens/ic-history.js?v=1"></script>
+  <script src="assets/screens/ic-statistics.js?v=1"></script>
+  <script src="assets/screens/ic-games.js?v=1"></script>
+  <script src="assets/screens/ic-community.js?v=1"></script>
+  <script src="assets/screens/ic-rules-pauses.js?v=1"></script>
+  <script src="assets/screens/ic-coach.js?v=1"></script>
+  <script src="assets/screens/ic-settings.js?v=1"></script>
+  <script src="assets/ic-app.js?v=1"></script>
+</body>
+</html>
