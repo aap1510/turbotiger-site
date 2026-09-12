@@ -34,6 +34,7 @@
         return '<article class="ic-card"><h4>' + Core.escapeHtml(ledger.currency) + '</h4>' + UI.metric("Resultado líquido", Core.formatSignedMoney(amount, ledger.currency, places)) + UI.metric("Volume apostado", Core.formatMoney(Core.unitsFrom(ledger, ["stake_volume_units", "volume_units"], null), ledger.currency, places)) + UI.badge(ledger.financial_complete === true ? "Financeiro reconciliado" : "Verifique a cobertura", ledger.financial_complete === true ? "complete" : "partial") + '</article>';
       }).join("") + '</div></section>';
       if (deps.featureEnabled("ic_personal_insights_enabled") || deps.featureEnabled("ic_session_risk_enabled")) html += renderRadar(data.radar || data.radar_antes_jogar || {});
+      if (deps.featureEnabled("ic_historical_report_enabled")) html += renderHistoricalSummary(data.historical_summary || data.resumo_historico || {});
       if (deps.featureEnabled("ic_personal_insights_enabled")) html += renderInsights(data.insights || data.insights_recentes || []);
       if (deps.featureEnabled("ic_discipline_gamification_enabled")) html += renderDiscipline(data.discipline || data.disciplina || {});
       var actions = [];
@@ -43,6 +44,17 @@
       if (deps.featureEnabled("ic_emergency_enabled")) actions.push(UI.button("Preciso parar", { route: "regras-pausas", icon: "shield", kind: "danger" }));
       html += '<section><div class="ic-card__header"><div><h3>Ações rápidas</h3><p>Escolha o próximo passo de forma consciente.</p></div></div><div class="ic-quick-actions">' + actions.join("") + '</div></section></div>';
       return html;
+    }
+
+    function renderHistoricalSummary(summary) {
+      var overall = summary.overall || {}, sessions = summary.sessions || {}, games = Core.normalizeArray(summary.games);
+      if (!overall.rodadas && !overall.rounds) return "";
+      var currency = overall.moeda || overall.currency || "BRL", places = Number(overall.casas == null ? 2 : overall.casas);
+      var result = overall.resultado == null ? null : String(overall.resultado);
+      var topGames = games.slice(0, 4).map(function (game) {
+        return '<article class="ic-card"><div class="ic-card__header"><div><h3>' + Core.escapeHtml(game.jogo || game.game) + '</h3><p>' + Core.safeText(game.rodadas || 0) + ' rodadas · ' + Core.safeText(game.sessoes || 0) + ' sessões</p></div>' + UI.badge("até " + Core.safeText(game.maior_multiplicador || 0) + "x", "neutral") + '</div><div class="ic-list">' + UI.listRow("Retorno observado", "Histórico deste jogo", Core.formatPercent(game.rtp, 2)) + UI.listRow("Resultado líquido", "No conjunto analisado", Core.formatSignedMoney(String(game.resultado), currency, places)) + UI.listRow("Premiações relevantes", "5x / 10x / 20x / 50x / 100x", [game.m5, game.m10, game.m20, game.m50, game.m100].map(Core.safeText).join(" / ")) + UI.listRow("Perdas disfarçadas de ganho", "Retorno maior que zero, mas menor que a aposta", Core.safeText(game.perdas_disfarcadas || 0)) + '</div></article>';
+      }).join("");
+      return '<section><div class="ic-card__header"><div><h3>Base histórica em análise</h3><p>Os testes já alimentam a inteligência desde o primeiro usuário.</p></div>' + UI.badge("exploratório", "neutral") + '</div>' + UI.banner("Base experimental inicial Turbo Tiger", "Os números descrevem o histórico capturado. Eles não preveem a próxima rodada.", "neutral") + '<div class="ic-summary-grid">' + UI.metric("Rodadas", Core.safeText(overall.rodadas || overall.rounds), "Em " + Core.safeText(overall.sessoes || 0) + " sessões") + UI.metric("Resultado acumulado", Core.formatSignedMoney(result, currency, places), "A média por sessão é diferente do total", Number(result) < 0 ? "negative" : "positive") + UI.metric("Sessão mediana", Core.formatSignedMoney(String(sessions.resultado_mediano || 0), currency, places), "Metade ficou abaixo e metade acima") + UI.metric("Multiplicador máximo", Core.safeText(overall.maior_multiplicador || 0) + "x", "Maior coeficiente observado") + UI.metric("Premiações ≥ 100x", Core.safeText(overall.m100 || 0), "Eventos extremos") + UI.metric("Perdas disfarçadas", Core.safeText(overall.perdas_disfarcadas || 0), "Retorno parcial com perda líquida") + '</div><div class="ic-grid ic-grid--cards">' + topGames + '</div><div class="ic-disclaimer">Retorno total elevado pode depender de poucos prêmios extremos. As telas de Estatísticas e Comunidade mostram amostra, concentração e resultado sem o maior pagamento.</div></section>';
     }
 
     function renderRadar(radar) {

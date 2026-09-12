@@ -1208,10 +1208,11 @@
     var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Evento", 25);
     var result = item.resultado || item.placar || {};
     var startAt = item.inicio_em || item.data_partida || item.data_inicio;
-    var metadata = [resultFieldText(item.subtipo_evento), visibility.live ? resultFieldText(item.periodo) : "", resultFieldText(item.fase), resultFieldText(item.rodada), [resultFieldText(item.local_nome), resultFieldText(item.local_cidade)].filter(Boolean).join(" · ")].filter(Boolean);
+    var metadata = [resultFieldText(item.subtipo_evento), resultFieldText(item.fase), resultFieldText(item.rodada), [resultFieldText(item.local_nome), resultFieldText(item.local_cidade)].filter(Boolean).join(" · ")].filter(Boolean);
     var eventStatus = String(item.status_normalizado || item.status || item.status_canonico || "").toLowerCase();
     var statusLabels = { cancelada: "Cancelado", adiada: "Adiado", abandonada: "Abandonado", suspensa: "Suspenso" };
-    var status = visibility.confirmed ? "Encerrado" : visibility.live ? (liveSourceIsPeriodic(item) ? "Atualização periódica" : "Ao vivo") : statusLabels[eventStatus] || "";
+    var status = visibility.confirmed ? "Encerrado" : visibility.live ? "Ao vivo" : statusLabels[eventStatus] || "";
+    var liveClock = visibility.live ? (eventStatus === "intervalo" ? "Intervalo" : resultFieldText(item.relogio && item.relogio.texto) || resultFieldText(item.periodo)) : "";
     var actions = interactive === false || !id ? "" : "<button type=\"button\" class=\"ie-text-action\"" + detailAttributes("event", id, "", title) + ">Detalhes</button>";
     var body = "<h3 class=\"ie-event-title\">" + escapeHtml(title) + "</h3>";
     if (format === "duelo_decisao") {
@@ -1222,7 +1223,7 @@
       }).join("") + "</div>";
       body += renderEventDecision(item, result, visibility.confirmed);
     }
-    body += "<div class=\"ie-event-meta\">" + (status ? "<strong>" + escapeHtml(status) + "</strong>" : "") + (startAt ? "<span>" + escapeHtml(formatDateTime(startAt)) + "</span>" : "") + metadata.map(function (text) { return "<span>" + escapeHtml(text) + "</span>"; }).join("") + "</div>";
+    body += "<div class=\"ie-event-meta\">" + (status ? "<strong>" + escapeHtml(status) + "</strong>" : "") + (liveClock ? "<span>" + escapeHtml(liveClock) + "</span>" : "") + (!visibility.live && startAt ? "<span>" + escapeHtml(formatDateTime(startAt)) + "</span>" : "") + metadata.map(function (text) { return "<span>" + escapeHtml(text) + "</span>"; }).join("") + "</div>";
     if (format === "classificacao" && visibility.resultAllowed) body += renderEventRanking(item, result, interactive === false, visibility.confirmed);
     return "<article class=\"ie-feed-card ie-wide ie-match-card ie-structured-event" + (visibility.live ? " is-live" : "") + (visibility.live && item.relogio && item.relogio.alem_regulamentar === true ? " is-regulation-exceeded" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(visibility.live ? "live" : "trophy") + "</span>" + escapeHtml(competition) + "</span>" + actions + "</div>" + body + "</article>";
   }
@@ -1270,15 +1271,16 @@
     else if (!statusText) statusText = live ? "Ao vivo" : formatDateTime(startAt, false);
     if (live) {
       // O backend normaliza o relógio informado na coleta autoritativa; nunca cronometre pelo início previsto.
-      statusText = resultFieldText(item.relogio && item.relogio.texto)
-        || (scoreUnitLabel(item) ? resultFieldText(item.periodo) : "")
-        || (liveSourceIsPeriodic(item) ? "Atualização periódica" : "Ao vivo");
+      statusText = status === "intervalo" ? "Intervalo"
+        : resultFieldText(item.relogio && item.relogio.texto)
+          || (scoreUnitLabel(item) ? resultFieldText(item.periodo) : "")
+          || "";
     }
-    var dateText = formatDate(startAt);
+    var dateText = live ? "Ao vivo" : formatDate(startAt);
     var center = hasScore ? "<span class=\"ie-score\">" + escapeHtml(scoreHome) + " – " + escapeHtml(scoreAway) + "</span>" : (pendingResult || staleLive || live) ? "<span class=\"ie-score\">×</span>" : "<span class=\"ie-match-time\">" + escapeHtml(formatDateTime(startAt, false) || "A definir") + "</span>";
     if (hasScore && scoreUnitLabel(item)) center += "<span class=\"ie-score-unit\">" + escapeHtml(scoreUnitLabel(item)) + "</span>";
-    if ((hasScore || live) && statusText) center += "<span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>";
     if (dateText) center += "<span class=\"ie-match-date\">" + escapeHtml(dateText) + "</span>";
+    if ((hasScore || live) && statusText) center += "<span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>";
     var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Confronto", 25);
     var compareAction = typeof compareSelection !== "undefined" && compareSelection && String(item.esporte || "").toLowerCase() === "futebol"
       && (scheduledStatus || status === "adiada") && !item.ao_vivo && startTimestamp > serverNow()
