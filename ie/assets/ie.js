@@ -658,6 +658,7 @@
   }
 
   function resetPersonalizedState(blocked) {
+    if (personalBets) personalBets.reset();
     if (compareSelection) compareSelection.reset();
     if (compareConfrontos) compareConfrontos.reset();
     serverClock = { epoch: NaN, tick: 0 };
@@ -747,6 +748,8 @@
   };
 
   window.TurboTigerIERefresh = function () {
+    if (personalBets && personalBets.active()) return personalBets.refresh();
+    if (personalBets) personalBets.invalidate();
     return loadAll(true);
   };
 
@@ -1225,6 +1228,7 @@
     }
     body += "<div class=\"ie-event-meta\">" + (status ? "<strong>" + escapeHtml(status) + "</strong>" : "") + (liveClock ? "<span>" + escapeHtml(liveClock) + "</span>" : "") + (!visibility.live && startAt ? "<span>" + escapeHtml(formatDateTime(startAt)) + "</span>" : "") + metadata.map(function (text) { return "<span>" + escapeHtml(text) + "</span>"; }).join("") + "</div>";
     if (format === "classificacao" && visibility.resultAllowed) body += renderEventRanking(item, result, interactive === false, visibility.confirmed);
+    if (id) body += '<div class="ieb-event-bets" data-bet-event-id="' + escapeHtml(id) + '"></div>';
     return "<article class=\"ie-feed-card ie-wide ie-match-card ie-structured-event" + (visibility.live ? " is-live" : "") + (visibility.live && item.relogio && item.relogio.alem_regulamentar === true ? " is-regulation-exceeded" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(visibility.live ? "live" : "trophy") + "</span>" + escapeHtml(competition) + "</span>" + actions + "</div>" + body + "</article>";
   }
 
@@ -1282,6 +1286,7 @@
     if (dateText) center += "<span class=\"ie-match-date\">" + escapeHtml(dateText) + "</span>";
     if ((hasScore || live) && statusText) center += "<span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>";
     var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Confronto", 25);
+    if (id) center += '<div class="ieb-event-bets" data-bet-event-id="' + escapeHtml(id) + '"></div>';
     var compareAction = typeof compareSelection !== "undefined" && compareSelection && String(item.esporte || "").toLowerCase() === "futebol"
       && (scheduledStatus || status === "adiada") && !item.ao_vivo && startTimestamp > serverNow()
       ? compareSelection.button(id, sides.home.name + " e " + sides.away.name, startTimestamp) : "";
@@ -1507,6 +1512,7 @@
       });
       html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-simulator-action=\"list\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span><span class=\"ie-entity-copy\"><strong>Simulações salvas</strong><span>Consulte as simulações da sua conta</span></span>" + icon("chevron") + "</button>");
       html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-compare-open><span class=\"ie-feed-icon\">" + icon("chart") + "</span><span class=\"ie-entity-copy\"><strong>Comparar Confrontos</strong><span>Teste os cenários de até três jogos</span></span>" + icon("chevron") + "</button>");
+      html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-personal-bets-open><span class=\"ie-feed-icon\">" + icon("news") + "</span><span class=\"ie-entity-copy\"><strong>Minhas apostas</strong><span>Bilhetes, resultados e controle pessoal</span></span>" + icon("chevron") + "</button>");
     }
     var content = html.join("") || emptyState(filteredSection ? "Nenhuma informação disponível" : "Nenhum favorito neste esporte", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Acompanhe times ou competições deste esporte para montar o seu espaço.", false);
     byId("homeContent").innerHTML = modeSwitcher + content;
@@ -5289,6 +5295,7 @@
 
   var compareConfrontos = null;
   var compareSelection = null;
+  var personalBets = null;
   function openCompareConfrontos(eventId) {
     if (!compareConfrontos) compareConfrontos = window.TurboTigerCompare({
       host: byId("detailContent"), rpc: rpc, now: serverNow,
@@ -5301,6 +5308,10 @@
   }
 
   function setupEvents() {
+    personalBets = window.TurboTigerBets({ host: byId("detailContent"), rpc: rpc, begin: beginDetail,
+      allow: automaticSaveNavigationAllowed, message: showToast,
+      share: function (ticket, element) { window.TurboTigerBetsRendering.share(ticket, element).catch(function (error) { showToast(error.message || "Não foi possível compartilhar o bilhete.", true); }); }
+    });
     compareSelection = window.TurboTigerCompareSelection({ root: document, now: serverNow,
       active: function () { return !!state.session; }, open: openCompareConfrontos });
     // Prevent navigation/sharing from racing a pending privacy change.

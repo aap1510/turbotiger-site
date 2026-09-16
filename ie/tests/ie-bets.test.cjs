@@ -1,0 +1,45 @@
+"use strict";
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const vm = require("node:vm");
+const context = { window: {} };
+vm.runInNewContext(fs.readFileSync(require("node:path").join(__dirname, "../assets/ie-bets.js"), "utf8"), context);
+const render = context.window.TurboTigerBetsRendering;
+const html = render.ticketHtml({ id: 1, plataforma: '<img src=x onerror="bad()">', situacao: "aberto", tipo: "multipla", apostado_em: "2026-09-15T03:30:00Z", valor: 10, odd: 2, retorno_potencial: 20, retorno_pago: null, moeda: "BRL", selecoes: [{ confronto: "A & B × C", mercado: "Resultado", escolha: "Casa", odd: 2 }] });
+assert(!html.includes("<img"));
+assert(html.includes("&lt;img"));
+assert(html.includes("15/09/2026"));
+assert(html.includes("00:30"));
+assert(html.includes("Não informado"));
+assert(html.includes("A &amp; B"));
+assert.equal((html.match(/data-bet-ticket=/g) || []).length, 1);
+assert.equal((html.match(/data-bet-share=/g) || []).length, 1);
+const icons = render.stack(["perdeu", "ganhou", "aberto"]);
+assert(icons.indexOf("ieb-perdeu") < icons.indexOf("ieb-ganhou"));
+assert(icons.indexOf("ieb-ganhou") < icons.indexOf("ieb-aberto"));
+assert.equal((icons.match(/class="ieb-ticket-icon/g) || []).length, 3);
+assert(icons.includes("--layer:0") && icons.includes("--layer:2"));
+assert.equal(render.money(null, "BRL"), "Não informado");
+assert.notEqual(render.money(0, "BRL"), "Não informado");
+console.log("OK: bilhete, escape de HTML, fuso de Brasília, valores desconhecidos e três cores sobrepostas.");
+
+async function behavior() {
+  const listeners = {}, attributes = {}, hostListeners = {};
+  const host = { innerHTML: "", scrollTop: 0, getAttribute: key => attributes[key], setAttribute: (k, v) => { attributes[k] = v; }, removeAttribute: k => { delete attributes[k]; }, addEventListener: (k, fn) => { hostListeners[k] = fn; } };
+  const sandbox = { window: {}, Map, Set, setTimeout, clearTimeout, MutationObserver: class { observe() {} }, document: { getElementById: () => host, addEventListener: (k, fn) => { listeners[k] = fn; }, querySelectorAll: () => [] } };
+  vm.runInNewContext(fs.readFileSync(require("node:path").join(__dirname, "../assets/ie-bets.js"), "utf8"), sandbox);
+  const requests = []; let response;
+  const empty = { plataformas: [], financeiro: [], estatisticas: [], bilhetes: [], pagina: 1, paginas: 0, total: 0 };
+  const api = sandbox.window.TurboTigerBets({ host, allow: () => true, begin: () => {}, message: () => {}, rpc: (name, args) => { requests.push({ name, args }); return new Promise(resolve => { response = resolve; }); } });
+  api.open(); assert.equal(attributes["data-view"], "personal-bets"); assert.equal(requests[0].args.p_situacao, "todos"); assert.equal(requests[0].args.p_inicio, null);
+  response(empty); await new Promise(setImmediate);
+  const positions = ["todos", "aberto", "ganhou", "perdeu", "cashout", "anulada", "outros"].map(s => host.innerHTML.indexOf('data-bet-status="' + s + '"'));
+  assert(positions.every((p, i) => p >= 0 && (i === 0 || p > positions[i - 1])));
+  assert(host.innerHTML.includes("Nenhum bilhete encontrado"));
+  hostListeners.change({ target: { hasAttribute: () => true, dataset: { betFilter: "plataforma" }, value: "167" } });
+  assert.equal(requests.at(-1).args.p_plataforma, 167);
+  api.reset(); host.innerHTML = "outra conta"; response(empty); await new Promise(setImmediate);
+  assert.equal(host.innerHTML, "outra conta", "resposta antiga não pode reaparecer após troca de conta");
+  console.log("OK: filtros ordenados, todas as plataformas por padrão e descarte de resposta após reset da conta.");
+}
+behavior().catch(error => { console.error(error); process.exitCode = 1; });
