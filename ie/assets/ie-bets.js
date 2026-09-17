@@ -7,7 +7,8 @@
   function money(v, currency) { if (v == null) return "Não informado"; try { return Number(v).toLocaleString("pt-BR", { style: "currency", currency: currency || "BRL" }); } catch (_) { return String(v) + " " + (currency || ""); } }
   function date(v) { if (!v || !Number.isFinite(Date.parse(v))) return "Não informado"; return new Date(v).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" }); }
   function ticketIcon() { return '<svg viewBox="0 0 28 20" aria-hidden="true"><path d="M2 2h24v5a3 3 0 0 0 0 6v5H2v-5a3 3 0 0 0 0-6Z"/><path d="M19 4v12"/></svg>'; }
-  function stack(statuses) { return '<span class="ieb-stack" role="img" aria-label="' + esc(statuses.map(function (s) { return labels[s]; }).join(", ")) + '">' + statuses.slice(0, 3).map(function (s, i) { return '<span class="ieb-ticket-icon ieb-' + esc(s) + '" style="--layer:' + i + '">' + ticketIcon() + '</span>'; }).join("") + '</span>'; }
+  function stack(statuses) { var shown=statuses.slice(0,3),start=(38-(23+Math.max(0,shown.length-1)*4))/2; return '<span class="ieb-stack" role="img" aria-label="' + esc(shown.map(function (s) { return labels[s]; }).join(", ")) + '" style="--start:'+start+'px">' + shown.map(function (s, i) { return '<span class="ieb-ticket-icon ieb-' + esc(s) + '" style="--layer:' + i + '">' + ticketIcon() + '</span>'; }).join("") + '</span>'; }
+  function summary(item) { var bets=item&&item.apostas||{}, parts=[["casa",bets.casa],["empate",bets.empate],["visitante",bets.visitante]].filter(function(v){return Number(v[1])>0;}).map(function(v){return Number(v[1])+" "+v[0];}); if(!parts.length)return ""; var total=parts.reduce(function(sum,p){return sum+Number(p.split(" ")[0]);},0); return (total===1?"Aposta: ":"Apostas: ")+parts.join(" | "); }
   function ticketHtml(t) {
     return '<article class="ieb-ticket" data-bet-ticket="' + esc(t.id) + '"><header><strong>' + esc(t.plataforma) + '</strong><span class="ieb-status ieb-' + esc(t.situacao) + '">' + esc(labels[t.situacao] || "Outros") + '</span></header><div class="ieb-muted">' + esc(t.tipo || "Bilhete") + ' · ' + esc(date(t.apostado_em)) + '</div>' + (t.selecoes || []).map(function (s) {
       return '<section class="ieb-selection"><strong>' + esc(s.confronto) + '</strong><span>' + esc(s.competicao || "Competição não informada") + '</span><span>' + esc(date(s.inicio)) + '</span><div>' + esc(s.mercado) + '</div><b>' + esc(s.escolha) + '</b><span>Odd: ' + esc(s.odd == null ? "Não informada" : s.odd) + '</span></section>';
@@ -43,7 +44,7 @@
     function invalidate() { clearBadges(); badges(); }
     async function badges() {
       var nodes = Array.from(document.querySelectorAll("[data-bet-event-id]")), ids = [];
-      nodes.forEach(function (n) { var id = Number(n.dataset.betEventId); if (cache.has(id)) { var item = cache.get(id); if (!n.hasAttribute("data-bet-ready")) { n.setAttribute("data-bet-ready", ""); n.innerHTML = stack(item.bilhetes || []) + (item.pessoas > 0 ? '<small>' + esc(item.pessoas) + ' membro' + (item.pessoas === 1 ? '' : 's') + ' com aposta neste confronto</small>' : ''); } } else if (id > 0 && !inflight.has(id) && ids.indexOf(id) < 0) ids.push(id); });
+      nodes.forEach(function (n) { var id = Number(n.dataset.betEventId); if (cache.has(id)) { var item = cache.get(id); if (!n.hasAttribute("data-bet-ready")) { var text=summary(item); n.setAttribute("data-bet-ready", ""); n.innerHTML = n.classList.contains("ieb-event-ticket") ? stack(item.bilhetes || []) : (text?'<small>'+esc(text)+'</small>':''); } } else if (id > 0 && !inflight.has(id) && ids.indexOf(id) < 0) ids.push(id); });
       if (!ids.length) return;
       ids = ids.slice(0, 100); var request = badgeEpoch; ids.forEach(function (id) { inflight.set(id, request); });
       try { var result = await api.rpc("ie_apostas_eventos_rpc", { p_eventos: ids }); if (request !== badgeEpoch) return; var rows = Array.isArray(result) ? result : result && result.itens; if (!Array.isArray(rows)) throw new Error("Indicadores indisponíveis"); ids.forEach(function (id) { cache.set(id, { bilhetes: [], pessoas: 0 }); }); rows.forEach(function (row) { if (ids.indexOf(Number(row.id_evento)) >= 0) cache.set(Number(row.id_evento), row); }); badges(); } catch (_) { /* An unavailable count is not displayed as zero. */ }
@@ -97,5 +98,5 @@
     try { await send("bet_share_begin", { size: encoded.length }); while (offset < encoded.length) { await send("bet_share_chunk", { offset: offset, data: encoded.slice(offset, offset + 48000) }); offset += 48000; } await send("bet_share_finish", {}); }
     finally { global.TurboTigerIEBetShareResult = null; }
   }
-  global.TurboTigerBetsRendering = { ticketHtml: ticketHtml, stack: stack, money: money, share: share };
+  global.TurboTigerBetsRendering = { ticketHtml: ticketHtml, stack: stack, summary: summary, money: money, share: share };
 })(window);
