@@ -2687,6 +2687,10 @@
   async function applyInitialRoute(route) {
     var requested = route || initialRouteDefinition();
     activateInitialRouteTab(requested);
+    if (requested.section === "apostas") {
+      await personalBets.open();
+      return;
+    }
     if (requested.section === "colaboracao") await openHistoryContribution(false);
     else if (requested.section === "configuracoes") openSettings(requested.context, true);
     else if (requested.section === "partidas" || requested.section === "jogos") {

@@ -35,7 +35,7 @@
       } catch (_) { if (request === version && active()) { host.innerHTML = '<div class="ieb-page">' + controls() + '<p role="alert">Não foi possível consultar seus bilhetes.</p><button type="button" data-bet-retry>Tentar novamente</button></div>'; } }
       finally { if (request === version) host.removeAttribute("aria-busy"); }
     }
-    function open() { if (!api.allow()) return; api.begin("Minhas apostas", "Seu histórico em todas as plataformas", false); host.setAttribute("data-detail-view", "personal-bets"); filters.pagina = 1; load(); }
+    function open() { if (!api.allow()) return; api.begin("Minhas apostas", "Seu histórico em todas as plataformas", false); host.setAttribute("data-detail-view", "personal-bets"); filters.pagina = 1; return load(); }
     function clearBadges() {
       badgeEpoch++; cache.clear(); inflight.clear();
       document.querySelectorAll("[data-bet-ready]").forEach(function (n) { n.removeAttribute("data-bet-ready"); n.replaceChildren(); });
