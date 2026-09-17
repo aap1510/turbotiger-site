@@ -2347,7 +2347,7 @@
     if (route.section === "colaboracao") requirements.base = true;
     else if (route.section === "configuracoes") { requirements.favorites = true; requirements.catalog = true; }
     else if (route.section === "partidas" || route.section === "jogos") {
-      requirements.sportSections = ["live", "upcoming", "results"];
+      requirements.sportSections = ["live", "upcoming"];
       requirements.favorites = route.context === "favoritos_primeiro";
     }
     else if (route.section === "campeonatos") requirements.sportSections = ["competitions"];
@@ -2411,6 +2411,7 @@
     hydrateCachedOpening(cached);
     rememberCurrentSelections();
     renderAll();
+    activateInitialRouteTab(route);
 
     var required = initialLoadRequirements(route);
     var critical = [];
@@ -2425,6 +2426,15 @@
     if (required.catalog) critical.push(loadCatalog(generation));
     await Promise.all(critical);
     if (!loadIsCurrent(generation)) return;
+
+    // Results are only the initial view when there is nothing live or upcoming.
+    // Otherwise they belong to the background, not the native opening gate.
+    if ((route.section === "partidas" || route.section === "jogos") && !route.eventId
+        && !state.games.live.length && !state.games.upcoming.length) {
+      required.sportSections.push("results");
+      await loadActiveSportSections(["results"], false, generation, true);
+      if (!loadIsCurrent(generation)) return;
+    }
 
     renderAll();
     await applyInitialRoute(route);
@@ -2457,7 +2467,7 @@
     }
     var remainingSections = ALL_SPORT_DATA_SECTIONS.filter(function (name) { return required.sportSections.indexOf(name) < 0; });
     if (remainingSections.length) {
-      pending.push(loadActiveSportSections(remainingSections, false, generation, false).then(function (result) {
+      pending.push(loadActiveSportSections(remainingSections, "partial", generation, false).then(function (result) {
         if (result && result.stale) backgroundStale = true;
         backgroundErrors = backgroundErrors.concat(result && result.errors || []);
       }, function (error) { backgroundErrors.push(error); }));
@@ -2668,8 +2678,15 @@
     };
   }
 
+  function activateInitialRouteTab(requested) {
+    var tabs = { partidas: "games", jogos: "games", campeonatos: "competitions", times: "teams", noticias: "news", configuracoes: "settings" };
+    if (requested.section === "cotacoes" || requested.section === "analises") state.homeSectionFilter = requested.section;
+    activateTab(tabs[requested.section] || "home");
+  }
+
   async function applyInitialRoute(route) {
     var requested = route || initialRouteDefinition();
+    activateInitialRouteTab(requested);
     if (requested.section === "colaboracao") await openHistoryContribution(false);
     else if (requested.section === "configuracoes") openSettings(requested.context, true);
     else if (requested.section === "partidas" || requested.section === "jogos") {
