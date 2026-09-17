@@ -21,7 +21,7 @@
       loading: ["refresh", "Carregando", "Estamos reunindo as informações desta área."],
       empty: ["info", "Nada por aqui ainda", "Quando houver dados, eles aparecerão aqui."],
       offline: ["alert", "Sem conexão", "O conteúdo não pôde ser atualizado. Nenhum dado desatualizado será apresentado como monitoramento ativo."],
-      insufficient_data: ["chart", "Ainda estamos conhecendo seu padrão", "A análise será liberada quando houver uma amostra suficiente."],
+      insufficient_data: ["chart", "Sem análise pessoal neste recorte", "Confira o período selecionado. Você também pode consultar a Comunidade, sem misturar os dados dela com o seu histórico."],
       insufficient_quality: ["alert", "Qualidade insuficiente", "O histórico existe, mas esta análise exige captura ou saldo confiável."],
       error: ["alert", "Não foi possível carregar", "Tente novamente em instantes."],
       unavailable: ["lock", "Recurso ainda indisponível", "A fachada segura desta área ainda não está disponível."]
@@ -30,7 +30,7 @@
     var body = '<div class="ic-state"><div class="ic-state__icon">' + icon(options.icon || entry[0]) + '</div><h3>' + Core.escapeHtml(options.title || entry[1]) + '</h3><p>' + Core.escapeHtml(options.message || entry[2]) + '</p>';
     if (type === "loading") body += '<div class="ic-skeleton" aria-hidden="true"><span></span><span></span><span></span></div>';
     if (options.meta) body += '<span class="ic-state__meta">' + Core.escapeHtml(options.meta) + '</span>';
-    body += '<span class="ic-state__meta">Última atualização: ' + Core.escapeHtml(options.updatedAt ? Core.formatDateTime(options.updatedAt) : "não disponível") + '</span>';
+    if (options.updatedAt) body += '<span class="ic-state__meta">Última atualização: ' + Core.escapeHtml(Core.formatDateTime(options.updatedAt)) + '</span>';
     if (options.retry !== false && ["offline", "error", "unavailable"].indexOf(type) >= 0) body += '<button class="ic-button" type="button" data-screen-action="retry">' + icon("refresh") + 'Tentar novamente</button>';
     return body + '</div>';
   }
@@ -39,16 +39,19 @@
     return '<article class="ic-metric"><span class="ic-metric__label">' + Core.escapeHtml(label) + '</span><strong class="ic-metric__value ic-value--' + Core.escapeHtml(tone || "neutral") + '">' + Core.escapeHtml(value) + '</strong>' + (detail ? '<span class="ic-metric__detail">' + Core.escapeHtml(detail) + '</span>' : '') + '</article>';
   }
 
-  function badge(label, status) { return '<span class="ic-badge ic-badge--' + Core.statusTone(status) + '">' + Core.escapeHtml(label) + '</span>'; }
+  function badge(label, status) { return '<span class="ic-badge ic-badge--' + Core.statusTone(status) + '">' + Core.escapeHtml(Core.statusLabel(label)) + '</span>'; }
 
   function evidence(item) {
     item = item || {};
     var values = [];
-    if (item.sample || item.amostra) values.push(Core.safeText(item.sample || item.amostra));
-    if (item.period || item.periodo) values.push(Core.safeText(item.period || item.periodo));
-    if (item.users || item.usuarios) values.push(Core.safeText(item.users || item.usuarios) + " usuários");
-    if (item.sessions || item.sessoes) values.push(Core.safeText(item.sessions || item.sessoes) + " sessões");
-    if (item.rounds || item.rodadas) values.push(Core.safeText(item.rounds || item.rodadas) + " rodadas");
+    var sample = item.sample || item.amostra;
+    if (sample && typeof sample === "object") item = Object.assign({}, sample, item);
+    if (sample && typeof sample !== "object") values.push(Core.safeText(sample));
+    var period = Core.evidencePeriod(item.period || item.periodo);
+    if (period) values.push(period);
+    if (item.users || item.usuarios) values.push(Core.countLabel(item.users || item.usuarios, "usuário", "usuários"));
+    if (item.sessions || item.sessoes) values.push(Core.countLabel(item.sessions || item.sessoes, "sessão", "sessões"));
+    if (item.rounds || item.rodadas) values.push(Core.countLabel(item.rounds || item.rodadas, "rodada", "rodadas"));
     if (item.updated_at || item.atualizado_em) values.push("Atualizado " + Core.formatDateTime(item.updated_at || item.atualizado_em));
     return values.length ? '<div class="ic-evidence">' + values.map(function (value) { return '<span>' + Core.escapeHtml(value) + '</span>'; }).join("") + '</div>' : '';
   }

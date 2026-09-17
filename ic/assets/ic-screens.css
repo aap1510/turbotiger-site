@@ -79,7 +79,7 @@
 .ic-emergency { border-color: rgba(211, 47, 47, .55); background: #140b0d; }
 .ic-emergency .ic-button { min-height: 48px; }
 
-.ic-coach-thread { min-height: 280px; display: grid; align-content: end; gap: 10px; }
+.ic-coach-thread { display: grid; align-content: start; gap: 10px; margin-bottom: 14px; }
 .ic-coach-message { max-width: 88%; padding: 12px 14px; border: 1px solid var(--ic-border); border-radius: 14px; background: var(--ic-surface-soft); font-size: .79rem; line-height: 1.5; }
 .ic-coach-message--user { justify-self: end; border-bottom-right-radius: 4px; background: #202124; }
 .ic-coach-message--coach { justify-self: start; border-bottom-left-radius: 4px; }

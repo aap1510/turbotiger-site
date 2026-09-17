@@ -309,6 +309,11 @@ svg {
 .ic-tabs button[aria-selected="true"] { color: var(--ic-text); }
 .ic-tabs button[aria-selected="true"] svg { color: var(--ic-gold); }
 .ic-tabs button[aria-selected="true"]::after { background: var(--ic-red); }
+.ic-tabs button.is-active { color: var(--ic-gold); }
+@media (max-width: 639px) {
+  .ic-tabs button { flex: 1 0 0; min-width: 60px; padding-inline: 4px; }
+  .ic-header__identity > div { min-width: 0; }
+}
 
 .ic-main {
   width: 100%;

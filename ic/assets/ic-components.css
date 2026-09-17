@@ -9,6 +9,19 @@
 .ic-section-header p { max-width: 650px; margin: 0; color: var(--ic-muted); font-size: .88rem; line-height: 1.5; }
 .ic-section-header__actions { flex: 0 0 auto; display: flex; gap: 8px; }
 
+/* Actions must not squeeze the heading into a narrow column on phones. */
+.ic-section-header > div:first-child { min-width: 0; }
+.ic-section-header__actions { flex-wrap: wrap; }
+@media (max-width: 639px) {
+  .ic-section-header { flex-direction: column; gap: 10px; }
+  .ic-section-header__actions { width: 100%; }
+  .ic-section-header__actions .ic-button { flex: 1 1 auto; }
+  .ic-section-header .ic-eyebrow { display: none; }
+  .ic-list-row { flex-wrap: wrap; }
+  .ic-list-row__value { max-width: 100%; overflow-wrap: anywhere; }
+  .ic-filter-summary .ic-field { flex: 1; min-width: 0; }
+}
+
 .ic-card {
   border: 1px solid var(--ic-border);
   border-radius: var(--ic-radius);

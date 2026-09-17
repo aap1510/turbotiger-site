@@ -43,7 +43,7 @@
     }
 
     function contextualLabel(type) {
-      if (type === "explain_session_state") return "Por que ficou laranja?";
+      if (type === "explain_session_state") return "Entender o estado da minha sessão";
       if (type === "explain_alert") return "O que mudou?";
       if (type === "explain_insight") return "Entender este insight";
       if (type === "explain_rule") return "Qual regra foi acionada?";
@@ -118,16 +118,16 @@
 
     function explanationHtml(item) {
       var response = item.explanation || {};
-      return '<article class="ic-coach-message ic-coach-message--coach"><strong>' + Core.escapeHtml(response.title || "Tiger Coach") + '</strong><div>' + Core.escapeHtml(response.message || "Os dados disponíveis ainda não permitem uma explicação segura.") + '</div>' + (Core.normalizeArray(response.fact_refs).length ? '<div class="ic-coach-message__refs">Fatos: ' + Core.escapeHtml(response.fact_refs.join(", ")) + '</div>' : '') + coachActionButtons(response.actions) + '</article>';
+      return '<article class="ic-coach-message ic-coach-message--coach"><strong>' + Core.escapeHtml(response.title || "Tiger Coach") + '</strong><div>' + Core.escapeHtml(response.message || "Os dados disponíveis ainda não permitem uma explicação segura.") + '</div>' + coachActionButtons(response.actions) + '</article>';
     }
 
     function content() {
       var context = state.context || {};
       if (context.ai_enabled === false && context.fallback_enabled === false) return UI.state({ type: "unavailable", title: "Explicações do Coach desativadas", message: "Os alertas determinísticos e o controle continuam funcionando normalmente.", retry: false });
       var suggestions = normalizedSuggestions();
-      var thread = state.explanations.length ? state.explanations.map(explanationHtml).join("") : '<article class="ic-coach-message ic-coach-message--coach"><strong>Tiger Coach</strong><div>Escolha um fato disponível para receber uma explicação validada. O Coach não aceita perguntas livres e não tenta prever a próxima rodada.</div></article>';
-      var choices = suggestions.length ? '<div class="ic-chip-row" aria-label="Explicações disponíveis">' + suggestions.map(function (item, index) { return '<button class="ic-chip" type="button" data-screen-action="coach-explain" data-action-value="' + index + '"' + (state.sending ? " disabled" : "") + '>' + Core.escapeHtml(item.label) + '</button>'; }).join("") + '</div>' : UI.banner("Nenhum fato selecionável agora", "O Coach só explica contextos determinísticos que o backend autorizou para esta sessão.", "neutral");
-      return '<section class="ic-card"><div class="ic-coach-thread" id="icCoachThread">' + thread + '</div>' + choices + '</section><div class="ic-disclaimer">A Edge Function recebe apenas <code>request_type</code> e <code>reference_id</code>. Ela busca o envelope determinístico autenticado, valida números, fatos e ações e retorna fallback seguro quando necessário.</div>';
+      var thread = state.explanations.length ? state.explanations.map(explanationHtml).join("") : '<article class="ic-coach-message ic-coach-message--coach"><strong>Vamos entender seus dados</strong><div>Escolha uma pergunta abaixo. Você também pode abrir o Coach a partir de um alerta ou resultado do seu histórico.</div></article>';
+      var choices = suggestions.length ? '<div class="ic-chip-row" aria-label="Explicações disponíveis">' + suggestions.map(function (item, index) { return '<button class="ic-chip" type="button" data-screen-action="coach-explain" data-action-value="' + index + '"' + (state.sending ? " disabled" : "") + '>' + Core.escapeHtml(item.label) + '</button>'; }).join("") + '</div>' : UI.banner("Nenhum fato selecionável agora", "As perguntas aparecerão quando houver uma sessão, alerta ou análise disponível para explicar.", "neutral");
+      return '<section class="ic-card"><div class="ic-coach-thread" id="icCoachThread">' + thread + '</div>' + choices + '</section><div class="ic-disclaimer">As explicações usam os dados disponíveis e seus compromissos. Não preveem resultados de jogos.</div>';
     }
 
     function render() {

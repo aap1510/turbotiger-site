@@ -5,7 +5,7 @@
 
   IC.Screens.historico = function (deps) {
     var Core = IC.Core, UI = IC.UI;
-    var state = { status: "idle", data: null, error: null, tab: "sessoes", sort: "recentes", filtersOpen: false, filters: {}, cursor: null, loadingMore: false, pendingSubscription: null };
+    var state = { status: "idle", data: null, error: null, tab: "sessoes", sort: "recentes", filtersOpen: false, filters: { periodo: "all" }, cursor: null, loadingMore: false, pendingSubscription: null };
 
     function nextCursor(result) {
       var data = result && result.data || {}, meta = result && result.meta || {};
@@ -71,6 +71,16 @@
     }
 
     function findItem(id) { return Core.normalizeArray((state.data || {}).items || (state.data || {}).itens).find(function (item) { return String(item.id || item.id_registro) === String(id); }); }
+    function detailHtml(item) {
+      var details = item.details || item.detalhes || {}, places = Core.decimalPlacesOf(item, null), currency = item.currency || item.moeda || "";
+      var values = Object.assign({}, item, details);
+      var fields = [["net_result_units", "Resultado líquido", "money"], ["stake_units", "Apostado", "money"], ["return_units", "Retornado", "money"], ["peak_units", "Pico da sessão", "money"], ["giveback_units", "Redução após o pico", "money"], ["drawdown_units", "Maior queda", "money"], ["multiplier", "Multiplicador", "multiplier"], ["bankroll_percent", "Aposta sobre a banca", "percent"], ["loss_streak", "Sequência de perdas"], ["stake_increases_after_loss", "Aumentos após perdas"], ["accelerations_after_loss", "Acelerações após perdas"], ["disguised_losses", "Retornos parciais com perda"], ["disguised_loss", "Retorno parcial com perda", "boolean"], ["stake_increase_after_loss", "Aumento após perda", "boolean"], ["acceleration_after_loss", "Aceleração após perda", "boolean"]];
+      var rows = fields.filter(function (field) { return values[field[0]] !== undefined; }).map(function (field) {
+        var value = values[field[0]], formatted = value == null ? "Não disponível" : field[2] === "money" ? Core.formatSignedMoney(value, currency, places) : field[2] === "boolean" ? (value === true ? "Sim" : value === false ? "Não" : "Não disponível") : field[2] === "percent" ? Core.formatPercent(value, 2) : Core.formatNumber(value) + (field[2] === "multiplier" ? "×" : "");
+        return UI.listRow(field[1], "", formatted);
+      }).join("");
+      return '<div class="ic-list">' + rows + '</div><details class="ic-form-section"><summary>Registro técnico completo</summary><pre class="ic-detail-json">' + Core.escapeHtml(JSON.stringify(details, null, 2)) + '</pre></details>';
+    }
     async function loadMore() {
       if (!state.cursor || state.loadingMore) return;
       state.loadingMore = true; renderInto();
@@ -94,7 +104,7 @@
       if (action === "retry") return load(true);
       if (action === "toggle-filters") { state.filtersOpen = !state.filtersOpen; renderInto(); return; }
       if (action === "history-tab") { state.tab = value; state.status = "idle"; renderInto(); load(true); return; }
-      if (action === "history-detail") { var item = findItem(value); if (item) UI.openSheet({ eyebrow: state.tab, title: item.title || item.titulo || "Detalhes históricos", html: UI.banner(item.title || item.titulo || "Registro", item.description || item.descricao || "Informações registradas pelo sistema.", item.status) + UI.evidence(item.evidence || item.evidencia || item) + '<pre class="ic-detail-json">' + Core.escapeHtml(JSON.stringify(item.details || item.detalhes || {}, null, 2)) + '</pre>' }); }
+      if (action === "history-detail") { var item = findItem(value); if (item) UI.openSheet({ eyebrow: state.tab, title: item.title || item.titulo || "Detalhes históricos", html: UI.banner(item.title || item.titulo || "Registro", item.description || item.descricao || "Informações registradas pelo sistema.", item.status) + UI.evidence(item.evidence || item.evidencia || item) + detailHtml(item) }); }
       if (action === "history-plan") { var selected = findItem(value); deps.store.set({ planningDraft: selected || null }); deps.navigate({ section: "planejar" }); UI.toast("Confirme data futura, duração, limite e lembrete antes de criar o plano."); }
       if (action === "load-more") return loadMore();
     }

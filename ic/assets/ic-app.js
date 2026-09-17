@@ -78,13 +78,16 @@
     store.set({ activeSection: section, route: route });
     Array.prototype.slice.call(document.querySelectorAll("[role='tab'][data-section]")).forEach(function (tab) {
       var active = tab.dataset.section === section;
+      tab.hidden = ["visao-geral", "planejar", "ao-vivo", "estatisticas"].indexOf(tab.dataset.section) < 0;
       tab.setAttribute("aria-selected", String(active));
       tab.tabIndex = active ? 0 : -1;
-      if (active) {
+      if (active && !tab.hidden) {
         tab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
         if (focusTab) tab.focus();
       }
     });
+    var more = document.getElementById("icMoreSections");
+    if (more) more.classList.toggle("is-active", ["visao-geral", "planejar", "ao-vivo", "estatisticas"].indexOf(section) < 0);
     Array.prototype.slice.call(document.querySelectorAll("[role='tabpanel'][data-panel]")).forEach(function (panel) { panel.hidden = panel.dataset.panel !== section; });
     var bootstrap = store.getState().bootstrap;
     if (section !== "visao-geral" && (!bootstrap || bootstrap.status !== "ready")) {
@@ -121,7 +124,7 @@
     rerender("visao-geral");
     try {
       var result = await api.rpc("ic_contexto_rpc", {}, { key: "central:context" });
-      var resource = { status: "ready", data: result.data || {}, meta: result.meta || {}, version: result.version, updatedAt: new Date().toISOString() };
+      var resource = { status: "ready", data: result.data || {}, meta: result.meta || {}, version: result.version, updatedAt: (result.data || {}).updated_at || (result.data || {}).generated_at || (result.meta || {}).generated_at || null };
       var receivedFlags = resource.data.feature_flags || resource.data.flags || {};
       var featureFlags = {};
       Core.FEATURE_FLAGS.forEach(function (flag) { featureFlags[flag] = receivedFlags[flag] === true; });
@@ -153,7 +156,8 @@
     var globalNode = document.getElementById("icGlobalSessionStatus");
     if (globalNode) globalNode.innerHTML = UI.icon("live") + '<span>' + Core.escapeHtml(globalSession.label || globalSession.rotulo || (globalSession.active || globalSession.ativa ? "Sessão ativa" : "Nenhuma sessão ativa")) + '</span>';
     var updated = document.getElementById("icLastUpdated");
-    if (updated) updated.textContent = data.updated_at || data.atualizado_em ? "Atualizado " + Core.formatDateTime(data.updated_at || data.atualizado_em, { hour: "2-digit", minute: "2-digit" }) : "Atualizado agora";
+    var updatedAt = data.updated_at || data.atualizado_em || data.generated_at;
+    if (updated) updated.textContent = updatedAt ? "Atualizado " + Core.formatDateTime(updatedAt, { hour: "2-digit", minute: "2-digit" }) : "";
     var notifications = data.notifications || data.notificacoes || {};
     var dot = document.getElementById("icNotificationDot");
     if (dot) dot.hidden = !(Number(notifications.unread || notifications.nao_lidas || 0) > 0);
@@ -250,7 +254,7 @@
   function bindEvents() {
     document.addEventListener("click", function (event) {
       var routeNode = event.target.closest("[data-route]");
-      if (routeNode) { event.preventDefault(); navigate({ section: routeNode.dataset.route }); return; }
+      if (routeNode) { event.preventDefault(); UI.closeSheet(); navigate({ section: routeNode.dataset.route }); return; }
       var tab = event.target.closest("[role='tab'][data-section]");
       if (tab) { event.preventDefault(); navigate({ section: tab.dataset.section }); return; }
       var globalAction = event.target.closest("[data-global-action]");
@@ -258,6 +262,7 @@
         event.preventDefault();
         if (globalAction.dataset.globalAction === "close") Bridge.close(route.loadGeneration);
         if (globalAction.dataset.globalAction === "notifications") notificationSheet();
+        if (globalAction.dataset.globalAction === "sections") UI.openSheet({ title: "Explorar a Central", html: '<div class="ic-quick-actions">' + [["historico", "Meu histórico", "history"], ["jogos", "Jogos e passaportes", "game"], ["comunidade", "Comunidade", "community"], ["regras-pausas", "Regras e pausas", "shield"], ["coach", "Tiger Coach", "coach"], ["configuracoes", "Meus alertas e configurações", "bell"]].filter(function (item) { return sectionEnabled(item[0]); }).map(function (item) { return UI.button(item[1], { route: item[0], icon: item[2] }); }).join("") + '</div>' });
         return;
       }
       var actionNode = event.target.closest("[data-screen-action]");
@@ -276,7 +281,7 @@
 
     document.getElementById("icTabs").addEventListener("keydown", function (event) {
       if (["ArrowLeft", "ArrowRight", "Home", "End"].indexOf(event.key) < 0) return;
-      var tabs = Array.prototype.slice.call(document.querySelectorAll("[role='tab'][data-section]"));
+      var tabs = Array.prototype.slice.call(document.querySelectorAll("[role='tab'][data-section]")).filter(function (tab) { return !tab.hidden; });
       var index = tabs.indexOf(document.activeElement);
       if (index < 0) return;
       event.preventDefault();

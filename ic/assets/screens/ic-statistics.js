@@ -22,6 +22,17 @@
     var postThreshold = 50, postGame = "all";
 
     function availableAreas() { return areas.filter(function (area) { return deps.featureEnabled(area.flag); }); }
+    function publicNotes(notes) {
+      var labels = {
+        model_update_pending: "A análise está aguardando atualização.",
+        historical_association_not_causation: "Uma associação histórica não comprova causa e efeito.",
+        not_a_next_round_prediction: "Não prevê a próxima rodada.",
+        only_confirmed_preexisting_plans_define_outcome: "Somente planos confirmados antes de jogar permitem medir o cumprimento dos limites.",
+        probability_interval_is_parameter_uncertainty_not_monte_carlo_error: "A faixa expressa a incerteza da estimativa.",
+        holdout_brier_interval_assumes_independent_sessions: "A avaliação depende das condições de independência entre sessões."
+      };
+      return notes.map(function (note) { return labels[note] || (/^[a-z0-9_]+$/.test(note) ? "Há limitações de amostra ou qualidade neste cálculo." : note); }).filter(function (note, index, all) { return all.indexOf(note) === index; });
+    }
     function normalizeArea() { var available = availableAreas(); if (!available.some(function (area) { return area.id === state.area; })) state.area = available.length ? available[0].id : null; return available; }
 
     async function load(force) {
@@ -53,7 +64,7 @@
     function content() {
       var data = state.data || {};
       var availableSeries = Core.normalizeArray(data.series || data.serie || data.items || data.itens);
-      if (data.status === "amostra_insuficiente" && (!availableSeries.length || state.area === "risco")) return UI.state({ type: "insufficient_data", message: data.message || data.mensagem, meta: data.sample_summary || data.resumo_amostra, retry: false });
+      if (data.status === "amostra_insuficiente" && (!availableSeries.length || state.area === "risco")) return UI.state({ type: "insufficient_data", retry: false }) + UI.button("Consultar a Comunidade", { route: "comunidade", icon: "community" });
       if (data.status === "qualidade_insuficiente" && (!availableSeries.length || state.area === "risco")) return UI.state({ type: "insufficient_quality", message: data.message || data.mensagem, meta: data.sample_summary || data.resumo_amostra, retry: false });
       if (state.area === "laboratorio") return laboratory(data);
       var summary = data.summary || data.resumo || {};
@@ -61,7 +72,7 @@
       if (!series.length && !Object.keys(summary).length) return UI.state({ type: "empty", title: "Ainda não há estatística para este recorte", message: "A infraestrutura permanece ativa e passará a exibir resultados quando houver dados elegíveis.", retry: false });
       var metrics = Core.normalizeArray(summary.metrics || summary.metricas).map(function (item) { return UI.metric(item.label || item.rotulo, item.formatted_value || item.valor_formatado || Core.safeText(item.value !== undefined ? item.value : item.valor), item.detail || item.detalhe); }).join("");
       var maximum = Math.max.apply(Math, [1].concat(series.map(function (item) { var value = finiteMetric(item.value !== undefined ? item.value : item.valor); return value === null ? 0 : Math.abs(value); })));
-      var rows = series.map(function (item) { var value = finiteMetric(item.value !== undefined ? item.value : item.valor); return '<div class="ic-stat-row"><span class="ic-stat-row__label">' + Core.escapeHtml(item.label || item.rotulo || "Faixa") + '</span><div class="ic-stat-row__track" aria-hidden="true"><div class="ic-stat-row__bar" style="width:' + (value === null ? 0 : Core.clamp(Math.abs(value) * 100 / maximum, 0, 100)) + '%"></div></div><strong class="ic-stat-row__value">' + Core.escapeHtml(item.formatted_value || item.valor_formatado || (value === null ? "Indisponível" : String(value).replace(".", ","))) + '</strong></div>' + seriesDetails(item); }).join("");
+      var rows = series.map(function (item) { var value = finiteMetric(item.value !== undefined ? item.value : item.valor); return '<div class="ic-stat-row"><span class="ic-stat-row__label">' + Core.escapeHtml(item.label || item.rotulo || "Faixa") + '</span><div class="ic-stat-row__track" aria-hidden="true"><div class="ic-stat-row__bar" style="width:' + (value === null ? 0 : Core.clamp(Math.abs(value) * 100 / maximum, 0, 100)) + '%"></div></div><strong class="ic-stat-row__value">' + Core.escapeHtml(item.formatted_value || item.valor_formatado || (value === null ? "Indisponível" : Core.formatNumber(value))) + '</strong></div>' + seriesDetails(item); }).join("");
       var warning = /insuficiente/.test(data.status || "") ? UI.banner("Histórico disponível, com limitações", "Os valores abaixo descrevem os registros disponíveis. Qualidade parcial ou reconstruída não equivale a saldo confirmado nem libera previsões.", "neutral") : "";
       return warning + (metrics ? '<div class="ic-grid ic-grid--metrics">' + metrics + '</div>' : '') + '<section class="ic-card"><div class="ic-card__header"><div><h3>' + Core.escapeHtml(data.title || data.titulo || areaLabel()) + '</h3><p>' + Core.escapeHtml(data.description || data.descricao || "Associação histórica apresentada com amostra e incerteza.") + '</p></div>' + UI.badge(data.evidence_status || data.status_evidencia || "descritivo", data.evidence_status || data.status_evidencia) + '</div><div class="ic-stat-block">' + rows + '</div>' + UI.evidence(data.evidence || data.evidencia || data) + '</section>' + renderEligiblePatterns(data) + '<div class="ic-disclaimer">Associações descrevem o histórico e não estabelecem causalidade nem preveem a próxima rodada.</div>';
     }
@@ -142,7 +153,7 @@
         var lower = probabilityValue(interval.lower), upper = probabilityValue(interval.upper);
         var eligible = model.probability_eligible === true && ["validado_fora_amostra", "replicado"].indexOf(model.status) >= 0 && probability !== null && lower !== null && upper !== null && lower <= probability && probability <= upper;
         var metric = eligible ? UI.metric("Estimativa comportamental", Core.formatPercent(probability * 100, 2), "Faixa de incerteza: " + Core.formatPercent(lower * 100, 2) + " a " + Core.formatPercent(upper * 100, 2)) : UI.banner("Estimativa ainda não liberada", "Amostra, qualidade e validação fora da amostra precisam ser suficientes. Ausência de estimativa não significa risco zero.", "neutral");
-        var notes = Core.normalizeArray(model.reasons).concat(Core.normalizeArray(model.limitations)).filter(function (value) { return typeof value === "string"; }).slice(0, 12);
+        var notes = publicNotes(Core.normalizeArray(model.reasons).concat(Core.normalizeArray(model.limitations)).filter(function (value) { return typeof value === "string"; }).slice(0, 12));
         return '<article class="ic-card"><div class="ic-card__header"><h3>' + Core.escapeHtml(model.game_label || "Seu planejamento") + '</h3>' + UI.badge(model.status || "amostra_insuficiente", model.status) + '</div>' + metric + protectionEvidence(model) + (notes.length ? '<p>' + Core.escapeHtml(notes.join(" ")) + '</p>' : '') + '<div class="ic-disclaimer">Esta análise não muda a cor do relógio, não flexibiliza seus limites e não prevê se o jogo pagará.</div></article>';
       }).join("") + '</div></section>';
     }
@@ -154,7 +165,7 @@
       if (query.p_id_jogo && !seen[query.p_id_jogo]) games.push({ id: query.p_id_jogo, label: "Jogo " + query.p_id_jogo });
       var form = '<form class="ic-card ic-form" id="icExposureForm"><h3>Consultar exposição histórica</h3><p>Consulta apenas: não altera sua banca, aposta, limites ou Sessão Planejada.</p><div class="ic-form-grid"><div class="ic-field"><label for="ic-exposure-game">Jogo</label><select id="ic-exposure-game" name="game"><option value="">Recortes disponíveis</option>' + games.map(function (game) { return '<option value="' + Core.escapeHtml(game.id) + '"' + (String(query.p_id_jogo) === game.id ? ' selected' : '') + '>' + Core.escapeHtml(game.label) + '</option>'; }).join("") + '</select></div><div class="ic-field"><label for="ic-exposure-pct">Aposta sobre a banca inicial (%)</label><input id="ic-exposure-pct" name="exposure" inputmode="decimal" required value="' + Core.escapeHtml(query.p_exposicao_pct === null ? "" : String(query.p_exposicao_pct).replace(".", ",")) + '"></div><div class="ic-field"><label for="ic-exposure-risk">Tolerância histórica para atingir a perda indicada (%)</label><input id="ic-exposure-risk" name="risk" inputmode="decimal" required value="' + Core.escapeHtml(query.p_risco_maximo === null ? "" : String(query.p_risco_maximo * 100).replace(".", ",")) + '"></div></div>' + UI.button("Consultar sem alterar meu plano", { type: "submit", kind: "primary" }) + '</form>';
       if (state.exposureError) return form + UI.banner("Curva de exposição indisponível", "Não foi possível atualizar o modelo. As outras estatísticas não substituem essa consulta.", "neutral");
-      if (!models.length) return form + UI.banner("Curva em formação", "Ainda não há recortes com saldo inicial e sessões elegíveis. Dados ausentes não são tratados como banca ou risco zero.", "neutral");
+      if (!models.length) return UI.banner("Curva de exposição ainda indisponível", "Esta análise precisa de saldo inicial e sessões elegíveis. Os outros resultados históricos continuam disponíveis quando houver registros.", "neutral");
       return form + '<div class="ic-list">' + models.map(function (model) {
         var game = model.game || {}, sample = model.sample || {}, period = model.period || {};
         var eligible = model.curve_eligible === true && model.status === "validado_fora_amostra";
@@ -169,7 +180,7 @@
         var targetText = validTarget ? (target.status === "dentro_tolerancia_historica" ? "Dentro da tolerância histórica consultada" : "Acima da tolerância histórica consultada") : target.status === "fora_suporte" ? "Percentual fora do suporte observado" : "Adequação ainda indisponível";
         var targetDetail = validTarget ? "Para " + Core.formatPercent(targetExposure, 2) + ", limite superior estimado de " + Core.formatPercent(upper * 100, 2) + "; tolerância escolhida: " + Core.formatPercent(tolerance * 100, 2) + ". Não significa que apostar seja seguro." : "Informe os parâmetros da consulta. Amostra, qualidade, suporte e validação futura precisam ser suficientes; não há extrapolação.";
         var source = ["pessoal", "comunidade", "ambos"].indexOf(model.scope) >= 0 ? sourceLabel(model.scope) : "Fonte não informada";
-        var notes = Core.normalizeArray(model.limitations).filter(function (note) { return typeof note === "string"; }).slice(0, 12);
+        var notes = publicNotes(Core.normalizeArray(model.limitations).filter(function (note) { return typeof note === "string"; }).slice(0, 12));
         return '<article class="ic-card"><div class="ic-card__header"><h3>' + Core.escapeHtml(model.game_label || "Jogo " + Core.safeText(game.id)) + '</h3>' + UI.badge(model.status || "amostra_insuficiente", model.status) + '</div><p>Evento analisado: perda de ' + Core.escapeHtml(Core.safeText(model.threshold_loss_pct)) + '% no mesmo recorte, em até ' + Core.escapeHtml(Core.safeText(period.fixed_horizon_paid_rounds)) + ' rodadas pagas. Sessões interrompidas antes desse horizonte são identificadas separadamente.</p><div class="ic-list">' + UI.listRow("Recorte", "Bet " + Core.safeText(game.bet_id) + " · versão " + Core.safeText(game.version_id) + " · " + Core.safeText(game.platform) + " · " + Core.safeText(game.mode), Core.safeText(model.currency)) + UI.listRow("Origem", source, "") + UI.listRow("Amostra", Core.safeText(sample.complete_sessions) + " sessões completas; " + Core.safeText(sample.censored_sessions) + " censuradas; " + Core.safeText(sample.users) + " usuários", "") + UI.listRow("Período", Core.formatDateTime(period.start) + " até " + Core.formatDateTime(period.end), "") + UI.listRow("Modelo", Core.safeText(model.model_version), "") + points + '</div>' + UI.banner(targetText, targetDetail, "neutral") + (notes.length ? '<p>' + Core.escapeHtml(notes.join(" ")) + '</p>' : '') + '<div class="ic-disclaimer">Associação observacional, não causal. O percentual de 0,5% é uma referência em análise, nunca um ótimo garantido. Esta consulta não determina a cor do relógio nem recomenda iniciar uma sessão.</div></article>';
       }).join("") + '</div>';
     }

@@ -1213,7 +1213,7 @@
     var startAt = item.inicio_em || item.data_partida || item.data_inicio;
     var metadata = [resultFieldText(item.subtipo_evento), resultFieldText(item.fase), resultFieldText(item.rodada), [resultFieldText(item.local_nome), resultFieldText(item.local_cidade)].filter(Boolean).join(" · ")].filter(Boolean);
     var eventStatus = String(item.status_normalizado || item.status || item.status_canonico || "").toLowerCase();
-    var statusLabels = { cancelada: "Cancelado", adiada: "Adiado", abandonada: "Abandonado", suspensa: "Suspenso" };
+    var statusLabels = { cancelada: "Cancelada", adiada: "Adiada", abandonada: "Abandonada", suspensa: "Suspensa", interrompida: "Interrompida" };
     var status = visibility.confirmed ? "Encerrado" : visibility.live ? "Ao vivo" : statusLabels[eventStatus] || "";
     var liveClock = visibility.live ? (eventStatus === "intervalo" ? "Intervalo" : resultFieldText(item.relogio && item.relogio.texto) || resultFieldText(item.periodo)) : "";
     var actions = interactive === false || !id ? "" : "<button type=\"button\" class=\"ie-text-action\"" + detailAttributes("event", id, "", title) + ">Detalhes</button>";
@@ -1242,6 +1242,8 @@
     var terminalStatus = ["encerrada", "encerrado", "finished", "finalizada", "finalizado"].indexOf(status) >= 0;
     var liveStatus = ["ao_vivo", "live", "em_andamento", "intervalo", "prorrogacao", "penaltis"].indexOf(status) >= 0;
     var scheduledStatus = ["agendado", "agendada", "scheduled", "timed", "not_started", "nao_iniciado", "nao_iniciada", "ns"].indexOf(status) >= 0;
+    var exceptionalStatusLabels = { cancelada: "Cancelada", adiada: "Adiada", abandonada: "Abandonada", suspensa: "Suspensa", interrompida: "Interrompida" };
+    var exceptionalStatusText = exceptionalStatusLabels[status] || "";
     var futureSchedule = !terminalStatus && !liveStatus && (scheduledStatus || (!Number.isNaN(startTimestamp) && startTimestamp > serverNow()));
     var pendingResult = !futureSchedule && (["pendente", "confirmando", "em_confirmacao", "aguardando_confirmacao", "pending", "pending_confirmation", "awaiting_confirmation"].indexOf(resultState) >= 0
       || ["aguardando_confirmacao", "confirmando", "em_confirmacao"].indexOf(status) >= 0
@@ -1270,9 +1272,10 @@
     var rawStatusText = String(item.minuto || item.status_texto || item.status_detalhado || "").trim();
     var technicalStatus = /^(TIMED|SCHEDULED|NOT_STARTED|NS)$/i.test(rawStatusText) || /^[A-Z_]+$/.test(rawStatusText);
     var statusText = technicalStatus ? "" : rawStatusText;
-    if (pendingResult || staleLive) statusText = "";
+    if (pendingResult) statusText = "";
+    else if (staleLive) statusText = "";
     else if (!statusText && confirmedResult && ["encerrada", "finished", "finalizada"].indexOf(status) >= 0) statusText = "Encerrado";
-    else if (!statusText) statusText = live ? "Ao vivo" : formatDateTime(startAt, false);
+    else if (!statusText) statusText = exceptionalStatusText || (live ? "Ao vivo" : formatDateTime(startAt, false));
     if (live) {
       // O backend normaliza o relógio informado na coleta autoritativa; nunca cronometre pelo início previsto.
       statusText = status === "intervalo" ? "Intervalo"
@@ -1284,14 +1287,15 @@
     var center = hasScore ? "<span class=\"ie-score\">" + escapeHtml(scoreHome) + " – " + escapeHtml(scoreAway) + "</span>" : (pendingResult || staleLive || live) ? "<span class=\"ie-score\">×</span>" : "<span class=\"ie-match-time\">" + escapeHtml(formatDateTime(startAt, false) || "A definir") + "</span>";
     if (hasScore && scoreUnitLabel(item)) center += "<span class=\"ie-score-unit\">" + escapeHtml(scoreUnitLabel(item)) + "</span>";
     if (dateText) center += "<span class=\"ie-match-date\">" + escapeHtml(dateText) + "</span>";
-    if ((hasScore || live) && statusText) center += "<span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>";
+    if ((hasScore || live || exceptionalStatusText) && statusText) center += "<span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>";
+    var availabilityNotice = staleLive ? "<small class=\"ie-match-update-state\">Atualização indisponível para este confronto</small>" : "";
     var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Confronto", 25);
     if (id) center += '<div class="ieb-event-bets" data-bet-event-id="' + escapeHtml(id) + '"></div>';
     var compareAction = typeof compareSelection !== "undefined" && compareSelection && String(item.esporte || "").toLowerCase() === "futebol"
       && (scheduledStatus || status === "adiada") && !item.ao_vivo && startTimestamp > serverNow()
       ? compareSelection.button(id, sides.home.name + " e " + sides.away.name, startTimestamp) : "";
     var actions = interactive === false || !id ? "" : "<div class=\"ie-match-actions\"><button type=\"button\" data-match-action=\"odds\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir cotações de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("chart") + "</button>" + compareAction + "<button type=\"button\" data-match-action=\"analysis\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir análises de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("analysis") + "</button></div>";
-    return "<article class=\"ie-feed-card ie-wide ie-match-card" + (live ? " is-live" : "") + (live && item.relogio && item.relogio.alem_regulamentar === true ? " is-regulation-exceeded" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "trophy") + "</span>" + escapeHtml(competition) + "</span>" + actions + "</div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name, "", sides.home.abbreviation) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name, "", sides.away.abbreviation) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div>" + renderScorePeriods(item, currentScoreShown) + "</article>";
+    return "<article class=\"ie-feed-card ie-wide ie-match-card" + (live ? " is-live" : "") + (live && item.relogio && item.relogio.alem_regulamentar === true ? " is-regulation-exceeded" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "trophy") + "</span>" + escapeHtml(competition) + "</span>" + actions + "</div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name, "", sides.home.abbreviation) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name, "", sides.away.abbreviation) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div>" + availabilityNotice + renderScorePeriods(item, currentScoreShown) + "</article>";
   }
 
   function renderNewsCard(item) {

@@ -43,7 +43,7 @@
       var editing = state.editingSeries ? state.editingSeries.planning : state.editingPlan;
       var draft = editing || historicalDraft;
       var start = Core.zonedDateTimeParts(draft.starts_at || draft.inicio_em || draft.inicio_planejado_em, draft.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone) || { date: "", time: "" };
-      var draftDate = start.date;
+      var draftDate = start.date || today;
       var draftTime = start.time || Core.safeText(draft.start_time || draft.hora_inicio, "").slice(0, 5);
       var duration = draft.duration_minutes || draft.duracao_minutos || (draft.duracao_limite_segundos ? Math.round(Number(draft.duracao_limite_segundos) / 60) : "");
       var loss = unitsInput(Core.unitsFrom(draft, ["loss_limit_units_text", "limite_perda_unidades_texto", "loss_limit_units", "limite_perda_unidades"], null), Core.decimalPlacesOf(draft, null));
@@ -116,6 +116,8 @@
         personal_message: draft.personal_message || draft.mensagem_pessoal
       };
       Object.keys(values).forEach(function (name) { var field = form.elements.namedItem(name); if (field && values[name] !== null && typeof values[name] !== "undefined") field.value = String(values[name]); });
+      var currencies = Core.currencyCatalog(currencyContext()), currencyField = form.elements.namedItem("currency");
+      if (currencyField && !currencyField.value && currencies.length === 1) currencyField.value = currencies[0].code;
       if (draft.recurrence && Array.isArray(draft.recurrence.weekdays)) Array.from(form.querySelectorAll('[name="weekdays"]')).forEach(function (field) { field.checked = draft.recurrence.weekdays.indexOf(Number(field.value)) >= 0; });
     }
 

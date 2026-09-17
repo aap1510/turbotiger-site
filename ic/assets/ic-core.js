@@ -28,8 +28,30 @@
   }
 
   function safeText(value, fallback) {
-    if (value === null || typeof value === "undefined" || value === "") return fallback === null || typeof fallback === "undefined" ? "—" : String(fallback);
+    if (value === null || typeof value === "undefined" || value === "" || typeof value === "object") return fallback === null || typeof fallback === "undefined" ? "—" : String(fallback);
     return String(value);
+  }
+
+  function formatNumber(value, digits) {
+    if (value === null || value === undefined || value === "" || !Number.isFinite(Number(value))) return "—";
+    return Number(value).toLocaleString("pt-BR", { maximumFractionDigits: digits === undefined ? 2 : digits });
+  }
+
+  function countLabel(value, singular, plural) {
+    return formatNumber(value, 0) + " " + (Number(value) === 1 ? singular : plural);
+  }
+
+  function evidencePeriod(value) {
+    if (value && typeof value === "object") {
+      var start = value.start || value.inicio || value.from, end = value.end || value.fim || value.to;
+      return start && end ? formatDateTime(start, { dateStyle: "short" }) + " a " + formatDateTime(end, { dateStyle: "short" }) : "";
+    }
+    return value === "30_days" ? "Últimos 30 dias" : safeText(value, "");
+  }
+
+  function statusLabel(value) {
+    var labels = { exploratorio: "Exploratório", descritivo: "Descritivo", amostra_insuficiente: "Poucos dados", sem_dados: "Sem histórico neste recorte", atualizacao_pendente: "Atualização pendente", model_update_pending: "Atualização pendente", validacao_futura: "Em validação", historica_reconstruida: "Histórico reconstruído", inconclusivo: "Inconclusivo", validado_fora_da_amostra: "Validado em outro período", replicado: "Replicado" };
+    return labels[String(value || "").toLowerCase()] || safeText(value);
   }
 
   function escapeHtml(value) {
@@ -319,6 +341,10 @@
     FEATURE_FLAGS: FEATURE_FLAGS.slice(),
     isPlainObject: isPlainObject,
     safeText: safeText,
+    formatNumber: formatNumber,
+    countLabel: countLabel,
+    evidencePeriod: evidencePeriod,
+    statusLabel: statusLabel,
     escapeHtml: escapeHtml,
     finiteInteger: finiteInteger,
     validUuid: validUuid,
