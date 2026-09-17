@@ -5,12 +5,43 @@
 
   IC.Screens["visao-geral"] = function (deps) {
     var Core = IC.Core, UI = IC.UI;
+    var wallet = null, walletError = false, walletLoading = false, disposed = false;
+
+    async function load(force) {
+      await deps.loadBootstrap(force);
+      if (disposed || walletLoading || (!force && wallet)) return;
+      walletLoading = true;
+      try {
+        var response = await deps.api.rpc("ic_carteira_resumo_rpc", {}, { key: "overview:wallet" });
+        if (!disposed) { wallet = response.data; walletError = false; }
+      } catch (error) {
+        if (!disposed && error.code !== "aborted" && error.code !== "stale_session") walletError = true;
+      } finally {
+        walletLoading = false;
+        if (!disposed) deps.container.innerHTML = render();
+      }
+    }
+
+    function renderWallet() {
+      if (walletError) return UI.banner("Carteira não atualizada", "Tente atualizar novamente. O resultado das rodadas abaixo não substitui o resultado financeiro da carteira.", "neutral");
+      if (!wallet) return "";
+      var rows = Core.normalizeArray(wallet.resumo).filter(function (item) { return item.moeda_conhecida === true; });
+      if (!rows.length) return "";
+      return '<section><h3>Sua carteira</h3><div class="ic-list">' + rows.map(function (item) {
+        var definition = Core.currencyCatalog((current() || {}).data).find(function (entry) { return entry.code === item.moeda; });
+        function money(value) {
+          if (value == null || !definition) return "Não confirmado";
+          return Core.formatMoney(Core.parseMoneyToUnitsText(String(value).replace(".", ","), definition.decimal_places), item.moeda, definition.decimal_places);
+        }
+        return '<article class="ic-card"><h4>' + Core.escapeHtml(item.moeda) + '</h4><div class="ic-summary-grid">' + UI.metric("Depósitos registrados", money(item.depositos_capturados), "Valores encontrados no histórico financeiro") + UI.metric("Saques registrados", money(item.saques_capturados), "Valores encontrados no histórico financeiro") + UI.metric("Saldo consolidado", money(item.saldo_total), "Último saldo conhecido; não é consulta bancária em tempo real") + UI.metric("Resultado financeiro", item.resultado_parcial === true ? "Não confirmado" : money(item.resultado), "Calculado pela carteira, separado das rodadas") + '</div>' + (item.resultado_parcial === true ? '<p class="ic-required-note">Há contas ou saldos sem cobertura completa. Não calculamos lucro por suposição.</p>' : '') + '</article>';
+      }).join("") + '</div></section>';
+    }
 
     function current() { return deps.store.getState().bootstrap; }
 
     function render() {
       var resource = current();
-      var html = UI.sectionHeader("Visão Geral", "Seu dia, suas regras e os fatos que merecem atenção agora.", UI.button("Atualizar", { action: "retry", icon: "refresh" }));
+      var html = UI.sectionHeader("Visão Geral", "Seu dia, suas regras e os fatos que merecem atenção agora.");
       if (!resource || resource.status === "loading") return html + UI.state({ type: "loading", retry: false });
       if (resource.status === "error") return html + UI.state({ type: resource.error && resource.error.code === "offline" ? "offline" : "error", message: resource.error && resource.error.message, meta: resource.updatedAt ? "Última atualização: " + Core.formatDateTime(resource.updatedAt) : null });
       var data = resource.data || {};
@@ -31,6 +62,7 @@
       ];
       if (deps.featureEnabled("ic_planned_session_enabled") && deps.featureEnabled("ic_reminders_enabled")) metrics.push(UI.metric("Próxima sessão", today.next_plan_at || today.proximo_plano_em ? Core.formatDateTime(today.next_plan_at || today.proximo_plano_em, { weekday: "short", hour: "2-digit", minute: "2-digit" }) : "Nenhuma", today.next_plan_at || today.proximo_plano_em ? "Lembrete automático configurado" : "Planeje quando fizer sentido"));
       html += '<div class="ic-page-stack">';
+      html += renderWallet();
       var hasActivityToday = Number(today.rounds || today.rodadas || today.sessions || today.sessoes || 0) > 0;
       html += hasActivityToday ? '<section><div class="ic-card__header"><div><h3>Resumo de hoje</h3><p>Atividade registrada nas suas contas.</p></div></div><div class="ic-summary-grid">' + metrics.join("") + '</div></section>' : UI.banner("Nenhuma atividade registrada hoje", "Seu histórico continua disponível abaixo. Nenhuma sessão é iniciada ao abrir esta tela.", "neutral");
       var ledgers = Core.normalizeArray(today.currency_subledgers || today.subledgers);
@@ -89,7 +121,7 @@
     }
 
     function handleAction(action, value) {
-      if (action === "retry") return deps.loadBootstrap(true);
+      if (action === "retry") return load(true);
       if (action === "understand") {
         var data = current() && current().data || {};
         var item = Core.normalizeArray(data.insights)[Number(value)];
@@ -98,6 +130,6 @@
       }
     }
 
-    return { render: render, load: function () { return deps.loadBootstrap(false); }, handleAction: handleAction };
+    return { render: render, load: load, handleAction: handleAction, dispose: function () { disposed = true; wallet = null; } };
   };
 }(window));

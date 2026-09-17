@@ -60,7 +60,7 @@
 
     function communityPatterns() { var data = state.data || {}; return Core.normalizeArray(data.patterns || data.padroes || data.hypotheses || data.hipoteses); }
     function render() {
-      var html = UI.sectionHeader("Comunidade", "Aprendizado agregado para medir risco e disciplina sem identificar pessoas.", UI.button("Meus alertas", { route: "configuracoes", icon: "bell" }) + UI.button("Atualizar", { action: "retry", icon: "refresh" })) + '<div class="ic-page-stack">';
+      var html = UI.sectionHeader("Comunidade", "Aprendizado agregado para medir risco e disciplina sem identificar pessoas.") + '<div class="ic-page-stack">';
       if (state.status === "idle" || state.status === "loading") html += UI.state({ type: "loading", retry: false });
       else if (state.status === "error") html += UI.state({ type: state.error && state.error.code === "offline" ? "offline" : state.error && /^http_40[346]$/.test(state.error.code || "") ? "unavailable" : "error", message: state.error && state.error.message });
       else html += content();

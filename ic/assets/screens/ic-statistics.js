@@ -18,7 +18,7 @@
       { id: "laboratorio", label: "Laboratório", flag: "ic_interval_lab_enabled" }
     ];
     var state = { status: "idle", data: null, error: null, area: deps.route().subsection || "sessoes", pendingHypothesis: null, protection: null, protectionError: null, exposure: null, exposureError: null, exposureQuery: { p_id_jogo: null, p_exposicao_pct: null, p_risco_maximo: null } };
-    var loadRevision = 0, disposed = false;
+    var loadRevision = 0, disposed = false, subnavScrollLeft = 0, subnavRestorePending = false;
     var postThreshold = 50, postGame = "all";
 
     function availableAreas() { return areas.filter(function (area) { return deps.featureEnabled(area.flag); }); }
@@ -80,8 +80,8 @@
         return UI.listRow(label, detail, formatted) + seriesDetails(item);
       }).join("");
       if (!available.length && series.length) rows = UI.banner("Saldo histórico não confirmado", "Estes registros não permitem calcular a banca inicial e final com segurança. Consulte Sessões para ver rodadas, duração e resultado registrados.", "neutral");
-      var warning = /insuficiente/.test(data.status || "") ? UI.banner("Histórico disponível, com limitações", "Os valores abaixo descrevem os registros disponíveis. Qualidade parcial ou reconstruída não equivale a saldo confirmado nem libera previsões.", "neutral") : "";
-      return warning + (metrics ? '<div class="ic-grid ic-grid--metrics">' + metrics + '</div>' : '') + '<section class="ic-card"><div class="ic-card__header"><div><h3>' + Core.escapeHtml(data.title || data.titulo || areaLabel()) + '</h3><p>' + Core.escapeHtml(data.description || data.descricao || "Associação histórica apresentada com amostra e incerteza.") + '</p></div>' + UI.badge(data.evidence_status || data.status_evidencia || "descritivo", data.evidence_status || data.status_evidencia) + '</div><div class="ic-stat-block">' + rows + '</div>' + UI.evidence(data.evidence || data.evidencia || data) + '</section>' + renderEligiblePatterns(data) + '<div class="ic-disclaimer">Associações descrevem o histórico e não estabelecem causalidade nem preveem a próxima rodada.</div>';
+      var warning = /insuficiente/.test(data.status || "") ? UI.banner("Histórico parcial", "Saldo não confirmado. Estes dados não preveem próximas rodadas.", "neutral") : "";
+      return warning + (metrics ? '<div class="ic-grid ic-grid--metrics">' + metrics + '</div>' : '') + '<section class="ic-card"><div class="ic-card__header"><div><h3>' + Core.escapeHtml(data.title || data.titulo || areaLabel()) + '</h3><p>' + Core.escapeHtml(data.description || data.descricao || "Associação histórica apresentada com amostra e incerteza.") + '</p></div>' + UI.badge(data.evidence_status || data.status_evidencia || "descritivo", data.evidence_status || data.status_evidencia) + '</div><div class="ic-stat-block">' + rows + '</div>' + UI.evidence(data.evidence || data.evidencia || data) + '</section><div class="ic-disclaimer">Associações descrevem o histórico e não estabelecem causalidade nem preveem a próxima rodada.</div>';
     }
 
     function seriesDetails(item) {
@@ -139,8 +139,6 @@
     function patternCode(item) { return item && (item.code || item.codigo || item.hypothesis_code || item.codigo_hipotese || item.pattern_code || item.codigo_padrao); }
     function evidenceId(item) { return Core.validUuid(item && (item.id_insight_evidencia || item.insight_evidence_id || item.uuid_insight_evidencia || item.evidence_id)); }
     function patternsFromData(data) { return Core.normalizeArray(data.notification_patterns || data.padroes_notificaveis || data.patterns || data.padroes || data.hypotheses || data.hipoteses); }
-    function renderEligiblePatterns() { return UI.button("Configurar meus alertas", { route: "configuracoes", icon: "bell" }); }
-
     function areaLabel() { var found = areas.find(function (item) { return item.id === state.area; }); return found ? found.label : "Estatísticas"; }
     function finiteMetric(value) { if ((typeof value !== "number" && typeof value !== "string") || (typeof value === "string" && !value.trim())) return null; var number = Number(value); return Number.isFinite(number) ? number : null; }
     function probabilityValue(value) { var number = finiteMetric(value); return number !== null && number >= 0 && number <= 1 ? number : null; }
@@ -209,21 +207,35 @@
       UI.openSheet({ eyebrow: "Lembrete de padrão histórico", title: "Ocorrência do padrão acompanhado", html: UI.banner("Direção histórica: " + Core.safeText(context.direcao_historica), "Fonte efetiva: " + sourceLabel(context.fonte_efetiva) + ". Chegou uma nova janela correspondente ao padrão histórico que você decidiu acompanhar.", "neutral") + '<div class="ic-list">' + UI.listRow("Escopo", "Estatística acompanhada", Core.safeText(context.escopo_estatistico)) + UI.listRow("Ocorrência atual", "Janela recorrente identificada", period || "Não informado") + UI.listRow("Versão da regra", "Critério usado para reconhecer esta ocorrência", Core.safeText(context.versao_regra)) + '</div><div class="ic-disclaimer">Este aviso não cria nem inicia Sessão Planejada e não prevê resultados futuros. Se a célula comunitária não for elegível, ela não é apresentada como origem efetiva.</div>' });
     }
     function render() {
-      var html = UI.sectionHeader("Estatísticas", "Explore custo, exposição, comportamento e qualidade sem transformar associação em promessa.", UI.button("Atualizar", { action: "retry", icon: "refresh" })) + '<div class="ic-page-stack">' + subnav();
+      var html = '<div class="ic-statistics-heading">' + UI.sectionHeader("Estatísticas", "Entenda suas sessões e resultados.") + '</div><div class="ic-page-stack">' + subnav();
       if (state.status === "idle" || state.status === "loading") html += UI.state({ type: "loading", retry: false });
       else if (state.status === "unavailable") html += UI.state({ type: "unavailable", message: "Nenhuma análise estatística está habilitada pela política atual.", retry: false });
       else if (state.status === "error") html += UI.state({ type: state.error && state.error.code === "offline" ? "offline" : state.error && /^http_40[346]$/.test(state.error.code || "") ? "unavailable" : "error", message: state.error && state.error.message });
       else html += content() + postMultipliers() + behavioralModels() + exposureModels();
       return html + '</div>';
     }
-    function renderInto() { if (!disposed) deps.container.innerHTML = render(); }
+    function renderInto() {
+      if (disposed) return;
+      var canQuery = typeof deps.container.querySelector === "function";
+      var previous = canQuery ? deps.container.querySelector('.ic-chip-row[aria-label="Áreas estatísticas"]') : null;
+      if (previous && !subnavRestorePending) subnavScrollLeft = previous.scrollLeft;
+      deps.container.innerHTML = render();
+      var current = canQuery ? deps.container.querySelector('.ic-chip-row[aria-label="Áreas estatísticas"]') : null;
+      if (current) current.scrollLeft = subnavScrollLeft;
+      subnavRestorePending = false;
+    }
     function findHypothesis(reference) { return patternsFromData(state.data || {}).find(function (item) { return String(patternCode(item)) === String(reference) || String(evidenceId(item)) === String(reference); }); }
     async function handleAction(action, value) {
       if (disposed) return;
       if (action === "post-threshold" && [5, 10, 20, 50, 100].indexOf(Number(value)) >= 0) { postThreshold = Number(value); renderInto(); return; }
       if (action === "post-game" && (value === "all" || Core.normalizeArray(state.data && state.data.post_multiplier && state.data.post_multiplier.rows).some(function (row) { return String(row.game_id) === value; }))) { postGame = value; renderInto(); return; }
       if (action === "retry") return load(true);
-      if (action === "stats-area" && availableAreas().some(function (area) { return area.id === value; })) { state.area = value; state.status = "idle"; deps.navigate({ section: "estatisticas", subsection: value }, true); load(true); }
+      if (action === "stats-area" && availableAreas().some(function (area) { return area.id === value; })) {
+        var currentSubnav = typeof deps.container.querySelector === "function" ? deps.container.querySelector('.ic-chip-row[aria-label="Áreas estatísticas"]') : null;
+        if (currentSubnav) subnavScrollLeft = currentSubnav.scrollLeft;
+        subnavRestorePending = true;
+        state.area = value; state.status = "idle"; deps.navigate({ section: "estatisticas", subsection: value }, true); load(true);
+      }
       if (action === "hypothesis-detail") { var item = findHypothesis(value); if (item) UI.openSheet({ eyebrow: item.code || item.codigo, title: item.title || item.titulo || "Hipótese", html: UI.banner("Status: " + Core.safeText(item.status), item.description || item.descricao || "", item.status) + UI.evidence(item.evidence || item.evidencia || item) + '<div class="ic-disclaimer">' + Core.escapeHtml(item.limitation || item.limitacao || "A causa não foi estabelecida e o resultado não prevê rodadas futuras.") + '</div>' }); }
     }
     function dispose() { disposed = true; loadRevision += 1; state.data = null; state.protection = null; state.protectionError = null; state.exposure = null; state.exposureError = null; state.exposureQuery = {}; state.pendingHypothesis = null; }

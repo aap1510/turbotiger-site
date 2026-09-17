@@ -19,7 +19,8 @@
   --ic-capture-off: #607d8b;
   --ic-radius: 14px;
   --ic-radius-small: 10px;
-  --ic-header-height: 108px;
+  --ic-header-height: 66px;
+  --ic-header-active-height: 105px;
   --ic-tabs-height: 67px;
   --ic-max-width: 1040px;
   --ic-shadow: 0 18px 50px rgba(0, 0, 0, .34);
@@ -178,8 +179,9 @@ svg {
   z-index: 30;
   top: 0;
   border-bottom: 1px solid var(--ic-border);
-  background: var(--ic-bg);
+  background: rgba(5, 6, 7, .94);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding-top: env(safe-area-inset-top);
 }
 
@@ -191,14 +193,16 @@ svg {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 10px max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left));
+  padding: 10px max(8px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left));
 }
 
 .ic-header__identity { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .ic-header__identity img { flex: 0 0 auto; object-fit: contain; }
-.ic-header h1 { margin: 1px 0 0; font-size: clamp(.98rem, 3.5vw, 1.25rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ic-header h1 { margin: 1px 0 0; display: flex; align-items: center; font-size: clamp(.98rem, 3.5vw, 1.25rem); white-space: nowrap; }
+.ic-header__session-dot { width: 9px; height: 9px; margin-left: 13px; border-radius: 50%; background: var(--ic-neutral); box-shadow: 0 0 0 3px rgba(138, 143, 152, .12); }
+.ic-header__session-dot.is-active { background: var(--ic-control); box-shadow: 0 0 0 3px rgba(31, 165, 91, .14); }
 .ic-eyebrow { margin: 0; color: var(--ic-gold); font-size: .68rem; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
-.ic-header__actions { display: flex; gap: 4px; flex: 0 0 auto; }
+.ic-header__actions { display: flex; gap: 2px; flex: 0 0 auto; }
 
 .ic-icon-button {
   position: relative;
@@ -213,6 +217,23 @@ svg {
 }
 .ic-icon-button:hover { background: var(--ic-surface-raised); }
 .ic-icon-button:active { transform: scale(.96); }
+.ic-header-settings svg { width: 21px; height: 21px; }
+.ic-close-button {
+  width: 28px;
+  height: 28px;
+  align-self: center;
+  margin: 5px;
+  border: 1px solid var(--ic-border-strong);
+  background: var(--ic-surface-raised);
+  color: var(--ic-text);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, .24);
+}
+.ic-close-button svg { width: 13px; height: 13px; }
+.ic-close-button:hover, .ic-close-button:focus-visible {
+  border-color: rgba(239, 63, 72, .65);
+  background: rgba(239, 63, 72, .12);
+  color: var(--ic-red);
+}
 
 .ic-notification-dot {
   position: absolute;
@@ -273,9 +294,12 @@ svg {
   overscroll-behavior-x: contain;
   scrollbar-width: none;
   border-bottom: 1px solid var(--ic-border);
-  background: var(--ic-bg);
+  background: rgba(5, 6, 7, .96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding: 0 max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left));
 }
+.ic-header.has-active-session + .ic-tabs { top: calc(var(--ic-header-active-height) + env(safe-area-inset-top)); }
 
 .ic-tabs button {
   position: relative;
@@ -325,7 +349,7 @@ svg {
 .ic-main > section { min-height: calc(100vh - var(--ic-header-height) - var(--ic-tabs-height) - 54px); }
 
 @media (min-width: 720px) {
-  :root { --ic-header-height: 106px; --ic-tabs-height: 70px; }
+  :root { --ic-header-height: 66px; --ic-header-active-height: 105px; --ic-tabs-height: 70px; }
   .ic-tabs { justify-content: flex-start; padding-left: max(calc((100vw - var(--ic-max-width)) / 2), 16px); padding-right: max(calc((100vw - var(--ic-max-width)) / 2), 16px); }
   .ic-tabs button { min-width: 102px; }
   .ic-main { padding-top: 28px; }
@@ -335,6 +359,7 @@ svg {
   .ic-gate-break { display: block; }
   .ic-header__identity img { width: 30px; height: 30px; }
   .ic-header__actions .ic-icon-button { width: 38px; height: 38px; }
+  .ic-header__actions .ic-close-button { width: 28px; height: 28px; }
   .ic-header h1 { max-width: 175px; }
   .ic-updated { display: none; }
   .ic-tabs button { flex: 1 1 0; min-width: 0; padding-inline: 3px; }

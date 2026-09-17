@@ -56,7 +56,7 @@
     }
 
     function render() {
-      var html = UI.sectionHeader("Ao Vivo", "Durante a sessão, o foco é cumprir a decisão tomada antes — sem previsão de rodada.", UI.button("Atualizar", { action: "retry", icon: "refresh" }));
+      var html = UI.sectionHeader("Ao Vivo", "Durante a sessão, o foco é cumprir a decisão tomada antes — sem previsão de rodada.");
       if (state.status === "idle" || state.status === "loading") return html + UI.state({ type: "loading", retry: false });
       if (state.status === "error") return html + UI.state({ type: state.error && state.error.code === "offline" ? "offline" : state.error && /^http_40[346]$/.test(state.error.code || "") ? "unavailable" : "error", message: state.error && state.error.message });
       var data = state.data || {};

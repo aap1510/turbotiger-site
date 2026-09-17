@@ -61,7 +61,7 @@
     }
 
     function render() {
-      var html = UI.sectionHeader("Meu Histórico", "Consulte fatos registrados sem transformar o passado em promessa futura.", UI.button("Meus alertas", { route: "configuracoes", icon: "bell" }) + UI.button("Atualizar", { action: "retry", icon: "refresh" })) + '<div class="ic-page-stack">' + controls();
+      var html = UI.sectionHeader("Meu Histórico", "Consulte fatos registrados sem transformar o passado em promessa futura.") + '<div class="ic-page-stack">' + controls();
       if (state.status === "idle" || state.status === "loading") html += UI.state({ type: "loading", retry: false });
       else if (state.status === "error") html += UI.state({ type: state.error && state.error.code === "offline" ? "offline" : state.error && /^http_40[346]$/.test(state.error.code || "") ? "unavailable" : "error", message: state.error && state.error.message });
       else html += results();

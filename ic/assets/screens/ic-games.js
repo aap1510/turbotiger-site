@@ -37,7 +37,7 @@
     }
 
     function render() {
-      var html = UI.sectionHeader("Jogos", deps.featureEnabled("ic_integrity_monitor_enabled") ? "Compare cobertura, volatilidade e integridade — não promessa de resultado." : "Compare cobertura e volatilidade — não promessa de resultado.", UI.button("Atualizar", { action: "retry", icon: "refresh" })) + '<div class="ic-page-stack">' + filters();
+      var html = UI.sectionHeader("Jogos", deps.featureEnabled("ic_integrity_monitor_enabled") ? "Compare cobertura, volatilidade e integridade — não promessa de resultado." : "Compare cobertura e volatilidade — não promessa de resultado.") + '<div class="ic-page-stack">' + filters();
       if (state.status === "idle" || state.status === "loading") html += UI.state({ type: "loading", retry: false });
       else if (state.status === "error") html += UI.state({ type: state.error && state.error.code === "offline" ? "offline" : state.error && /^http_40[346]$/.test(state.error.code || "") ? "unavailable" : "error", message: state.error && state.error.message });
       else html += games();

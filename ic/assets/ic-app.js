@@ -148,15 +148,22 @@
 
   function renderHeader(data) {
     data = data || {};
-    var greeting = document.getElementById("icGreeting");
-    if (greeting) greeting.textContent = data.greeting || data.saudacao || "Seu controle";
     var capture = data.capture || data.captura || {};
     var captureNode = document.getElementById("icCaptureStatus");
     if (captureNode) captureNode.innerHTML = '<span class="ic-status-dot ic-status-dot--' + Core.statusTone(capture.status || capture.estado || "neutral") + '"></span><span>' + Core.escapeHtml(capture.label || capture.rotulo || "Captura não informada") + '</span>';
     var globalSession = data.global_session || data.sessao_global || {};
+    var sessionActive = globalSession.active === true || globalSession.ativa === true;
     if (captureNode) captureNode.hidden = !(globalSession.active || globalSession.ativa);
-    var globalNode = document.getElementById("icGlobalSessionStatus");
-    if (globalNode) globalNode.innerHTML = UI.icon("live") + '<span>' + Core.escapeHtml(globalSession.label || globalSession.rotulo || (globalSession.active || globalSession.ativa ? "Sessão ativa" : "Nenhuma sessão ativa")) + '</span>';
+    var sessionDot = document.getElementById("icHeaderSessionDot");
+    if (sessionDot) {
+      sessionDot.classList.toggle("is-active", sessionActive);
+      sessionDot.setAttribute("aria-label", sessionActive ? "Sessão ativa" : "Nenhuma sessão ativa");
+      sessionDot.title = sessionActive ? "Sessão ativa" : "Nenhuma sessão ativa";
+    }
+    var statusStrip = document.getElementById("icStatusStrip");
+    if (statusStrip) statusStrip.hidden = !sessionActive;
+    var header = document.querySelector(".ic-header");
+    if (header) header.classList.toggle("has-active-session", sessionActive);
     var updated = document.getElementById("icLastUpdated");
     var updatedAt = data.updated_at || data.atualizado_em || data.generated_at;
     if (updated) updated.textContent = updatedAt ? "Atualizado " + Core.formatDateTime(updatedAt, { hour: "2-digit", minute: "2-digit" }) : "";

@@ -147,6 +147,24 @@ button {
   -webkit-backdrop-filter: blur(16px);
 }
 
+.ie-header-brand {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ie-header-sport-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  fill: none;
+  stroke: var(--ie-gold);
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .ie-header-title {
   min-width: 0;
 }
@@ -4974,6 +4992,16 @@ body.ie-reordering-favorites {
   .ie-header {
     padding-right: 10px;
     padding-left: 10px;
+  }
+
+  .ie-header-brand {
+    gap: 8px;
+  }
+
+  .ie-header-sport-icon {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
   }
 
   .ie-header-settings span {

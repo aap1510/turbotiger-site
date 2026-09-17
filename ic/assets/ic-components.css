@@ -12,6 +12,14 @@
 /* Actions must not squeeze the heading into a narrow column on phones. */
 .ic-section-header > div:first-child { min-width: 0; }
 .ic-section-header__actions { flex-wrap: wrap; }
+.ic-statistics-heading .ic-section-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ic-statistics-heading .ic-section-header__actions { align-self: start; }
 @media (max-width: 639px) {
   .ic-section-header { flex-direction: column; gap: 10px; }
   .ic-section-header__actions { width: auto; align-self: flex-end; }
