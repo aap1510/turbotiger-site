@@ -14,8 +14,8 @@
     }).join("") + '<dl class="ieb-values"><div><dt>Apostado</dt><dd>' + esc(money(t.valor, t.moeda)) + '</dd></div><div><dt>Odd total</dt><dd>' + esc(t.odd == null ? "Não informada" : t.odd) + '</dd></div><div><dt>Retorno potencial</dt><dd>' + esc(money(t.retorno_potencial, t.moeda)) + '</dd></div><div><dt>Retorno pago</dt><dd>' + esc(money(t.retorno_pago, t.moeda)) + '</dd></div></dl><small class="ieb-muted">Registro pessoal · Turbo Tiger</small></article><button type="button" class="ieb-share" data-bet-share="' + esc(t.id) + '">Compartilhar bilhete</button>';
   }
   global.TurboTigerBets = function (api) {
-    var host = api.host, filters = { plataforma: "", inicio: "", fim: "", situacao: "todos", pagina: 1 }, version = 0, data = null, cache = new Map(), inflight = new Set(), timer;
-    function active() { return host.getAttribute("data-view") === "personal-bets"; }
+    var host = api.host, filters = { plataforma: "", inicio: "", fim: "", situacao: "todos", pagina: 1 }, version = 0, badgeEpoch = 0, data = null, cache = new Map(), inflight = new Map(), timer;
+    function active() { return host.getAttribute("data-detail-view") === "personal-bets"; }
     function controls() {
       return '<div class="ieb-filters"><label>Plataforma<select data-bet-filter="plataforma"><option value="">Todas</option>' + (data && data.plataformas || []).map(function (p) { return '<option value="' + esc(p.id) + '"' + (String(p.id) === filters.plataforma ? ' selected' : '') + '>' + esc(p.nome) + '</option>'; }).join("") + '</select></label><div class="ieb-dates"><label>Início<input type="date" data-bet-filter="inicio" value="' + esc(filters.inicio) + '"></label><label>Fim<input type="date" data-bet-filter="fim" value="' + esc(filters.fim) + '"></label></div><nav aria-label="Situação dos bilhetes">' + Object.keys(labels).map(function (s) { return '<button type="button" data-bet-status="' + s + '" aria-pressed="' + (filters.situacao === s) + '">' + labels[s] + '</button>'; }).join("") + '</nav></div>';
     }
@@ -31,18 +31,23 @@
       try {
         var result = await api.rpc("ie_minhas_apostas_rpc", { p_plataforma: filters.plataforma ? Number(filters.plataforma) : null, p_inicio: filters.inicio || null, p_fim: filters.fim || null, p_situacao: filters.situacao, p_pagina: filters.pagina });
         if (request !== version || !active()) return;
-        data = result; render();
+        data = result; render(); invalidate();
       } catch (_) { if (request === version && active()) { host.innerHTML = '<div class="ieb-page">' + controls() + '<p role="alert">Não foi possível consultar seus bilhetes.</p><button type="button" data-bet-retry>Tentar novamente</button></div>'; } }
       finally { if (request === version) host.removeAttribute("aria-busy"); }
     }
-    function open() { if (!api.allow()) return; api.begin("Minhas apostas", "Seu histórico em todas as plataformas", false); host.setAttribute("data-view", "personal-bets"); filters.pagina = 1; load(); }
+    function open() { if (!api.allow()) return; api.begin("Minhas apostas", "Seu histórico em todas as plataformas", false); host.setAttribute("data-detail-view", "personal-bets"); filters.pagina = 1; load(); }
+    function clearBadges() {
+      badgeEpoch++; cache.clear(); inflight.clear();
+      document.querySelectorAll("[data-bet-ready]").forEach(function (n) { n.removeAttribute("data-bet-ready"); n.replaceChildren(); });
+    }
+    function invalidate() { clearBadges(); badges(); }
     async function badges() {
       var nodes = Array.from(document.querySelectorAll("[data-bet-event-id]")), ids = [];
       nodes.forEach(function (n) { var id = Number(n.dataset.betEventId); if (cache.has(id)) { var item = cache.get(id); if (!n.hasAttribute("data-bet-ready")) { n.setAttribute("data-bet-ready", ""); n.innerHTML = stack(item.bilhetes || []) + (item.pessoas > 0 ? '<small>' + esc(item.pessoas) + ' membro' + (item.pessoas === 1 ? '' : 's') + ' com aposta neste confronto</small>' : ''); } } else if (id > 0 && !inflight.has(id) && ids.indexOf(id) < 0) ids.push(id); });
       if (!ids.length) return;
-      ids = ids.slice(0, 100); ids.forEach(function (id) { inflight.add(id); }); var request = version;
-      try { var result = await api.rpc("ie_apostas_eventos_rpc", { p_eventos: ids }); if (request !== version) return; ids.forEach(function (id) { cache.set(id, { bilhetes: [], pessoas: 0 }); }); (Array.isArray(result) ? result : []).forEach(function (row) { cache.set(Number(row.id_evento), row); }); badges(); } catch (_) { /* An unavailable count is not displayed as zero. */ }
-      finally { ids.forEach(function (id) { inflight.delete(id); }); }
+      ids = ids.slice(0, 100); var request = badgeEpoch; ids.forEach(function (id) { inflight.set(id, request); });
+      try { var result = await api.rpc("ie_apostas_eventos_rpc", { p_eventos: ids }); if (request !== badgeEpoch) return; var rows = Array.isArray(result) ? result : result && result.itens; if (!Array.isArray(rows)) throw new Error("Indicadores indisponíveis"); ids.forEach(function (id) { cache.set(id, { bilhetes: [], pessoas: 0 }); }); rows.forEach(function (row) { if (ids.indexOf(Number(row.id_evento)) >= 0) cache.set(Number(row.id_evento), row); }); badges(); } catch (_) { /* An unavailable count is not displayed as zero. */ }
+      finally { ids.forEach(function (id) { if (inflight.get(id) === request) inflight.delete(id); }); }
     }
     new MutationObserver(function () { clearTimeout(timer); timer = setTimeout(badges, 80); }).observe(document.getElementById("ieApp"), { childList: true, subtree: true });
     new MutationObserver(function () { clearTimeout(timer); timer = setTimeout(badges, 80); }).observe(host, { childList: true, subtree: true });
@@ -61,7 +66,7 @@
     host.addEventListener("touchmove", function (event) { if (!pull) return; var dx = Math.abs(event.touches[0].clientX - pull.x), dy = event.touches[0].clientY - pull.y; if (dx > 25 || dy < 0) { pull = null; return; } pull.ready = dy > 70; host.classList.toggle("ieb-pull-ready", pull.ready); }, { passive: true });
     host.addEventListener("touchend", function () { var refresh = pull && pull.ready; pull = null; host.classList.remove("ieb-pull-ready"); if (refresh && active()) load(); }, { passive: true });
     host.addEventListener("touchcancel", function () { pull = null; host.classList.remove("ieb-pull-ready"); }, { passive: true });
-    return { open: open, active: active, refresh: load, reset: function () { version++; shareEpoch++; data = null; cache.clear(); inflight.clear(); filters = { plataforma: "", inicio: "", fim: "", situacao: "todos", pagina: 1 }; }, invalidate: function () { cache.clear(); document.querySelectorAll("[data-bet-ready]").forEach(function (n) { n.removeAttribute("data-bet-ready"); }); badges(); } };
+    return { open: open, active: active, refresh: load, reset: function () { version++; shareEpoch++; data = null; clearBadges(); host.removeAttribute("data-detail-view"); filters = { plataforma: "", inicio: "", fim: "", situacao: "todos", pagina: 1 }; }, invalidate: invalidate };
   };
   async function share(ticket, element) {
     if (sharing) return;
