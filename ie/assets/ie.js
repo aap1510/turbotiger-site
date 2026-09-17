@@ -2402,7 +2402,7 @@
   async function loadInitialOpening(generation, route) {
     await requestSession();
     var cached = loadCache();
-    var bootstrap = await rpc("ie_central_bootstrap_rpc", {});
+    var bootstrap = await rpc("ie_central_abertura_rpc", {});
     if (!loadIsCurrent(generation)) return;
     state.bootstrap = bootstrap || {};
     state.sportFavoriteOrder = normalizeSportFavoriteOrder(state.bootstrap.preferencias || {});
@@ -2481,7 +2481,7 @@
     state.card = null;
     clearSportSections(VOLATILE_SPORT_DATA_SECTIONS);
     state.gameCompetitionGames = { live: [], upcoming: [], results: [] };
-    var bootstrap = await rpc("ie_central_bootstrap_rpc", {});
+    var bootstrap = await rpc("ie_central_abertura_rpc", {});
     if (!loadIsCurrent(generation)) return;
     state.bootstrap = bootstrap || {};
     state.sportFavoriteOrder = normalizeSportFavoriteOrder(state.bootstrap.preferencias || {});
@@ -3565,7 +3565,7 @@
     }
   }
 
-  function renderHistoricalComparison(data) {
+  function renderHistoricalComparison(data, generalOnly) {
     var teamA = data && data.time_a || {};
     var teamB = data && data.time_b || {};
     var summary = data && data.resumo || {};
@@ -3598,6 +3598,7 @@
     var performanceHtml = data.desempenho_time_a && data.desempenho_time_b ? "<div class=\"ie-performance-compare\">" + performanceBlock(teamA, data.desempenho_time_a) + performanceBlock(teamB, data.desempenho_time_b) + "</div>" : "";
     var general = data.desempenho_geral || {};
     var generalHtml = general.desempenho_time_a && general.desempenho_time_b ? "<p class=\"ie-performance-scope\">" + escapeHtml(general.escopo || "Todos os jogos oficiais disponíveis, independentemente do adversário.") + "</p><div class=\"ie-performance-compare\">" + performanceBlock(teamA, general.desempenho_time_a) + performanceBlock(teamB, general.desempenho_time_b) + "</div>" : "";
+    if (generalOnly) return generalHtml ? detailSection("Desempenho geral: casa e fora", generalHtml) : "";
     if (!total) return emptyState(unavailableCopy[0], unavailableCopy[1], false) + (generalHtml ? detailSection("Desempenho geral: casa e fora", generalHtml) : "");
     var scopeNotice = data.cobertura && data.cobertura.oficialidade_auditada === false
       ? "<p class=\"ie-performance-scope\">Acervo parcial em revisão: categoria e oficialidade dos jogos ainda não foram totalmente verificadas. As contagens abaixo não representam um total oficial certificado.</p>" : "";
@@ -4924,18 +4925,34 @@
     try {
       var data = await rpc("ie_confronto_evento_rpc", { p_id_evento: Number(id), p_limite: 20, p_offset: 0 });
       if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
-      if (data.recurso_suportado === true && data.status_historico !== "identidade_pendente") {
-        try { data.desempenho_geral = await rpc("ie_desempenho_geral_evento_rpc", { p_id_evento: Number(id) }); } catch (generalError) { /* desempenho geral pode não estar mapeado */ }
-      }
-      if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
-      var baseSummary = null;
-      if (data.recurso_suportado === true) {
-        try { baseSummary = await rpc("ie_base_futebol_brasil_resumo_rpc", {}); } catch (baseError) { /* selo da base não bloqueia as estatísticas */ }
-      }
-      if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       byId("detailTitle").textContent = displayText((data.time_a && data.time_a.nome || "Time A") + " × " + (data.time_b && data.time_b.nome || "Time B"));
       byId("detailSubtitle").textContent = "Histórico disponível do confronto";
-      byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + renderBrazilDatabaseSummary(baseSummary) + renderHistoricalComparison(data);
+      byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + renderHistoricalComparison(data)
+        + '<div data-analysis-general></div><div data-analysis-base></div>';
+      // Supplemental all-opponent statistics and archive totals never hold the
+      // opening gate. Update only their own nodes, not the visible comparison.
+      var generalSlot = byId("detailContent").querySelector("[data-analysis-general]");
+      var baseSlot = byId("detailContent").querySelector("[data-analysis-base]");
+      var generation = state.loadGeneration;
+      var epoch = state.sessionEpoch;
+      function current(slot) {
+        return loadIsCurrent(generation) && epoch === state.sessionEpoch && slot.isConnected
+          && byId("detailContent").getAttribute("data-detail-view") === view;
+      }
+      if (data.recurso_suportado === true) {
+        if (state.baseSummary) baseSlot.innerHTML = renderBrazilDatabaseSummary(state.baseSummary);
+        else rpc("ie_base_futebol_brasil_resumo_rpc", {}).then(function (summary) {
+          if (current(baseSlot)) baseSlot.innerHTML = renderBrazilDatabaseSummary(summary);
+        }).catch(function () { /* Optional archive total must not hide the comparison. */ });
+        if (data.status_historico !== "identidade_pendente" && !data.desempenho_geral) {
+          generalSlot.textContent = "Carregando desempenho geral...";
+          rpc("ie_desempenho_geral_evento_rpc", { p_id_evento: Number(id) }).then(function (general) {
+            if (current(generalSlot)) generalSlot.innerHTML = renderHistoricalComparison(Object.assign({}, data, { desempenho_geral: general }), true);
+          }).catch(function () {
+            if (current(generalSlot)) generalSlot.textContent = "Desempenho geral indisponível no momento.";
+          });
+        }
+      }
     } catch (error) {
       if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + emptyState("Análise indisponível", friendlyError(error), false);
     }
