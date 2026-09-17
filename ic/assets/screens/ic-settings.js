@@ -5,9 +5,10 @@
 
   IC.Screens.configuracoes = function (deps) {
     var Core = IC.Core, UI = IC.UI;
+    var alerts = IC.AlertPreferences(deps);
     var state = { status: "idle", data: null, error: null, open: "notifications", pendingSubscription: null, requests: [], dataRequest: null, requesting: false, exportText: null };
     var groups = [
-      ["notifications", "Notificações", "Canal, som, vibração e horário silencioso"],
+      ["notifications", "Meus alertas estatísticos", "Resultados, jogos, Bets e antecedências"],
       ["clock", "Relógio", "Exibição, texto, movimento e acessibilidade"],
       ["bankroll", "Banca", "Moeda, teto percentual e contas"],
       ["data", "Dados", "Qualidade, sincronização, exportação e privacidade"],
@@ -27,6 +28,7 @@
       try { var result = await deps.api.rpc("ic_configuracoes_contexto_rpc", {}, { key: "settings:context" }); state.status = "ready"; state.data = result.data || {}; state.error = null; }
       catch (error) { if (error.code === "aborted" || error.code === "stale_session") return; state.status = "error"; state.error = error; }
       renderInto();
+      if (state.status === "ready") await alerts.load(force);
     }
 
     function groupBody(id) {
@@ -82,38 +84,11 @@
       finally { state.requesting = false; renderInto(); }
     }
 
-    function subscriptionCode(item) { return item && (item.code || item.codigo || item.hypothesis_code || item.codigo_hipotese); }
-    function evidenceId(item) { return Core.validUuid(item && (item.id_insight_evidencia || item.insight_evidence_id || item.uuid_insight_evidencia || item.evidence_id)); }
-    function sourceLabel(value) { return value === "pessoal" ? "Meu histórico" : value === "comunidade" ? "Comunidade" : "Meu histórico + comunidade"; }
     function notificationChannel(value) { value = String(value || "hybrid").toLowerCase(); return value === "remoto" ? "remote" : value === "hibrido" ? "hybrid" : ["local", "remote", "hybrid"].indexOf(value) >= 0 ? value : "hybrid"; }
     function channelOption(value, label, current) { return '<option value="' + value + '"' + (current === value ? " selected" : "") + '>' + label + '</option>'; }
-    function subscriptions(data) { return Core.normalizeArray(data.subscriptions || data.assinaturas || data.hypothesis_subscriptions || data.assinaturas_hipoteses); }
     function notificationsBody(data) {
-      var active = subscriptions(data);
       var currentChannel = notificationChannel(data.channel);
-      var list = active.length ? '<section><div class="ic-card__header"><div><h3>Lembretes de padrões históricos</h3><p>Avisos dinâmicos sem data fixa. Cada aviso identifica sua origem efetiva e a direção observada.</p></div></div><div class="ic-list">' + active.map(function (item, index) {
-        var direction = item.direction || item.direcao || "descritiva";
-        var effective = item.effective_source || item.fonte_efetiva;
-        return UI.listRow(item.title || item.titulo || subscriptionCode(item) || "Padrão histórico", "Direção observada: " + direction + (effective ? " · Origem efetiva: " + sourceLabel(effective) : ""), "Preferência: " + sourceLabel(item.source || item.fonte || item.scope || item.escopo_estatistico || "ambos"), evidenceId(item) ? UI.button("Gerenciar", { action: "settings-subscription", value: evidenceId(item), icon: "bell", kind: "quiet" }) : "");
-      }).join("") + '</div></section>' : UI.state({ type: "empty", title: "Nenhum lembrete de padrão", message: "Você poderá acompanhar ocorrências em Estatísticas, Histórico ou Comunidade, escolhendo a origem pessoal, comunitária ou ambas.", retry: false });
-      return '<form class="ic-form" id="icSettingsNotifications"><div class="ic-field"><label for="ic-notification-channel">Canal do lembrete</label><select id="ic-notification-channel" name="channel">' + channelOption("local", "Local", currentChannel) + channelOption("remote", "Remoto", currentChannel) + channelOption("hybrid", "Híbrido", currentChannel) + '</select><small>O lembrete funcional é obrigatório em toda Sessão Planejada. Aqui você escolhe apenas como ele será entregue.</small></div><label class="ic-check"><input type="checkbox" name="sound"' + (data.sound !== false ? " checked" : "") + '><span>Som nos alertas permitidos</span></label><label class="ic-check"><input type="checkbox" name="vibration"' + (data.vibration !== false ? " checked" : "") + '><span>Vibração nos alertas permitidos</span></label><div class="ic-form-grid"><div class="ic-field"><label for="ic-quiet-start">Silencioso a partir de</label><input id="ic-quiet-start" type="time" name="quiet_start" value="' + Core.escapeHtml(data.quiet_start || "22:00") + '"></div><div class="ic-field"><label for="ic-quiet-end">Até</label><input id="ic-quiet-end" type="time" name="quiet_end" value="' + Core.escapeHtml(data.quiet_end || "08:00") + '"></div></div>' + saveButton("notifications") + '</form><div class="ic-disclaimer">Lembrete de Sessão Planejada e assinatura de padrão são contratos diferentes: o primeiro sempre tem data e horário; a assinatura acompanha uma análise sem marcar sessão. No canal Local, uma ocorrência estatística aparece somente no painel enquanto o aplicativo estiver disponível; a origem pessoal/comunitária nunca é afirmada por um agendamento antigo sem revalidação.</div>' + list;
-    }
-
-    function communityEligible(item) { return item.community_eligible !== false && item.comunidade_elegivel !== false && item.community_cell_eligible !== false && item.celula_comunitaria_elegivel !== false; }
-    function openSubscription(item) {
-      state.pendingSubscription = item;
-      var direction = item.direction || item.direcao || "descritiva";
-      var eligible = communityEligible(item);
-      UI.openSheet({ eyebrow: subscriptionCode(item), title: "Gerenciar lembrete de padrão", html: UI.banner("Direção observada: " + direction, "Escolha quais dados devem sustentar o lembrete recorrente. A notificação exibirá apenas a fonte efetivamente elegível naquela ocorrência.", "neutral") + '<div class="ic-choice-grid">' + UI.button("Meu histórico", { action: "settings-source", value: "pessoal" }) + UI.button("Comunidade", { action: "settings-source", value: "comunidade" }) + UI.button("Ambos, quando elegíveis", { action: "settings-source", value: "ambos", kind: "primary" }) + '</div>' + (!eligible ? UI.banner("Comunidade ainda sem evidência elegível", "A preferência pode permanecer ativa. Nenhum aviso alegará origem comunitária até que a célula atenda aos critérios de amostra, qualidade, concentração e privacidade.", "neutral") : '') + '<div class="ic-card__footer">' + UI.button("Desativar lembrete", { action: "settings-unsubscribe", kind: "danger" }) + '</div><div class="ic-disclaimer">Sem data fixa: o Turbo Tiger avisará em cada nova ocorrência da janela histórica. Isso não cria Sessão Planejada nem prevê resultados.</div>' });
-    }
-
-    async function saveSubscription(source, active) {
-      var item = state.pendingSubscription;
-      if (!item || !evidenceId(item)) return;
-      try {
-        await deps.api.rpc("ic_hipotese_notificacao_rpc", { p_id_insight_evidencia: evidenceId(item), p_escopo_estatistico: source, p_ativa: active }, { key: "settings:subscription" });
-        UI.closeSheet(); UI.toast(active ? "Origem da assinatura atualizada." : "Assinatura desativada."); state.pendingSubscription = null; state.status = "idle"; await load(true);
-      } catch (error) { UI.toast(error.message || "Não foi possível atualizar a assinatura."); }
+      return alerts.render() + '<details class="ic-settings-delivery"><summary>Som e entrega de sessões planejadas</summary><form class="ic-form" id="icSettingsNotifications"><div class="ic-field"><label for="ic-notification-channel">Canal do lembrete</label><select id="ic-notification-channel" name="channel">' + channelOption("local", "Local", currentChannel) + channelOption("remote", "Remoto", currentChannel) + channelOption("hybrid", "Híbrido", currentChannel) + '</select></div><label class="ic-check"><input type="checkbox" name="sound"' + (data.sound !== false ? " checked" : "") + '><span>Som</span></label><label class="ic-check"><input type="checkbox" name="vibration"' + (data.vibration !== false ? " checked" : "") + '><span>Vibração</span></label><input type="hidden" name="quiet_start" value="' + Core.escapeHtml(data.quiet_start || "22:00") + '"><input type="hidden" name="quiet_end" value="' + Core.escapeHtml(data.quiet_end || "08:00") + '"></form></details>';
     }
 
     function saveButton(id) { return UI.button("Salvar esta seção", { type: "submit", kind: "primary", value: id }); }
@@ -130,13 +105,11 @@
       else html += content();
       return html + '</div>';
     }
-    function renderInto() { deps.container.innerHTML = render(); }
+    function renderInto() { deps.container.innerHTML = render(); alerts.refreshStatus(); }
     async function handleAction(action, value) {
+      if (action.indexOf("alerts-") === 0) return alerts.handleAction(action, value);
       if (action === "retry") load(true);
       if (action === "settings-group") { state.open = state.open === value ? null : value; renderInto(); if (state.open === "data") await loadRequests(); }
-      if (action === "settings-subscription") { var notifications = (state.data || {}).notifications || (state.data || {}).notificacoes || {}; var item = subscriptions(notifications).find(function (candidate) { return String(evidenceId(candidate)) === String(value); }); if (item) openSubscription(item); }
-      if (action === "settings-source" && ["pessoal", "comunidade", "ambos"].indexOf(value) >= 0) return saveSubscription(value, true);
-      if (action === "settings-unsubscribe") return saveSubscription((state.pendingSubscription && (state.pendingSubscription.source || state.pendingSubscription.fonte || state.pendingSubscription.scope || state.pendingSubscription.escopo_estatistico)) || "ambos", false);
       if (action === "request-export") return requestData("exportacao_resumo", null);
       if (action === "request-correction") UI.openSheet({ title: "Informar uma correção", html: '<form class="ic-form" id="icDataCorrection"><div class="ic-field"><label for="icCorrectionDescription">O que precisa ser revisado?</label><textarea id="icCorrectionDescription" name="description" minlength="10" maxlength="2000" required></textarea><small>Indique a data, a Bet e o registro envolvido. Não informe senhas ou códigos de acesso.</small></div><p>A solicitação fica registrada para revisão. Nenhuma rodada ou movimentação será alterada automaticamente.</p>' + UI.button("Registrar solicitação", { type: "submit", disabled: state.requesting }) + '</form>' });
       if (action === "data-request-detail") return showRequest(value);
@@ -165,6 +138,11 @@
       try { await deps.api.rpc("ic_configuracoes_salvar_rpc", { p_secao: section, p_preferencias: payload }, { key: "settings:save" }); UI.toast("Configurações salvas."); state.status = "idle"; await load(true); }
       catch (error) { UI.toast(error.message || "Não foi possível salvar as configurações."); }
     }
-    return { render: render, load: load, handleAction: handleAction, handleSubmit: handleSubmit };
+    function handleChange(target) {
+      if (target.closest("#icAlertPreferences")) return alerts.handleChange(target);
+      var form = target.closest("#icSettingsNotifications");
+      if (form) return handleSubmit(form);
+    }
+    return { render: render, load: load, handleAction: handleAction, handleSubmit: handleSubmit, handleChange: handleChange, dispose: alerts.dispose };
   };
 }(window));

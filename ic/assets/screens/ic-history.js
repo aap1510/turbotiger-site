@@ -52,13 +52,12 @@
         var value = hasMoney ? Core.formatSignedMoney(Core.unitsFrom(item, ["net_result_units_text", "resultado_liquido_unidades_texto", "net_result_units", "resultado_liquido_unidades"], "0"), item.currency || item.moeda || "BRL", Core.decimalPlacesOf(item, 2)) : item.observed_return !== undefined || item.retorno_observado !== undefined ? Core.formatPercent(item.observed_return || item.retorno_observado, 1) : "";
         var actions = UI.button("Detalhes", { action: "history-detail", value: item.id || item.id_registro, kind: "quiet" });
         if (state.tab === "periodos" && deps.featureEnabled("ic_planned_session_enabled") && deps.featureEnabled("ic_reminders_enabled")) actions += UI.button(item.plan_count || item.quantidade_planos ? "Plano ativo" : "Planejar sessão", { action: "history-plan", value: item.id || item.id_registro, icon: "calendar", kind: item.plan_count || item.quantidade_planos ? "gold" : "quiet", disabled: item.planning_blocked || item.planejamento_bloqueado });
-        if (state.tab === "periodos" && isSubscribable(item) && deps.featureEnabled("ic_personal_insights_enabled")) actions += UI.button(item.notification_active || item.notificacao_ativa ? "Gerenciar lembrete" : "Lembrar deste padrão", { action: "history-subscribe", value: evidenceId(item), icon: "bell", kind: item.notification_active || item.notificacao_ativa ? "gold" : "quiet" });
         return UI.listRow(title, meta, value, actions) + UI.evidence(item.evidence || item.evidencia || item);
       }).join("") + '</div>' + (state.cursor ? '<div class="ic-card__footer">' + UI.button(state.loadingMore ? "Carregando…" : "Carregar mais", { action: "load-more", disabled: state.loadingMore }) + '</div>' : '');
     }
 
     function render() {
-      var html = UI.sectionHeader("Meu Histórico", "Consulte fatos registrados sem transformar o passado em promessa futura.", UI.button("Atualizar", { action: "retry", icon: "refresh" })) + '<div class="ic-page-stack">' + controls();
+      var html = UI.sectionHeader("Meu Histórico", "Consulte fatos registrados sem transformar o passado em promessa futura.", UI.button("Meus alertas", { route: "configuracoes", icon: "bell" }) + UI.button("Atualizar", { action: "retry", icon: "refresh" })) + '<div class="ic-page-stack">' + controls();
       if (state.status === "idle" || state.status === "loading") html += UI.state({ type: "loading", retry: false });
       else if (state.status === "error") html += UI.state({ type: state.error && state.error.code === "offline" ? "offline" : state.error && /^http_40[346]$/.test(state.error.code || "") ? "unavailable" : "error", message: state.error && state.error.message });
       else html += results();
@@ -72,30 +71,6 @@
     }
 
     function findItem(id) { return Core.normalizeArray((state.data || {}).items || (state.data || {}).itens).find(function (item) { return String(item.id || item.id_registro) === String(id); }); }
-    function patternCode(item) { return item && (item.hypothesis_code || item.codigo_hipotese || item.pattern_code || item.codigo_padrao); }
-    function evidenceId(item) { return Core.validUuid(item && (item.id_insight_evidencia || item.insight_evidence_id || item.uuid_insight_evidencia || item.evidence_id)); }
-    function temporalRule(item) { return item && (item.temporal_rule_id || item.id_regra_temporal || item.temporal_rule_code || item.codigo_regra_temporal || item.temporal_rule || item.regra_temporal); }
-    function isSubscribable(item) {
-      var status = String(item && (item.status || item.evidence_status || item.status_evidencia) || "").toLowerCase();
-      return !!(patternCode(item) && evidenceId(item) && temporalRule(item) && (item.notification_eligible === true || item.notificacao_elegivel === true || item.subscription_eligible === true || item.assinatura_elegivel === true) && (item.evidence_eligible === true || item.evidencia_elegivel === true) && !/explorat|observacao_inicial|observação_inicial|ruido|ruído|insuficiente/.test(status));
-    }
-    function communityEligible(item) { return item.community_eligible !== false && item.comunidade_elegivel !== false && item.community_cell_eligible !== false && item.celula_comunitaria_elegivel !== false; }
-    function subscriptionSheet(item) {
-      state.pendingSubscription = item;
-      var direction = item.direction || item.direcao || "descritiva";
-      var eligible = communityEligible(item);
-      var html = UI.banner("Direção observada: " + direction, "Escolha quais dados devem sustentar o lembrete recorrente. Cada aviso identificará somente a fonte efetivamente elegível naquela ocorrência.", "neutral") + '<div class="ic-choice-grid">' + UI.button("Meu histórico", { action: "history-source", value: "pessoal" }) + UI.button("Comunidade", { action: "history-source", value: "comunidade" }) + UI.button("Ambos, quando elegíveis", { action: "history-source", value: "ambos", kind: "primary" }) + '</div>' + (!eligible ? UI.banner("Comunidade ainda sem evidência elegível", "Você pode registrar essa preferência agora. Nenhum aviso alegará origem comunitária até que a célula atenda aos critérios de amostra, qualidade, concentração e privacidade.", "neutral") : '') + (item.notification_active || item.notificacao_ativa ? '<div class="ic-card__footer">' + UI.button("Desativar lembrete", { action: "history-unsubscribe", kind: "danger" }) + '</div>' : '') + '<div class="ic-disclaimer">Sem data fixa: o Turbo Tiger reconhecerá cada nova ocorrência da janela histórica. Isso não cria Sessão Planejada nem prevê resultados.</div>';
-      UI.openSheet({ eyebrow: patternCode(item), title: "Lembrete de padrão histórico", html: html });
-    }
-    async function saveSubscription(source, active) {
-      var item = state.pendingSubscription;
-      if (!item || !patternCode(item)) return;
-      try {
-        await deps.api.rpc("ic_hipotese_notificacao_rpc", { p_id_insight_evidencia: evidenceId(item), p_escopo_estatistico: source, p_ativa: active }, { key: "history:subscription" });
-        UI.closeSheet(); UI.toast(active ? "Lembrete recorrente ativado." : "Lembrete recorrente desativado."); state.pendingSubscription = null; state.status = "idle"; await load(true);
-      } catch (error) { UI.toast(error.message || "Não foi possível atualizar a assinatura."); }
-    }
-
     async function loadMore() {
       if (!state.cursor || state.loadingMore) return;
       state.loadingMore = true; renderInto();
@@ -121,9 +96,6 @@
       if (action === "history-tab") { state.tab = value; state.status = "idle"; renderInto(); load(true); return; }
       if (action === "history-detail") { var item = findItem(value); if (item) UI.openSheet({ eyebrow: state.tab, title: item.title || item.titulo || "Detalhes históricos", html: UI.banner(item.title || item.titulo || "Registro", item.description || item.descricao || "Informações registradas pelo sistema.", item.status) + UI.evidence(item.evidence || item.evidencia || item) + '<pre class="ic-detail-json">' + Core.escapeHtml(JSON.stringify(item.details || item.detalhes || {}, null, 2)) + '</pre>' }); }
       if (action === "history-plan") { var selected = findItem(value); deps.store.set({ planningDraft: selected || null }); deps.navigate({ section: "planejar" }); UI.toast("Confirme data futura, duração, limite e lembrete antes de criar o plano."); }
-      if (action === "history-subscribe") { var subscription = Core.normalizeArray((state.data || {}).items || (state.data || {}).itens).find(function (item) { return String(evidenceId(item)) === String(value); }); if (subscription && isSubscribable(subscription)) subscriptionSheet(subscription); }
-      if (action === "history-source" && ["pessoal", "comunidade", "ambos"].indexOf(value) >= 0) return saveSubscription(value, true);
-      if (action === "history-unsubscribe") return saveSubscription((state.pendingSubscription && (state.pendingSubscription.notification_source || state.pendingSubscription.fonte_notificacao || state.pendingSubscription.scope || state.pendingSubscription.escopo_estatistico)) || "ambos", false);
       if (action === "load-more") return loadMore();
     }
 

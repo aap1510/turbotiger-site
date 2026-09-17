@@ -69,6 +69,9 @@
         var text = await response.text();
         var payload = text ? JSON.parse(text) : null;
         if (!response.ok) {
+          if (name === "ic_alertas_preferencias_salvar_rpc" && payload && payload.code === "40001") {
+            throw Object.assign(new Error("Preferências alteradas em outra sessão."), { code: "ic_alertas_conflito_revisao", status: response.status });
+          }
           throw Object.assign(new Error(publicHttpMessage(response.status)), { code: "http_" + response.status, status: response.status });
         }
         if (epoch !== (options.getSessionEpoch ? options.getSessionEpoch() : epoch)) throw Object.assign(new Error("Resposta de sessão anterior descartada."), { code: "stale_session" });

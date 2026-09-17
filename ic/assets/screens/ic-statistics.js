@@ -19,6 +19,7 @@
     ];
     var state = { status: "idle", data: null, error: null, area: deps.route().subsection || "banca", pendingHypothesis: null, protection: null, protectionError: null, exposure: null, exposureError: null, exposureQuery: { p_id_jogo: null, p_exposicao_pct: null, p_risco_maximo: null } };
     var loadRevision = 0, disposed = false;
+    var postThreshold = 50, postGame = "all";
 
     function availableAreas() { return areas.filter(function (area) { return deps.featureEnabled(area.flag); }); }
     function normalizeArea() { var available = availableAreas(); if (!available.some(function (area) { return area.id === state.area; })) state.area = available.length ? available[0].id : null; return available; }
@@ -51,39 +52,76 @@
 
     function content() {
       var data = state.data || {};
-      if (data.status === "amostra_insuficiente") return UI.state({ type: "insufficient_data", message: data.message || data.mensagem, meta: data.sample_summary || data.resumo_amostra, retry: false });
-      if (data.status === "qualidade_insuficiente") return UI.state({ type: "insufficient_quality", message: data.message || data.mensagem, meta: data.sample_summary || data.resumo_amostra, retry: false });
+      var availableSeries = Core.normalizeArray(data.series || data.serie || data.items || data.itens);
+      if (data.status === "amostra_insuficiente" && (!availableSeries.length || state.area === "risco")) return UI.state({ type: "insufficient_data", message: data.message || data.mensagem, meta: data.sample_summary || data.resumo_amostra, retry: false });
+      if (data.status === "qualidade_insuficiente" && (!availableSeries.length || state.area === "risco")) return UI.state({ type: "insufficient_quality", message: data.message || data.mensagem, meta: data.sample_summary || data.resumo_amostra, retry: false });
       if (state.area === "laboratorio") return laboratory(data);
       var summary = data.summary || data.resumo || {};
       var series = Core.normalizeArray(data.series || data.serie || data.items || data.itens);
       if (!series.length && !Object.keys(summary).length) return UI.state({ type: "empty", title: "Ainda não há estatística para este recorte", message: "A infraestrutura permanece ativa e passará a exibir resultados quando houver dados elegíveis.", retry: false });
       var metrics = Core.normalizeArray(summary.metrics || summary.metricas).map(function (item) { return UI.metric(item.label || item.rotulo, item.formatted_value || item.valor_formatado || Core.safeText(item.value !== undefined ? item.value : item.valor), item.detail || item.detalhe); }).join("");
-      var maximum = Math.max.apply(Math, [1].concat(series.map(function (item) { return Math.abs(Number(item.value || item.valor || 0)); })));
-      var rows = series.map(function (item) { var value = Number(item.value || item.valor || 0); return '<div class="ic-stat-row"><span class="ic-stat-row__label">' + Core.escapeHtml(item.label || item.rotulo || "Faixa") + '</span><div class="ic-stat-row__track" aria-hidden="true"><div class="ic-stat-row__bar" style="width:' + Core.clamp(Math.abs(value) * 100 / maximum, 0, 100) + '%"></div></div><strong class="ic-stat-row__value">' + Core.escapeHtml(item.formatted_value || item.valor_formatado || String(value).replace(".", ",")) + '</strong></div>'; }).join("");
-      return (metrics ? '<div class="ic-grid ic-grid--metrics">' + metrics + '</div>' : '') + '<section class="ic-card"><div class="ic-card__header"><div><h3>' + Core.escapeHtml(data.title || data.titulo || areaLabel()) + '</h3><p>' + Core.escapeHtml(data.description || data.descricao || "Associação histórica apresentada com amostra e incerteza.") + '</p></div>' + UI.badge(data.evidence_status || data.status_evidencia || "descritivo", data.evidence_status || data.status_evidencia) + '</div><div class="ic-stat-block">' + rows + '</div>' + UI.evidence(data.evidence || data.evidencia || data) + '</section>' + renderEligiblePatterns(data) + '<div class="ic-disclaimer">Associações descrevem o histórico e não estabelecem causalidade nem preveem a próxima rodada.</div>';
+      var maximum = Math.max.apply(Math, [1].concat(series.map(function (item) { var value = finiteMetric(item.value !== undefined ? item.value : item.valor); return value === null ? 0 : Math.abs(value); })));
+      var rows = series.map(function (item) { var value = finiteMetric(item.value !== undefined ? item.value : item.valor); return '<div class="ic-stat-row"><span class="ic-stat-row__label">' + Core.escapeHtml(item.label || item.rotulo || "Faixa") + '</span><div class="ic-stat-row__track" aria-hidden="true"><div class="ic-stat-row__bar" style="width:' + (value === null ? 0 : Core.clamp(Math.abs(value) * 100 / maximum, 0, 100)) + '%"></div></div><strong class="ic-stat-row__value">' + Core.escapeHtml(item.formatted_value || item.valor_formatado || (value === null ? "Indisponível" : String(value).replace(".", ","))) + '</strong></div>' + seriesDetails(item); }).join("");
+      var warning = /insuficiente/.test(data.status || "") ? UI.banner("Histórico disponível, com limitações", "Os valores abaixo descrevem os registros disponíveis. Qualidade parcial ou reconstruída não equivale a saldo confirmado nem libera previsões.", "neutral") : "";
+      return warning + (metrics ? '<div class="ic-grid ic-grid--metrics">' + metrics + '</div>' : '') + '<section class="ic-card"><div class="ic-card__header"><div><h3>' + Core.escapeHtml(data.title || data.titulo || areaLabel()) + '</h3><p>' + Core.escapeHtml(data.description || data.descricao || "Associação histórica apresentada com amostra e incerteza.") + '</p></div>' + UI.badge(data.evidence_status || data.status_evidencia || "descritivo", data.evidence_status || data.status_evidencia) + '</div><div class="ic-stat-block">' + rows + '</div>' + UI.evidence(data.evidence || data.evidencia || data) + '</section>' + renderEligiblePatterns(data) + '<div class="ic-disclaimer">Associações descrevem o histórico e não estabelecem causalidade nem preveem a próxima rodada.</div>';
+    }
+
+    function seriesDetails(item) {
+      var fields = [
+        ["net_result_units", "Resultado líquido", true], ["balance_initial_units", "Saldo inicial", true],
+        ["movements_units", "Movimentações líquidas", true], ["balance_final_units", "Saldo final", true],
+        ["peak_units", "Pico do resultado", true], ["giveback_units", "Redução após o pico", true],
+        ["drawdown_units", "Maior drawdown", true], ["bonus_credited_units", "Bônus creditado", true],
+        ["free_spin_result_units", "Resultado dos free spins", true],
+        ["stake_increases_after_loss", "Aumentos após perda"], ["accelerations_after_loss", "Acelerações após perda"],
+        ["disguised_losses", "Retornos inferiores à aposta"], ["maximum_loss_streak", "Maior sequência de perdas"],
+        ["duration_seconds", "Duração em segundos"], ["rounds", "Rodadas"]
+      ];
+      var rows = fields.filter(function (field) { return Object.prototype.hasOwnProperty.call(item, field[0]); }).map(function (field) {
+        var value = item[field[0]], text = value === null || value === undefined ? "Indisponível" : field[2] ? Core.formatMoney(value, item.currency, item.decimal_places) : Core.safeText(value);
+        return UI.listRow(field[1], "", text);
+      }).join("");
+      if (item.detail) rows = '<p>' + Core.escapeHtml(item.detail) + '</p>' + rows;
+      if (item.quality) rows += UI.listRow("Qualidade dos registros", "", Core.safeText(item.quality));
+      return rows ? '<details class="ic-card"><summary>Entender este resultado</summary><div class="ic-list">' + rows + '</div></details>' : '';
+    }
+
+    function postMultipliers() {
+      if (["pico", "intervalos"].indexOf(state.area) < 0) return "";
+      var data = state.data && state.data.post_multiplier;
+      if (!data || data.version !== "ic_post_multiplier_descriptive_v1") return "";
+      var rows = Core.normalizeArray(data.rows);
+      if (!rows.length) return UI.banner("Após multiplicadores", "Ainda não há eventos elegíveis na projeção diária.", "neutral");
+      var fmt = function (value) { var number = finiteMetric(value); return number === null ? "Indisponível" : new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 }).format(number); };
+      var games = [], seen = Object.create(null);
+      rows.forEach(function (row) { var id = Core.safeText(row.game_id, ""); if (id && !seen[id]) { seen[id] = true; games.push({ id: id, label: row.game }); } });
+      var filters = '<div class="ic-chip-row" aria-label="Multiplicador mínimo">' + [5, 10, 20, 50, 100].map(function (n) { return '<button type="button" class="ic-chip' + (postThreshold === n ? ' is-active' : '') + '" aria-pressed="' + (postThreshold === n) + '" data-screen-action="post-threshold" data-action-value="' + n + '">≥' + n + '×</button>'; }).join("") + '</div><div class="ic-chip-row" aria-label="Jogo analisado">' + [{ id: "all", label: "Todos os jogos" }].concat(games).map(function (game) { return '<button type="button" class="ic-chip' + (postGame === game.id ? ' is-active' : '') + '" aria-pressed="' + (postGame === game.id) + '" data-screen-action="post-game" data-action-value="' + Core.escapeHtml(game.id) + '">' + Core.escapeHtml(game.label) + '</button>'; }).join("") + '</div>';
+      rows = rows.filter(function (row) { return Number(row.threshold) === postThreshold && (postGame === "all" || String(row.game_id) === postGame); });
+      return '<section><h3>' + (state.area === "pico" ? "O que aconteceu depois dos multiplicadores" : "Distância observada entre multiplicadores") + '</h3><p>Atualização: ' + Core.escapeHtml(Core.formatDateTime(data.updated_at)) + '. Análise pessoal, separada por jogo e moeda.</p>' + filters + (!rows.length ? UI.banner("Nenhum evento neste recorte", "Escolha outro jogo ou limiar. Ausência de eventos não indica quando haverá um prêmio.", "neutral") : '') + '<div class="ic-list">' + rows.map(function (row) {
+        var body;
+        if (state.area === "intervalos") {
+          body = UI.listRow("Pares completos", "Com próxima ocorrência observada", fmt(row.complete_pairs)) + UI.listRow("Eventos sem sucessor", "Não entram na média; não são espera zero", fmt(row.censored_events)) + UI.listRow("Média / mediana de rodadas", "Somente pares completos", fmt(row.mean_rounds) + " / " + fmt(row.median_rounds)) + UI.listRow("Metade central dos intervalos", "Percentis 25 a 75", fmt(row.p25_rounds) + " a " + fmt(row.p75_rounds) + " rodadas") + UI.listRow("Tempo médio registrado", "Não mede o tempo real de requisição", fmt(row.mean_seconds) + " s");
+        } else {
+          body = UI.listRow("Continuação após o evento", "Ocorrências, não sessões independentes", fmt(row.continued)) + UI.listRow("Terminaram abaixo do resultado pós-evento", "No mesmo recorte de sessão/jogo", fmt(row.ended_below_event)) + Core.normalizeArray(row.horizons).map(function (h) {
+            var units = finiteMetric(h.mean_net_units), places = finiteMetric(row.decimal_places);
+            var money = units === null || !Number.isInteger(places) || places < 0 || places > 8 || !/^[A-Z]{3}$/.test(row.currency || "") ? "Indisponível" : new Intl.NumberFormat("pt-BR", { style: "currency", currency: row.currency, minimumFractionDigits: places, maximumFractionDigits: Math.max(places, 2) }).format(units / Math.pow(10, places));
+            return UI.listRow("Próximas " + fmt(h.rounds) + " rodadas: " + money, fmt(h.complete) + " horizontes completos; " + fmt(h.censored) + " incompletos", fmt(h.negative) + " negativos");
+          }).join("");
+        }
+        return '<details class="ic-card"><summary>' + Core.escapeHtml(row.game + " · ≥" + fmt(row.threshold) + "× · " + row.currency) + '</summary><p>' + Core.escapeHtml(fmt(row.events) + " eventos em " + fmt(row.sessions) + " sessões. Bet " + Core.safeText(row.bet_id) + "; versão " + Core.safeText(row.game_version) + "; plataforma " + Core.safeText(row.platform)) + '</p><p>' + Core.escapeHtml(Core.formatDateTime(row.period_start) + " até " + Core.formatDateTime(row.period_end)) + '</p><div class="ic-list">' + body + '</div><p>Qualidade temporal: ' + Core.escapeHtml(Core.normalizeArray(row.temporal_quality).join(", ")) + '. Qualidade financeira: ' + Core.escapeHtml(Core.normalizeArray(row.financial_quality).join(", ")) + '.</p></details>';
+      }).join("") + '</div><div class="ic-disclaimer">' + Core.normalizeArray(data.limitations).map(function (note) { return '<p>' + Core.escapeHtml(note) + '</p>'; }).join("") + '</div></section>';
     }
 
     function laboratory(data) {
       var items = Core.normalizeArray(data.hypotheses || data.hipoteses || data.items || data.itens);
       if (!items.length) return UI.state({ type: "empty", title: "Nenhuma hipótese publicada", message: "Descobertas só aparecem após registro de método, amostra, limitações e status de validação.", retry: false });
-      return '<div class="ic-list">' + items.map(function (item) { var direction = item.direction || item.direcao || "descritiva", effective = item.effective_source || item.fonte_efetiva; var bell = isSubscribable(item) ? UI.button(item.notification_active ? "Gerenciar lembrete" : "Lembrar deste padrão", { action: "hypothesis-bell", value: evidenceId(item), icon: "bell", kind: item.notification_active ? "gold" : "quiet" }) : ""; return '<article class="ic-card"><div class="ic-card__header"><div><span class="ic-hypothesis-code">' + Core.escapeHtml(item.code || item.codigo) + '</span><h3>' + Core.escapeHtml(item.title || item.titulo || item.description || item.descricao) + '</h3><p>Direção observada: ' + Core.escapeHtml(direction) + '. ' + Core.escapeHtml(item.limitation || item.limitacao || "") + (effective ? ' Origem efetiva da última atualização: ' + Core.escapeHtml(sourceLabel(effective)) + '.' : '') + '</p></div>' + UI.badge(item.status || "exploratorio", item.status) + '</div>' + UI.evidence(item.evidence || item.evidencia || item) + '<div class="ic-card__footer">' + UI.button("Ver método", { action: "hypothesis-detail", value: item.code || item.codigo }) + bell + '</div></article>'; }).join("") + '</div><div class="ic-disclaimer">Hipóteses exploratórias permanecem apenas para consulta. O sino só aparece quando existe identidade temporal, regra versionada e evidência elegível.</div>';
+      return '<div class="ic-list">' + items.map(function (item) { var direction = item.direction || item.direcao || "descritiva", effective = item.effective_source || item.fonte_efetiva; var bell = ""; return '<article class="ic-card"><div class="ic-card__header"><div><span class="ic-hypothesis-code">' + Core.escapeHtml(item.code || item.codigo) + '</span><h3>' + Core.escapeHtml(item.title || item.titulo || item.description || item.descricao) + '</h3><p>Direção observada: ' + Core.escapeHtml(direction) + '. ' + Core.escapeHtml(item.limitation || item.limitacao || "") + (effective ? ' Origem efetiva da última atualização: ' + Core.escapeHtml(sourceLabel(effective)) + '.' : '') + '</p></div>' + UI.badge(item.status || "exploratorio", item.status) + '</div>' + UI.evidence(item.evidence || item.evidencia || item) + '<div class="ic-card__footer">' + UI.button("Ver método", { action: "hypothesis-detail", value: item.code || item.codigo }) + bell + '</div></article>'; }).join("") + '</div><div class="ic-disclaimer">Os alertas são configurados em Meus alertas estatísticos; você não precisa escolher padrões individualmente.</div>';
     }
 
     function patternCode(item) { return item && (item.code || item.codigo || item.hypothesis_code || item.codigo_hipotese || item.pattern_code || item.codigo_padrao); }
     function evidenceId(item) { return Core.validUuid(item && (item.id_insight_evidencia || item.insight_evidence_id || item.uuid_insight_evidencia || item.evidence_id)); }
-    function temporalRule(item) { return item && (item.temporal_rule_id || item.id_regra_temporal || item.temporal_rule_code || item.codigo_regra_temporal || item.temporal_rule || item.regra_temporal); }
-    function isSubscribable(item) {
-      var status = String(item && (item.status || item.evidence_status || item.status_evidencia) || "").toLowerCase();
-      var eligible = item && (item.notification_eligible === true || item.notificacao_elegivel === true || item.subscription_eligible === true || item.assinatura_elegivel === true);
-      var evidence = item && (item.evidence_eligible === true || item.evidencia_elegivel === true);
-      return !!(patternCode(item) && evidenceId(item) && temporalRule(item) && eligible && evidence && !/explorat|observacao_inicial|observação_inicial|ruido|ruído|insuficiente/.test(status));
-    }
     function patternsFromData(data) { return Core.normalizeArray(data.notification_patterns || data.padroes_notificaveis || data.patterns || data.padroes || data.hypotheses || data.hipoteses); }
-    function renderEligiblePatterns(data) {
-      var items = patternsFromData(data).filter(isSubscribable);
-      if (!items.length) return "";
-      return '<section><div class="ic-card__header"><div><h3>Lembretes de padrões históricos</h3><p>Padrões temporais elegíveis deste recorte, com direção e evidência explícitas.</p></div></div><div class="ic-list">' + items.map(function (item) { var code = patternCode(item); return '<article class="ic-card"><div class="ic-card__header"><div><h3>' + Core.escapeHtml(item.title || item.titulo || code) + '</h3><p>Direção observada: ' + Core.escapeHtml(item.direction || item.direcao || "descritiva") + '.</p></div>' + UI.badge(item.status || "elegivel", item.status) + '</div>' + UI.evidence(item.evidence || item.evidencia || item) + '<div class="ic-card__footer">' + UI.button(item.notification_active || item.notificacao_ativa ? "Gerenciar lembrete" : "Lembrar deste padrão", { action: "hypothesis-bell", value: evidenceId(item), icon: "bell", kind: item.notification_active || item.notificacao_ativa ? "gold" : "quiet" }) + '</div></article>'; }).join("") + '</div></section>';
-    }
+    function renderEligiblePatterns() { return UI.button("Configurar meus alertas", { route: "configuracoes", icon: "bell" }); }
 
     function areaLabel() { var found = areas.find(function (item) { return item.id === state.area; }); return found ? found.label : "Estatísticas"; }
     function finiteMetric(value) { if ((typeof value !== "number" && typeof value !== "string") || (typeof value === "string" && !value.trim())) return null; var number = Number(value); return Number.isFinite(number) ? number : null; }
@@ -157,35 +195,18 @@
       if (state.status === "idle" || state.status === "loading") html += UI.state({ type: "loading", retry: false });
       else if (state.status === "unavailable") html += UI.state({ type: "unavailable", message: "Nenhuma análise estatística está habilitada pela política atual.", retry: false });
       else if (state.status === "error") html += UI.state({ type: state.error && state.error.code === "offline" ? "offline" : state.error && /^http_40[346]$/.test(state.error.code || "") ? "unavailable" : "error", message: state.error && state.error.message });
-      else html += content() + behavioralModels() + exposureModels();
+      else html += content() + postMultipliers() + behavioralModels() + exposureModels();
       return html + '</div>';
     }
     function renderInto() { if (!disposed) deps.container.innerHTML = render(); }
     function findHypothesis(reference) { return patternsFromData(state.data || {}).find(function (item) { return String(patternCode(item)) === String(reference) || String(evidenceId(item)) === String(reference); }); }
-    function subscriptionSheet(item) {
-      var code = item.code || item.codigo, direction = item.direction || item.direcao || "descritiva";
-      state.pendingHypothesis = item;
-      var eligible = communityEligible(item);
-      var html = UI.banner("Direção observada: " + direction, "Escolha quais dados devem sustentar o lembrete recorrente. Cada aviso identificará somente a fonte efetivamente elegível naquela ocorrência.", "neutral") + '<div class="ic-choice-grid">' + UI.button("Meu histórico", { action: "hypothesis-source", value: "pessoal" }) + UI.button("Comunidade", { action: "hypothesis-source", value: "comunidade" }) + UI.button("Ambos, quando elegíveis", { action: "hypothesis-source", value: "ambos", kind: "primary" }) + '</div>' + (!eligible ? UI.banner("Comunidade ainda sem evidência elegível", "Você pode registrar essa preferência agora. Nenhum aviso alegará origem comunitária até que a célula atenda aos critérios de amostra, qualidade, concentração e privacidade.", "neutral") : '') + (item.notification_active ? '<div class="ic-card__footer">' + UI.button("Desativar lembrete", { action: "hypothesis-unsubscribe", value: code, kind: "danger" }) + '</div>' : '') + '<div class="ic-disclaimer">Sem data fixa: o Turbo Tiger reconhecerá cada nova ocorrência da janela histórica. O aviso é descritivo e não prevê resultados.</div>';
-      UI.openSheet({ eyebrow: code, title: "Lembrete de padrão histórico", html: html });
-    }
-    async function saveSubscription(source, active) {
-      var item = state.pendingHypothesis;
-      if (!item) return;
-      try {
-        await deps.api.rpc("ic_hipotese_notificacao_rpc", { p_id_insight_evidencia: evidenceId(item), p_escopo_estatistico: source, p_ativa: active }, { key: "statistics:bell" });
-        if (disposed) return;
-        UI.closeSheet(); UI.toast(active ? "Lembrete recorrente ativado." : "Lembrete recorrente desativado."); state.pendingHypothesis = null; state.status = "idle"; await load(true);
-      } catch (error) { if (!disposed) UI.toast(error.message || "Não foi possível atualizar a assinatura."); }
-    }
     async function handleAction(action, value) {
       if (disposed) return;
+      if (action === "post-threshold" && [5, 10, 20, 50, 100].indexOf(Number(value)) >= 0) { postThreshold = Number(value); renderInto(); return; }
+      if (action === "post-game" && (value === "all" || Core.normalizeArray(state.data && state.data.post_multiplier && state.data.post_multiplier.rows).some(function (row) { return String(row.game_id) === value; }))) { postGame = value; renderInto(); return; }
       if (action === "retry") return load(true);
       if (action === "stats-area" && availableAreas().some(function (area) { return area.id === value; })) { state.area = value; state.status = "idle"; deps.navigate({ section: "estatisticas", subsection: value }, true); load(true); }
       if (action === "hypothesis-detail") { var item = findHypothesis(value); if (item) UI.openSheet({ eyebrow: item.code || item.codigo, title: item.title || item.titulo || "Hipótese", html: UI.banner("Status: " + Core.safeText(item.status), item.description || item.descricao || "", item.status) + UI.evidence(item.evidence || item.evidencia || item) + '<div class="ic-disclaimer">' + Core.escapeHtml(item.limitation || item.limitacao || "A causa não foi estabelecida e o resultado não prevê rodadas futuras.") + '</div>' }); }
-      if (action === "hypothesis-bell") { var hypothesis = findHypothesis(value); if (hypothesis && isSubscribable(hypothesis)) subscriptionSheet(hypothesis); }
-      if (action === "hypothesis-source" && ["pessoal", "comunidade", "ambos"].indexOf(value) >= 0) return saveSubscription(value, true);
-      if (action === "hypothesis-unsubscribe") return saveSubscription((state.pendingHypothesis && (state.pendingHypothesis.notification_source || state.pendingHypothesis.fonte_notificacao || state.pendingHypothesis.scope || state.pendingHypothesis.escopo_estatistico)) || "ambos", false);
     }
     function dispose() { disposed = true; loadRevision += 1; state.data = null; state.protection = null; state.protectionError = null; state.exposure = null; state.exposureError = null; state.exposureQuery = {}; state.pendingHypothesis = null; }
     return { render: render, load: load, handleAction: handleAction, handleSubmit: handleSubmit, dispose: dispose };
