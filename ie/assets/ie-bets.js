@@ -53,7 +53,7 @@
     new MutationObserver(function () { clearTimeout(timer); timer = setTimeout(badges, 80); }).observe(document.getElementById("ieApp"), { childList: true, subtree: true });
     new MutationObserver(function () { clearTimeout(timer); timer = setTimeout(badges, 80); }).observe(host, { childList: true, subtree: true });
     document.addEventListener("click", function (event) {
-      if (event.target.closest("[data-personal-bets-open]")) { open(); return; }
+      if (event.target.closest("[data-personal-bets-open]")) { event.preventDefault(); event.stopImmediatePropagation(); open(); return; }
       if (!active()) return;
       var button = event.target.closest("[data-bet-status],[data-bet-page],[data-bet-retry],[data-bet-share]"); if (!button) return;
       if (button.hasAttribute("data-bet-share")) { var ticket = (data && data.bilhetes || []).find(function (t) { return String(t.id) === button.dataset.betShare; }); if (ticket) api.share(ticket, host.querySelector('[data-bet-ticket="' + Number(ticket.id) + '"]')); return; }

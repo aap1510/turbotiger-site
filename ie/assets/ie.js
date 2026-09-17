@@ -1290,7 +1290,7 @@
     if ((hasScore || live || exceptionalStatusText) && statusText) center += "<span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>";
     var availabilityNotice = staleLive ? "<small class=\"ie-match-update-state\">Atualização indisponível para este confronto</small>" : "";
     var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Confronto", 25);
-    if (id) center = '<div class="ieb-event-ticket" data-bet-event-id="' + escapeHtml(id) + '"></div>' + center;
+    if (id) center = '<button type="button" class="ieb-event-ticket" data-bet-event-id="' + escapeHtml(id) + '" data-personal-bets-open aria-label="Abrir Minhas apostas"></button>' + center;
     var compareAction = typeof compareSelection !== "undefined" && compareSelection && String(item.esporte || "").toLowerCase() === "futebol"
       && (scheduledStatus || status === "adiada") && !item.ao_vivo && startTimestamp > serverNow()
       ? compareSelection.button(id, sides.home.name + " e " + sides.away.name, startTimestamp) : "";
