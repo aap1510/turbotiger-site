@@ -202,7 +202,8 @@ svg {
 .ic-header__session-dot { width: 9px; height: 9px; margin-left: 13px; border-radius: 50%; background: var(--ic-neutral); box-shadow: 0 0 0 3px rgba(138, 143, 152, .12); }
 .ic-header__session-dot.is-active { background: var(--ic-control); box-shadow: 0 0 0 3px rgba(31, 165, 91, .14); }
 .ic-eyebrow { margin: 0; color: var(--ic-gold); font-size: .68rem; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
-.ic-header__actions { display: flex; gap: 2px; flex: 0 0 auto; }
+.ic-header .ic-eyebrow { white-space: nowrap; }
+.ic-header__actions { display: flex; gap: 0; flex: 0 0 auto; }
 
 .ic-icon-button {
   position: relative;

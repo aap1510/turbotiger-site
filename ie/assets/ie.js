@@ -2354,7 +2354,8 @@
     else if (route.section === "noticias") requirements.sportSections = ["news"];
     else if (route.section === "cotacoes") requirements.card = true;
     else if (route.section === "analises") { requirements.card = true; requirements.base = true; }
-    else if (route.section !== "times") requirements.sportSections = ["forYou", "competitions"];
+    // The default home renders navigation links, not match/competition data.
+    // These sections are loaded after the opening gate, with the other background data.
     return requirements;
   }
 
