@@ -17,7 +17,7 @@
       { id: "risco", label: "Risco da sessão", flag: "ic_session_risk_enabled" },
       { id: "laboratorio", label: "Laboratório", flag: "ic_interval_lab_enabled" }
     ];
-    var state = { status: "idle", data: null, error: null, area: deps.route().subsection || "banca", pendingHypothesis: null, protection: null, protectionError: null, exposure: null, exposureError: null, exposureQuery: { p_id_jogo: null, p_exposicao_pct: null, p_risco_maximo: null } };
+    var state = { status: "idle", data: null, error: null, area: deps.route().subsection || "sessoes", pendingHypothesis: null, protection: null, protectionError: null, exposure: null, exposureError: null, exposureQuery: { p_id_jogo: null, p_exposicao_pct: null, p_risco_maximo: null } };
     var loadRevision = 0, disposed = false;
     var postThreshold = 50, postGame = "all";
 
@@ -70,9 +70,16 @@
       var summary = data.summary || data.resumo || {};
       var series = Core.normalizeArray(data.series || data.serie || data.items || data.itens);
       if (!series.length && !Object.keys(summary).length) return UI.state({ type: "empty", title: "Ainda não há estatística para este recorte", message: "A infraestrutura permanece ativa e passará a exibir resultados quando houver dados elegíveis.", retry: false });
-      var metrics = Core.normalizeArray(summary.metrics || summary.metricas).map(function (item) { return UI.metric(item.label || item.rotulo, item.formatted_value || item.valor_formatado || Core.safeText(item.value !== undefined ? item.value : item.valor), item.detail || item.detalhe); }).join("");
-      var maximum = Math.max.apply(Math, [1].concat(series.map(function (item) { var value = finiteMetric(item.value !== undefined ? item.value : item.valor); return value === null ? 0 : Math.abs(value); })));
-      var rows = series.map(function (item) { var value = finiteMetric(item.value !== undefined ? item.value : item.valor); return '<div class="ic-stat-row"><span class="ic-stat-row__label">' + Core.escapeHtml(item.label || item.rotulo || "Faixa") + '</span><div class="ic-stat-row__track" aria-hidden="true"><div class="ic-stat-row__bar" style="width:' + (value === null ? 0 : Core.clamp(Math.abs(value) * 100 / maximum, 0, 100)) + '%"></div></div><strong class="ic-stat-row__value">' + Core.escapeHtml(item.formatted_value || item.valor_formatado || (value === null ? "Indisponível" : Core.formatNumber(value))) + '</strong></div>' + seriesDetails(item); }).join("");
+      var metrics = Core.normalizeArray(summary.metrics || summary.metricas).map(function (item) { return UI.metric(item.label || item.rotulo, finiteMetric(item.value !== undefined ? item.value : item.valor) !== null ? Core.formatNumber(item.value !== undefined ? item.value : item.valor) : (item.formatted_value || item.valor_formatado || Core.safeText(item.value !== undefined ? item.value : item.valor)), item.detail || item.detalhe); }).join("");
+      var available = series.filter(function (item) { return finiteMetric(item.value !== undefined ? item.value : item.valor) !== null; });
+      var rows = available.map(function (item) {
+        var value = finiteMetric(item.value !== undefined ? item.value : item.valor);
+        var label = item.started_at ? Core.formatDateTime(item.started_at) : item.label || item.rotulo || "Faixa";
+        var formatted = item.rounds_per_minute != null ? Core.formatNumber(item.rounds_per_minute) + " rodadas/min" : state.area === "sessoes" ? Core.formatNumber(value, 0) + " rodadas" : item.formatted_value || item.valor_formatado || Core.formatNumber(value);
+        var detail = item.duration_seconds == null ? "" : Core.formatDuration(item.duration_seconds);
+        return UI.listRow(label, detail, formatted) + seriesDetails(item);
+      }).join("");
+      if (!available.length && series.length) rows = UI.banner("Saldo histórico não confirmado", "Estes registros não permitem calcular a banca inicial e final com segurança. Consulte Sessões para ver rodadas, duração e resultado registrados.", "neutral");
       var warning = /insuficiente/.test(data.status || "") ? UI.banner("Histórico disponível, com limitações", "Os valores abaixo descrevem os registros disponíveis. Qualidade parcial ou reconstruída não equivale a saldo confirmado nem libera previsões.", "neutral") : "";
       return warning + (metrics ? '<div class="ic-grid ic-grid--metrics">' + metrics + '</div>' : '') + '<section class="ic-card"><div class="ic-card__header"><div><h3>' + Core.escapeHtml(data.title || data.titulo || areaLabel()) + '</h3><p>' + Core.escapeHtml(data.description || data.descricao || "Associação histórica apresentada com amostra e incerteza.") + '</p></div>' + UI.badge(data.evidence_status || data.status_evidencia || "descritivo", data.evidence_status || data.status_evidencia) + '</div><div class="ic-stat-block">' + rows + '</div>' + UI.evidence(data.evidence || data.evidencia || data) + '</section>' + renderEligiblePatterns(data) + '<div class="ic-disclaimer">Associações descrevem o histórico e não estabelecem causalidade nem preveem a próxima rodada.</div>';
     }
@@ -89,11 +96,11 @@
         ["duration_seconds", "Duração em segundos"], ["rounds", "Rodadas"]
       ];
       var rows = fields.filter(function (field) { return Object.prototype.hasOwnProperty.call(item, field[0]); }).map(function (field) {
-        var value = item[field[0]], text = value === null || value === undefined ? "Indisponível" : field[2] ? Core.formatMoney(value, item.currency, item.decimal_places) : Core.safeText(value);
+        var value = item[field[0]], text = value === null || value === undefined ? "Indisponível" : field[2] ? Core.formatMoney(value, item.currency, item.decimal_places) : Core.formatNumber(value);
         return UI.listRow(field[1], "", text);
       }).join("");
-      if (item.detail) rows = '<p>' + Core.escapeHtml(item.detail) + '</p>' + rows;
-      if (item.quality) rows += UI.listRow("Qualidade dos registros", "", Core.safeText(item.quality));
+      if (item.detail) rows = '<p>' + Core.escapeHtml(item.detail === "sem_saldo" ? "Saldo não confirmado" : item.detail) + '</p>' + rows;
+      if (item.quality) rows += UI.listRow("Qualidade dos registros", "", Core.statusLabel(item.quality));
       return rows ? '<details class="ic-card"><summary>Entender este resultado</summary><div class="ic-list">' + rows + '</div></details>' : '';
     }
 

@@ -14,7 +14,7 @@
 .ic-section-header__actions { flex-wrap: wrap; }
 @media (max-width: 639px) {
   .ic-section-header { flex-direction: column; gap: 10px; }
-  .ic-section-header__actions { width: 100%; }
+  .ic-section-header__actions { width: auto; align-self: flex-end; }
   .ic-section-header__actions .ic-button { flex: 1 1 auto; }
   .ic-section-header .ic-eyebrow { display: none; }
   .ic-list-row { flex-wrap: wrap; }

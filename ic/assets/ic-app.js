@@ -114,6 +114,7 @@
     if (replace) root.history.replaceState(route, "", url);
     else root.history.pushState(route, "", url);
     activateSection(route.section, false);
+    root.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }
 
   async function loadBootstrap(force) {
@@ -153,6 +154,7 @@
     var captureNode = document.getElementById("icCaptureStatus");
     if (captureNode) captureNode.innerHTML = '<span class="ic-status-dot ic-status-dot--' + Core.statusTone(capture.status || capture.estado || "neutral") + '"></span><span>' + Core.escapeHtml(capture.label || capture.rotulo || "Captura não informada") + '</span>';
     var globalSession = data.global_session || data.sessao_global || {};
+    if (captureNode) captureNode.hidden = !(globalSession.active || globalSession.ativa);
     var globalNode = document.getElementById("icGlobalSessionStatus");
     if (globalNode) globalNode.innerHTML = UI.icon("live") + '<span>' + Core.escapeHtml(globalSession.label || globalSession.rotulo || (globalSession.active || globalSession.ativa ? "Sessão ativa" : "Nenhuma sessão ativa")) + '</span>';
     var updated = document.getElementById("icLastUpdated");

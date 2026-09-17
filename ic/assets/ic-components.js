@@ -68,6 +68,7 @@
 
   function button(label, options) {
     options = options || {};
+    if (options.action === "retry" && options.icon === "refresh") return '<button class="ic-icon-button" type="button" data-screen-action="retry" aria-label="Atualizar" title="Atualizar">' + icon("refresh") + '</button>';
     var classes = "ic-button" + (options.kind ? " ic-button--" + options.kind : "") + (options.block ? " ic-button--block" : "");
     var attributes = options.route ? ' data-route="' + Core.escapeHtml(options.route) + '"' : ' data-screen-action="' + Core.escapeHtml(options.action || "") + '"';
     if (options.value !== null && typeof options.value !== "undefined") attributes += ' data-action-value="' + Core.escapeHtml(options.value) + '"';

@@ -118,6 +118,9 @@
       Object.keys(values).forEach(function (name) { var field = form.elements.namedItem(name); if (field && values[name] !== null && typeof values[name] !== "undefined") field.value = String(values[name]); });
       var currencies = Core.currencyCatalog(currencyContext()), currencyField = form.elements.namedItem("currency");
       if (currencyField && !currencyField.value && currencies.length === 1) currencyField.value = currencies[0].code;
+      var overall = (currencyContext().historical_summary || {}).overall || {};
+      var historicalCurrency = overall.moeda || overall.currency;
+      if (currencyField && !currencyField.value && historicalCurrency && currencies.some(function (item) { return item.code === historicalCurrency; })) currencyField.value = historicalCurrency;
       if (draft.recurrence && Array.isArray(draft.recurrence.weekdays)) Array.from(form.querySelectorAll('[name="weekdays"]')).forEach(function (field) { field.checked = draft.recurrence.weekdays.indexOf(Number(field.value)) >= 0; });
     }
 

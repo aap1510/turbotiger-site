@@ -50,6 +50,8 @@
   }
 
   function statusLabel(value) {
+    if (value === "reconstruida_modelada") return "Histórico reconstruído; saldo não confirmado";
+    if (value === "sem_saldo") return "Saldo não confirmado";
     var labels = { exploratorio: "Exploratório", descritivo: "Descritivo", amostra_insuficiente: "Poucos dados", sem_dados: "Sem histórico neste recorte", atualizacao_pendente: "Atualização pendente", model_update_pending: "Atualização pendente", validacao_futura: "Em validação", historica_reconstruida: "Histórico reconstruído", inconclusivo: "Inconclusivo", validado_fora_da_amostra: "Validado em outro período", replicado: "Replicado" };
     return labels[String(value || "").toLowerCase()] || safeText(value);
   }

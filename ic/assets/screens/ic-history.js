@@ -46,13 +46,17 @@
       return '<div class="ic-list">' + items.map(function (item) {
         var title = item.title || item.titulo || item.period_label || item.periodo_rotulo || Core.formatDateTime(item.started_at || item.inicio_em);
         var meta = item.description || item.descricao || [item.bet || item.bet_nome, item.game || item.jogo, item.rounds || item.rodadas ? (item.rounds || item.rodadas) + " rodadas" : null].filter(Boolean).join(" · ");
+        if (state.tab === "sessoes") {
+          title = Core.formatDateTime(item.started_at || item.inicio_em);
+          meta = [item.game || item.jogo, Core.formatNumber(item.rounds || item.rodadas || 0, 0) + " rodadas", item.duration_seconds == null ? null : Core.formatDuration(item.duration_seconds)].filter(Boolean).join(" · ");
+        }
         var effectiveSource = item.effective_source || item.fonte_efetiva;
         if (effectiveSource) meta += (meta ? " · " : "") + (effectiveSource === "pessoal" ? "Origem efetiva: seu histórico" : effectiveSource === "comunidade" ? "Origem efetiva: comunidade elegível" : "Origem efetiva: seu histórico e comunidade elegível");
         var hasMoney = item.net_result_units_text !== undefined || item.resultado_liquido_unidades_texto !== undefined || item.net_result_units !== undefined || item.resultado_liquido_unidades !== undefined;
         var value = hasMoney ? Core.formatSignedMoney(Core.unitsFrom(item, ["net_result_units_text", "resultado_liquido_unidades_texto", "net_result_units", "resultado_liquido_unidades"], "0"), item.currency || item.moeda || "BRL", Core.decimalPlacesOf(item, 2)) : item.observed_return !== undefined || item.retorno_observado !== undefined ? Core.formatPercent(item.observed_return || item.retorno_observado, 1) : "";
         var actions = UI.button("Detalhes", { action: "history-detail", value: item.id || item.id_registro, kind: "quiet" });
         if (state.tab === "periodos" && deps.featureEnabled("ic_planned_session_enabled") && deps.featureEnabled("ic_reminders_enabled")) actions += UI.button(item.plan_count || item.quantidade_planos ? "Plano ativo" : "Planejar sessão", { action: "history-plan", value: item.id || item.id_registro, icon: "calendar", kind: item.plan_count || item.quantidade_planos ? "gold" : "quiet", disabled: item.planning_blocked || item.planejamento_bloqueado });
-        return UI.listRow(title, meta, value, actions) + UI.evidence(item.evidence || item.evidencia || item);
+        return UI.listRow(title, meta, value, actions) + (state.tab === "sessoes" ? "" : UI.evidence(item.evidence || item.evidencia || item));
       }).join("") + '</div>' + (state.cursor ? '<div class="ic-card__footer">' + UI.button(state.loadingMore ? "Carregando…" : "Carregar mais", { action: "load-more", disabled: state.loadingMore }) + '</div>' : '');
     }
 

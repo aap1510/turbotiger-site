@@ -38,6 +38,7 @@
     <symbol id="ic-i-check" viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></symbol>
     <symbol id="ic-i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></symbol>
     <symbol id="ic-i-filter" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></symbol>
+    <symbol id="ic-i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
     <symbol id="ic-i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></symbol>
   </svg>
 
@@ -64,7 +65,7 @@
           <img src="../assets/icone-turbotiger-raio.webp" alt="" width="34" height="34">
           <div>
             <p class="ic-eyebrow" id="icGreeting">Seu controle</p>
-            <h1>Inteligência de Cassino</h1>
+            <h1 aria-label="Inteligência de Cassino">Central IC</h1>
           </div>
         </div>
         <div class="ic-header__actions">
@@ -101,7 +102,7 @@
       <button role="tab" id="ic-tab-regras-pausas" aria-controls="ic-panel-regras-pausas" aria-selected="false" tabindex="-1" data-section="regras-pausas"><svg aria-hidden="true"><use href="#ic-i-shield"></use></svg><span>Regras e Pausas</span></button>
       <button role="tab" id="ic-tab-coach" aria-controls="ic-panel-coach" aria-selected="false" tabindex="-1" data-section="coach"><svg aria-hidden="true"><use href="#ic-i-coach"></use></svg><span>Tiger Coach</span></button>
       <button role="tab" id="ic-tab-configuracoes" aria-controls="ic-panel-configuracoes" aria-selected="false" tabindex="-1" data-section="configuracoes"><svg aria-hidden="true"><use href="#ic-i-settings"></use></svg><span>Configurações</span></button>
-      <button id="icMoreSections" type="button" data-global-action="sections" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#ic-i-filter"></use></svg><span>Mais</span></button>
+      <button id="icMoreSections" type="button" data-global-action="sections" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#ic-i-menu"></use></svg><span>Mais</span></button>
     </nav>
 
     <div class="ic-main" id="icMain">

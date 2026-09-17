@@ -5,7 +5,7 @@
 
   IC.Screens.jogos = function (deps) {
     var Core = IC.Core, UI = IC.UI;
-    var state = { status: "idle", data: null, error: null, query: "", quality: "", order: "alphabetical", filters: {}, simulationGame: null, simulationBet: null, passport: null, simulating: false, simulationRequest: null };
+    var state = { status: "idle", data: null, error: null, query: "", quality: "", order: "rounds", filters: {}, simulationGame: null, simulationBet: null, passport: null, simulating: false, simulationRequest: null };
     var disposed = false, passportRevision = 0;
 
     function currencyContext() {

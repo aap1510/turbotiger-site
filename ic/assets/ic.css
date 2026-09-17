@@ -178,7 +178,7 @@ svg {
   z-index: 30;
   top: 0;
   border-bottom: 1px solid var(--ic-border);
-  background: rgba(5, 6, 7, .96);
+  background: var(--ic-bg);
   backdrop-filter: blur(16px);
   padding-top: env(safe-area-inset-top);
 }
@@ -273,7 +273,7 @@ svg {
   overscroll-behavior-x: contain;
   scrollbar-width: none;
   border-bottom: 1px solid var(--ic-border);
-  background: rgba(5, 6, 7, .97);
+  background: var(--ic-bg);
   padding: 0 max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left));
 }
 
@@ -337,7 +337,7 @@ svg {
   .ic-header__actions .ic-icon-button { width: 38px; height: 38px; }
   .ic-header h1 { max-width: 175px; }
   .ic-updated { display: none; }
-  .ic-tabs button { min-width: 82px; padding-inline: 9px; }
+  .ic-tabs button { flex: 1 1 0; min-width: 0; padding-inline: 3px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

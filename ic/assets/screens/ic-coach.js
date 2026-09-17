@@ -48,7 +48,7 @@
       if (type === "explain_insight") return "Entender este insight";
       if (type === "explain_rule") return "Qual regra foi acionada?";
       if (type === "post_session_review") return "Revisar esta sessão";
-      return "Como estou neste período?";
+      return "Entender meu resumo do período";
     }
 
     function coachActionDefinition(action) {
