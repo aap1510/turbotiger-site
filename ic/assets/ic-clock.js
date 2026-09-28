@@ -1,19 +1,46 @@
 (function (root, factory) {
   "use strict";
   var Core = root.TurboTigerIC && root.TurboTigerIC.Core;
-  var api = factory(Core);
+  var api = factory(Core, root);
   root.TurboTigerIC = root.TurboTigerIC || {};
   root.TurboTigerIC.Clock = api;
-  if (typeof module === "object" && module.exports) module.exports = factory(require("./ic-core.js"));
-}(typeof window !== "undefined" ? window : globalThis, function (Core) {
+  if (typeof module === "object" && module.exports) module.exports = factory(require("./ic-core.js"), root);
+}(typeof window !== "undefined" ? window : globalThis, function (Core, root) {
   "use strict";
+
+  var fontesLegendasRelogio = {
+    "legenda_ic_relogio_neutro": "Neutro",
+    "legenda_ic_relogio_controle": "Controle",
+    "legenda_ic_relogio_atencao": "Atenção",
+    "legenda_ic_relogio_atencao_elevada": "Atenção elevada",
+    "legenda_ic_relogio_limite": "Limite",
+    "legenda_ic_relogio_captura_indisponivel": "Captura indisponível",
+    "legenda_ic_relogio_tempo_planejado_atingido": "Tempo planejado atingido",
+    "legenda_ic_relogio_limite_perda_atingido": "Limite de perda atingido",
+    "legenda_ic_relogio_valor_limite_perda": "de {valor} de perda",
+    "legenda_ic_relogio_indisponivel": "Indisponível",
+    "legenda_ic_relogio_controle_financeiro_incompleto": "controle financeiro incompleto",
+    "legenda_ic_relogio_limite_perda": "Limite de perda",
+    "legenda_ic_relogio_monitoramento_financeiro_incompleto": "Monitoramento financeiro incompleto",
+    "legenda_ic_relogio_captura_pendente_reconciliacao": "O tempo continua, mas resultado e limite financeiro não serão apresentados como seguros até a captura ser reconciliada.",
+    "legenda_ic_relogio_captura_completa": "Captura completa",
+    "legenda_ic_relogio_captura": "Captura ",
+    "legenda_ic_relogio_decorridos": " decorridos",
+    "legenda_ic_relogio_tempo": "Tempo"
+  };
+  if (root.TurboTigerLegendas) root.TurboTigerLegendas.registrar(fontesLegendasRelogio);
+  function legendaRelogio(chave, valores) {
+    if (root.TurboTigerLegendas) return root.TurboTigerLegendas.texto(chave, valores);
+    return fontesLegendasRelogio[chave].replace(/\{([a-z][a-z0-9_]*)\}/g, function (token, nome) { return valores && Object.prototype.hasOwnProperty.call(valores, nome) ? String(valores[nome]) : token; });
+  }
+
   var LABELS = {
-    neutral: "Neutro",
-    control: "Controle",
-    attention: "Atenção",
-    high: "Atenção elevada",
-    limit: "Limite",
-    capture_unavailable: "Captura indisponível"
+    get neutral() { return legendaRelogio("legenda_ic_relogio_neutro"); },
+    get control() { return legendaRelogio("legenda_ic_relogio_controle"); },
+    get attention() { return legendaRelogio("legenda_ic_relogio_atencao"); },
+    get high() { return legendaRelogio("legenda_ic_relogio_atencao_elevada"); },
+    get limit() { return legendaRelogio("legenda_ic_relogio_limite"); },
+    get capture_unavailable() { return legendaRelogio("legenda_ic_relogio_captura_indisponivel"); }
   };
 
   function valueOf(record, textKey, numericKey) {
@@ -43,7 +70,7 @@
     if (objectivePercent >= 100) {
       state = "limit";
       var code = timePercent >= 100 ? "planned_time_reached" : "planned_loss_reached";
-      if (!reasons.some(function (reason) { return reason && reason.code === code; })) reasons.push({ code: code, label: timePercent >= 100 ? "Tempo planejado atingido" : "Limite de perda atingido", severity: "limit" });
+      if (!reasons.some(function (reason) { return reason && reason.code === code; })) reasons.push({ code: code, label: timePercent >= 100 ? legendaRelogio("legenda_ic_relogio_tempo_planejado_atingido") : legendaRelogio("legenda_ic_relogio_limite_perda_atingido"), severity: "limit" });
     }
     return {
       state: state,
@@ -67,9 +94,9 @@
     var item = normalize(value);
     var tone = item.state === "capture_unavailable" ? "capture" : item.state;
     var reasons = item.reasons.length ? '<div class="ic-card__footer">' + item.reasons.map(function (reason) { return UI.badge(reason.label || reason.descricao || reason, reason.severity || item.state); }).join("") + '</div>' : '';
-    var financial = item.captureComplete ? '<div class="ic-clock-card__limit"><strong>' + Core.escapeHtml(Core.formatSignedMoney(item.netResultUnits, item.currency, item.decimalPlaces)) + '</strong><span>de ' + Core.escapeHtml(Core.formatMoney(item.lossLimitUnits, item.currency, item.decimalPlaces)) + ' de perda</span></div>' : '<div class="ic-clock-card__limit"><strong>Indisponível</strong><span>controle financeiro incompleto</span></div>';
-    var lossProgress = item.captureComplete ? UI.progress("Limite de perda", item.lossPercent, Core.formatMoney(item.lossUnits, item.currency, item.decimalPlaces) + " / " + Core.formatMoney(item.lossLimitUnits, item.currency, item.decimalPlaces), tone) : UI.banner("Monitoramento financeiro incompleto", "O tempo continua, mas resultado e limite financeiro não serão apresentados como seguros até a captura ser reconciliada.", "capture");
-    return '<article class="ic-card ic-clock-card ic-clock-card--' + tone + '"><div class="ic-clock-card__state"><h3>' + Core.escapeHtml(item.label.toUpperCase()) + '</h3>' + UI.badge(item.captureComplete ? "Captura completa" : "Captura " + item.captureQuality, item.captureComplete ? "control" : "capture") + '</div><div class="ic-clock-card__body"><div class="ic-clock-card__primary"><strong class="ic-clock-card__time">' + Core.escapeHtml(Core.formatDuration(item.elapsedSeconds)) + '<span class="ic-sr-only"> decorridos</span></strong>' + financial + '</div>' + UI.progress("Tempo", item.timePercent, Core.formatDuration(item.elapsedSeconds) + " / " + Core.formatDuration(item.plannedSeconds), tone) + lossProgress + reasons + '</div></article>';
+    var financial = item.captureComplete ? '<div class="ic-clock-card__limit"><strong>' + Core.escapeHtml(Core.formatSignedMoney(item.netResultUnits, item.currency, item.decimalPlaces)) + "</strong><span>" + Core.escapeHtml(legendaRelogio("legenda_ic_relogio_valor_limite_perda", { valor: Core.formatMoney(item.lossLimitUnits, item.currency, item.decimalPlaces) })) + "</span></div>" : ("<div class=\"ic-clock-card__limit\"><strong>" + Core.escapeHtml(legendaRelogio("legenda_ic_relogio_indisponivel")) + "</strong><span>" + Core.escapeHtml(legendaRelogio("legenda_ic_relogio_controle_financeiro_incompleto")) + "</span></div>");
+    var lossProgress = item.captureComplete ? UI.progress(legendaRelogio("legenda_ic_relogio_limite_perda"), item.lossPercent, Core.formatMoney(item.lossUnits, item.currency, item.decimalPlaces) + " / " + Core.formatMoney(item.lossLimitUnits, item.currency, item.decimalPlaces), tone) : UI.banner(legendaRelogio("legenda_ic_relogio_monitoramento_financeiro_incompleto"), legendaRelogio("legenda_ic_relogio_captura_pendente_reconciliacao"), "capture");
+    return '<article class="ic-card ic-clock-card ic-clock-card--' + tone + '"><div class="ic-clock-card__state"><h3>' + Core.escapeHtml(item.label.toUpperCase()) + '</h3>' + UI.badge(item.captureComplete ? legendaRelogio("legenda_ic_relogio_captura_completa") : legendaRelogio("legenda_ic_relogio_captura") + item.captureQuality, item.captureComplete ? "control" : "capture") + '</div><div class="ic-clock-card__body"><div class="ic-clock-card__primary"><strong class="ic-clock-card__time">' + Core.escapeHtml(Core.formatDuration(item.elapsedSeconds)) + ("<span class=\"ic-sr-only\">" + Core.escapeHtml(legendaRelogio("legenda_ic_relogio_decorridos")) + "</span></strong>") + financial + '</div>' + UI.progress(legendaRelogio("legenda_ic_relogio_tempo"), item.timePercent, Core.formatDuration(item.elapsedSeconds) + " / " + Core.formatDuration(item.plannedSeconds), tone) + lossProgress + reasons + '</div></article>';
   }
 
   return { normalize: normalize, render: render, LABELS: LABELS };

@@ -5,6 +5,36 @@
   root.TurboTigerIC.UI = factory(root, Core);
 }(typeof window !== "undefined" ? window : globalThis, function (root, Core) {
   "use strict";
+
+  var fontesLegendasComponentes = {
+    "legenda_ic_componentes_carregando": "Carregando",
+    "legenda_ic_componentes_carregando_descricao": "Estamos reunindo as informações desta área.",
+    "legenda_ic_componentes_sem_dados": "Nada por aqui ainda",
+    "legenda_ic_componentes_sem_dados_descricao": "Quando houver dados, eles aparecerão aqui.",
+    "legenda_ic_componentes_sem_conexao": "Sem conexão",
+    "legenda_ic_componentes_sem_conexao_descricao": "O conteúdo não pôde ser atualizado. Nenhum dado desatualizado será apresentado como monitoramento ativo.",
+    "legenda_ic_componentes_sem_analise": "Sem análise pessoal neste recorte",
+    "legenda_ic_componentes_sem_analise_descricao": "Confira o período selecionado. Você também pode consultar a Comunidade, sem misturar os dados dela com o seu histórico.",
+    "legenda_ic_componentes_qualidade_insuficiente": "Qualidade insuficiente",
+    "legenda_ic_componentes_qualidade_insuficiente_descricao": "O histórico existe, mas esta análise exige captura ou saldo confiável.",
+    "legenda_ic_componentes_erro_carregamento": "Não foi possível carregar",
+    "legenda_ic_componentes_erro_carregamento_descricao": "Tente novamente em instantes.",
+    "legenda_ic_componentes_recurso_indisponivel": "Recurso ainda indisponível",
+    "legenda_ic_componentes_recurso_indisponivel_descricao": "A fachada segura desta área ainda não está disponível.",
+    "legenda_ic_componentes_ultima_atualizacao": "Última atualização: ",
+    "legenda_ic_componentes_tentar_novamente": "Tentar novamente",
+    "legenda_ic_componentes_usuario": "usuário",
+    "legenda_ic_componentes_usuarios": "usuários",
+    "legenda_ic_componentes_sessao": "sessão",
+    "legenda_ic_componentes_sessoes": "sessões",
+    "legenda_ic_componentes_rodada": "rodada",
+    "legenda_ic_componentes_rodadas": "rodadas",
+    "legenda_ic_componentes_atualizar": "Atualizar",
+    "legenda_ic_componentes_detalhes": "Detalhes",
+    "legenda_ic_componentes_atualizado": "Atualizado "
+  };
+  if (root.TurboTigerLegendas) root.TurboTigerLegendas.registrar(fontesLegendasComponentes);
+  function legendaComponentes(chave) { return root.TurboTigerLegendas ? root.TurboTigerLegendas.texto(chave) : fontesLegendasComponentes[chave]; }
   var sheetReturnFocus = null;
   var toastTimer = null;
 
@@ -18,20 +48,20 @@
     options = options || {};
     var type = options.type || "empty";
     var map = {
-      loading: ["refresh", "Carregando", "Estamos reunindo as informações desta área."],
-      empty: ["info", "Nada por aqui ainda", "Quando houver dados, eles aparecerão aqui."],
-      offline: ["alert", "Sem conexão", "O conteúdo não pôde ser atualizado. Nenhum dado desatualizado será apresentado como monitoramento ativo."],
-      insufficient_data: ["chart", "Sem análise pessoal neste recorte", "Confira o período selecionado. Você também pode consultar a Comunidade, sem misturar os dados dela com o seu histórico."],
-      insufficient_quality: ["alert", "Qualidade insuficiente", "O histórico existe, mas esta análise exige captura ou saldo confiável."],
-      error: ["alert", "Não foi possível carregar", "Tente novamente em instantes."],
-      unavailable: ["lock", "Recurso ainda indisponível", "A fachada segura desta área ainda não está disponível."]
+      loading: ["refresh", legendaComponentes("legenda_ic_componentes_carregando"), legendaComponentes("legenda_ic_componentes_carregando_descricao")],
+      empty: ["info", legendaComponentes("legenda_ic_componentes_sem_dados"), legendaComponentes("legenda_ic_componentes_sem_dados_descricao")],
+      offline: ["alert", legendaComponentes("legenda_ic_componentes_sem_conexao"), legendaComponentes("legenda_ic_componentes_sem_conexao_descricao")],
+      insufficient_data: ["chart", legendaComponentes("legenda_ic_componentes_sem_analise"), legendaComponentes("legenda_ic_componentes_sem_analise_descricao")],
+      insufficient_quality: ["alert", legendaComponentes("legenda_ic_componentes_qualidade_insuficiente"), legendaComponentes("legenda_ic_componentes_qualidade_insuficiente_descricao")],
+      error: ["alert", legendaComponentes("legenda_ic_componentes_erro_carregamento"), legendaComponentes("legenda_ic_componentes_erro_carregamento_descricao")],
+      unavailable: ["lock", legendaComponentes("legenda_ic_componentes_recurso_indisponivel"), legendaComponentes("legenda_ic_componentes_recurso_indisponivel_descricao")]
     };
     var entry = map[type] || map.empty;
     var body = '<div class="ic-state"><div class="ic-state__icon">' + icon(options.icon || entry[0]) + '</div><h3>' + Core.escapeHtml(options.title || entry[1]) + '</h3><p>' + Core.escapeHtml(options.message || entry[2]) + '</p>';
     if (type === "loading") body += '<div class="ic-skeleton" aria-hidden="true"><span></span><span></span><span></span></div>';
     if (options.meta) body += '<span class="ic-state__meta">' + Core.escapeHtml(options.meta) + '</span>';
-    if (options.updatedAt) body += '<span class="ic-state__meta">Última atualização: ' + Core.escapeHtml(Core.formatDateTime(options.updatedAt)) + '</span>';
-    if (options.retry !== false && ["offline", "error", "unavailable"].indexOf(type) >= 0) body += '<button class="ic-button" type="button" data-screen-action="retry">' + icon("refresh") + 'Tentar novamente</button>';
+    if (options.updatedAt) body += "<span class=\"ic-state__meta\">" + Core.escapeHtml(legendaComponentes("legenda_ic_componentes_ultima_atualizacao")) + Core.escapeHtml(Core.formatDateTime(options.updatedAt)) + '</span>';
+    if (options.retry !== false && ["offline", "error", "unavailable"].indexOf(type) >= 0) body += '<button class="ic-button" type="button" data-screen-action="retry">' + icon("refresh") + Core.escapeHtml(legendaComponentes("legenda_ic_componentes_tentar_novamente")) + "</button>";
     return body + '</div>';
   }
 
@@ -49,10 +79,10 @@
     if (sample && typeof sample !== "object") values.push(Core.safeText(sample));
     var period = Core.evidencePeriod(item.period || item.periodo);
     if (period) values.push(period);
-    if (item.users || item.usuarios) values.push(Core.countLabel(item.users || item.usuarios, "usuário", "usuários"));
-    if (item.sessions || item.sessoes) values.push(Core.countLabel(item.sessions || item.sessoes, "sessão", "sessões"));
-    if (item.rounds || item.rodadas) values.push(Core.countLabel(item.rounds || item.rodadas, "rodada", "rodadas"));
-    if (item.updated_at || item.atualizado_em) values.push("Atualizado " + Core.formatDateTime(item.updated_at || item.atualizado_em));
+    if (item.users || item.usuarios) values.push(Core.countLabel(item.users || item.usuarios, legendaComponentes("legenda_ic_componentes_usuario"), legendaComponentes("legenda_ic_componentes_usuarios")));
+    if (item.sessions || item.sessoes) values.push(Core.countLabel(item.sessions || item.sessoes, legendaComponentes("legenda_ic_componentes_sessao"), legendaComponentes("legenda_ic_componentes_sessoes")));
+    if (item.rounds || item.rodadas) values.push(Core.countLabel(item.rounds || item.rodadas, legendaComponentes("legenda_ic_componentes_rodada"), legendaComponentes("legenda_ic_componentes_rodadas")));
+    if (item.updated_at || item.atualizado_em) values.push(legendaComponentes("legenda_ic_componentes_atualizado") + Core.formatDateTime(item.updated_at || item.atualizado_em));
     return values.length ? '<div class="ic-evidence">' + values.map(function (value) { return '<span>' + Core.escapeHtml(value) + '</span>'; }).join("") + '</div>' : '';
   }
 
@@ -68,7 +98,7 @@
 
   function button(label, options) {
     options = options || {};
-    if (options.action === "retry" && options.icon === "refresh") return '<button class="ic-icon-button" type="button" data-screen-action="retry" aria-label="Atualizar" title="Atualizar">' + icon("refresh") + '</button>';
+    if (options.action === "retry" && options.icon === "refresh") return "<button class=\"ic-icon-button\" type=\"button\" data-screen-action=\"retry\" aria-label=\"" + Core.escapeHtml(legendaComponentes("legenda_ic_componentes_atualizar")) + "\" title=\"" + Core.escapeHtml(legendaComponentes("legenda_ic_componentes_atualizar")) + "\">" + icon("refresh") + '</button>';
     var classes = "ic-button" + (options.kind ? " ic-button--" + options.kind : "") + (options.block ? " ic-button--block" : "");
     var attributes = options.route ? ' data-route="' + Core.escapeHtml(options.route) + '"' : ' data-screen-action="' + Core.escapeHtml(options.action || "") + '"';
     if (options.value !== null && typeof options.value !== "undefined") attributes += ' data-action-value="' + Core.escapeHtml(options.value) + '"';
@@ -88,7 +118,7 @@
     if (!sheet || !backdrop) return;
     if (sheet.hidden) sheetReturnFocus = document.activeElement;
     document.getElementById("icSheetEyebrow").textContent = options.eyebrow || "Turbo Tiger";
-    document.getElementById("icSheetTitle").textContent = options.title || "Detalhes";
+    document.getElementById("icSheetTitle").textContent = options.title || legendaComponentes("legenda_ic_componentes_detalhes");
     document.getElementById("icSheetBody").innerHTML = options.html || "";
     backdrop.hidden = false;
     sheet.hidden = false;

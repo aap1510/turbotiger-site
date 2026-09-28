@@ -1,6 +1,102 @@
 (function () {
   "use strict";
 
+  var LEGENDAS_ADMIN = {
+    "legenda_admin_confirme_seu_e_mail_antes_de_entrar": "Confirme seu e-mail antes de entrar.",
+    "legenda_admin_falha_de_conexao_verifique_sua_internet_e_tente_novamente": "Falha de conexao. Verifique sua internet e tente novamente.",
+    "legenda_admin_e_mail_ou_senha_invalidos": "E-mail ou senha invalidos.",
+    "legenda_admin_o_primeiro_administrador_ja_foi_configurado": "O primeiro administrador já foi configurado.",
+    "legenda_admin_esta_area_e_essencial_e_nao_pode_ser_desativada": "Esta área é essencial e não pode ser desativada.",
+    "legenda_admin_nao_foi_possivel_carregar_as_configuracoes_de_notificacao": "Não foi possível carregar as configurações de notificação.",
+    "legenda_admin_categoria_invalida": "Categoria inválida.",
+    "legenda_admin_preencha_os_campos_obrigatorios": "Preencha os campos obrigatórios.",
+    "legenda_admin_nao_foi_possivel_concluir_a_operacao": "Não foi possível concluir a operação.",
+    "legenda_admin_sessao_expirada_entre_novamente": "Sessão expirada. Entre novamente.",
+    "legenda_admin_voce_nao_tem_permissao_para_esta_acao": "Você não tem permissão para esta ação.",
+    "legenda_admin_nao_foi_possivel_carregar_o_historico": "Não foi possível carregar o histórico.",
+    "legenda_admin_informe_pelo_menos_um_grupo": "Informe pelo menos um grupo.",
+    "legenda_admin_informe_pelo_menos_uma_licenca": "Informe pelo menos uma licença.",
+    "legenda_admin_selecione_pelo_menos_uma_plataforma": "Selecione pelo menos uma plataforma.",
+    "legenda_admin_informe_o_token_de_destino": "Informe o token de destino.",
+    "legenda_admin_informe_pelo_menos_um_usuario": "Informe pelo menos um usuário.",
+    "legenda_admin_e_mail_ou_senha_invalidos_variante": "E-mail ou senha inválidos.",
+    "legenda_admin_nao_foi_possivel_salvar_o_modelo": "Não foi possível salvar o modelo.",
+    "legenda_admin_entre_para_continuar": "Entre para continuar.",
+    "legenda_admin_nenhum_destinatario_encontrado_para_esta_configuracao": "Nenhum destinatário encontrado para esta configuração.",
+    "legenda_admin_perfil_administrativo_invalido": "Perfil administrativo inválido.",
+    "legenda_admin_o_perfil_de_super_administrador_nao_pode_ser_desativado": "O perfil de super administrador não pode ser desativado.",
+    "legenda_admin_seu_perfil_nao_permite_enviar_para_todos_os_aparelhos": "Seu perfil não permite enviar para todos os aparelhos.",
+    "legenda_admin_nao_encontrei_contexto_real_para_preencher_este_modelo_aguarde_um_evento_automatico_desse_tipo_ou_envie_uma_mensagem_sem_placeholders": "Não encontrei contexto real para preencher este modelo. Aguarde um evento automático desse tipo ou envie uma mensagem sem placeholders.",
+    "legenda_admin_sem_permissao_para_administracao": "Sem permissão para administração.",
+    "legenda_admin_sem_permissao_para_alterar_areas_administrativas": "Sem permissão para alterar áreas administrativas.",
+    "legenda_admin_sem_permissao_para_configurar_notificacoes": "Sem permissão para configurar notificações.",
+    "legenda_admin_sem_permissao_para_acessar_o_mmn": "Sem permissão para acessar o MMN.",
+    "legenda_admin_sem_permissao_para_alterar_perfis_administrativos": "Sem permissão para alterar perfis administrativos.",
+    "legenda_admin_sem_permissao_para_acessar_notificacoes": "Sem permissão para acessar notificações.",
+    "legenda_admin_sem_permissao_para_acessar_o_so_bolao": "Sem permissão para acessar o Só Bolão.",
+    "legenda_admin_sem_permissao_para_alterar_usuarios_administrativos": "Sem permissão para alterar usuários administrativos.",
+    "legenda_admin_usuario_nao_encontrado_no_supabase_auth": "Usuário não encontrado no Supabase Auth.",
+    "legenda_admin_nao_foi_possivel_concluir_a_operacao_variante": "Nao foi possivel concluir a operacao.",
+    "legenda_admin_simulacao_concluida_tokens_encontrados": "Simulacao concluida. Tokens encontrados: {quantidade}.",
+    "legenda_admin_envio_concluido_enviadas": "Envio concluido. Enviadas: {enviadas}. Falhas: {falhas}.",
+    "legenda_admin_operacao_concluida": "Operacao concluida.",
+    "legenda_admin_destino": "Destino: ",
+    "legenda_admin_plataforma": "Plataforma: ",
+    "legenda_admin_antes_do_filtro": "Antes do filtro: ",
+    "legenda_admin_padrao": "Padrao",
+    "legenda_admin_automatico": "Automatico",
+    "legenda_admin_manual": "Manual",
+    "legenda_admin_sua_mensagem_aparece_aqui": "Sua mensagem aparece aqui.",
+    "legenda_admin_usuarios": "Usuários",
+    "legenda_admin_nenhum_usuario_encontrado": "Nenhum usuário encontrado.",
+    "legenda_admin_usuario": "Usuário ",
+    "legenda_admin_licencas": "Licenças",
+    "legenda_admin_nenhuma_licenca_encontrada": "Nenhuma licença encontrada.",
+    "legenda_admin_grupos": "Grupos",
+    "legenda_admin_nenhum_grupo_encontrado": "Nenhum grupo encontrado.",
+    "legenda_admin_grupo": "Grupo ",
+    "legenda_admin_chave": "Chave ",
+    "legenda_admin_ativo": "Ativo",
+    "legenda_admin_inativo": "Inativo",
+    "legenda_admin_nao_configurado": "Nao configurado",
+    "legenda_admin_acessar": "Acessar",
+    "legenda_admin_configurar": "Configurar",
+    "legenda_admin_enviar": "Enviar",
+    "legenda_admin_todos_aparelhos": "Todos aparelhos",
+    "legenda_admin_usuarios_variante": "Usuarios",
+    "legenda_admin_perfis": "Perfis",
+    "legenda_admin_areas": "Areas",
+    "legenda_admin_ativa": "Ativa",
+    "legenda_admin_inativa": "Inativa",
+    "legenda_admin_editando_usuario": "Editando usuario.",
+    "legenda_admin_editando_perfil": "Editando perfil.",
+    "legenda_admin_editando_area": "Editando area.",
+    "legenda_admin_salvando": "Salvando",
+    "legenda_admin_nao_foi_possivel_salvar_o_usuario": "Nao foi possivel salvar o usuario.",
+    "legenda_admin_usuario_salvo": "Usuario salvo.",
+    "legenda_admin_nao_foi_possivel_salvar_o_perfil": "Nao foi possivel salvar o perfil.",
+    "legenda_admin_perfil_salvo": "Perfil salvo.",
+    "legenda_admin_nao_foi_possivel_salvar_a_area": "Nao foi possivel salvar a area.",
+    "legenda_admin_area_salva": "Area salva.",
+    "legenda_admin_enviando": "Enviando...",
+    "legenda_admin_salvo": "Salvo",
+    "legenda_admin_entrando": "Entrando",
+    "legenda_admin_carregando": "Carregando",
+    "legenda_admin_online": "Online",
+    "legenda_admin_nenhum_modelo_manual_encontrado_para_esta_categoria": "Nenhum modelo manual encontrado para esta categoria.",
+    "legenda_admin_modelos_da_categoria": "Modelos da categoria",
+    "legenda_admin_nenhuma_configuracao_encontrada": "Nenhuma configuracao encontrada.",
+    "legenda_admin_filtrar": "Filtrar",
+    "legenda_admin_editar": "Editar"
+  };
+  if (window.TurboTigerLegendas) window.TurboTigerLegendas.registrar(LEGENDAS_ADMIN);
+  function legendaAdmin(chave, parametros) {
+    if (window.TurboTigerLegendas) return window.TurboTigerLegendas.texto(chave, parametros);
+    return LEGENDAS_ADMIN[chave].replace(/\{([a-z][a-z0-9_]*)\}/g, function (original, nome) {
+      return parametros && Object.prototype.hasOwnProperty.call(parametros, nome) ? String(parametros[nome]) : original;
+    });
+  }
+
   var CONFIG = {
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
@@ -20,52 +116,62 @@
   };
 
   var FRIENDLY_MESSAGES = {
-    "Email not confirmed": "Confirme seu e-mail antes de entrar.",
-    "Failed to fetch": "Falha de conexao. Verifique sua internet e tente novamente.",
-    "Invalid login credentials": "E-mail ou senha invalidos.",
-    admin_ja_configurado: "O primeiro administrador j\u00e1 foi configurado.",
-    area_protegida: "Esta \u00e1rea \u00e9 essencial e n\u00e3o pode ser desativada.",
-    catalogo_indisponivel: "N\u00e3o foi poss\u00edvel carregar as configura\u00e7\u00f5es de notifica\u00e7\u00e3o.",
-    categoria_invalida: "Categoria inv\u00e1lida.",
-    dados_obrigatorios: "Preencha os campos obrigat\u00f3rios.",
-    falha_http_400: "N\u00e3o foi poss\u00edvel concluir a opera\u00e7\u00e3o.",
-    falha_http_401: "Sess\u00e3o expirada. Entre novamente.",
-    falha_http_403: "Voc\u00ea n\u00e3o tem permiss\u00e3o para esta a\u00e7\u00e3o.",
-    historico_indisponivel: "N\u00e3o foi poss\u00edvel carregar o hist\u00f3rico.",
-    informe_grupos: "Informe pelo menos um grupo.",
-    informe_licencas: "Informe pelo menos uma licen\u00e7a.",
-    informe_plataforma: "Selecione pelo menos uma plataforma.",
-    informe_token: "Informe o token de destino.",
-    informe_usuarios: "Informe pelo menos um usu\u00e1rio.",
-    invalid_credentials: "E-mail ou senha invalidos.",
-    invalid_grant: "E-mail ou senha inv\u00e1lidos.",
-    missing_authorization: "Sess\u00e3o expirada. Entre novamente.",
-    modelo_nao_salvo: "N\u00e3o foi poss\u00edvel salvar o modelo.",
-    nao_autenticado: "Entre para continuar.",
-    nenhum_destinatario_push: "Nenhum destinat\u00e1rio encontrado para esta configura\u00e7\u00e3o.",
-    perfil_admin_invalido: "Perfil administrativo inv\u00e1lido.",
-    perfil_protegido: "O perfil de super administrador n\u00e3o pode ser desativado.",
-    push_broadcast_sem_permissao: "Seu perfil n\u00e3o permite enviar para todos os aparelhos.",
-    push_contexto_real_indisponivel: "N\u00e3o encontrei contexto real para preencher este modelo. Aguarde um evento autom\u00e1tico desse tipo ou envie uma mensagem sem placeholders.",
-    sem_permissao_admin: "Sem permiss\u00e3o para administra\u00e7\u00e3o.",
-    sem_permissao_areas: "Sem permiss\u00e3o para alterar \u00e1reas administrativas.",
-    sem_permissao_configurar_push: "Sem permiss\u00e3o para configurar notifica\u00e7\u00f5es.",
-    sem_permissao_mmn: "Sem permiss\u00e3o para acessar o MMN.",
-    sem_permissao_perfis: "Sem permiss\u00e3o para alterar perfis administrativos.",
-    sem_permissao_push: "Sem permiss\u00e3o para acessar notifica\u00e7\u00f5es.",
-    sem_permissao_sobolao: "Sem permiss\u00e3o para acessar o S\u00f3 Bol\u00e3o.",
-    sem_permissao_usuarios: "Sem permiss\u00e3o para alterar usu\u00e1rios administrativos.",
-    sessao_expirada: "Sess\u00e3o expirada. Entre novamente.",
-    usuario_auth_nao_encontrado: "Usu\u00e1rio n\u00e3o encontrado no Supabase Auth."
+    "Email not confirmed": "legenda_admin_confirme_seu_e_mail_antes_de_entrar",
+    "Failed to fetch": "legenda_admin_falha_de_conexao_verifique_sua_internet_e_tente_novamente",
+    "Invalid login credentials": "legenda_admin_e_mail_ou_senha_invalidos",
+    admin_ja_configurado: "legenda_admin_o_primeiro_administrador_ja_foi_configurado",
+    area_protegida: "legenda_admin_esta_area_e_essencial_e_nao_pode_ser_desativada",
+    catalogo_indisponivel: "legenda_admin_nao_foi_possivel_carregar_as_configuracoes_de_notificacao",
+    categoria_invalida: "legenda_admin_categoria_invalida",
+    dados_obrigatorios: "legenda_admin_preencha_os_campos_obrigatorios",
+    falha_http_400: "legenda_admin_nao_foi_possivel_concluir_a_operacao",
+    falha_http_401: "legenda_admin_sessao_expirada_entre_novamente",
+    falha_http_403: "legenda_admin_voce_nao_tem_permissao_para_esta_acao",
+    historico_indisponivel: "legenda_admin_nao_foi_possivel_carregar_o_historico",
+    informe_grupos: "legenda_admin_informe_pelo_menos_um_grupo",
+    informe_licencas: "legenda_admin_informe_pelo_menos_uma_licenca",
+    informe_plataforma: "legenda_admin_selecione_pelo_menos_uma_plataforma",
+    informe_token: "legenda_admin_informe_o_token_de_destino",
+    informe_usuarios: "legenda_admin_informe_pelo_menos_um_usuario",
+    invalid_credentials: "legenda_admin_e_mail_ou_senha_invalidos",
+    invalid_grant: "legenda_admin_e_mail_ou_senha_invalidos_variante",
+    missing_authorization: "legenda_admin_sessao_expirada_entre_novamente",
+    modelo_nao_salvo: "legenda_admin_nao_foi_possivel_salvar_o_modelo",
+    nao_autenticado: "legenda_admin_entre_para_continuar",
+    nenhum_destinatario_push: "legenda_admin_nenhum_destinatario_encontrado_para_esta_configuracao",
+    perfil_admin_invalido: "legenda_admin_perfil_administrativo_invalido",
+    perfil_protegido: "legenda_admin_o_perfil_de_super_administrador_nao_pode_ser_desativado",
+    push_broadcast_sem_permissao: "legenda_admin_seu_perfil_nao_permite_enviar_para_todos_os_aparelhos",
+    push_contexto_real_indisponivel: "legenda_admin_nao_encontrei_contexto_real_para_preencher_este_modelo_aguarde_um_evento_automatico_desse_tipo_ou_envie_uma_mensagem_sem_placeholders",
+    sem_permissao_admin: "legenda_admin_sem_permissao_para_administracao",
+    sem_permissao_areas: "legenda_admin_sem_permissao_para_alterar_areas_administrativas",
+    sem_permissao_configurar_push: "legenda_admin_sem_permissao_para_configurar_notificacoes",
+    sem_permissao_mmn: "legenda_admin_sem_permissao_para_acessar_o_mmn",
+    sem_permissao_perfis: "legenda_admin_sem_permissao_para_alterar_perfis_administrativos",
+    sem_permissao_push: "legenda_admin_sem_permissao_para_acessar_notificacoes",
+    sem_permissao_sobolao: "legenda_admin_sem_permissao_para_acessar_o_so_bolao",
+    sem_permissao_usuarios: "legenda_admin_sem_permissao_para_alterar_usuarios_administrativos",
+    sessao_expirada: "legenda_admin_sessao_expirada_entre_novamente",
+    usuario_auth_nao_encontrado: "legenda_admin_usuario_nao_encontrado_no_supabase_auth"
   };
 
+  var alvoApresentacaoAdmin = null;
+  var estadosLegendaAdmin = new Map();
+  var textosCalculadosAdmin = new Map();
+  function apresentarTextoAdmin(el, calcular) {
+    el.textContent = calcular();
+    textosCalculadosAdmin.set(el, { calcular: calcular, ultimo: el.textContent });
+  }
   function qs(id) {
+    if (alvoApresentacaoAdmin && alvoApresentacaoAdmin.id === id) return alvoApresentacaoAdmin;
     return document.getElementById(id);
   }
 
   function setStatus(el, text, kind) {
     if (!el) return;
     el.textContent = friendlyMessage(text || "");
+    var chave = Object.keys(LEGENDAS_ADMIN).find(function (item) { return legendaAdmin(item) === el.textContent; });
+    estadosLegendaAdmin.set(el, { chave: chave || "", ultimo: el.textContent });
     el.classList.remove("is-error", "is-ok");
     if (kind) el.classList.add(kind === "ok" ? "is-ok" : "is-error");
   }
@@ -86,29 +192,30 @@
   function friendlyMessage(value) {
     var raw = String(value == null ? "" : value).trim();
     if (!raw) return "";
-    return FRIENDLY_MESSAGES[raw] || FRIENDLY_MESSAGES[raw.toLowerCase()] || raw;
+    var chaveLegenda = FRIENDLY_MESSAGES[raw] || FRIENDLY_MESSAGES[raw.toLowerCase()];
+    return chaveLegenda ? legendaAdmin(chaveLegenda) : raw;
   }
 
   function responseMessage(data) {
     if (!data || typeof data !== "object") return friendlyMessage(data);
-    if (data.ok === false) return friendlyMessage(data.error || data.message || "Nao foi possivel concluir a operacao.");
-    if (data.dry_run) return "Simulacao concluida. Tokens encontrados: " + (data.tokens || 0) + ".";
+    if (data.ok === false) return friendlyMessage(data.error || data.message || legendaAdmin("legenda_admin_nao_foi_possivel_concluir_a_operacao_variante"));
+    if (data.dry_run) return legendaAdmin("legenda_admin_simulacao_concluida_tokens_encontrados", { quantidade: data.tokens || 0 });
     if (Object.prototype.hasOwnProperty.call(data, "sent")) {
       if ((data.sent || 0) === 0 && (data.failed || 0) === 0) {
         return zeroPushMessage(data);
       }
-      return "Envio concluido. Enviadas: " + (data.sent || 0) + ". Falhas: " + (data.failed || 0) + ".";
+      return legendaAdmin("legenda_admin_envio_concluido_enviadas", { enviadas: data.sent || 0, falhas: data.failed || 0 });
     }
-    if (data.ok === true) return "Operacao concluida.";
+    if (data.ok === true) return legendaAdmin("legenda_admin_operacao_concluida");
     return safeJson(data);
   }
 
   function zeroPushMessage(data) {
     var parts = [];
-    if (data.destino_tipo) parts.push("Destino: " + data.destino_tipo);
-    if (data.plataformas) parts.push("Plataforma: " + String(data.plataformas));
+    if (data.destino_tipo) parts.push(legendaAdmin("legenda_admin_destino") + data.destino_tipo);
+    if (data.plataformas) parts.push(legendaAdmin("legenda_admin_plataforma") + String(data.plataformas));
     if (Object.prototype.hasOwnProperty.call(data, "tokens_resolvidos")) {
-      parts.push("Antes do filtro: " + (data.tokens_resolvidos || 0));
+      parts.push(legendaAdmin("legenda_admin_antes_do_filtro") + (data.tokens_resolvidos || 0));
     }
     return friendlyMessage(data.error || "nenhum_destinatario_push") + (parts.length ? " " + parts.join(". ") + "." : "");
   }
@@ -172,7 +279,7 @@
       data = await parseResponse(response);
     } catch (error) {
       if (response.status === 400 || response.status === 401) {
-        throw new Error("E-mail ou senha invalidos.");
+        throw new Error(legendaAdmin("legenda_admin_e_mail_ou_senha_invalidos"));
       }
       throw error;
     }
@@ -319,7 +426,7 @@
       .replace(/_/g, " ")
       .replace(/\s+/g, " ")
       .trim()
-      .replace(/^./, function (letter) { return letter.toUpperCase(); }) || "Padrao";
+      .replace(/^./, function (letter) { return letter.toUpperCase(); }) || legendaAdmin("legenda_admin_padrao");
   }
 
   function modelTypeOptions(categoria) {
@@ -425,19 +532,19 @@
     var rows = categoria ? sendModelOptions(categoria) : [];
 
     if (!rows.length) {
-      box.innerHTML = "<div class=\"status-line\">Nenhum modelo manual encontrado para esta categoria.</div>";
+      box.innerHTML = "<div class=\"status-line\">" + escapeHtml(legendaAdmin("legenda_admin_nenhum_modelo_manual_encontrado_para_esta_categoria")) + "</div>";
       return;
     }
 
     box.innerHTML =
-      "<div class=\"section-label\">Modelos da categoria</div>" +
+      "<div class=\"section-label\">" + escapeHtml(legendaAdmin("legenda_admin_modelos_da_categoria")) + "</div>" +
       "<div class=\"send-model-list\">" +
       rows.map(function (option) {
         var model = exactModel(categoria, option.tipo);
         var title = (model && model.titulo_padrao) || option.titulo_padrao || "Turbo Tiger";
         var message = (model && model.mensagem_padrao) || option.mensagem_padrao || "";
         var active = option.tipo === selectedTipo ? " is-selected" : "";
-        var modo = [option.automatico ? "Automatico" : "", option.manual ? "Manual" : ""].filter(Boolean).join(" / ");
+        var modo = [option.automatico ? legendaAdmin("legenda_admin_automatico") : "", option.manual ? legendaAdmin("legenda_admin_manual") : ""].filter(Boolean).join(" / ");
         return "<button class=\"send-model-card" + active + "\" type=\"button\" data-send-model=\"" + escapeHtml(option.tipo) + "\">" +
           "<span class=\"send-model-card-title\">" + escapeHtml(option.nome || humanizeTipo(option.tipo)) + "</span>" +
           "<span class=\"send-model-card-key\">" + escapeHtml(option.tipo) + (modo ? " - " + escapeHtml(modo) : "") + "</span>" +
@@ -509,7 +616,7 @@
     var media = qs(mediaId);
     var image = qs(imageId);
     titleEl.textContent = title || "Turbo Tiger";
-    bodyEl.textContent = body || "Sua mensagem aparece aqui.";
+    apresentarTextoAdmin(bodyEl, function () { return body || legendaAdmin("legenda_admin_sua_mensagem_aparece_aqui"); });
     if (media && image) {
       var showImage = useImage && /^https:\/\//i.test(imageUrl);
       media.hidden = !showImage;
@@ -584,11 +691,11 @@
     var emptyText = "";
 
     if (tipo === "usuarios") {
-      title = "Usu\u00e1rios";
+      title = legendaAdmin("legenda_admin_usuarios");
       attrName = "data-destino-user";
-      emptyText = "Nenhum usu\u00e1rio encontrado.";
+      emptyText = legendaAdmin("legenda_admin_nenhum_usuario_encontrado");
       items = ((state.catalogo && state.catalogo.usuarios) || []).map(function (user) {
-        var name = user.nome || user.email || user.loginuser || ("Usu\u00e1rio " + user.cod_usuario);
+        var name = user.nome || user.email || user.loginuser || (legendaAdmin("legenda_admin_usuario") + user.cod_usuario);
         var detail = ["ID " + user.cod_usuario, user.email || "", user.loginuser || ""].filter(Boolean).join(" - ");
         return {
           value: String(user.cod_usuario),
@@ -598,9 +705,9 @@
         };
       });
     } else if (tipo === "licenca") {
-      title = "Licen\u00e7as";
+      title = legendaAdmin("legenda_admin_licencas");
       attrName = "data-destino-licenca";
-      emptyText = "Nenhuma licen\u00e7a encontrada.";
+      emptyText = legendaAdmin("legenda_admin_nenhuma_licenca_encontrada");
       items = ((state.catalogo && state.catalogo.licencas) || []).map(function (licenca) {
         return {
           value: licenca.chave,
@@ -610,14 +717,14 @@
         };
       });
     } else if (tipo === "grupo") {
-      title = "Grupos";
+      title = legendaAdmin("legenda_admin_grupos");
       attrName = "data-destino-grupo";
-      emptyText = "Nenhum grupo encontrado.";
+      emptyText = legendaAdmin("legenda_admin_nenhum_grupo_encontrado");
       items = ((state.catalogo && state.catalogo.grupos) || []).map(function (grupo) {
         return {
           value: grupo.chave || String(grupo.cod_usuario_grupo),
-          label: grupo.nome || grupo.chave || ("Grupo " + grupo.cod_usuario_grupo),
-          detail: grupo.chave ? ("Chave " + grupo.chave) : "",
+          label: grupo.nome || grupo.chave || (legendaAdmin("legenda_admin_grupo") + grupo.cod_usuario_grupo),
+          detail: grupo.chave ? (legendaAdmin("legenda_admin_chave") + grupo.chave) : "",
           search: String((grupo.nome || "") + " " + (grupo.chave || "") + " " + (grupo.cod_usuario_grupo || "")).toLowerCase()
         };
       });
@@ -632,7 +739,7 @@
     box.hidden = false;
     box.innerHTML =
       "<div class=\"section-label\">" + escapeHtml(title) + "</div>" +
-      "<label class=\"field choice-filter\"><input id=\"sendDestinoSearch\" type=\"search\" placeholder=\"Filtrar\"></label>" +
+      "<label class=\"field choice-filter\"><input id=\"sendDestinoSearch\" type=\"search\" placeholder=\"" + escapeHtml(legendaAdmin("legenda_admin_filtrar")) + "\"></label>" +
       "<div class=\"choice-list\">" + createChoiceMarkup(items, attrName, emptyText) + "</div>";
 
     var search = qs("sendDestinoSearch");
@@ -663,7 +770,7 @@
     tbody.innerHTML = "";
     if (!rows.length) {
       var tr = document.createElement("tr");
-      tr.innerHTML = "<td colspan=\"5\" class=\"status-line\">Nenhuma configuracao encontrada.</td>";
+      tr.innerHTML = "<td colspan=\"5\" class=\"status-line\">" + escapeHtml(legendaAdmin("legenda_admin_nenhuma_configuracao_encontrada")) + "</td>";
       tbody.appendChild(tr);
       return;
     }
@@ -672,8 +779,8 @@
     var title = (model && model.titulo_padrao) || option.titulo_padrao || "";
     var priority = (model && model.prioridade) || (currentCategoryDefault(categoria) && currentCategoryDefault(categoria).prioridade_padrao) || "";
     var statusClass = model ? (model.ativo ? "ok" : "bad") : "warn";
-    var statusText = model ? (model.ativo ? "Ativo" : "Inativo") : "Nao configurado";
-      var modo = [option.automatico ? "Automatico" : "", option.manual ? "Manual" : ""].filter(Boolean).join(" / ");
+    var statusText = model ? (model.ativo ? legendaAdmin("legenda_admin_ativo") : legendaAdmin("legenda_admin_inativo")) : legendaAdmin("legenda_admin_nao_configurado");
+      var modo = [option.automatico ? legendaAdmin("legenda_admin_automatico") : "", option.manual ? legendaAdmin("legenda_admin_manual") : ""].filter(Boolean).join(" / ");
       var tr = document.createElement("tr");
       tr.className = option.tipo === selectedTipo ? "is-selected" : "";
       tr.setAttribute("data-model-row", option.tipo);
@@ -681,8 +788,8 @@
         "<td><strong>" + escapeHtml(option.nome) + "</strong><br><span class=\"status-line\">" + escapeHtml(option.tipo) + (option.descricao ? " - " + escapeHtml(option.descricao) : "") + (modo ? " - " + escapeHtml(modo) : "") + "</span></td>" +
         "<td>" + escapeHtml(title) + "</td>" +
         "<td>" + escapeHtml(priority) + "</td>" +
-        "<td><span class=\"pill " + statusClass + "\">" + statusText + "</span></td>" +
-        "<td><div class=\"row-actions\"><button class=\"btn btn-ghost btn-small\" type=\"button\" data-edit-model=\"" + escapeHtml(option.tipo) + "\">Editar</button></div></td>";
+        "<td><span class=\"pill " + statusClass + "\">" + escapeHtml(statusText) + "</span></td>" +
+        "<td><div class=\"row-actions\"><button class=\"btn btn-ghost btn-small\" type=\"button\" data-edit-model=\"" + escapeHtml(option.tipo) + "\">" + escapeHtml(legendaAdmin("legenda_admin_editar")) + "</button></div></td>";
       tbody.appendChild(tr);
     });
   }
@@ -709,21 +816,21 @@
   function permissionActionsFor(areaKey) {
     if (areaKey === "push") {
       return [
-        { chave: "acessar", nome: "Acessar" },
-        { chave: "configurar", nome: "Configurar" },
-        { chave: "enviar", nome: "Enviar" },
-        { chave: "broadcast", nome: "Todos aparelhos" }
+        { chave: "acessar", nome: legendaAdmin("legenda_admin_acessar") },
+        { chave: "configurar", nome: legendaAdmin("legenda_admin_configurar") },
+        { chave: "enviar", nome: legendaAdmin("legenda_admin_enviar") },
+        { chave: "broadcast", nome: legendaAdmin("legenda_admin_todos_aparelhos") }
       ];
     }
     if (areaKey === "admin") {
       return [
-        { chave: "acessar", nome: "Acessar" },
-        { chave: "usuarios", nome: "Usuarios" },
-        { chave: "perfis", nome: "Perfis" },
-        { chave: "areas", nome: "Areas" }
+        { chave: "acessar", nome: legendaAdmin("legenda_admin_acessar") },
+        { chave: "usuarios", nome: legendaAdmin("legenda_admin_usuarios_variante") },
+        { chave: "perfis", nome: legendaAdmin("legenda_admin_perfis") },
+        { chave: "areas", nome: legendaAdmin("legenda_admin_areas") }
       ];
     }
-    return [{ chave: "acessar", nome: "Acessar" }];
+    return [{ chave: "acessar", nome: legendaAdmin("legenda_admin_acessar") }];
   }
 
   function loadPermissionEditor(permissoes) {
@@ -798,9 +905,9 @@
       tr.innerHTML =
         "<td><strong>" + escapeHtml(user.email || "") + "</strong><br><span class=\"status-line\">" + escapeHtml(user.nome || "") + "</span></td>" +
         "<td>" + escapeHtml(user.perfil_nome || user.perfil_chave || "") + "</td>" +
-        "<td><span class=\"pill " + (user.ativo ? "ok" : "bad") + "\">" + (user.ativo ? "Ativo" : "Inativo") + "</span></td>" +
+        "<td><span class=\"pill " + (user.ativo ? "ok" : "bad") + "\">" + escapeHtml((user.ativo ? legendaAdmin("legenda_admin_ativo") : legendaAdmin("legenda_admin_inativo"))) + "</span></td>" +
         "<td>" + escapeHtml(formatDate(user.ultimo_login_em)) + "</td>" +
-        "<td><div class=\"row-actions\"><button class=\"btn btn-ghost btn-small\" type=\"button\" data-edit-user=\"" + index + "\">Editar</button></div></td>";
+        "<td><div class=\"row-actions\"><button class=\"btn btn-ghost btn-small\" type=\"button\" data-edit-user=\"" + index + "\">" + escapeHtml(legendaAdmin("legenda_admin_editar")) + "</button></div></td>";
       tbody.appendChild(tr);
     });
   }
@@ -817,8 +924,8 @@
       tr.innerHTML =
         "<td><strong>" + escapeHtml(perfil.nome || "") + "</strong><br><span class=\"status-line\">" + escapeHtml(perfil.chave || "") + "</span></td>" +
         "<td>" + escapeHtml(areas) + "</td>" +
-        "<td><span class=\"pill " + (perfil.ativo ? "ok" : "bad") + "\">" + (perfil.ativo ? "Ativo" : "Inativo") + "</span></td>" +
-        "<td><div class=\"row-actions\"><button class=\"btn btn-ghost btn-small\" type=\"button\" data-edit-profile=\"" + index + "\">Editar</button></div></td>";
+        "<td><span class=\"pill " + (perfil.ativo ? "ok" : "bad") + "\">" + escapeHtml((perfil.ativo ? legendaAdmin("legenda_admin_ativo") : legendaAdmin("legenda_admin_inativo"))) + "</span></td>" +
+        "<td><div class=\"row-actions\"><button class=\"btn btn-ghost btn-small\" type=\"button\" data-edit-profile=\"" + index + "\">" + escapeHtml(legendaAdmin("legenda_admin_editar")) + "</button></div></td>";
       tbody.appendChild(tr);
     });
   }
@@ -833,8 +940,8 @@
         "<td><strong>" + escapeHtml(area.nome || "") + "</strong><br><span class=\"status-line\">" + escapeHtml(area.chave || "") + "</span></td>" +
         "<td>" + escapeHtml(area.descricao || "") + "</td>" +
         "<td>" + escapeHtml(area.ordem || "") + "</td>" +
-        "<td><span class=\"pill " + (area.ativo ? "ok" : "bad") + "\">" + (area.ativo ? "Ativa" : "Inativa") + "</span></td>" +
-        "<td><div class=\"row-actions\"><button class=\"btn btn-ghost btn-small\" type=\"button\" data-edit-area=\"" + index + "\">Editar</button></div></td>";
+        "<td><span class=\"pill " + (area.ativo ? "ok" : "bad") + "\">" + escapeHtml((area.ativo ? legendaAdmin("legenda_admin_ativa") : legendaAdmin("legenda_admin_inativa"))) + "</span></td>" +
+        "<td><div class=\"row-actions\"><button class=\"btn btn-ghost btn-small\" type=\"button\" data-edit-area=\"" + index + "\">" + escapeHtml(legendaAdmin("legenda_admin_editar")) + "</button></div></td>";
       tbody.appendChild(tr);
     });
   }
@@ -873,7 +980,7 @@
     qs("admUserNome").value = user.nome || "";
     qs("admUserPerfil").value = user.perfil_chave || "";
     qs("admUserAtivo").checked = user.ativo !== false;
-    setStatus(qs("userStatus"), "Editando usuario.", "");
+    setStatus(qs("userStatus"), legendaAdmin("legenda_admin_editando_usuario"), "");
   }
 
   function editAdminProfile(index) {
@@ -885,7 +992,7 @@
     qs("admProfileDescricao").value = perfil.descricao || "";
     qs("admProfileAtivo").checked = perfil.ativo !== false;
     loadPermissionEditor(perfil.permissoes_json || {});
-    setStatus(qs("profileStatus"), "Editando perfil.", "");
+    setStatus(qs("profileStatus"), legendaAdmin("legenda_admin_editando_perfil"), "");
   }
 
   function editAdminArea(index) {
@@ -897,7 +1004,7 @@
     qs("admAreaDescricao").value = area.descricao || "";
     qs("admAreaOrdem").value = area.ordem || 100;
     qs("admAreaAtivo").checked = area.ativo !== false;
-    setStatus(qs("areaStatus"), "Editando area.", "");
+    setStatus(qs("areaStatus"), legendaAdmin("legenda_admin_editando_area"), "");
   }
 
   async function loadAdminData() {
@@ -920,7 +1027,7 @@
   async function saveAdminUser(event) {
     event.preventDefault();
     setBusy(qs("admUserSaveButton"), true);
-    setStatus(qs("userStatus"), "Salvando", "");
+    setStatus(qs("userStatus"), legendaAdmin("legenda_admin_salvando"), "");
     try {
       var data = await rpc("adm_admin_usuario_salvar_rpc", {
         p_cod_adm_usuario: qs("admUserCod").value ? Number(qs("admUserCod").value) : null,
@@ -930,8 +1037,8 @@
         p_perfil_chave: qs("admUserPerfil").value,
         p_ativo: qs("admUserAtivo").checked
       });
-      if (!data || data.ok !== true) throw new Error((data && data.error) || "Nao foi possivel salvar o usuario.");
-      setStatus(qs("userStatus"), "Usuario salvo.", "ok");
+      if (!data || data.ok !== true) throw new Error((data && data.error) || legendaAdmin("legenda_admin_nao_foi_possivel_salvar_o_usuario"));
+      setStatus(qs("userStatus"), legendaAdmin("legenda_admin_usuario_salvo"), "ok");
       resetAdminUserForm();
       await loadAdminData();
     } catch (error) {
@@ -944,7 +1051,7 @@
   async function saveAdminProfile(event) {
     event.preventDefault();
     setBusy(qs("admProfileSaveButton"), true);
-    setStatus(qs("profileStatus"), "Salvando", "");
+    setStatus(qs("profileStatus"), legendaAdmin("legenda_admin_salvando"), "");
     try {
       var data = await rpc("adm_admin_perfil_salvar_rpc", {
         p_chave: qs("admProfileChave").value.trim(),
@@ -953,8 +1060,8 @@
         p_permissoes_json: buildProfilePermissions(),
         p_ativo: qs("admProfileAtivo").checked
       });
-      if (!data || data.ok !== true) throw new Error((data && data.error) || "Nao foi possivel salvar o perfil.");
-      setStatus(qs("profileStatus"), "Perfil salvo.", "ok");
+      if (!data || data.ok !== true) throw new Error((data && data.error) || legendaAdmin("legenda_admin_nao_foi_possivel_salvar_o_perfil"));
+      setStatus(qs("profileStatus"), legendaAdmin("legenda_admin_perfil_salvo"), "ok");
       resetAdminProfileForm();
       await loadAdminData();
     } catch (error) {
@@ -967,7 +1074,7 @@
   async function saveAdminArea(event) {
     event.preventDefault();
     setBusy(qs("admAreaSaveButton"), true);
-    setStatus(qs("areaStatus"), "Salvando", "");
+    setStatus(qs("areaStatus"), legendaAdmin("legenda_admin_salvando"), "");
     try {
       var ordem = Number(qs("admAreaOrdem").value || 100);
       var data = await rpc("adm_admin_area_salvar_rpc", {
@@ -977,8 +1084,8 @@
         p_ativo: qs("admAreaAtivo").checked,
         p_ordem: Number.isFinite(ordem) ? Math.trunc(ordem) : 100
       });
-      if (!data || data.ok !== true) throw new Error((data && data.error) || "Nao foi possivel salvar a area.");
-      setStatus(qs("areaStatus"), "Area salva.", "ok");
+      if (!data || data.ok !== true) throw new Error((data && data.error) || legendaAdmin("legenda_admin_nao_foi_possivel_salvar_a_area"));
+      setStatus(qs("areaStatus"), legendaAdmin("legenda_admin_area_salva"), "ok");
       resetAdminAreaForm();
       await loadAdminData();
     } catch (error) {
@@ -1058,7 +1165,7 @@
     var button = qs("sendButton");
     var result = qs("sendResult");
     setBusy(button, true);
-    result.textContent = "Enviando...";
+    apresentarTextoAdmin(result, function () { return legendaAdmin("legenda_admin_enviando"); });
     try {
       var destino = buildDestino();
       var plataformas = selectedPlatforms();
@@ -1091,11 +1198,13 @@
         body: JSON.stringify(payload)
       });
       var data = await parseResponse(response);
-      result.textContent = responseMessage(data);
+      apresentarTextoAdmin(result, function () { return responseMessage(data); });
       await loadHistory();
       await loadCatalog();
     } catch (error) {
-      result.textContent = friendlyMessage(error.message || String(error));
+      var mensagemErro = error.message || String(error);
+      var chaveErro = Object.keys(LEGENDAS_ADMIN).find(function (chave) { return legendaAdmin(chave) === mensagemErro; });
+      apresentarTextoAdmin(result, function () { return chaveErro ? legendaAdmin(chaveErro) : friendlyMessage(mensagemErro); });
     } finally {
       setBusy(button, false);
     }
@@ -1105,7 +1214,7 @@
     event.preventDefault();
     var button = qs("modelSaveButton");
     setBusy(button, true);
-    setStatus(qs("modelStatus"), "Salvando", "");
+    setStatus(qs("modelStatus"), legendaAdmin("legenda_admin_salvando"), "");
     try {
       var data = await rpc("adm_push_modelo_salvar_rpc", {
         p_categoria: qs("modelCategoria").value,
@@ -1119,7 +1228,7 @@
         p_ativo: qs("modelAtivo").checked
       });
       if (!data || data.ok !== true) throw new Error((data && data.error) || "modelo_nao_salvo");
-      setStatus(qs("modelStatus"), "Salvo", "ok");
+      setStatus(qs("modelStatus"), legendaAdmin("legenda_admin_salvo"), "ok");
       await loadCatalog();
     } catch (error) {
       setStatus(qs("modelStatus"), error.message || String(error), "error");
@@ -1176,7 +1285,7 @@
       event.preventDefault();
       var button = qs("loginButton");
       setBusy(button, true);
-      setStatus(qs("loginStatus"), "Entrando", "");
+      setStatus(qs("loginStatus"), legendaAdmin("legenda_admin_entrando"), "");
       try {
         var session = await login(qs("loginEmail").value.trim(), qs("loginPassword").value);
         saveSession(session);
@@ -1308,7 +1417,7 @@
   }
 
   async function bootPush() {
-    setStatus(qs("pageStatus"), "Carregando", "");
+    setStatus(qs("pageStatus"), legendaAdmin("legenda_admin_carregando"), "");
     try {
       var contexto = await ensureAdmin("push");
       if (!contexto) return;
@@ -1316,25 +1425,64 @@
       qs("adminIdentity").textContent = nome;
       await loadCatalog();
       await loadHistory();
-      setStatus(qs("pageStatus"), "Online", "ok");
+      setStatus(qs("pageStatus"), legendaAdmin("legenda_admin_online"), "ok");
     } catch (error) {
       setStatus(qs("pageStatus"), error.message || String(error), "error");
     }
   }
 
   async function bootAdmin() {
-    setStatus(qs("pageStatus"), "Carregando", "");
+    setStatus(qs("pageStatus"), legendaAdmin("legenda_admin_carregando"), "");
     try {
       var contexto = await ensureAdmin("admin");
       if (!contexto) return;
       var nome = (contexto.usuario && (contexto.usuario.nome || contexto.usuario.email)) || "Turbo Tiger";
       qs("adminIdentity").textContent = nome;
       await loadAdminData();
-      setStatus(qs("pageStatus"), "Online", "ok");
+      setStatus(qs("pageStatus"), legendaAdmin("legenda_admin_online"), "ok");
     } catch (error) {
       setStatus(qs("pageStatus"), error.message || String(error), "error");
     }
   }
+
+
+  function reapresentarAdmin(id, renderizar) {
+    var alvo = document.getElementById(id);
+    if (!alvo || !window.TurboTigerLegendas || !window.TurboTigerLegendas.atualizarApresentacao) return;
+    alvoApresentacaoAdmin = alvo.cloneNode(true);
+    try {
+      renderizar();
+      var atualizado = window.TurboTigerLegendas.atualizarApresentacao(alvo, alvoApresentacaoAdmin.innerHTML);
+      if (atualizado && id === "sendDestinoOptions") {
+        var modelos = alvoApresentacaoAdmin.querySelectorAll("[data-choice-label]");
+        var pesquisa = alvo.querySelector("#sendDestinoSearch");
+        var termo = pesquisa ? pesquisa.value.trim().toLowerCase() : "";
+        Array.prototype.forEach.call(alvo.querySelectorAll("[data-choice-label]"), function (item, indice) {
+          var rotulo = modelos[indice].getAttribute("data-choice-label");
+          item.setAttribute("data-choice-label", rotulo);
+          item.hidden = termo !== "" && rotulo.indexOf(termo) === -1;
+        });
+      }
+    } finally { alvoApresentacaoAdmin = null; }
+  }
+
+  window.addEventListener("turbotiger:idioma", function () {
+    textosCalculadosAdmin.forEach(function (estado, el) {
+      if (!el.isConnected || el.textContent !== estado.ultimo) { textosCalculadosAdmin.delete(el); return; }
+      el.textContent = estado.calcular(); estado.ultimo = el.textContent;
+    });
+    estadosLegendaAdmin.forEach(function (estado, el) {
+      if (!el.isConnected || el.textContent !== estado.ultimo) { estadosLegendaAdmin.delete(el); return; }
+      if (estado.chave) { el.textContent = legendaAdmin(estado.chave); estado.ultimo = el.textContent; }
+    });
+    reapresentarAdmin("modelsTableBody", renderModels);
+    reapresentarAdmin("adminUsersTableBody", renderAdminUsers);
+    reapresentarAdmin("adminProfilesTableBody", renderAdminProfiles);
+    reapresentarAdmin("adminAreasTableBody", renderAdminAreas);
+    reapresentarAdmin("sendModelPicker", renderSendModelPicker);
+    reapresentarAdmin("sendDestinoOptions", renderDestinoOptions);
+    reapresentarAdmin("profilePermissions", function () { loadPermissionEditor({}); });
+  });
 
   document.addEventListener("DOMContentLoaded", function () {
     var page = document.body.getAttribute("data-admin-page");

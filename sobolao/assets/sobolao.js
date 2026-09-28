@@ -1,6 +1,113 @@
 (function () {
   "use strict";
 
+  var fontesLegendasSobolao = {
+    "legenda_sobolao_confirme_seu_e_mail_antes_de_entrar": "Confirme seu e-mail antes de entrar.",
+    "legenda_sobolao_falha_de_conexao_verifique_sua_internet_e_tente_novamente": "Falha de conexão. Verifique sua internet e tente novamente.",
+    "legenda_sobolao_e_mail_ou_senha_invalidos": "E-mail ou senha inválidos.",
+    "legenda_sobolao_sessao_expirada_entre_novamente": "Sessão expirada. Entre novamente.",
+    "legenda_sobolao_entre_para_continuar": "Entre para continuar.",
+    "legenda_sobolao_sem_permissao_administrativa": "Sem permissão administrativa.",
+    "legenda_sobolao_sem_permissao_para_acessar_o_so_bolao": "Sem permissão para acessar o Só Bolão.",
+    "legenda_sobolao_o_app_demorou_para_validar_sua_sessao_toque_em_atualizar": "O app demorou para validar sua sessão. Toque em Atualizar.",
+    "legenda_sobolao_nao_foi_possivel_validar_sua_sessao_pelo_app": "Não foi possível validar sua sessão pelo app.",
+    "legenda_sobolao_bolao_indisponivel_para_reserva": "Bolão indisponível para reserva.",
+    "legenda_sobolao_nao_ha_cotas_suficientes_nesse_bolao": "Não há cotas suficientes nesse bolão.",
+    "legenda_sobolao_preencha_os_campos_obrigatorios": "Preencha os campos obrigatórios.",
+    "legenda_sobolao_complete_a_cartela_do_palpite_antes_de_reservar": "Complete a cartela do palpite antes de reservar.",
+    "legenda_sobolao_analise": "análise",
+    "legenda_sobolao_aguardando_comprovante": "aguardando comprovante",
+    "legenda_sobolao_escolha_manual": "Escolha manual",
+    "legenda_sobolao_0_0_numeros": "0/0 números",
+    "legenda_sobolao_selecione_um_bolao_primeiro": "Selecione um bolão primeiro.",
+    "legenda_sobolao_selecione_um_bolao_para_montar_a_cartela": "Selecione um bolão para montar a cartela.",
+    "legenda_sobolao_nenhum_bolao_selecionado": "Nenhum bolão selecionado.",
+    "legenda_sobolao_cartela_completa": "Cartela completa.",
+    "legenda_sobolao_nenhum_numero_marcado": "Nenhum número marcado.",
+    "legenda_sobolao_nenhum_concurso_na_fila": "Nenhum concurso na fila.",
+    "legenda_sobolao_aguardando_registro": "Aguardando registro",
+    "legenda_sobolao_todas": "Todas",
+    "legenda_sobolao_editar": "Editar",
+    "legenda_sobolao_cotas": "Cotas",
+    "legenda_sobolao_valor": "Valor",
+    "legenda_sobolao_limite": "Limite",
+    "legenda_sobolao_loterica": "Lotérica",
+    "legenda_sobolao_a_definir": "A definir",
+    "legenda_sobolao_reservar": "Reservar",
+    "legenda_sobolao_nenhum_bolao_encontrado": "Nenhum bolão encontrado.",
+    "legenda_sobolao_abrir": "Abrir",
+    "legenda_sobolao_pendente": "Pendente",
+    "legenda_sobolao_aguardando": "Aguardando",
+    "legenda_sobolao_nenhuma_participacao_encontrada": "Nenhuma participação encontrada.",
+    "legenda_sobolao_premio_estimado": " - prêmio estimado ",
+    "legenda_sobolao_nenhum_resultado_registrado": "Nenhum resultado registrado.",
+    "legenda_sobolao_nenhum_premio_apurado": "Nenhum prêmio apurado.",
+    "legenda_sobolao_cnpj": "CNPJ",
+    "legenda_sobolao_boloes": "Bolões",
+    "legenda_sobolao_repasse": "Repasse",
+    "legenda_sobolao_nenhuma_loterica_cadastrada": "Nenhuma lotérica cadastrada.",
+    "legenda_sobolao_sem_repasses_pendentes": "Sem repasses pendentes.",
+    "legenda_sobolao_media": "média",
+    "legenda_sobolao_nenhum_chamado_aberto": "Nenhum chamado aberto.",
+    "legenda_sobolao_bolao": "bolão",
+    "legenda_sobolao_loterica_2": "lotérica",
+    "legenda_sobolao_premio": "prêmio",
+    "legenda_sobolao_marcar_ok": "Marcar ok",
+    "legenda_sobolao_fila_operacional_limpa": "Fila operacional limpa.",
+    "legenda_sobolao_ola_2": "Olá.",
+    "legenda_sobolao_carregando": "Carregando",
+    "legenda_sobolao_entre_para_continuar_2": "Entre para continuar",
+    "legenda_sobolao_previa_local": "Prévia local",
+    "legenda_sobolao_online": "Online",
+    "legenda_sobolao_entrando": "Entrando",
+    "legenda_sobolao_reservando": "Reservando",
+    "legenda_sobolao_reserva_criada_na_previa_local": "Reserva criada na prévia local.",
+    "legenda_sobolao_nao_foi_possivel_reservar": "Não foi possível reservar.",
+    "legenda_sobolao_reserva_criada": "Reserva criada.",
+    "legenda_sobolao_salvando_bolao": "Salvando bolão",
+    "legenda_sobolao_nao_foi_possivel_salvar_o_bolao": "Não foi possível salvar o bolão.",
+    "legenda_sobolao_bolao_salvo": "Bolão salvo.",
+    "legenda_sobolao_salvando_loterica": "Salvando lotérica",
+    "legenda_sobolao_nao_foi_possivel_salvar_a_loterica": "Não foi possível salvar a lotérica.",
+    "legenda_sobolao_loterica_salva": "Lotérica salva.",
+    "legenda_sobolao_abrindo_chamado": "Abrindo chamado",
+    "legenda_sobolao_nao_foi_possivel_abrir_chamado": "Não foi possível abrir chamado.",
+    "legenda_sobolao_chamado_aberto": "Chamado aberto.",
+    "legenda_sobolao_atualizando": "Atualizando",
+    "legenda_sobolao_nao_foi_possivel_atualizar": "Não foi possível atualizar.",
+    "legenda_sobolao_atualizado": "Atualizado.",
+    "legenda_sobolao_sessao_encerrada": "Sessão encerrada",
+    "legenda_sobolao_numeros_selecionados": "{selecionados}/{total} números",
+    "legenda_sobolao_marcar_numeros": "Marque {quantidade} número(s).",
+    "legenda_sobolao_instrucao_cartela": "{titulo} #{concurso} - marque {quantidade} números.",
+    "legenda_sobolao_apostas_mes": "{quantidade}/mês",
+    "legenda_sobolao_quantidade_boloes": "{quantidade} bolão(ões)",
+    "legenda_sobolao_quantidade_participacoes": "{quantidade} participação(ões)",
+    "legenda_sobolao_quantidade_resultados": "{quantidade} resultado(s)",
+    "legenda_sobolao_quantidade_lancamentos": "{quantidade} lançamentos",
+    "legenda_sobolao_quantidade_parceiras": "{quantidade} parceira(s)",
+    "legenda_sobolao_quantidade_chamados": "{quantidade} chamado(s)",
+    "legenda_sobolao_quantidade_itens": "{quantidade} item(ns)",
+    "legenda_sobolao_saudacao_membro": "Olá, {nome}.",
+    "legenda_sobolao_estado_ativo": "ativo",
+    "legenda_sobolao_estado_ativa": "ativa",
+    "legenda_sobolao_estado_ok": "ok",
+    "legenda_sobolao_estado_aberto": "aberto",
+    "legenda_sobolao_estado_pago": "pago",
+    "legenda_sobolao_estado_confirmado": "confirmado",
+    "legenda_sobolao_estado_apurado": "apurado",
+    "legenda_sobolao_estado_pendente": "pendente",
+    "legenda_sobolao_estado_reservado": "reservado",
+    "legenda_sobolao_estado_fechando": "fechando",
+    "legenda_sobolao_estado_registrado": "registrado",
+    "legenda_sobolao_estado_rascunho": "rascunho"
+  };
+  if (window.TurboTigerLegendas) window.TurboTigerLegendas.registrar(fontesLegendasSobolao);
+  function legendaSobolao(chave, parametros) {
+    if (window.TurboTigerLegendas) return window.TurboTigerLegendas.texto(chave, parametros);
+    return String(fontesLegendasSobolao[chave] || chave).replace(/\{([a-z][a-z0-9_]*)\}/g, function (marca, nome) { return parametros && Object.prototype.hasOwnProperty.call(parametros, nome) ? String(parametros[nome]) : marca; });
+  }
+
   var CONFIG = {
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
@@ -28,6 +135,26 @@
     lotofacil: { min: 1, max: 25, qty: 15, nome: "Lotofácil" },
     quina: { min: 1, max: 80, qty: 5, nome: "Quina" }
   };
+
+  var reapresentandoIdioma = false;
+  var statusRenderizado = new WeakMap();
+  function apresentarHTML(elemento, html) {
+    if (reapresentandoIdioma) {
+      var motor = window.TurboTigerLegendas;
+      if (motor && typeof motor.atualizarApresentacao === "function") motor.atualizarApresentacao(elemento, html);
+      return;
+    }
+    elemento.innerHTML = html;
+  }
+  function atualizarIdiomaSobolao() {
+    if (!state.data || qs("sobolaoApp").hidden || !window.TurboTigerLegendas || typeof window.TurboTigerLegendas.atualizarApresentacao !== "function") return;
+    reapresentandoIdioma = true;
+    try {
+      renderAppGreeting(); renderMetrics(); renderSummary(); renderBoloes();
+      renderMine(); renderResults(); renderAwards(); renderPartners(); renderSupport(); renderAdmin();
+      renderSlip();
+    } finally { reapresentandoIdioma = false; }
+  }
 
   function qs(id) {
     return document.getElementById(id);
@@ -104,28 +231,31 @@
   function friendlyMessage(value) {
     var raw = String(value == null ? "" : value).trim();
     var map = {
-      "Email not confirmed": "Confirme seu e-mail antes de entrar.",
-      "Failed to fetch": "Falha de conexão. Verifique sua internet e tente novamente.",
-      "Invalid login credentials": "E-mail ou senha inválidos.",
-      "invalid_grant": "E-mail ou senha inválidos.",
-      "missing_authorization": "Sessão expirada. Entre novamente.",
-      "nao_autenticado": "Entre para continuar.",
-      "sem_permissao_admin": "Sem permissão administrativa.",
-      "sem_permissao_sobolao": "Sem permissão para acessar o Só Bolão.",
-      "sessao_expirada": "Sessão expirada. Entre novamente.",
-      "app_session_timeout": "O app demorou para validar sua sessão. Toque em Atualizar.",
-      "app_session_unavailable": "Não foi possível validar sua sessão pelo app.",
-      "bolao_indisponivel": "Bolão indisponível para reserva.",
-      "cotas_insuficientes": "Não há cotas suficientes nesse bolão.",
-      "dados_obrigatorios": "Preencha os campos obrigatórios.",
-      "palpite_incompleto": "Complete a cartela do palpite antes de reservar."
+      "Email not confirmed": legendaSobolao("legenda_sobolao_confirme_seu_e_mail_antes_de_entrar"),
+      "Failed to fetch": legendaSobolao("legenda_sobolao_falha_de_conexao_verifique_sua_internet_e_tente_novamente"),
+      "Invalid login credentials": legendaSobolao("legenda_sobolao_e_mail_ou_senha_invalidos"),
+      "invalid_grant": legendaSobolao("legenda_sobolao_e_mail_ou_senha_invalidos"),
+      "missing_authorization": legendaSobolao("legenda_sobolao_sessao_expirada_entre_novamente"),
+      "nao_autenticado": legendaSobolao("legenda_sobolao_entre_para_continuar"),
+      "sem_permissao_admin": legendaSobolao("legenda_sobolao_sem_permissao_administrativa"),
+      "sem_permissao_sobolao": legendaSobolao("legenda_sobolao_sem_permissao_para_acessar_o_so_bolao"),
+      "sessao_expirada": legendaSobolao("legenda_sobolao_sessao_expirada_entre_novamente"),
+      "app_session_timeout": legendaSobolao("legenda_sobolao_o_app_demorou_para_validar_sua_sessao_toque_em_atualizar"),
+      "app_session_unavailable": legendaSobolao("legenda_sobolao_nao_foi_possivel_validar_sua_sessao_pelo_app"),
+      "bolao_indisponivel": legendaSobolao("legenda_sobolao_bolao_indisponivel_para_reserva"),
+      "cotas_insuficientes": legendaSobolao("legenda_sobolao_nao_ha_cotas_suficientes_nesse_bolao"),
+      "dados_obrigatorios": legendaSobolao("legenda_sobolao_preencha_os_campos_obrigatorios"),
+      "palpite_incompleto": legendaSobolao("legenda_sobolao_complete_a_cartela_do_palpite_antes_de_reservar")
     };
     return map[raw] || map[raw.toLowerCase()] || raw;
   }
 
-  function setStatus(el, text, kind) {
+  function setStatus(el, text, kind, renderizado) {
     if (!el) return;
+    if (reapresentandoIdioma && (!renderizado || statusRenderizado.get(el) !== el.textContent)) return;
     el.textContent = friendlyMessage(text || "");
+    if (renderizado) statusRenderizado.set(el, el.textContent);
+    if (reapresentandoIdioma) return;
     el.classList.remove("is-error", "is-ok");
     if (kind) el.classList.add(kind === "ok" ? "is-ok" : "is-error");
   }
@@ -139,10 +269,22 @@
     var cls = value === "ativo" || value === "ativa" || value === "ok" || value === "aberto" || value === "pago" || value === "confirmado" || value === "apurado" ? "ok" :
       (value === "pendente" || value === "reservado" || value === "fechando" || value === "registrado" || value === "analise" || value === "rascunho" ? "warn" : "bad");
     var labels = {
-      analise: "análise",
-      aguardando_comprovante: "aguardando comprovante"
+      ativo: legendaSobolao("legenda_sobolao_estado_ativo"),
+      ativa: legendaSobolao("legenda_sobolao_estado_ativa"),
+      ok: legendaSobolao("legenda_sobolao_estado_ok"),
+      aberto: legendaSobolao("legenda_sobolao_estado_aberto"),
+      pago: legendaSobolao("legenda_sobolao_estado_pago"),
+      confirmado: legendaSobolao("legenda_sobolao_estado_confirmado"),
+      apurado: legendaSobolao("legenda_sobolao_estado_apurado"),
+      pendente: legendaSobolao("legenda_sobolao_estado_pendente"),
+      reservado: legendaSobolao("legenda_sobolao_estado_reservado"),
+      fechando: legendaSobolao("legenda_sobolao_estado_fechando"),
+      registrado: legendaSobolao("legenda_sobolao_estado_registrado"),
+      rascunho: legendaSobolao("legenda_sobolao_estado_rascunho"),
+      analise: legendaSobolao("legenda_sobolao_analise"),
+      aguardando_comprovante: legendaSobolao("legenda_sobolao_aguardando_comprovante")
     };
-    return "<span class=\"sb-pill " + cls + "\">" + escapeHtml(labels[value] || status || "pendente") + "</span>";
+    return "<span class=\"sb-pill " + cls + "\">" + escapeHtml(labels[value] || status || legendaSobolao("legenda_sobolao_estado_pendente")) + "</span>";
   }
 
   function parseNumbers(value) {
@@ -258,14 +400,13 @@
     if (!grid) return;
     var bolao = currentBolao();
     if (!bolao) {
-      state.slip.selected = [];
-      updateSlipHidden();
-      qs("slipMode").textContent = "Escolha manual";
-      qs("slipCounter").textContent = "0/0 números";
-      qs("slipHint").textContent = "Selecione um bolão primeiro.";
-      qs("slipSubtitle").textContent = "Selecione um bolão para montar a cartela.";
-      qs("slipSelected").innerHTML = "<span class=\"sb-status\">Nenhum bolão selecionado.</span>";
-      grid.innerHTML = "";
+      if (!reapresentandoIdioma) { state.slip.selected = []; updateSlipHidden(); }
+      qs("slipMode").textContent = legendaSobolao("legenda_sobolao_escolha_manual");
+      qs("slipCounter").textContent = legendaSobolao("legenda_sobolao_0_0_numeros");
+      qs("slipHint").textContent = legendaSobolao("legenda_sobolao_selecione_um_bolao_primeiro");
+      qs("slipSubtitle").textContent = legendaSobolao("legenda_sobolao_selecione_um_bolao_para_montar_a_cartela");
+      apresentarHTML(qs("slipSelected"), "<span class=\"sb-status\">" + escapeHtml(legendaSobolao("legenda_sobolao_nenhum_bolao_selecionado")) + "</span>");
+      apresentarHTML(grid, "");
       return;
     }
 
@@ -274,14 +415,14 @@
     var selectedLookup = {};
     selected.forEach(function (num) { selectedLookup[num] = true; });
     var full = selected.length >= rule.qty;
-    updateSlipHidden();
+    if (!reapresentandoIdioma) updateSlipHidden();
     qs("slipMode").textContent = rule.nome;
-    qs("slipCounter").textContent = selected.length + "/" + rule.qty + " números";
-    qs("slipHint").textContent = full ? "Cartela completa." : "Marque " + (rule.qty - selected.length) + " número(s).";
-    qs("slipSubtitle").textContent = (bolao.titulo || rule.nome) + " #" + (bolao.concurso || "") + " - marque " + rule.qty + " números.";
-    qs("slipSelected").innerHTML = selected.length ? selected.map(function (num) {
+    qs("slipCounter").textContent = legendaSobolao("legenda_sobolao_numeros_selecionados", { selecionados: selected.length, total: rule.qty });
+    qs("slipHint").textContent = full ? legendaSobolao("legenda_sobolao_cartela_completa") : legendaSobolao("legenda_sobolao_marcar_numeros", { quantidade: rule.qty - selected.length });
+    qs("slipSubtitle").textContent = legendaSobolao("legenda_sobolao_instrucao_cartela", { titulo: bolao.titulo || rule.nome, concurso: bolao.concurso || "", quantidade: rule.qty });
+    apresentarHTML(qs("slipSelected"), selected.length ? selected.map(function (num) {
       return "<span class=\"sb-ball\">" + escapeHtml(num) + "</span>";
-    }).join("") : "<span class=\"sb-status\">Nenhum número marcado.</span>";
+    }).join("") : ("<span class=\"sb-status\">" + escapeHtml(legendaSobolao("legenda_sobolao_nenhum_numero_marcado")) + "</span>"));
 
     var buttons = [];
     for (var i = rule.min; i <= rule.max; i += 1) {
@@ -290,7 +431,7 @@
       var locked = full && !isSelected;
       buttons.push("<button class=\"sb-number-button" + (isSelected ? " is-selected" : "") + (locked ? " is-locked" : "") + "\" type=\"button\" data-slip-number=\"" + i + "\" aria-pressed=\"" + (isSelected ? "true" : "false") + "\"" + (locked ? " disabled" : "") + ">" + label + "</button>");
     }
-    grid.innerHTML = buttons.join("");
+    apresentarHTML(grid, buttons.join(""));
   }
 
   function readSession() {
@@ -796,30 +937,30 @@
     qs("metricPendencias").textContent = compactNumber(r.pendencias);
     qs("summaryTaxa").textContent = pct(r.taxa_gestao_percentual);
     qs("summaryConversao").textContent = pct(r.conversao_alvo_percentual);
-    qs("summaryApostasMes").textContent = compactNumber(r.apostas_media_mes) + "/mês";
+    qs("summaryApostasMes").textContent = legendaSobolao("legenda_sobolao_apostas_mes", { quantidade: compactNumber(r.apostas_media_mes) });
     qs("summaryTicket").textContent = moneyFromCents(r.ticket_oficial_centavos);
   }
 
   function renderSummary() {
-    qs("operationFlow").innerHTML = (state.data.fluxo || []).map(function (item, index) {
+    apresentarHTML(qs("operationFlow"), (state.data.fluxo || []).map(function (item, index) {
       return "<div class=\"sb-flow-item\">" +
         "<span class=\"sb-flow-index\">" + String(index + 1).padStart(2, "0") + "</span>" +
         "<div><strong>" + escapeHtml(item.titulo) + "</strong><span>" + escapeHtml(item.texto) + "</span></div>" +
       "</div>";
-    }).join("");
+    }).join(""));
 
-    qs("nextDraws").innerHTML = (state.data.boloes || []).slice(0, 4).map(function (bolao) {
+    apresentarHTML(qs("nextDraws"), (state.data.boloes || []).slice(0, 4).map(function (bolao) {
       return "<div class=\"sb-draw\">" +
         "<div><strong>" + escapeHtml(bolao.modalidade || "") + " #" + escapeHtml(bolao.concurso || "") + "</strong>" +
         "<div class=\"sb-draw-meta\">" + escapeHtml(bolao.titulo || "") + " - " + formatDate(bolao.data_sorteio) + "</div></div>" +
         renderBalls(bolao.numeros) +
       "</div>";
-    }).join("") || empty("Nenhum concurso na fila.");
+    }).join("") || empty(legendaSobolao("legenda_sobolao_nenhum_concurso_na_fila")));
   }
 
   function renderBalls(numbers) {
     var list = normalizeNumbers(numbers).slice(0, 15);
-    if (!list.length) return "<div class=\"sb-draw-balls\"><span class=\"sb-status\">Aguardando registro</span></div>";
+    if (!list.length) return ("<div class=\"sb-draw-balls\"><span class=\"sb-status\">" + escapeHtml(legendaSobolao("legenda_sobolao_aguardando_registro")) + "</span></div>");
     return "<div class=\"sb-draw-balls\">" + list.map(function (num) {
       return "<span class=\"sb-ball\">" + escapeHtml(num) + "</span>";
     }).join("") + "</div>";
@@ -828,15 +969,16 @@
   function fillFiltersAndJoin() {
     var modalidades = state.data.modalidades || [];
     var currentModalidade = qs("filterModalidade").value;
-    qs("filterModalidade").innerHTML = "<option value=\"\">Todas</option>" + modalidades.map(function (item) {
+    apresentarHTML(qs("filterModalidade"), ("<option value=\"\">" + escapeHtml(legendaSobolao("legenda_sobolao_todas")) + "</option>") + modalidades.map(function (item) {
       return "<option value=\"" + escapeHtml(item.chave || item.nome) + "\">" + escapeHtml(item.nome || item.chave) + "</option>";
-    }).join("");
+    }).join(""));
+    if (reapresentandoIdioma) return;
     qs("filterModalidade").value = currentModalidade || "";
 
     var currentBolaoValue = qs("joinBolao").value;
-    qs("joinBolao").innerHTML = (state.data.boloes || []).map(function (bolao) {
+    apresentarHTML(qs("joinBolao"), (state.data.boloes || []).map(function (bolao) {
       return "<option value=\"" + escapeHtml(bolao.cod_bolao) + "\">" + escapeHtml(bolao.titulo) + " - " + moneyFromCents(bolao.valor_total_cota_centavos) + "</option>";
-    }).join("");
+    }).join(""));
     if (currentBolaoValue) {
       var exists = Array.prototype.some.call(qs("joinBolao").options, function (option) {
         return option.value === currentBolaoValue;
@@ -859,32 +1001,32 @@
   function renderBoloes() {
     fillFiltersAndJoin();
     var rows = filteredBoloes();
-    qs("boloesGrid").innerHTML = rows.length ? rows.map(function (bolao) {
+    apresentarHTML(qs("boloesGrid"), rows.length ? rows.map(function (bolao) {
       var reserved = numberValue(bolao.cotas_reservadas);
       var total = Math.max(1, numberValue(bolao.qtd_cotas));
       var width = Math.min(100, reserved / total * 100);
       var adminButton = state.role === "admin" || state.role === "suporte" ?
-        "<button class=\"sb-btn sb-btn-ghost sb-btn-small\" type=\"button\" data-edit-bolao=\"" + escapeHtml(bolao.cod_bolao) + "\">Editar</button>" : "";
+        "<button class=\"sb-btn sb-btn-ghost sb-btn-small\" type=\"button\" data-edit-bolao=\"" + escapeHtml(bolao.cod_bolao) + ("\">" + escapeHtml(legendaSobolao("legenda_sobolao_editar")) + "</button>") : "";
       return "<article class=\"sb-card\">" +
         "<div class=\"sb-card-head\"><div><h3>" + escapeHtml(bolao.titulo) + "</h3><small>" + escapeHtml(bolao.modalidade) + " #" + escapeHtml(bolao.concurso) + "</small></div>" + pill(bolao.status) + "</div>" +
         renderBalls(bolao.numeros) +
         "<div class=\"sb-progress\"><span class=\"sb-progress-fill\" style=\"width:" + width + "%\"></span></div>" +
         "<div class=\"sb-card-data\">" +
-          "<span><b>Cotas</b><strong>" + compactNumber(reserved) + "/" + compactNumber(total) + "</strong></span>" +
-          "<span><b>Valor</b><strong>" + moneyFromCents(bolao.valor_total_cota_centavos) + "</strong></span>" +
-          "<span><b>Limite</b><strong>" + formatDateTime(bolao.data_limite) + "</strong></span>" +
-          "<span><b>Lotérica</b><strong>" + escapeHtml(bolao.loterica || "A definir") + "</strong></span>" +
+          ("<span><b>" + escapeHtml(legendaSobolao("legenda_sobolao_cotas")) + "</b><strong>") + compactNumber(reserved) + "/" + compactNumber(total) + "</strong></span>" +
+          ("<span><b>" + escapeHtml(legendaSobolao("legenda_sobolao_valor")) + "</b><strong>") + moneyFromCents(bolao.valor_total_cota_centavos) + "</strong></span>" +
+          ("<span><b>" + escapeHtml(legendaSobolao("legenda_sobolao_limite")) + "</b><strong>") + formatDateTime(bolao.data_limite) + "</strong></span>" +
+          ("<span><b>" + escapeHtml(legendaSobolao("legenda_sobolao_loterica")) + "</b><strong>") + escapeHtml(bolao.loterica || legendaSobolao("legenda_sobolao_a_definir")) + "</strong></span>" +
         "</div>" +
-        "<div class=\"sb-form-actions\"><button class=\"sb-btn sb-btn-primary sb-btn-small\" type=\"button\" data-select-bolao=\"" + escapeHtml(bolao.cod_bolao) + "\">Reservar</button>" + adminButton + "</div>" +
+        "<div class=\"sb-form-actions\"><button class=\"sb-btn sb-btn-primary sb-btn-small\" type=\"button\" data-select-bolao=\"" + escapeHtml(bolao.cod_bolao) + ("\">" + escapeHtml(legendaSobolao("legenda_sobolao_reservar")) + "</button>") + adminButton + "</div>" +
       "</article>";
-    }).join("") : empty("Nenhum bolão encontrado.");
-    setStatus(qs("boloesStatus"), rows.length + " bolão(ões)", "ok");
+    }).join("") : empty(legendaSobolao("legenda_sobolao_nenhum_bolao_encontrado")));
+    setStatus(qs("boloesStatus"), legendaSobolao("legenda_sobolao_quantidade_boloes", { quantidade: rows.length }), "ok", true);
   }
 
   function renderMine() {
     var rows = state.data.minhas_participacoes || [];
-    qs("myTableBody").innerHTML = rows.length ? rows.map(function (row) {
-      var doc = row.documento_url ? "<a href=\"" + escapeHtml(row.documento_url) + "\" target=\"_blank\" rel=\"noopener\">Abrir</a>" : "Pendente";
+    apresentarHTML(qs("myTableBody"), rows.length ? rows.map(function (row) {
+      var doc = row.documento_url ? "<a href=\"" + escapeHtml(row.documento_url) + ("\" target=\"_blank\" rel=\"noopener\">" + escapeHtml(legendaSobolao("legenda_sobolao_abrir")) + "</a>") : legendaSobolao("legenda_sobolao_pendente");
       var palpite = normalizeNumbers(row.palpite_numeros || row.numeros_palpite || row.numeros || []).join(", ");
       return "<tr>" +
         "<td><strong>" + escapeHtml(row.bolao) + "</strong><br><span class=\"sb-status\">" + escapeHtml(row.modalidade || "") + "</span></td>" +
@@ -892,28 +1034,28 @@
         "<td>" + compactNumber(row.cotas) + "</td>" +
         "<td>" + moneyFromCents(row.valor_total_centavos) + "</td>" +
         "<td>" + pill(row.status) + "</td>" +
-        "<td><span class=\"sb-status\">" + escapeHtml(palpite || "Aguardando") + "</span></td>" +
+        "<td><span class=\"sb-status\">" + escapeHtml(palpite || legendaSobolao("legenda_sobolao_aguardando")) + "</span></td>" +
         "<td>" + doc + "</td>" +
       "</tr>";
-    }).join("") : "<tr><td colspan=\"7\">" + empty("Nenhuma participação encontrada.") + "</td></tr>";
-    setStatus(qs("myStatus"), rows.length + " participação(ões)", "ok");
+    }).join("") : "<tr><td colspan=\"7\">" + empty(legendaSobolao("legenda_sobolao_nenhuma_participacao_encontrada")) + "</td></tr>");
+    setStatus(qs("myStatus"), legendaSobolao("legenda_sobolao_quantidade_participacoes", { quantidade: rows.length }), "ok", true);
   }
 
   function renderResults() {
     var rows = state.data.resultados || [];
-    qs("resultsGrid").innerHTML = rows.length ? rows.map(function (row) {
+    apresentarHTML(qs("resultsGrid"), rows.length ? rows.map(function (row) {
       return "<article class=\"sb-result\">" +
         "<div><h3>" + escapeHtml(row.modalidade) + " #" + escapeHtml(row.concurso) + "</h3>" +
-        "<span class=\"sb-status\">" + formatDate(row.data_sorteio) + " - prêmio estimado " + moneyFromCents(row.premio_estimado_centavos) + "</span></div>" +
+        "<span class=\"sb-status\">" + formatDate(row.data_sorteio) + legendaSobolao("legenda_sobolao_premio_estimado") + moneyFromCents(row.premio_estimado_centavos) + "</span></div>" +
         renderBalls(row.numeros) +
       "</article>";
-    }).join("") : empty("Nenhum resultado registrado.");
-    setStatus(qs("resultsStatus"), rows.length + " resultado(s)", "ok");
+    }).join("") : empty(legendaSobolao("legenda_sobolao_nenhum_resultado_registrado")));
+    setStatus(qs("resultsStatus"), legendaSobolao("legenda_sobolao_quantidade_resultados", { quantidade: rows.length }), "ok", true);
   }
 
   function renderAwards() {
     var rows = state.data.premios || [];
-    qs("awardsTableBody").innerHTML = rows.length ? rows.map(function (row) {
+    apresentarHTML(qs("awardsTableBody"), rows.length ? rows.map(function (row) {
       return "<tr>" +
         "<td><strong>" + escapeHtml(row.bolao) + "</strong></td>" +
         "<td>" + escapeHtml(row.faixa || "") + "</td>" +
@@ -921,53 +1063,53 @@
         "<td><strong>" + moneyFromCents(row.minha_parte_centavos) + "</strong></td>" +
         "<td>" + pill(row.status) + "</td>" +
       "</tr>";
-    }).join("") : "<tr><td colspan=\"5\">" + empty("Nenhum prêmio apurado.") + "</td></tr>";
-    setStatus(qs("awardsStatus"), rows.length + " lancamento(s)", "ok");
+    }).join("") : "<tr><td colspan=\"5\">" + empty(legendaSobolao("legenda_sobolao_nenhum_premio_apurado")) + "</td></tr>");
+    setStatus(qs("awardsStatus"), legendaSobolao("legenda_sobolao_quantidade_lancamentos", { quantidade: rows.length }), "ok", true);
   }
 
   function renderPartners() {
     var rows = state.data.lotericas || [];
-    qs("partnersGrid").innerHTML = rows.length ? rows.map(function (row) {
+    apresentarHTML(qs("partnersGrid"), rows.length ? rows.map(function (row) {
       var adminButton = state.role === "admin" || state.role === "suporte" ?
-        "<button class=\"sb-btn sb-btn-ghost sb-btn-small\" type=\"button\" data-edit-partner=\"" + escapeHtml(row.cod_loterica) + "\">Editar</button>" : "";
+        "<button class=\"sb-btn sb-btn-ghost sb-btn-small\" type=\"button\" data-edit-partner=\"" + escapeHtml(row.cod_loterica) + ("\">" + escapeHtml(legendaSobolao("legenda_sobolao_editar")) + "</button>") : "";
       return "<article class=\"sb-card\">" +
         "<div class=\"sb-card-head\"><div><h3>" + escapeHtml(row.nome) + "</h3><small>" + escapeHtml(row.cidade || "") + "/" + escapeHtml(row.uf || "") + "</small></div>" + pill(row.status) + "</div>" +
         "<div class=\"sb-card-data\">" +
-          "<span><b>CNPJ</b><strong>" + escapeHtml(row.cnpj || "") + "</strong></span>" +
-          "<span><b>Bolões</b><strong>" + compactNumber(row.boloes_ativos) + "</strong></span>" +
-          "<span><b>Repasse</b><strong>" + moneyFromCents(row.repasse_pendente_centavos) + "</strong></span>" +
+          ("<span><b>" + escapeHtml(legendaSobolao("legenda_sobolao_cnpj")) + "</b><strong>") + escapeHtml(row.cnpj || "") + "</strong></span>" +
+          ("<span><b>" + escapeHtml(legendaSobolao("legenda_sobolao_boloes")) + "</b><strong>") + compactNumber(row.boloes_ativos) + "</strong></span>" +
+          ("<span><b>" + escapeHtml(legendaSobolao("legenda_sobolao_repasse")) + "</b><strong>") + moneyFromCents(row.repasse_pendente_centavos) + "</strong></span>" +
         "</div>" +
         "<div class=\"sb-form-actions\">" + adminButton + "</div>" +
       "</article>";
-    }).join("") : empty("Nenhuma lotérica cadastrada.");
+    }).join("") : empty(legendaSobolao("legenda_sobolao_nenhuma_loterica_cadastrada")));
 
-    qs("partnerQueueBody").innerHTML = (state.data.fila_loterica || []).map(function (row) {
-      var doc = row.comprovante_url ? "<a href=\"" + escapeHtml(row.comprovante_url) + "\" target=\"_blank\" rel=\"noopener\">Abrir</a>" : "Pendente";
+    apresentarHTML(qs("partnerQueueBody"), (state.data.fila_loterica || []).map(function (row) {
+      var doc = row.comprovante_url ? "<a href=\"" + escapeHtml(row.comprovante_url) + ("\" target=\"_blank\" rel=\"noopener\">" + escapeHtml(legendaSobolao("legenda_sobolao_abrir")) + "</a>") : legendaSobolao("legenda_sobolao_pendente");
       return "<tr><td><strong>" + escapeHtml(row.bolao) + "</strong></td><td>" + moneyFromCents(row.repasse_centavos) + "</td><td>" + doc + "</td><td>" + pill(row.status) + "</td></tr>";
-    }).join("") || "<tr><td colspan=\"4\">" + empty("Sem repasses pendentes.") + "</td></tr>";
-    setStatus(qs("partnersStatus"), rows.length + " parceira(s)", "ok");
+    }).join("") || "<tr><td colspan=\"4\">" + empty(legendaSobolao("legenda_sobolao_sem_repasses_pendentes")) + "</td></tr>");
+    setStatus(qs("partnersStatus"), legendaSobolao("legenda_sobolao_quantidade_parceiras", { quantidade: rows.length }), "ok", true);
   }
 
   function renderSupport() {
     var rows = state.data.chamados || [];
-    qs("ticketsList").innerHTML = rows.length ? rows.map(function (row) {
-      return "<article class=\"sb-ticket\"><strong>#" + escapeHtml(row.cod_chamado) + " - " + escapeHtml(row.assunto) + "</strong><small>" + escapeHtml(row.prioridade || "média") + " - " + formatDateTime(row.atualizado_em) + "</small>" + pill(row.status) + "</article>";
-    }).join("") : empty("Nenhum chamado aberto.");
-    setStatus(qs("supportStatus"), rows.length + " chamado(s)", "ok");
+    apresentarHTML(qs("ticketsList"), rows.length ? rows.map(function (row) {
+      return "<article class=\"sb-ticket\"><strong>#" + escapeHtml(row.cod_chamado) + " - " + escapeHtml(row.assunto) + "</strong><small>" + escapeHtml(row.prioridade || legendaSobolao("legenda_sobolao_media")) + " - " + formatDateTime(row.atualizado_em) + "</small>" + pill(row.status) + "</article>";
+    }).join("") : empty(legendaSobolao("legenda_sobolao_nenhum_chamado_aberto")));
+    setStatus(qs("supportStatus"), legendaSobolao("legenda_sobolao_quantidade_chamados", { quantidade: rows.length }), "ok", true);
   }
 
   function renderAdmin() {
     var rows = state.data.fila_admin || [];
-    qs("adminQueueBody").innerHTML = rows.length ? rows.map(function (row) {
+    apresentarHTML(qs("adminQueueBody"), rows.length ? rows.map(function (row) {
       return "<tr>" +
-        "<td><strong>" + escapeHtml(row.titulo) + "</strong><br><span class=\"sb-status\">" + escapeHtml(({ bolao: "bolão", loterica: "lotérica", premio: "prêmio" })[row.tipo] || row.tipo || "") + "</span></td>" +
+        "<td><strong>" + escapeHtml(row.titulo) + "</strong><br><span class=\"sb-status\">" + escapeHtml(({ bolao: legendaSobolao("legenda_sobolao_bolao"), loterica: legendaSobolao("legenda_sobolao_loterica_2"), premio: legendaSobolao("legenda_sobolao_premio") })[row.tipo] || row.tipo || "") + "</span></td>" +
         "<td>" + escapeHtml(row.responsavel || "") + "</td>" +
         "<td>" + moneyFromCents(row.valor_centavos) + "</td>" +
         "<td>" + pill(row.status) + "</td>" +
-        "<td><button class=\"sb-btn sb-btn-ghost sb-btn-small\" type=\"button\" data-admin-done=\"" + escapeHtml(row.id) + "\">Marcar ok</button></td>" +
+        "<td><button class=\"sb-btn sb-btn-ghost sb-btn-small\" type=\"button\" data-admin-done=\"" + escapeHtml(row.id) + ("\">" + escapeHtml(legendaSobolao("legenda_sobolao_marcar_ok")) + "</button></td>") +
       "</tr>";
-    }).join("") : "<tr><td colspan=\"5\">" + empty("Fila operacional limpa.") + "</td></tr>";
-    setStatus(qs("adminStatus"), rows.length + " item(ns)", "ok");
+    }).join("") : "<tr><td colspan=\"5\">" + empty(legendaSobolao("legenda_sobolao_fila_operacional_limpa")) + "</td></tr>");
+    setStatus(qs("adminStatus"), legendaSobolao("legenda_sobolao_quantidade_itens", { quantidade: rows.length }), "ok", true);
   }
 
   function empty(text) {
@@ -982,7 +1124,7 @@
     var fullName = String(user.name || metadata.full_name || metadata.name || user.email || "").trim();
     if (fullName.indexOf("@") >= 0) fullName = fullName.split("@")[0].replace(/[._-]+/g, " ");
     var firstName = fullName.split(/\s+/)[0];
-    heading.textContent = firstName ? "Olá, " + firstName + "." : "Olá.";
+    heading.textContent = firstName ? legendaSobolao("legenda_sobolao_saudacao_membro", { nome: firstName }) : legendaSobolao("legenda_sobolao_ola_2");
   }
 
   function renderAll() {
@@ -1003,7 +1145,7 @@
 
   async function boot() {
     showLoading(true);
-    setStatus(qs("pageStatus"), "Carregando", "");
+    setStatus(qs("pageStatus"), legendaSobolao("legenda_sobolao_carregando"), "");
     configureMode();
     state.session = state.mode === "app" ? null : readSession();
     state.role = state.mode === "app" ? "usuario" : readRole();
@@ -1011,7 +1153,7 @@
     if (state.mode !== "app" && (!state.session || !state.session.access_token)) {
       showLoading(false);
       showLogin(true);
-      setStatus(qs("pageStatus"), "Entre para continuar", "");
+      setStatus(qs("pageStatus"), legendaSobolao("legenda_sobolao_entre_para_continuar_2"), "");
       return;
     }
     try {
@@ -1023,7 +1165,7 @@
       showLoading(false);
       showLogin(false);
       renderAll();
-      setStatus(qs("pageStatus"), state.demo ? "Prévia local" : "Online", state.demo ? "" : "ok");
+      setStatus(qs("pageStatus"), state.demo ? legendaSobolao("legenda_sobolao_previa_local") : legendaSobolao("legenda_sobolao_online"), state.demo ? "" : "ok");
     } catch (error) {
       showLoading(false);
       showLogin(true);
@@ -1039,14 +1181,14 @@
     state.data = demoData(state.role);
     showLogin(false);
     renderAll();
-    setStatus(qs("pageStatus"), "Prévia local", "");
+    setStatus(qs("pageStatus"), legendaSobolao("legenda_sobolao_previa_local"), "");
   }
 
   async function submitLogin(event) {
     event.preventDefault();
     var button = qs("loginButton");
     setBusy(button, true);
-    setStatus(qs("loginStatus"), "Entrando", "");
+    setStatus(qs("loginStatus"), legendaSobolao("legenda_sobolao_entrando"), "");
     try {
       saveRole(qs("loginRole").value);
       var session = await login(qs("loginEmail").value.trim(), qs("loginPassword").value);
@@ -1075,7 +1217,7 @@
     event.preventDefault();
     var button = qs("joinButton");
     setBusy(button, true);
-    setStatus(qs("boloesStatus"), "Reservando", "");
+    setStatus(qs("boloesStatus"), legendaSobolao("legenda_sobolao_reservando"), "");
     try {
       var bolaoId = Number(qs("joinBolao").value);
       var cotas = Math.max(1, intValue(qs("joinCotas").value, 1));
@@ -1099,15 +1241,15 @@
           documento_url: "",
           data_sorteio: bolao.data_sorteio
         });
-        setStatus(qs("boloesStatus"), "Reserva criada na prévia local.", "ok");
+        setStatus(qs("boloesStatus"), legendaSobolao("legenda_sobolao_reserva_criada_na_previa_local"), "ok");
       } else {
         var data = await rpc("sobolao_participar_rpc", {
           p_cod_bolao: bolaoId,
           p_qtd_cotas: cotas,
           p_palpite_numeros: numeros
         });
-        if (!data || data.ok !== true) throw new Error((data && data.error) || "Não foi possível reservar.");
-        setStatus(qs("boloesStatus"), "Reserva criada.", "ok");
+        if (!data || data.ok !== true) throw new Error((data && data.error) || legendaSobolao("legenda_sobolao_nao_foi_possivel_reservar"));
+        setStatus(qs("boloesStatus"), legendaSobolao("legenda_sobolao_reserva_criada"), "ok");
         await loadData();
       }
       state.slip.selected = [];
@@ -1155,7 +1297,7 @@
     event.preventDefault();
     var button = qs("adminBolaoButton");
     setBusy(button, true);
-    setStatus(qs("adminStatus"), "Salvando bolão", "");
+    setStatus(qs("adminStatus"), legendaSobolao("legenda_sobolao_salvando_bolao"), "");
     try {
       var payload = {
         p_cod_bolao: qs("adminBolaoId").value ? Number(qs("adminBolaoId").value) : null,
@@ -1191,12 +1333,12 @@
         if (!existing) state.data.boloes.unshift(row);
       } else {
         var data = await rpc("adm_sobolao_bolao_salvar_rpc", payload);
-        if (!data || data.ok !== true) throw new Error((data && data.error) || "Não foi possível salvar o bolão.");
+        if (!data || data.ok !== true) throw new Error((data && data.error) || legendaSobolao("legenda_sobolao_nao_foi_possivel_salvar_o_bolao"));
         await loadData();
       }
       resetAdminBolao();
       renderAll();
-      setStatus(qs("adminStatus"), "Bolão salvo.", "ok");
+      setStatus(qs("adminStatus"), legendaSobolao("legenda_sobolao_bolao_salvo"), "ok");
     } catch (error) {
       setStatus(qs("adminStatus"), error.message || String(error), "error");
     } finally {
@@ -1229,7 +1371,7 @@
     event.preventDefault();
     var button = qs("partnerButton");
     setBusy(button, true);
-    setStatus(qs("adminStatus"), "Salvando lotérica", "");
+    setStatus(qs("adminStatus"), legendaSobolao("legenda_sobolao_salvando_loterica"), "");
     try {
       var payload = {
         p_cod_loterica: qs("partnerId").value ? Number(qs("partnerId").value) : null,
@@ -1252,12 +1394,12 @@
         if (!existing) state.data.lotericas.unshift(row);
       } else {
         var data = await rpc("adm_sobolao_loterica_salvar_rpc", payload);
-        if (!data || data.ok !== true) throw new Error((data && data.error) || "Não foi possível salvar a lotérica.");
+        if (!data || data.ok !== true) throw new Error((data && data.error) || legendaSobolao("legenda_sobolao_nao_foi_possivel_salvar_a_loterica"));
         await loadData();
       }
       resetPartner();
       renderAll();
-      setStatus(qs("adminStatus"), "Lotérica salva.", "ok");
+      setStatus(qs("adminStatus"), legendaSobolao("legenda_sobolao_loterica_salva"), "ok");
     } catch (error) {
       setStatus(qs("adminStatus"), error.message || String(error), "error");
     } finally {
@@ -1269,7 +1411,7 @@
     event.preventDefault();
     var button = qs("supportButton");
     setBusy(button, true);
-    setStatus(qs("supportStatus"), "Abrindo chamado", "");
+    setStatus(qs("supportStatus"), legendaSobolao("legenda_sobolao_abrindo_chamado"), "");
     try {
       var payload = {
         p_assunto: qs("supportSubject").value.trim(),
@@ -1286,13 +1428,13 @@
         });
       } else {
         var data = await rpc("sobolao_suporte_chamado_rpc", payload);
-        if (!data || data.ok !== true) throw new Error((data && data.error) || "Não foi possível abrir chamado.");
+        if (!data || data.ok !== true) throw new Error((data && data.error) || legendaSobolao("legenda_sobolao_nao_foi_possivel_abrir_chamado"));
         await loadData();
       }
       qs("supportSubject").value = "";
       qs("supportMessage").value = "";
       renderAll();
-      setStatus(qs("supportStatus"), "Chamado aberto.", "ok");
+      setStatus(qs("supportStatus"), legendaSobolao("legenda_sobolao_chamado_aberto"), "ok");
     } catch (error) {
       setStatus(qs("supportStatus"), error.message || String(error), "error");
     } finally {
@@ -1301,7 +1443,7 @@
   }
 
   async function markAdminDone(id) {
-    setStatus(qs("adminStatus"), "Atualizando", "");
+    setStatus(qs("adminStatus"), legendaSobolao("legenda_sobolao_atualizando"), "");
     try {
       if (state.demo) {
         (state.data.fila_admin || []).forEach(function (row) {
@@ -1314,11 +1456,11 @@
           p_status: "ok",
           p_observacao: "Atualizado pelo painel Só Bolão"
         });
-        if (!data || data.ok !== true) throw new Error((data && data.error) || "Não foi possível atualizar.");
+        if (!data || data.ok !== true) throw new Error((data && data.error) || legendaSobolao("legenda_sobolao_nao_foi_possivel_atualizar"));
         await loadData();
       }
       renderAll();
-      setStatus(qs("adminStatus"), "Atualizado.", "ok");
+      setStatus(qs("adminStatus"), legendaSobolao("legenda_sobolao_atualizado"), "ok");
     } catch (error) {
       setStatus(qs("adminStatus"), error.message || String(error), "error");
     }
@@ -1331,7 +1473,7 @@
     qs("logoutButton").addEventListener("click", function () {
       clearSession();
       showLogin(true);
-      setStatus(qs("pageStatus"), "Sessão encerrada", "");
+      setStatus(qs("pageStatus"), legendaSobolao("legenda_sobolao_sessao_encerrada"), "");
     });
     qs("switchAccountButton").addEventListener("click", function () {
       clearSession();
@@ -1392,6 +1534,7 @@
     });
   }
 
+  if (typeof window.addEventListener === "function") window.addEventListener("turbotiger:idioma", atualizarIdiomaSobolao);
   document.addEventListener("DOMContentLoaded", function () {
     configureMode();
     loadBrandConfig();

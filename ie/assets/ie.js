@@ -1,6 +1,807 @@
 (function () {
   "use strict";
 
+  var fontesLegendasCentral = {
+    "legenda_ie_central_quantidade_selecionado": "{quantidade} selecionado",
+    "legenda_ie_central_quantidade_selecionados": "{quantidade} selecionados",
+    "legenda_ie_central_antes_do_inicio": "Antes do início",
+    "legenda_ie_central_partida_iniciada": "Partida iniciada",
+    "legenda_ie_central_escalacao_disponivel": "Escalação disponível",
+    "legenda_ie_central_gol": "Gol",
+    "legenda_ie_central_cartao_vermelho": "Cartão vermelho",
+    "legenda_ie_central_intervalo": "Intervalo",
+    "legenda_ie_central_encerramento": "Encerramento",
+    "legenda_ie_central_mudanca_de_horario": "Mudança de horário",
+    "legenda_ie_central_sincronizando_horario": "Sincronizando horário",
+    "legenda_ie_central_dados_atualizados_agora": "Dados atualizados agora.",
+    "legenda_ie_central_abrir_informacoes": "Abrir informações",
+    "legenda_ie_central_confirme_o_confronto_e_o_periodo_das_odds_informadas": "Confirme o confronto e o período das odds informadas.",
+    "legenda_ie_central_informe_odds_maiores_que_1_e_ate_1_000_com_ate_quatro_casas_decimais": "Informe odds maiores que 1 e até 1.000, com até quatro casas decimais.",
+    "legenda_ie_central_informe_pelo_menos_uma_odd_para_casa_empate_e_fora": "Informe pelo menos uma odd para Casa, Empate e Fora.",
+    "legenda_ie_central_preencha_ao_menos_uma_odd_de_cada_casa_selecionada_ou_desmarque_a_casa": "Preencha ao menos uma odd de cada casa selecionada, ou desmarque a casa.",
+    "legenda_ie_central_a_entrada_manual_esta_disponivel_para_resultado_1x2_em_90_minutos": "A entrada manual está disponível para Resultado 1X2 em 90 minutos.",
+    "legenda_ie_central_o_sino_nao_acompanha_odds_digitadas_manualmente_salve_sem_o_sino": "O sino não acompanha odds digitadas manualmente. Salve sem o sino.",
+    "legenda_ie_central_o_aplicativo_demorou_para_validar_sua_sessao": "O aplicativo demorou para validar sua sessão.",
+    "legenda_ie_central_nao_foi_possivel_validar_sua_sessao_pelo_aplicativo": "Não foi possível validar sua sessão pelo aplicativo.",
+    "legenda_ie_central_sua_sessao_expirou_volte_ao_aplicativo_e_tente_novamente": "Sua sessão expirou. Volte ao aplicativo e tente novamente.",
+    "legenda_ie_central_sua_sessao_nao_esta_disponivel": "Sua sessão não está disponível.",
+    "legenda_ie_central_nao_foi_possivel_acessar_a_central_verifique_sua_conexao": "Não foi possível acessar a central. Verifique sua conexão.",
+    "legenda_ie_central_escolha_o_ano_e_o_time_antes_de_pesquisar": "Escolha o ano e o time antes de pesquisar.",
+    "legenda_ie_central_o_ano_escolhido_esta_fora_do_periodo_disponivel": "O ano escolhido está fora do período disponível.",
+    "legenda_ie_central_escolha_um_time_na_lista_de_resultados": "Escolha um time na lista de resultados.",
+    "legenda_ie_central_preencha_data_times_placar_competicao_e_temporada": "Preencha data, times, placar, competição e temporada.",
+    "legenda_ie_central_a_data_informada_ainda_nao_ocorreu": "A data informada ainda não ocorreu.",
+    "legenda_ie_central_confira_os_numeros_do_placar_informado": "Confira os números do placar informado.",
+    "legenda_ie_central_informe_os_dois_placares_do_intervalo": "Informe os dois placares do intervalo.",
+    "legenda_ie_central_o_placar_do_intervalo_nao_pode_ser_maior_que_o_placar_final": "O placar do intervalo não pode ser maior que o placar final.",
+    "legenda_ie_central_os_times_precisam_ser_diferentes_e_validos": "Os times precisam ser diferentes e válidos.",
+    "legenda_ie_central_informe_uma_competicao_valida": "Informe uma competição válida.",
+    "legenda_ie_central_preencha_todos_os_dados_do_confronto_antes_de_enviar": "Preencha todos os dados do confronto antes de enviar.",
+    "legenda_ie_central_revise_os_dados_informados": "Revise os dados informados.",
+    "legenda_ie_central_as_informacoes_ultrapassaram_o_limite_permitido": "As informações ultrapassaram o limite permitido.",
+    "legenda_ie_central_a_observacao_ultrapassou_o_limite_permitido": "A observação ultrapassou o limite permitido.",
+    "legenda_ie_central_um_dos_textos_ultrapassou_o_limite_permitido": "Um dos textos ultrapassou o limite permitido.",
+    "legenda_ie_central_altere_pelo_menos_uma_informacao_ou_escreva_uma_observacao": "Altere pelo menos uma informação ou escreva uma observação.",
+    "legenda_ie_central_este_confronto_nao_foi_localizado_na_base": "Este confronto não foi localizado na base.",
+    "legenda_ie_central_nao_foi_possivel_identificar_este_envio_tente_novamente": "Não foi possível identificar este envio. Tente novamente.",
+    "legenda_ie_central_escolha_se_acompanhou_no_local_ou_pela_tv_outro_meio": "Escolha se acompanhou no local ou pela TV/outro meio.",
+    "legenda_ie_central_esta_experiencia_nao_foi_localizada": "Esta experiência não foi localizada.",
+    "legenda_ie_central_este_horario_coincide_com_outro_confronto_marcado_no_local": "Este horário coincide com outro confronto marcado no local.",
+    "legenda_ie_central_nao_ha_horario_suficiente_para_validar_a_presenca_no_local": "Não há horário suficiente para validar a presença no local.",
+    "legenda_ie_central_informe_o_nome_da_pessoa_que_assistiu_com_voce": "Informe o nome da pessoa que assistiu com você.",
+    "legenda_ie_central_informe_um_e_mail_valido": "Informe um e-mail válido.",
+    "legenda_ie_central_confirme_a_autorizacao_antes_de_enviar_o_convite": "Confirme a autorização antes de enviar o convite.",
+    "legenda_ie_central_esta_pessoa_pediu_para_nao_receber_novos_convites": "Esta pessoa pediu para não receber novos convites.",
+    "legenda_ie_central_sua_historia_esportiva_esta_privada": "Sua história esportiva está privada.",
+    "legenda_ie_central_esta_historia_esportiva_nao_esta_disponivel": "Esta história esportiva não está disponível.",
+    "legenda_ie_central_nao_foi_possivel_gerar_um_codigo_seguro_para_esta_historia": "Não foi possível gerar um código seguro para esta história.",
+    "legenda_ie_central_este_confronto_nao_esta_disponivel_nas_suas_selecoes": "Este confronto não está disponível nas suas seleções.",
+    "legenda_ie_central_o_simulador_esta_disponivel_somente_antes_do_inicio_confirmado_do_confronto": "O simulador está disponível somente antes do início confirmado do confronto.",
+    "legenda_ie_central_informe_um_valor_valido_para_a_simulacao": "Informe um valor válido para a simulação.",
+    "legenda_ie_central_o_valor_precisa_permitir_ao_menos_um_centavo_para_cada_mercado_escolhido": "O valor precisa permitir ao menos um centavo para cada mercado escolhido.",
+    "legenda_ie_central_informe_um_limite_pessoal_entre_0_e_100": "Informe um limite pessoal entre 0% e 100%.",
+    "legenda_ie_central_selecione_de_1_a_20_casas_brasileiras_autorizadas": "Selecione de 1 a 20 casas brasileiras autorizadas.",
+    "legenda_ie_central_selecione_ao_menos_uma_casa_brasileira_autorizada": "Selecione ao menos uma casa brasileira autorizada.",
+    "legenda_ie_central_uma_das_casas_selecionadas_nao_esta_mais_na_lista_brasileira_vigente": "Uma das casas selecionadas não está mais na lista brasileira vigente.",
+    "legenda_ie_central_selecione_ao_menos_um_mercado_disponivel": "Selecione ao menos um mercado disponível.",
+    "legenda_ie_central_um_dos_mercados_ainda_nao_possui_regras_comparaveis_para_simulacao": "Um dos mercados ainda não possui regras comparáveis para simulação.",
+    "legenda_ie_central_o_periodo_informado_nao_corresponde_as_regras_atuais_do_mercado": "O período informado não corresponde às regras atuais do mercado.",
+    "legenda_ie_central_informe_uma_margem_de_alerta_entre_0_01_e_100_pontos_percentuais": "Informe uma margem de alerta entre 0,01 e 100 pontos percentuais.",
+    "legenda_ie_central_esta_simulacao_nao_esta_mais_disponivel": "Esta simulação não está mais disponível.",
+    "legenda_ie_central_revise_os_campos_da_simulacao_antes_de_continuar": "Revise os campos da simulação antes de continuar.",
+    "legenda_ie_central_a_mesma_casa_foi_selecionada_mais_de_uma_vez": "A mesma casa foi selecionada mais de uma vez.",
+    "legenda_ie_central_o_mesmo_mercado_foi_selecionado_mais_de_uma_vez": "O mesmo mercado foi selecionado mais de uma vez.",
+    "legenda_ie_central_voce_atingiu_o_limite_de_simulacoes_abertas_arquive_uma_para_salvar_outra": "Você atingiu o limite de simulações abertas. Arquive uma para salvar outra.",
+    "legenda_ie_central_voce_atingiu_o_limite_de_simulacoes_para_este_confronto": "Você atingiu o limite de simulações para este confronto.",
+    "legenda_ie_central_as_regras_verificadas_mudaram_recalcule_a_simulacao_antes_de_reativar_o_sino": "As regras verificadas mudaram. Recalcule a simulação antes de reativar o sino.",
+    "legenda_ie_central_a_lista_oficial_brasileira_precisa_ser_atualizada_antes_de_novos_calculos": "A lista oficial brasileira precisa ser atualizada antes de novos cálculos.",
+    "legenda_ie_central_as_cotacoes_mudaram_durante_o_calculo_confira_os_dados_e_calcule_novamente": "As cotações mudaram durante o cálculo. Confira os dados e calcule novamente.",
+    "legenda_ie_central_nao_ha_cotacoes_brasileiras_atuais_e_completas_com_regras_e_limites_verificados_para_esta_selecao": "Não há cotações brasileiras atuais e completas, com regras e limites verificados, para esta seleção.",
+    "legenda_ie_central_uma_das_casas_nao_possui_mais_cotacoes_elegiveis_para_este_confronto_atualize_antes_de_calcular": "Uma das casas não possui mais cotações elegíveis para este confronto. Atualize antes de calcular.",
+    "legenda_ie_central_sem_dados_brasileiros_elegiveis_nao_e_possivel_salvar_uma_simulacao_calculavel": "Sem dados brasileiros elegíveis, não é possível salvar uma simulação calculável.",
+    "legenda_ie_central_nao_foi_possivel_carregar_as_informacoes": "Não foi possível carregar as informações.",
+    "legenda_ie_central_casa": "Casa",
+    "legenda_ie_central_casa_apostas": "Casa",
+    "legenda_ie_central_visitante": "Visitante",
+    "legenda_ie_central_este_esporte": "Este esporte",
+    "legenda_ie_central_em_breve": "Em breve!",
+    "legenda_ie_central_estamos_preparando_esta_modalidade_para_voce_acompanhar_competicoes_participantes_e_confrontos_em_um": "Estamos preparando esta modalidade para você acompanhar competições, participantes e confrontos em um só lugar.",
+    "legenda_ie_central_competicao": "Competição",
+    "legenda_ie_central_evento_esportivo": "Evento esportivo",
+    "legenda_ie_central_parciais_na_ordem_dos_participantes": "Parciais, na ordem dos participantes",
+    "legenda_ie_central_classificacao_do_evento": "Classificação do evento",
+    "legenda_ie_central_classificacao_final": "Classificação final",
+    "legenda_ie_central_classificacao_parcial": "Classificação parcial",
+    "legenda_ie_central_tempo": "Tempo",
+    "legenda_ie_central_diferenca": "Diferença",
+    "legenda_ie_central_voltas": "Voltas",
+    "legenda_ie_central_grid": "Grid",
+    "legenda_ie_central_paradas": "Paradas",
+    "legenda_ie_central_status": "Status",
+    "legenda_ie_central_participante": "Participante",
+    "legenda_ie_central_classificacao_completa_em_detalhes": "Classificação completa em Detalhes",
+    "legenda_ie_central_vitoria_de": "Vitória de ",
+    "legenda_ie_central_empate": "Empate",
+    "legenda_ie_central_sem_resultado": "Sem resultado",
+    "legenda_ie_central_round": "Round ",
+    "legenda_ie_central_evento": "Evento",
+    "legenda_ie_central_cancelada": "Cancelada",
+    "legenda_ie_central_adiada": "Adiada",
+    "legenda_ie_central_abandonada": "Abandonada",
+    "legenda_ie_central_suspensa": "Suspensa",
+    "legenda_ie_central_interrompida": "Interrompida",
+    "legenda_ie_central_encerrado": "Encerrado",
+    "legenda_ie_central_ao_vivo": "Ao vivo",
+    "legenda_ie_central_detalhes": "Detalhes",
+    "legenda_ie_central_a_definir": "A definir",
+    "legenda_ie_central_atualizacao_indisponivel_para_este_confronto": "Atualização indisponível para este confronto",
+    "legenda_ie_central_confronto": "Confronto",
+    "legenda_ie_central_abrir_minhas_apostas": "Abrir Minhas apostas",
+    "legenda_ie_central_abrir_cotacoes_de": "Abrir cotações de ",
+    "legenda_ie_central_abrir_analises_de": "Abrir análises de ",
+    "legenda_ie_central_noticia_esportiva": "Notícia esportiva",
+    "legenda_ie_central_fonte": "Fonte: ",
+    "legenda_ie_central_nao_informada": "não informada",
+    "legenda_ie_central_fora": "Fora",
+    "legenda_ie_central_analises_estatisticas": "Análises estatísticas",
+    "legenda_ie_central_cotacoes_informativas": "Cotações informativas",
+    "legenda_ie_central_probabilidade_estatistica": "Probabilidade estatística",
+    "legenda_ie_central_estimativa_estatistica_nao_representa_recomendacao_nem_garantia_de_resultado": "Estimativa estatística. Não representa recomendação nem garantia de resultado.",
+    "legenda_ie_central_informacao_neutra_sem_indicacao_ou_direcionamento_para_apostas": "Informação neutra, sem indicação ou direcionamento para apostas.",
+    "legenda_ie_central_time_a": "Time A",
+    "legenda_ie_central_time_b": "Time B",
+    "legenda_ie_central_jogos": " jogos",
+    "legenda_ie_central_vitorias": "vitórias",
+    "legenda_ie_central_empates": "Empates",
+    "legenda_ie_central_resultados": "resultados",
+    "legenda_ie_central_estatistica_historica_resultados_passados_nao_garantem_resultados_futuros": "Estatística histórica. Resultados passados não garantem resultados futuros.",
+    "legenda_ie_central_analises": "Análises",
+    "legenda_ie_central_resumo_dos_seus_acompanhamentos": "Resumo dos seus acompanhamentos",
+    "legenda_ie_central_proximos": "Próximos",
+    "legenda_ie_central_encerrados": "Encerrados",
+    "legenda_ie_central_resumo_informativo_das_suas_selecoes_esportivas": "Resumo informativo das suas seleções esportivas.",
+    "legenda_ie_central_analise_esportiva": "Análise esportiva",
+    "legenda_ie_central_estimativas_quando_disponiveis_sao_estatisticas_e_nao_representam_recomendacao_nem_garantia_de_resul": "Estimativas, quando disponíveis, são estatísticas e não representam recomendação nem garantia de resultado.",
+    "legenda_ie_central_inicio": "Início ",
+    "legenda_ie_central_fim": "Fim ",
+    "legenda_ie_central_recebido_em": "Recebido em ",
+    "legenda_ie_central_classificacao_indisponivel_nas_fontes_habilitadas": "Classificação indisponível nas fontes habilitadas.",
+    "legenda_ie_central_classificacao_em_atualizacao_as_colocacoes_ainda_nao_foram_confirmadas_pela_fonte": "Classificação em atualização. As colocações ainda não foram confirmadas pela fonte.",
+    "legenda_ie_central_ultima_classificacao_recebida_atualizacao_pendente": "Última classificação recebida — atualização pendente.",
+    "legenda_ie_central_classificacao_recebida_da_fonte": "Classificação recebida da fonte.",
+    "legenda_ie_central_pts": "Pts",
+    "legenda_ie_central_pontos": "Pontos",
+    "legenda_ie_central_jogos_2": "Jogos",
+    "legenda_ie_central_vitorias_2": "Vitórias",
+    "legenda_ie_central_derrotas": "Derrotas",
+    "legenda_ie_central_saldo_de_gols": "Saldo de gols",
+    "legenda_ie_central_pos": "Pos.",
+    "legenda_ie_central_colocacao_nao_informada": "Colocação não informada",
+    "legenda_ie_central_nao_informado": "Não informado",
+    "legenda_ie_central_classificacao_geral": "Classificação geral",
+    "legenda_ie_central_veja_todos_os_participantes_em_detalhes": "Veja todos os participantes em Detalhes.",
+    "legenda_ie_central_pts_pontos_j_jogos_v_vitorias_e_empates_d_derrotas_sg_saldo_de_gols_deslize_a_tabela_para_ver_todas": "Pts: pontos · J: jogos · V: vitórias · E: empates · D: derrotas · SG: saldo de gols. Deslize a tabela para ver todas as colunas.",
+    "legenda_ie_central_classificacao_confirmada": "Classificação confirmada",
+    "legenda_ie_central_participante_da_temporada": "Participante da temporada",
+    "legenda_ie_central_colocacao": "Colocação",
+    "legenda_ie_central_classificados_confirmados": "Classificados confirmados",
+    "legenda_ie_central_fase": "Fase: ",
+    "legenda_ie_central_lista_parcial_os_demais_classificados_ainda_estao_em_atualizacao": "Lista parcial: os demais classificados ainda estão em atualização.",
+    "legenda_ie_central_avanco_de_fase": "Avanço de fase",
+    "legenda_ie_central_esta_fase_nao_usa_tabela_de_colocacao_os_classificados_serao_exibidos_quando_o_avanco_estiver_confir": "Esta fase não usa tabela de colocação. Os classificados serão exibidos quando o avanço estiver confirmado; participar de um confronto não comprova classificação.",
+    "legenda_ie_central_participantes_da_temporada": "Participantes da temporada",
+    "legenda_ie_central_participantes_em_atualizacao": "Participantes em atualização.",
+    "legenda_ie_central_desde": "Desde ",
+    "legenda_ie_central_ate": "Até ",
+    "legenda_ie_central_base_propria": "Base própria",
+    "legenda_ie_central_futebol_do_brasil": "Futebol do Brasil",
+    "legenda_ie_central_acervo_historico_organizado_pelo_turbo_tiger": "Acervo histórico organizado pelo Turbo Tiger",
+    "legenda_ie_central_partidas": "Partidas",
+    "legenda_ie_central_competicoes": "Competições",
+    "legenda_ie_central_times": "Times",
+    "legenda_ie_central_escolha_seus_esportes": "Escolha seus esportes",
+    "legenda_ie_central_defina_um_esporte_favorito_e_acompanhe_os_times_participantes_e_competicoes_que_realmente_interessam": "Defina um esporte favorito e acompanhe os times, participantes e competições que realmente interessam a você.",
+    "legenda_ie_central_minha_historia_esportiva": "Minha história esportiva",
+    "legenda_ie_central_seus_registros_e_sua_privacidade": "Seus registros e sua privacidade",
+    "legenda_ie_central_top_10_dos_colaboradores": "Top 10 dos colaboradores",
+    "legenda_ie_central_colaboracoes_aprovadas_para_nossa_base": "Colaborações aprovadas para nossa base",
+    "legenda_ie_central_top_10_dos_que_assistiram_ao_vivo": "Top 10 dos que assistiram ao vivo",
+    "legenda_ie_central_historias_compartilhadas_pelos_membros": "Histórias compartilhadas pelos membros",
+    "legenda_ie_central_simulacoes_salvas": "Simulações salvas",
+    "legenda_ie_central_consulte_as_simulacoes_da_sua_conta": "Consulte as simulações da sua conta",
+    "legenda_ie_central_comparar_confrontos": "Comparar Confrontos",
+    "legenda_ie_central_teste_os_cenarios_de_ate_tres_jogos": "Teste os cenários de até três jogos",
+    "legenda_ie_central_minhas_apostas": "Minhas apostas",
+    "legenda_ie_central_bilhetes_resultados_e_controle_pessoal": "Bilhetes, resultados e controle pessoal",
+    "legenda_ie_central_nenhuma_informacao_disponivel": "Nenhuma informação disponível",
+    "legenda_ie_central_nenhum_favorito_neste_esporte": "Nenhum favorito neste esporte",
+    "legenda_ie_central_esta_secao_ainda_nao_possui_dados_atualizados_para_suas_escolhas": "Esta seção ainda não possui dados atualizados para suas escolhas.",
+    "legenda_ie_central_acompanhe_times_ou_competicoes_deste_esporte_para_montar_o_seu_espaco": "Acompanhe times ou competições deste esporte para montar o seu espaço.",
+    "legenda_ie_central_defina_ao_menos_um_esporte_favorito_para_acompanhar_confrontos": "Defina ao menos um esporte favorito para acompanhar confrontos.",
+    "legenda_ie_central_todas_as_favoritas": "Todas as favoritas",
+    "legenda_ie_central_carregando_confrontos": "Carregando confrontos",
+    "legenda_ie_central_buscando_os_confrontos_desta_competicao": "Buscando os confrontos desta competição.",
+    "legenda_ie_central_nenhum_confronto": "Nenhum confronto",
+    "legenda_ie_central_nao_ha_confrontos_nesta_secao_para_os_times_e_competicoes_acompanhados": "Não há confrontos nesta seção para os times e competições acompanhados.",
+    "legenda_ie_central_defina_ao_menos_um_esporte_favorito_para_acompanhar_noticias": "Defina ao menos um esporte favorito para acompanhar notícias.",
+    "legenda_ie_central_nenhuma_noticia": "Nenhuma notícia",
+    "legenda_ie_central_ainda_nao_encontramos_noticias_autorizadas_relacionadas_as_suas_selecoes": "Ainda não encontramos notícias autorizadas relacionadas às suas seleções.",
+    "legenda_ie_central_esporte": "Esporte",
+    "legenda_ie_central_em_breve_2": " — Em breve!",
+    "legenda_ie_central_todos": "Todos",
+    "legenda_ie_central_time": "Time",
+    "legenda_ie_central_todas": "Todas",
+    "legenda_ie_central_arrastar_para_ordenar": "Arrastar para ordenar ",
+    "legenda_ie_central_acompanhar": "Acompanhar",
+    "legenda_ie_central_notificar": "Notificar",
+    "legenda_ie_central_nenhum_resultado": "Nenhum resultado",
+    "legenda_ie_central_ajuste_os_filtros_ou_a_busca": "Ajuste os filtros ou a busca.",
+    "legenda_ie_central_defina_ao_menos_um_esporte_favorito_para_acompanhar_times_e_participantes": "Defina ao menos um esporte favorito para acompanhar times e participantes.",
+    "legenda_ie_central_defina_ao_menos_um_esporte_favorito_para_acompanhar_competicoes": "Defina ao menos um esporte favorito para acompanhar competições.",
+    "legenda_ie_central_time_ou_participante": "Time ou participante",
+    "legenda_ie_central_remover": "Remover ",
+    "legenda_ie_central_desativar": "Desativar",
+    "legenda_ie_central_ativar": "Ativar",
+    "legenda_ie_central_notificacoes_de": " notificações de ",
+    "legenda_ie_central_nenhum_time_acompanhado": "Nenhum time acompanhado",
+    "legenda_ie_central_use_as_configuracoes_para_escolher_times_ou_participantes_deste_esporte": "Use as configurações para escolher times ou participantes deste esporte.",
+    "legenda_ie_central_nenhuma_competicao_acompanhada": "Nenhuma competição acompanhada",
+    "legenda_ie_central_use_as_configuracoes_para_escolher_suas_competicoes_deste_esporte": "Use as configurações para escolher suas competições deste esporte.",
+    "legenda_ie_central_favoritar": "Favoritar ",
+    "legenda_ie_central_nenhum_esporte_disponivel": "Nenhum esporte disponível",
+    "legenda_ie_central_o_catalogo_esportivo_ainda_nao_foi_disponibilizado": "O catálogo esportivo ainda não foi disponibilizado.",
+    "legenda_ie_central_algumas_informacoes_deste_esporte_nao_puderam_ser_atualizadas": "Algumas informações deste esporte não puderam ser atualizadas.",
+    "legenda_ie_central_atualizando": "Atualizando...",
+    "legenda_ie_central_atualizacao_parcial": "Atualização parcial",
+    "legenda_ie_central_informacoes_atualizadas": "Informações atualizadas.",
+    "legenda_ie_central_sem_conexao": "Sem conexão",
+    "legenda_ie_central_sem_conexao_os_confrontos_e_resultados_nao_foram_restaurados": "Sem conexão. Os confrontos e resultados não foram restaurados.",
+    "legenda_ie_central_algumas_informacoes_nao_puderam_ser_atualizadas": "Algumas informações não puderam ser atualizadas.",
+    "legenda_ie_central_noticias": "Notícias",
+    "legenda_ie_central_cotacoes": "Cotações",
+    "legenda_ie_central_detalhes_da_partida": "Detalhes da partida",
+    "legenda_ie_central_detalhes_da_competicao": "Detalhes da competição",
+    "legenda_ie_central_tentar_novamente": "Tentar novamente",
+    "legenda_ie_central_salvo": "Salvo.",
+    "legenda_ie_central_complete_os_campos_validos_para_salvar": "Complete os campos válidos para salvar.",
+    "legenda_ie_central_nao_foi_possivel_confirmar_o_salvamento": "Não foi possível confirmar o salvamento. ",
+    "legenda_ie_central_salvando": "Salvando...",
+    "legenda_ie_central_aguarde_a_confirmacao_do_salvamento_antes_de_sair": "Aguarde a confirmação do salvamento antes de sair.",
+    "legenda_ie_central_confirme_o_salvamento_usando_tentar_novamente_antes_de_compartilhar_ou_abrir_a_previa": "Confirme o salvamento usando Tentar novamente antes de compartilhar ou abrir a prévia.",
+    "legenda_ie_central_ha_alteracoes_sem_confirmacao_de_salvamento_sair_mesmo_assim_e_conferir_ao_reabrir": "Há alterações sem confirmação de salvamento. Sair mesmo assim e conferir ao reabrir?",
+    "legenda_ie_central_time_da_casa": "Time da casa",
+    "legenda_ie_central_time_visitante": "Time visitante",
+    "legenda_ie_central_nenhum_time_vence": "Nenhum time vence",
+    "legenda_ie_central_resultado": "Resultado",
+    "legenda_ie_central_resultado_do_mercado": "Resultado do mercado",
+    "legenda_ie_central_referencia_global_indisponivel": "Referência global indisponível",
+    "legenda_ie_central_nenhuma_cotacao_global_atual_e_completa_foi_confirmada_para_este_confronto": "Nenhuma cotação global atual e completa foi confirmada para este confronto.",
+    "legenda_ie_central_estimativa_sem_margem": "Estimativa sem margem: ",
+    "legenda_ie_central_maxima_global_observada": "Máxima global observada: ",
+    "legenda_ie_central_media_global_observada": "Média global observada: ",
+    "legenda_ie_central_mediana": "Mediana: ",
+    "legenda_ie_central_casa_2": "Casa ",
+    "legenda_ie_central_empate_2": "Empate ",
+    "legenda_ie_central_fora_2": "Fora ",
+    "legenda_ie_central_resultado_da_partida": "Resultado da partida",
+    "legenda_ie_central_referencia_global_identificada": "Referência global identificada · ",
+    "legenda_ie_central_casa_completa": " casa completa",
+    "legenda_ie_central_casas_completas": " casas completas",
+    "legenda_ie_central_somente_referencia": "Somente referência",
+    "legenda_ie_central_margem_media_observada": "Margem média observada: ",
+    "legenda_ie_central_horario_da_fonte_indisponivel": "Horário da fonte indisponível",
+    "legenda_ie_central_a_estimativa_sem_margem_resume_o_mercado_nao_e_chance_real_nem_previsao_a_maxima_global_nunca_entra": "A estimativa sem margem resume o mercado; não é chance real nem previsão. A máxima global nunca entra na distribuição do simulador.",
+    "legenda_ie_central_sem_cotacoes_brasileiras_disponiveis": "Sem cotações brasileiras disponíveis",
+    "legenda_ie_central_ainda_nao_recebemos_um_conjunto_brasileiro_atual_e_completo_para_este_confronto": "Ainda não recebemos um conjunto brasileiro atual e completo para este confronto.",
+    "legenda_ie_central_a_autorizacao_de_uma_casa_nao_significa_que_a_fonte_forneca_suas_cotacoes_sem_dados_verificados_nao": " A autorização de uma casa não significa que a fonte forneça suas cotações. Sem dados verificados, não há seleção nem cálculo.",
+    "legenda_ie_central_limites_informados_pela_fonte": "Limites informados pela fonte",
+    "legenda_ie_central_limites_individuais_ainda_precisam_ser_conferidos": "Limites individuais ainda precisam ser conferidos",
+    "legenda_ie_central_cotacao_desatualizada_ultima_coleta_aceita_somente_para_teste_coleta": "Cotação desatualizada — última coleta aceita somente para teste. Coleta: ",
+    "legenda_ie_central_casa_autorizada": "Casa autorizada",
+    "legenda_ie_central_operacao_brasileira_autorizada": "Operação brasileira autorizada · ",
+    "legenda_ie_central_mercado": "Mercado",
+    "legenda_ie_central_teste_origem_declarada_pela_fonte": "Teste: origem declarada pela fonte",
+    "legenda_ie_central_conjunto_nacional_verificado": "Conjunto nacional verificado",
+    "legenda_ie_central_time_da_casa_2": "time da casa",
+    "legenda_ie_central_time_visitante_2": "time visitante",
+    "legenda_ie_central_como_interpretar": "Como interpretar",
+    "legenda_ie_central_vitoria_de_2": " vitória de ",
+    "legenda_ie_central_nenhum_time_vence_2": " nenhum time vence",
+    "legenda_ie_central_simulador_de_impacto_financeiro": "Simulador de Impacto Financeiro",
+    "legenda_ie_central_entenda_os_cenarios_de_perda_e_exposicao_financeira": "Entenda os cenários de perda e exposição financeira.",
+    "legenda_ie_central_o_calculo_usa_cotacoes_brasileiras_atuais_no_modo_de_teste_a_origem_declarada_pela_fonte_e_aceita_e": "O cálculo usa cotações brasileiras atuais. No modo de teste, a origem declarada pela fonte é aceita e limites desconhecidos geram avisos.",
+    "legenda_ie_central_simular_impacto_financeiro": "Simular Impacto Financeiro",
+    "legenda_ie_central_ainda_nao_ha_dados_elegiveis_para_simular_este_confronto": "Ainda não há dados elegíveis para simular este confronto.",
+    "legenda_ie_central_referencias_globais_por_casa": "Referências globais por casa",
+    "legenda_ie_central_casas_brasileiras_autorizadas": "Casas brasileiras autorizadas",
+    "legenda_ie_central_distribuicao_e_cenarios_combinados_de_ate_tres_jogos_com_odds_editaveis": "Distribuição e cenários combinados de até três jogos, com odds editáveis.",
+    "legenda_ie_central_referencias_informativas_sem_recomendacao_ou_garantia_de_resultado": "Referências informativas, sem recomendação ou garantia de resultado.",
+    "legenda_ie_central_o_turbo_tiger_nao_abre_casas_nao_usa_links_afiliados_e_nao_executa_apostas": " O Turbo Tiger não abre casas, não usa links afiliados e não executa apostas.",
+    "legenda_ie_central_simulacao": "Simulação",
+    "legenda_ie_central_calculo_indisponivel": "Cálculo indisponível",
+    "legenda_ie_central_simulacao_incompleta": "Simulação incompleta",
+    "legenda_ie_central_cobertura_teorica_condicionada": "Cobertura teórica condicionada",
+    "legenda_ie_central_menor_impacto_dentro_do_limite_pessoal": "Menor impacto dentro do limite pessoal",
+    "legenda_ie_central_dentro_do_limite_pessoal_definido": "Dentro do limite pessoal definido",
+    "legenda_ie_central_acima_do_limite_pessoal_definido": "Acima do limite pessoal definido",
+    "legenda_ie_central_impacto_financeiro_calculado": "Impacto financeiro calculado",
+    "legenda_ie_central_pronto_para_simular": "Pronto para simular",
+    "legenda_ie_central_selecione_as_casas_o_mercado_e_informe_o_valor_nenhuma_aposta_sera_aberta_ou_executada": "Selecione as casas, o mercado e informe o valor. Nenhuma aposta será aberta ou executada.",
+    "legenda_ie_central_modo_de_teste": "Modo de teste.",
+    "legenda_ie_central_origem_brasileira_declarada_pelo_provedor_sem_confirmacao_independente_limites_desconhecidos_nao_imp": " Origem brasileira declarada pelo provedor, sem confirmação independente. Limites desconhecidos não impedem este cálculo. Regras de liquidação e aceitação não foram verificadas; os valores abaixo são apenas cenários teóricos, não limites garantidos de perda.",
+    "legenda_ie_central_simulacao_com_odds_informadas": "Simulação com odds informadas.",
+    "legenda_ie_central_valores_digitados_ou_copiados_da_fonte_sem_confirmacao_de_disponibilidade_limites_ou_equivalencia_da": " Valores digitados ou copiados da fonte, sem confirmação de disponibilidade, limites ou equivalência das regras. Taxas e impostos não incluídos.",
+    "legenda_ie_central_cotacoes_desatualizadas": "Cotações desatualizadas.",
+    "legenda_ie_central_ultima_coleta": " Última coleta: ",
+    "legenda_ie_central_horario_indisponivel": "horário indisponível",
+    "legenda_ie_central_valor_considerado": "Valor considerado",
+    "legenda_ie_central_limite_conservador_maximo": "Limite conservador máximo",
+    "legenda_ie_central_impacto_maximo": "Impacto máximo",
+    "legenda_ie_central_limite_pessoal": "Limite pessoal",
+    "legenda_ie_central_valor_com_calculo_completo": "Valor com cálculo completo: ",
+    "legenda_ie_central_valor_sem_dados_suficientes": " · Valor sem dados suficientes: ",
+    "legenda_ie_central_a_parte_indisponivel_foi_tratada_como_perda_integral_no_limite_conservador": ". A parte indisponível foi tratada como perda integral no limite conservador.",
+    "legenda_ie_central_resultado_da_partida_90_minutos": "Resultado da partida · 90 minutos",
+    "legenda_ie_central_sem_calculo": "Sem cálculo",
+    "legenda_ie_central_nao_ha_cotacoes_atuais_completas_e_equivalentes_nas_casas_escolhidas": "Não há cotações atuais, completas e equivalentes nas casas escolhidas.",
+    "legenda_ie_central_valor_tratado_conservadoramente": "Valor tratado conservadoramente: ",
+    "legenda_ie_central_manual": "Manual",
+    "legenda_ie_central_editada_pelo_usuario": "Editada pelo usuário",
+    "legenda_ie_central_provedor_copia": "Provedor (cópia)",
+    "legenda_ie_central_provedor": "Provedor",
+    "legenda_ie_central_nao_calculavel": "Não calculável",
+    "legenda_ie_central_origem": "Origem",
+    "legenda_ie_central_odd_minima_para_o_limite_pessoal": "Odd mínima para o limite pessoal",
+    "legenda_ie_central_cotacao_abaixo_do_minimo": " · cotação abaixo do mínimo",
+    "legenda_ie_central_casa_brasileira_autorizada": "Casa brasileira autorizada",
+    "legenda_ie_central_odd": "Odd",
+    "legenda_ie_central_prob_implicita": "Prob. implícita",
+    "legenda_ie_central_valor_simulado": "Valor simulado",
+    "legenda_ie_central_retorno_bruto": "Retorno bruto",
+    "legenda_ie_central_apos_o_valor_antes_de_custos": "Após o valor, antes de custos",
+    "legenda_ie_central_indice_de_cobertura": "Índice de cobertura: ",
+    "legenda_ie_central_pior_resultado": "Pior resultado: ",
+    "legenda_ie_central_maior_resultado_teorico": "Maior resultado teórico: ",
+    "legenda_ie_central_fonte_observada": "Fonte observada: ",
+    "legenda_ie_central_o_pior_cenario_e_exato_para_o_unico_mercado_calculado_antes_de_taxas_e_mudancas_operacionais": "O pior cenário é exato para o único mercado calculado, antes de taxas e mudanças operacionais.",
+    "legenda_ie_central_ha_mais_de_um_mercado_ou_parte_indisponivel_o_resultado_usa_um_limite_conservador_probabilidades_nao": "Há mais de um mercado ou parte indisponível: o resultado usa um limite conservador. Probabilidades não foram somadas.",
+    "legenda_ie_central_a_odd_minima_preserva_o_limite_pessoal_apenas_mantendo_os_valores_distribuidos_com_todas_as_partes_a": "A odd mínima preserva o limite pessoal apenas mantendo os valores distribuídos, com todas as partes aceitas e liquidadas nas mesmas condições. Se alterar um valor, recalcule. Não é garantia de perda máxima na prática.",
+    "legenda_ie_central_resultado_da_simulacao": "Resultado da simulação",
+    "legenda_ie_central_nao_ha_dados_brasileiros_elegiveis_suficientes_para_calcular_agora": "Não há dados brasileiros elegíveis suficientes para calcular agora.",
+    "legenda_ie_central_somente_parte_da_configuracao_pode_ser_calculada": "Somente parte da configuração pôde ser calculada.",
+    "legenda_ie_central_dentro_do_limite_significa_apenas_o_limite_escolhido_por_voce_nao_significa_que_seja_seguro": "Dentro do limite significa apenas o limite escolhido por você; não significa que seja seguro.",
+    "legenda_ie_central_antes_de_qualquer_decisao": "Antes de qualquer decisão",
+    "legenda_ie_central_as_odds_podem_mudar_antes_da_confirmacao": "As odds podem mudar antes da confirmação.",
+    "legenda_ie_central_a_probabilidade_implicita_vem_da_cotacao_e_nao_preve_o_resultado": "A probabilidade implícita vem da cotação e não prevê o resultado.",
+    "legenda_ie_central_a_casa_pode_limitar_recusar_ou_anular_uma_aposta": "A casa pode limitar, recusar ou anular uma aposta.",
+    "legenda_ie_central_prorrogacao_penaltis_abandono_e_devolucao_precisam_seguir_regras_equivalentes": "Prorrogação, pênaltis, abandono e devolução precisam seguir regras equivalentes.",
+    "legenda_ie_central_taxas_impostos_limites_e_arredondamentos_podem_alterar_o_impacto": "Taxas, impostos, limites e arredondamentos podem alterar o impacto.",
+    "legenda_ie_central_o_menor_risco_financeiro_e_nao_apostar_o_turbo_tiger_nao_executa_nem_encaminha_apostas": "O menor risco financeiro é não apostar. O Turbo Tiger não executa nem encaminha apostas.",
+    "legenda_ie_central_parametros_alterados": "Parâmetros alterados",
+    "legenda_ie_central_o_resultado_anterior_nao_corresponde_mais_as_escolhas_atuais_calcule_novamente_antes_de_interpretar": "O resultado anterior não corresponde mais às escolhas atuais. Calcule novamente antes de interpretar os valores.",
+    "legenda_ie_central_recalcule_para_conferir_o_cenario_com_os_dados_disponiveis_agora": "Recalcule para conferir o cenário com os dados disponíveis agora.",
+    "legenda_ie_central_os_dados_atuais_nao_permitem_revalidar_este_calculo": "Os dados atuais não permitem revalidar este cálculo.",
+    "legenda_ie_central_resultado_anterior_nao_revalidado": "Resultado anterior não revalidado",
+    "legenda_ie_central_os_valores_anteriores_ficam_ocultos_ate_uma_nova_validacao": " Os valores anteriores ficam ocultos até uma nova validação.",
+    "legenda_ie_central_nenhuma_simulacao_salva_para_este_confronto": "Nenhuma simulação salva para este confronto.",
+    "legenda_ie_central_calculada_em": "Calculada em ",
+    "legenda_ie_central_requer_nova_validacao": "Requer nova validação",
+    "legenda_ie_central_arquivar": "Arquivar ",
+    "legenda_ie_central_simulacao_2": "simulação",
+    "legenda_ie_central_arquivar_2": "Arquivar",
+    "legenda_ie_central_teste_origem_brasileira_declarada_pela_fonte_limites_desconhecidos_nao_bloqueiam": "Teste: origem brasileira declarada pela fonte; limites desconhecidos não bloqueiam",
+    "legenda_ie_central_odds_da_fonte_disponiveis_para_este_confronto": "Odds da fonte disponíveis para este confronto",
+    "legenda_ie_central_sem_cotacao_da_fonte_voce_pode_informar_as_odds_observadas": "Sem cotação da fonte: você pode informar as odds observadas",
+    "legenda_ie_central_favorita": "Favorita",
+    "legenda_ie_central_nenhuma_casa_possui_dados_elegiveis_para_este_confronto_a_lista_regulatoria_nao_sera_oferecida_como": "Nenhuma casa possui dados elegíveis para este confronto. A lista regulatória não será oferecida como se tivesse cotações disponíveis.",
+    "legenda_ie_central_teste_teorico_com_dados_da_fonte_sem_confirmacao_de_aceitacao": "Teste teórico com dados da fonte, sem confirmação de aceitação",
+    "legenda_ie_central_dados_da_fonte_disponiveis": "Dados da fonte disponíveis",
+    "legenda_ie_central_pode_ser_preenchido_com_odds_observadas_por_voce": "Pode ser preenchido com odds observadas por você",
+    "legenda_ie_central_sem_conjunto_brasileiro_elegivel_para_calculo": "Sem conjunto brasileiro elegível para cálculo",
+    "legenda_ie_central_habilitado_no_simulador": "Habilitado no simulador",
+    "legenda_ie_central_indisponivel_para_calculo": "Indisponível para cálculo",
+    "legenda_ie_central_verificacao_ainda_nao_informada": "verificação ainda não informada",
+    "legenda_ie_central_decisao_mais_consciente": "Decisão mais consciente",
+    "legenda_ie_central_compare_consequencias_financeiras_nao_promessas_de_resultado": "Compare consequências financeiras, não promessas de resultado.",
+    "legenda_ie_central_referencias_globais_sao_informativas_o_calculo_usa_casas_autorizadas_e_odds_da_fonte_ou_informadas_p": "Referências globais são informativas. O cálculo usa casas autorizadas e odds da fonte ou informadas por você. No modo de teste, origem declarada e limites desconhecidos são indicados sem impedir a simulação.",
+    "legenda_ie_central_nome_da_simulacao": "Nome da simulação",
+    "legenda_ie_central_valor_total_a_considerar": "Valor total a considerar",
+    "legenda_ie_central_r": "R$",
+    "legenda_ie_central_limite_pessoal_de_perda": "Limite pessoal de perda",
+    "legenda_ie_central_e_um_limite_escolhido_por_voce_nao_torna_o_cenario_seguro": "É um limite escolhido por você; não torna o cenário seguro.",
+    "legenda_ie_central_casas_brasileiras_autorizadas_2": "Casas brasileiras autorizadas ",
+    "legenda_ie_central_escolha_ate_20_casas_as_cotacoes_disponiveis_serao_exibidas_automaticamente_e_as_ausentes_poderao_se": "Escolha até 20 casas. As cotações disponíveis serão exibidas automaticamente e as ausentes poderão ser informadas por você. Sem links, logotipos ou direcionamento.",
+    "legenda_ie_central_buscar_casa_brasileira_autorizada": "Buscar casa brasileira autorizada",
+    "legenda_ie_central_buscar_pelo_nome_da_casa": "Buscar pelo nome da casa",
+    "legenda_ie_central_salvar_selecao_como_minhas_favoritas": "Salvar seleção como minhas favoritas",
+    "legenda_ie_central_lista_autorizada_verificada_em": "Lista autorizada verificada em ",
+    "legenda_ie_central_mercados": "Mercados",
+    "legenda_ie_central_voce_pode_escolher_um_ou_mais_mercados_quando_suas_regras_estiverem_normalizadas_o_orcamento_e_divid": "Você pode escolher um ou mais mercados quando suas regras estiverem normalizadas. O orçamento é dividido entre eles; probabilidades nunca são somadas.",
+    "legenda_ie_central_sino_exclusivo_desta_simulacao": "Sino exclusivo desta simulação",
+    "legenda_ie_central_odds_alteradas_manualmente_nao_podem_ser_monitoradas_automaticamente": "Odds alteradas manualmente não podem ser monitoradas automaticamente.",
+    "legenda_ie_central_toque_nesta_area_para_ativar_ou_desativar_o_aviso_desta_simulacao": "Toque nesta área para ativar ou desativar o aviso desta simulação.",
+    "legenda_ie_central_ativar_sino_desta_simulacao": "Ativar sino desta simulação",
+    "legenda_ie_central_avisar_quando_a_perda_maxima_mudar_pelo_menos": "Avisar quando a perda máxima mudar pelo menos",
+    "legenda_ie_central_p_p": "p.p.",
+    "legenda_ie_central_ao_salvar_novamente_o_cenario_atual_passa_a_ser_a_nova_referencia": "Ao salvar novamente, o cenário atual passa a ser a nova referência.",
+    "legenda_ie_central_o_horario_de_inicio_nao_esta_confirmado_no_futuro_novos_calculos_e_salvamentos_ficam_bloqueados": "O horário de início não está confirmado no futuro. Novos cálculos e salvamentos ficam bloqueados.",
+    "legenda_ie_central_a_verificacao_da_lista_oficial_brasileira_esta_vencida_ou_indisponivel_o_simulador_permanece_bloquea": "A verificação da lista oficial brasileira está vencida ou indisponível. O simulador permanece bloqueado preventivamente até a atualização.",
+    "legenda_ie_central_calcular_impacto": "Calcular impacto",
+    "legenda_ie_central_salvar_simulacao": "Salvar simulação",
+    "legenda_ie_central_aguardando_dados_brasileiros_atuais_e_completos_com_regras_e_limites_verificados_para_este_confronto": "Aguardando dados brasileiros atuais e completos, com regras e limites verificados para este confronto.",
+    "legenda_ie_central_simulacoes_deste_confronto": "Simulações deste confronto",
+    "legenda_ie_central_sem_cotacao": "Sem cotação",
+    "legenda_ie_central_melhor_odd": "Melhor odd",
+    "legenda_ie_central_informar_outra_odd_para": "Informar outra odd para ",
+    "legenda_ie_central_casa_autorizada_2": "casa autorizada",
+    "legenda_ie_central_digite_para_substituir": "Digite para substituir",
+    "legenda_ie_central_usando_a_odd_exibida": "Usando a odd exibida",
+    "legenda_ie_central_odd_informada_por_voce": "Odd informada por você",
+    "legenda_ie_central_coleta": "Coleta: ",
+    "legenda_ie_central_odds_das_casas_selecionadas": "Odds das casas selecionadas",
+    "legenda_ie_central_as_maiores_cotacoes_recebidas_estao_destacadas_se_alguma_estiver_diferente_no_momento_digite_a_nova": "As maiores cotações recebidas estão destacadas. Se alguma estiver diferente no momento, digite a nova odd no campo logo abaixo.",
+    "legenda_ie_central_selecione_uma_ou_mais_casas_acima_para_visualizar_ou_informar_as_odds": "Selecione uma ou mais casas acima para visualizar ou informar as odds.",
+    "legenda_ie_central_confirmo_que_os_dados_informados_correspondem_a_este_confronto_e_ao_resultado_em_90_minutos_incluind": "Confirmo que os dados informados correspondem a este confronto e ao resultado em 90 minutos, incluindo acréscimos e excluindo prorrogação e pênaltis.",
+    "legenda_ie_central_condicoes_de_liquidacao_limites_e_aceitacao_nao_foram_verificadas_ao_informar_uma_odd_manualmente_o": "Condições de liquidação, limites e aceitação não foram verificadas. Ao informar uma odd manualmente, o sino fica indisponível porque esse número não pode ser monitorado automaticamente.",
+    "legenda_ie_central_calculando_com_as_odds_selecionadas": "Calculando com as odds selecionadas...",
+    "legenda_ie_central_somente_as_simulacoes_da_sua_conta": "Somente as simulações da sua conta",
+    "legenda_ie_central_salva": "Salva",
+    "legenda_ie_central_monitorando": "Monitorando",
+    "legenda_ie_central_revisao_necessaria": "Revisão necessária",
+    "legenda_ie_central_expirada": "Expirada",
+    "legenda_ie_central_nenhuma_simulacao_salva": "Nenhuma simulação salva",
+    "legenda_ie_central_as_simulacoes_que_voce_salvar_aparecerao_aqui": "As simulações que você salvar aparecerão aqui.",
+    "legenda_ie_central_paginas_de_simulacoes": "Páginas de simulações",
+    "legenda_ie_central_anterior": "Anterior",
+    "legenda_ie_central_proxima": "Próxima",
+    "legenda_ie_central_nao_foi_possivel_carregar": "Não foi possível carregar",
+    "legenda_ie_central_carregando_casas_e_mercados": "Carregando casas e mercados...",
+    "legenda_ie_central_simulador_indisponivel": "Simulador indisponível",
+    "legenda_ie_central_simulacao_salva_com_sino_independente_ativo": "Simulação salva com sino independente ativo.",
+    "legenda_ie_central_simulacao_salva": "Simulação salva.",
+    "legenda_ie_central_casas_favoritas_atualizadas": "Casas favoritas atualizadas.",
+    "legenda_ie_central_arquivar_esta_simulacao_o_sino_exclusivo_tambem_sera_desativado": "Arquivar esta simulação? O sino exclusivo também será desativado.",
+    "legenda_ie_central_simulacao_arquivada_e_sino_desativado": "Simulação arquivada e sino desativado.",
+    "legenda_ie_central_identificacao_historica_em_revisao": "Identificação histórica em revisão",
+    "legenda_ie_central_o_vinculo_de_uma_das_equipes_com_o_acervo_ainda_precisa_ser_confirmado_isso_nao_significa_que_elas_n": "O vínculo de uma das equipes com o acervo ainda precisa ser confirmado. Isso não significa que elas nunca se enfrentaram.",
+    "legenda_ie_central_historico_fora_da_cobertura_atual": "Histórico fora da cobertura atual",
+    "legenda_ie_central_o_acervo_historico_disponivel_ainda_nao_cobre_este_confronto_ou_esporte": "O acervo histórico disponível ainda não cobre este confronto ou esporte.",
+    "legenda_ie_central_nenhum_confronto_neste_recorte": "Nenhum confronto neste recorte",
+    "legenda_ie_central_as_equipes_foram_identificadas_mas_nao_ha_confrontos_no_recorte_historico_disponivel_a_base_pode_nao": "As equipes foram identificadas, mas não há confrontos no recorte histórico disponível. A base pode não reunir todos os jogos já realizados.",
+    "legenda_ie_central_historico_temporariamente_indisponivel": "Histórico temporariamente indisponível",
+    "legenda_ie_central_nao_foi_possivel_confirmar_os_dados_historicos_deste_confronto_agora": "Não foi possível confirmar os dados históricos deste confronto agora.",
+    "legenda_ie_central_aproveit": "Aproveit.",
+    "legenda_ie_central_vitorias_em": "Vitórias em ",
+    "legenda_ie_central_dos_jogos": "% dos jogos",
+    "legenda_ie_central_em_casa": "Em casa",
+    "legenda_ie_central_fora_de_casa": "Fora de casa",
+    "legenda_ie_central_em_todos_os_confrontos_registrados": "Em todos os confrontos registrados",
+    "legenda_ie_central_todos_os_jogos_oficiais_disponiveis_independentemente_do_adversario": "Todos os jogos oficiais disponíveis, independentemente do adversário.",
+    "legenda_ie_central_desempenho_geral_casa_e_fora": "Desempenho geral: casa e fora",
+    "legenda_ie_central_acervo_parcial_em_revisao_categoria_e_oficialidade_dos_jogos_ainda_nao_foram_totalmente_verificadas": "Acervo parcial em revisão: categoria e oficialidade dos jogos ainda não foram totalmente verificadas. As contagens abaixo não representam um total oficial certificado.",
+    "legenda_ie_central_com_mando_de": "Com mando de ",
+    "legenda_ie_central_somente_neste_confronto_casa_e_fora": "Somente neste confronto: casa e fora",
+    "legenda_ie_central_confrontos_mais_recentes": "Confrontos mais recentes",
+    "legenda_ie_central_resultados_passados_nao_garantem_resultados_futuros": "Resultados passados não garantem resultados futuros.",
+    "legenda_ie_central_times_catalogados": "Times catalogados",
+    "legenda_ie_central_ajude_a_completar_esta_historia_confira_e_contribua_com_informacoes_do_seu_time": "Ajude a completar esta história: confira e contribua com informações do seu time.",
+    "legenda_ie_central_dom": "Dom",
+    "legenda_ie_central_seg": "Seg",
+    "legenda_ie_central_ter": "Ter",
+    "legenda_ie_central_qua": "Qua",
+    "legenda_ie_central_qui": "Qui",
+    "legenda_ie_central_sex": "Sex",
+    "legenda_ie_central_sab": "Sáb",
+    "legenda_ie_central_desmarcar": "Desmarcar ",
+    "legenda_ie_central_marcar": "Marcar ",
+    "legenda_ie_central_nenhum_time_encontrado": "Nenhum time encontrado.",
+    "legenda_ie_central_informe_um_ano_valido_com_4_digitos": "Informe um ano válido com 4 dígitos.",
+    "legenda_ie_central_primeiro_selecione_o_seu_time_na_lista": "Primeiro, selecione o seu time na lista.",
+    "legenda_ie_central_se_informar_o_ano_digite_os_4_digitos": "Se informar o ano, digite os 4 dígitos.",
+    "legenda_ie_central_selecione_a_uf_da_competicao_estadual": "Selecione a UF da competição estadual.",
+    "legenda_ie_central_toque_em_pesquisar_para_atualizar_os_confrontos": "Toque em Pesquisar para atualizar os confrontos.",
+    "legenda_ie_central_os_confrontos_sao_atualizados_automaticamente": "Os confrontos são atualizados automaticamente.",
+    "legenda_ie_central_nacional": "Nacional",
+    "legenda_ie_central_estadual": "Estadual",
+    "legenda_ie_central_selecione": "Selecione",
+    "legenda_ie_central_nao_selecionado": "Não selecionado",
+    "legenda_ie_central_campeao": "Campeão",
+    "legenda_ie_central_vice": "Vice",
+    "legenda_ie_central_uf": "UF *",
+    "legenda_ie_central_encontre_um_confronto": "Encontre um confronto",
+    "legenda_ie_central_os_filtros_com_sao_obrigatorios": "Os filtros com * são obrigatórios.",
+    "legenda_ie_central_seu_time": "Seu time *",
+    "legenda_ie_central_digite_e_selecione_um_ou_mais_times": "Digite e selecione um ou mais times",
+    "legenda_ie_central_time_adversario": "Time adversário",
+    "legenda_ie_central_opcional_selecione_um_ou_mais": "Opcional: selecione um ou mais",
+    "legenda_ie_central_ano": "Ano",
+    "legenda_ie_central_opcional": "Opcional",
+    "legenda_ie_central_temporada": "Temporada",
+    "legenda_ie_central_abrangencia": "Abrangência",
+    "legenda_ie_central_titulos": "Títulos",
+    "legenda_ie_central_pesquisar": "Pesquisar",
+    "legenda_ie_central_limpar_filtros": "Limpar filtros",
+    "legenda_ie_central_conte_com_quem_voce_assistiu": "Conte com quem você assistiu",
+    "legenda_ie_central_com_quem": "Com quem?",
+    "legenda_ie_central_como_voce_acompanhou_este_confronto": "Como você acompanhou este confronto",
+    "legenda_ie_central_marcar_que_assistiu_no_local_do_evento": "Marcar que assistiu no local do evento",
+    "legenda_ie_central_marcar_que_assistiu_pela_tv_ou_outro_meio": "Marcar que assistiu pela TV ou outro meio",
+    "legenda_ie_central_final": "Final",
+    "legenda_ie_central_final_ida": "Final · ida",
+    "legenda_ie_central_final_volta": "Final · volta",
+    "legenda_ie_central_desempate_da_decisao": "Desempate da decisão",
+    "legenda_ie_central_titulo_confirmado": "Título confirmado",
+    "legenda_ie_central_rodada_decisiva": "Rodada decisiva",
+    "legenda_ie_central_entrega_da_taca": "Entrega da taça",
+    "legenda_ie_central_final_da_fase": "Final da fase",
+    "legenda_ie_central_relacionado_ao_titulo": "Relacionado ao título",
+    "legenda_ie_central_confronto_de_titulo": "Confronto de título",
+    "legenda_ie_central_quadrangular": "Quadrangular",
+    "legenda_ie_central_quadrangular_final": "Quadrangular final",
+    "legenda_ie_central_triangular": "Triangular",
+    "legenda_ie_central_triangular_final": "Triangular final",
+    "legenda_ie_central_pontos_corridos": "Pontos corridos",
+    "legenda_ie_central_mata_mata": "Mata-mata",
+    "legenda_ie_central_fase_final": "Fase final",
+    "legenda_ie_central_principal": "Principal",
+    "legenda_ie_central_rodada": "Rodada ",
+    "legenda_ie_central_campeoes": "Campeões: ",
+    "legenda_ie_central_campeao_2": "Campeão: ",
+    "legenda_ie_central_vices": "Vices: ",
+    "legenda_ie_central_vice_2": "Vice: ",
+    "legenda_ie_central_titulo_compartilhado": "Título compartilhado",
+    "legenda_ie_central_de_titulo": " de título",
+    "legenda_ie_central_contribuido_por": "Contribuído por ",
+    "legenda_ie_central_anonimo": "Anônimo",
+    "legenda_ie_central_e_mais": "e mais ",
+    "legenda_ie_central_usuario": " usuário",
+    "legenda_ie_central_usuarios": " usuários",
+    "legenda_ie_central_conferir": "Conferir ",
+    "legenda_ie_central_w_o": "W.O.",
+    "legenda_ie_central_competicao_nao_informada": "Competição não informada",
+    "legenda_ie_central_confronto_encontrado": " confronto encontrado",
+    "legenda_ie_central_confrontos_encontrados": " confrontos encontrados",
+    "legenda_ie_central_confrontos": "Confrontos",
+    "legenda_ie_central_selecione_o_seu_time": "Selecione o seu time",
+    "legenda_ie_central_os_confrontos_mais_recentes_aparecerao_automaticamente": "Os confrontos mais recentes aparecerão automaticamente.",
+    "legenda_ie_central_ano_fora_do_periodo_disponivel": "Ano fora do período disponível",
+    "legenda_ie_central_filtros_alterados": "Filtros alterados",
+    "legenda_ie_central_filtros_prontos": "Filtros prontos",
+    "legenda_ie_central_os_confrontos_serao_atualizados_automaticamente": "Os confrontos serão atualizados automaticamente.",
+    "legenda_ie_central_nenhum_confronto_encontrado": "Nenhum confronto encontrado",
+    "legenda_ie_central_revise_os_filtros_informados_ou_envie_um_confronto_que_ainda_nao_esta_na_base": "Revise os filtros informados ou envie um confronto que ainda não está na base.",
+    "legenda_ie_central_paginacao_dos_confrontos": "Paginação dos confrontos",
+    "legenda_ie_central_pagina": "Página ",
+    "legenda_ie_central_toque_em_um_confronto_para_sugerir_correcao_ou_no_ao_lado_para_incluir_algum_tambem_marque_se_assist": "Toque em um confronto para sugerir correção ou no + ao lado para incluir algum. Também marque se assistiu no local ",
+    "legenda_ie_central_ou_pela_tv_outro_meio": " ou pela TV/outro meio ",
+    "legenda_ie_central_colabore_com_nossa_base": "Colabore com nossa base",
+    "legenda_ie_central_carregando_filtros": "Carregando filtros...",
+    "legenda_ie_central_nao_foi_possivel_abrir_a_colaboracao": "Não foi possível abrir a colaboração",
+    "legenda_ie_central_encontrou_algo_diferente_corrija_os_dados_abaixo_e_envie_para_nossa_analise": "Encontrou algo diferente? Corrija os dados abaixo e envie para nossa análise.",
+    "legenda_ie_central_nao_encontrou_uma_partida_preencha_todos_os_dados_do_confronto_e_envie_para_conferencia": "Não encontrou uma partida? Preencha todos os dados do confronto e envie para conferência.",
+    "legenda_ie_central_data": "Data",
+    "legenda_ie_central_horario": "Horário",
+    "legenda_ie_central_placar_casa": "Placar casa",
+    "legenda_ie_central_intervalo_casa": "Intervalo casa",
+    "legenda_ie_central_placar_visitante": "Placar visitante",
+    "legenda_ie_central_intervalo_visitante": "Intervalo visitante",
+    "legenda_ie_central_fase_2": "Fase",
+    "legenda_ie_central_rodada_2": "Rodada",
+    "legenda_ie_central_estadio": "Estádio",
+    "legenda_ie_central_cidade": "Cidade",
+    "legenda_ie_central_tipo_da_partida": "Tipo da partida *",
+    "legenda_ie_central_partida_oficial": "Partida oficial",
+    "legenda_ie_central_amistoso": "Amistoso",
+    "legenda_ie_central_observacoes_da_base": "Observações da base",
+    "legenda_ie_central_sua_observacao": "Sua observação",
+    "legenda_ie_central_se_desejar_explique_o_que_deve_ser_conferido": "Se desejar, explique o que deve ser conferido.",
+    "legenda_ie_central_contribuir_anonimamente": "Contribuir anonimamente",
+    "legenda_ie_central_seu_codinome_nao_sera_mostrado_nesta_contribuicao": "Seu codinome não será mostrado nesta contribuição.",
+    "legenda_ie_central_por_padrao_seu_codinome_sera_exibido_apos_a_aprovacao_da_contribuicao": "Por padrão, seu codinome será exibido após a aprovação da contribuição.",
+    "legenda_ie_central_enviar_para_analise": "Enviar para análise",
+    "legenda_ie_central_corrigir_confronto": "Corrigir confronto",
+    "legenda_ie_central_enviar_confronto": "Enviar confronto",
+    "legenda_ie_central_nova_informacao_para_analise": "Nova informação para análise",
+    "legenda_ie_central_nao_foi_possivel_carregar_os_dados_deste_confronto": "Não foi possível carregar os dados deste confronto.",
+    "legenda_ie_central_este_confronto_nao_pertence_a_base_historica_editavel": "Este confronto não pertence à base histórica editável.",
+    "legenda_ie_central_preparando_informacoes": "Preparando informações...",
+    "legenda_ie_central_colaboradores": "Colaboradores",
+    "legenda_ie_central_contribuiu_em": "Contribuiu em ",
+    "legenda_ie_central_nenhuma_autoria_publica": "Nenhuma autoria pública",
+    "legenda_ie_central_ainda_nao_ha_colaboradores_aprovados_para_este_confronto": "Ainda não há colaboradores aprovados para este confronto.",
+    "legenda_ie_central_ranking_de_colaboradores": "Ranking de colaboradores",
+    "legenda_ie_central_contribuicoes_aprovadas_para_nossa_base": "Contribuições aprovadas para nossa base",
+    "legenda_ie_central_ranking_em_formacao": "Ranking em formação",
+    "legenda_ie_central_as_primeiras_contribuicoes_aprovadas_aparecerao_aqui": "As primeiras contribuições aprovadas aparecerão aqui.",
+    "legenda_ie_central_sufixo_ordinal": "º",
+    "legenda_ie_central_posicao_ordinal": "{posicao}º",
+    "legenda_ie_central_colaborador": "Colaborador",
+    "legenda_ie_central_contribuicao": " contribuição",
+    "legenda_ie_central_contribuicoes": " contribuições",
+    "legenda_ie_central_top_10": "Top 10",
+    "legenda_ie_central_quem_mais_ajudou_a_fortalecer_nossa_base": "Quem mais ajudou a fortalecer nossa base",
+    "legenda_ie_central_todos_os_colaboradores": "Todos os colaboradores",
+    "legenda_ie_central_contribuicoes_aprovadas": "Contribuições aprovadas",
+    "legenda_ie_central_horarios_coincidentes": "Horários coincidentes",
+    "legenda_ie_central_voce_so_pode_estar_em_um_local_por_vez": "Você só pode estar em um local por vez",
+    "legenda_ie_central_confira_onde_voce_estava": "Confira onde você estava",
+    "legenda_ie_central_um_dos_confrontos_nao_tem_horario_suficiente_para_validar_a_presenca_no_local": "Um dos confrontos não tem horário suficiente para validar a presença no local.",
+    "legenda_ie_central_a_margem_de_deslocamento_deste_confronto_coincide_com_outro_ja_marcado_no_local": "A margem de deslocamento deste confronto coincide com outro já marcado no local.",
+    "legenda_ie_central_marcar_este_confronto": "Marcar este confronto",
+    "legenda_ie_central_manter_o_que_ja_estava": "Manter o que já estava",
+    "legenda_ie_central_sugerir_correcao_do_confronto_em_conflito": "Sugerir correção do confronto em conflito",
+    "legenda_ie_central_cancelar": "Cancelar",
+    "legenda_ie_central_validando_sua_presenca": "Validando sua presença",
+    "legenda_ie_central_marcado_voce_assistiu_no_local": "Marcado: você assistiu no local.",
+    "legenda_ie_central_marcado_voce_assistiu_pela_tv_outro_meio": "Marcado: você assistiu pela TV/outro meio.",
+    "legenda_ie_central_marcacao_removida": "Marcação removida.",
+    "legenda_ie_central_presenca_atualizada_para_este_confronto": "Presença atualizada para este confronto.",
+    "legenda_ie_central_nenhuma_alteracao_foi_feita": "Nenhuma alteração foi feita.",
+    "legenda_ie_central_a_marcacao_anterior_foi_mantida": "A marcação anterior foi mantida.",
+    "legenda_ie_central_convite_registrado": "Convite registrado",
+    "legenda_ie_central_pessoa": "Pessoa",
+    "legenda_ie_central_remover_2": "Remover",
+    "legenda_ie_central_voce_ainda_nao_informou_com_quem_assistiu": "Você ainda não informou com quem assistiu.",
+    "legenda_ie_central_com_quem_voce_assistiu": "Com quem você assistiu?",
+    "legenda_ie_central_nos_conte_com_quem_voce_assistiu": "Nos conte com quem você assistiu",
+    "legenda_ie_central_nome": "Nome",
+    "legenda_ie_central_e_mail": "E-mail ",
+    "legenda_ie_central_opcional_2": "(opcional)",
+    "legenda_ie_central_nome_exemplo_com": "nome@exemplo.com",
+    "legenda_ie_central_se_informar_o_e_mail_confirme_que_conhece_esta_pessoa_e_autoriza_o_turbo_tiger_a_enviar_um_unico_con": "Se informar o e-mail, confirme que conhece esta pessoa e autoriza o Turbo Tiger a enviar um único convite relacionado a este confronto.",
+    "legenda_ie_central_sem_e_mail_o_nome_fica_apenas_na_sua_lembranca_privada_com_e_mail_a_pessoa_podera_confirmar_contesta": "Sem e-mail, o nome fica apenas na sua lembrança privada. Com e-mail, a pessoa poderá confirmar, contestar ou recusar o registro. O endereço nunca será exibido publicamente.",
+    "legenda_ie_central_salvar": "Salvar",
+    "legenda_ie_central_marque_primeiro_como_voce_acompanhou_este_confronto": "Marque primeiro como você acompanhou este confronto.",
+    "legenda_ie_central_carregando": "Carregando...",
+    "legenda_ie_central_convite_registrado_para_envio": "Convite registrado para envio.",
+    "legenda_ie_central_salvo_na_sua_lembranca": "Salvo na sua lembrança.",
+    "legenda_ie_central_removido": "Removido.",
+    "legenda_ie_central_registros_declarados_pelos_membros": "Registros declarados pelos membros",
+    "legenda_ie_central_os_primeiros_registros_de_quem_acompanhou_confrontos_aparecerao_aqui": "Os primeiros registros de quem acompanhou confrontos aparecerão aqui.",
+    "legenda_ie_central_o_ranking_considera_registros_declarados_a_presenca_no_local_recebe_peso_maior_que_tv_outro_meio": "O ranking considera registros declarados. A presença no local recebe peso maior que TV/outro meio.",
+    "legenda_ie_central_membro": "Membro",
+    "legenda_ie_central_no_local": " no local · ",
+    "legenda_ie_central_por_tv_outro": " por TV/outro",
+    "legenda_ie_central_pts_2": " pts",
+    "legenda_ie_central_previa_privada": "Prévia privada",
+    "legenda_ie_central_sua_historia": "Sua história",
+    "legenda_ie_central_por_tv_outro_2": " por TV/outro · ",
+    "legenda_ie_central_historia_formada_por_registros_declarados_pelo_membro_voce_controla_o_que_fica_visivel": "História formada por registros declarados pelo membro. Você controla o que fica visível.",
+    "legenda_ie_central_pagina_publica": "Página pública",
+    "legenda_ie_central_voce_decide_quando_sua_historia_pode_ser_vista_pelo_codigo_seguro": "Você decide quando sua história pode ser vista pelo código seguro.",
+    "legenda_ie_central_informacoes_visiveis": "Informações visíveis",
+    "legenda_ie_central_meu_nome_real": "Meu nome real",
+    "legenda_ie_central_meu_sobrenome": "Meu sobrenome",
+    "legenda_ie_central_meu_codinome": "Meu codinome",
+    "legenda_ie_central_linha_do_tempo": "Linha do tempo",
+    "legenda_ie_central_locais_dos_eventos": "Locais dos eventos",
+    "legenda_ie_central_com_quem_assistiu": "Com quem assistiu",
+    "legenda_ie_central_colaboracoes_aprovadas": "Colaborações aprovadas",
+    "legenda_ie_central_participacao_no_ranking": "Participação no ranking",
+    "legenda_ie_central_codigo_publico_revogavel": "Código público revogável",
+    "legenda_ie_central_ainda_nao_gerado": "Ainda não gerado",
+    "legenda_ie_central_compartilhar": " Compartilhar",
+    "legenda_ie_central_gerar_novo_codigo": "Gerar novo código",
+    "legenda_ie_central_ao_gerar_outro_codigo_o_anterior_deixa_de_funcionar_ids_internos_e_dados_privados_nunca_fazem_parte": "Ao gerar outro código, o anterior deixa de funcionar. IDs internos e dados privados nunca fazem parte do link.",
+    "legenda_ie_central_visualizar_como_seus_amigos_verao_sua_historia": "Visualizar como seus amigos verão sua história",
+    "legenda_ie_central_titulos_acompanhados": "Títulos acompanhados",
+    "legenda_ie_central_confrontos_de_titulo": "Confrontos de título",
+    "legenda_ie_central_decisoes_completas": "Decisões completas",
+    "legenda_ie_central_confirmacoes_assistidas": "Confirmações assistidas",
+    "legenda_ie_central_principais_no_local": "Principais no local",
+    "legenda_ie_central_clubes_campeoes": "Clubes campeões",
+    "legenda_ie_central_titulo": "Título",
+    "legenda_ie_central_confronto_da_decisao_acompanhado": " confronto da decisão acompanhado",
+    "legenda_ie_central_confrontos_da_decisao_acompanhados": " confrontos da decisão acompanhados",
+    "legenda_ie_central_confronto_de_titulo_acompanhado": " confronto de título acompanhado",
+    "legenda_ie_central_confrontos_de_titulo_acompanhados": " confrontos de título acompanhados",
+    "legenda_ie_central_campeao_nao_informado": "Campeão não informado",
+    "legenda_ie_central_titulo_compartilhado_2": " · Título compartilhado",
+    "legenda_ie_central_decisao_completa": "Decisão completa",
+    "legenda_ie_central_decisao_incompleta": "Decisão incompleta",
+    "legenda_ie_central_principal_no_local": "Principal no local",
+    "legenda_ie_central_acompanhado": "Acompanhado",
+    "legenda_ie_central_titulos_na_sua_historia": "Títulos na sua história",
+    "legenda_ie_central_somente_edicoes_e_confrontos_confirmados_na_base": "Somente edições e confrontos confirmados na base.",
+    "legenda_ie_central_carregando_sua_historia": "Carregando sua história...",
+    "legenda_ie_central_nao_foi_possivel_confirmar_a_privacidade": "Não foi possível confirmar a privacidade.",
+    "legenda_ie_central_novo_codigo_publico_gerado": "Novo código público gerado.",
+    "legenda_ie_central_previa_da_sua_historia": "Prévia da sua história",
+    "legenda_ie_central_como_seus_amigos_verao": "Como seus amigos verão",
+    "legenda_ie_central_ative_a_pagina_publica": "Ative a página pública",
+    "legenda_ie_central_ative_a_opcao_pagina_publica_para_visualizar_como_seus_amigos_verao": "Ative a opção Página pública para visualizar como seus amigos verão.",
+    "legenda_ie_central_previa_publica_da_sua_historia_esportiva": "Prévia pública da sua história esportiva",
+    "legenda_ie_central_ative_a_pagina_publica_antes_de_compartilhar": "Ative a página pública antes de compartilhar.",
+    "legenda_ie_central_minha_historia_esportiva_no_turbo_tiger": "Minha história esportiva no Turbo Tiger",
+    "legenda_ie_central_veja_minha_historia_com_o_esporte_no_turbo_tiger": "Veja minha história com o esporte no Turbo Tiger.",
+    "legenda_ie_central_link_seguro_copiado_agora_e_so_compartilhar": "Link seguro copiado. Agora é só compartilhar.",
+    "legenda_ie_central_nao_foi_possivel_compartilhar_agora": "Não foi possível compartilhar agora.",
+    "legenda_ie_central_colaboracao_ja_recebida": "Colaboração já recebida",
+    "legenda_ie_central_confronto_ja_localizado": "Confronto já localizado",
+    "legenda_ie_central_colaboracao_recebida": "Colaboração recebida",
+    "legenda_ie_central_aguardando_analise": "Aguardando análise",
+    "legenda_ie_central_confira_antes_de_enviar_novamente": "Confira antes de enviar novamente",
+    "legenda_ie_central_este_envio_ja_esta_aguardando_analise": "Este envio já está aguardando análise.",
+    "legenda_ie_central_este_confronto_ja_esta_em_nossa_base": "Este confronto já está em nossa base.",
+    "legenda_ie_central_obrigado_por_colaborar_com_a_nossa_base": "Obrigado por colaborar com a nossa base.",
+    "legenda_ie_central_a_contribuicao_ja_foi_registrada_em_sua_conta_nao_e_necessario_envia_la_novamente": "A contribuição já foi registrada em sua conta; não é necessário enviá-la novamente.",
+    "legenda_ie_central_confira_o_registro_e_se_houver_alguma_diferenca_envie_uma_correcao": "Confira o registro e, se houver alguma diferença, envie uma correção.",
+    "legenda_ie_central_recebemos_as_informacoes_em_sua_conta_e_vamos_conferi_las_antes_de_alterar_a_base": "Recebemos as informações em sua conta e vamos conferi-las antes de alterar a base.",
+    "legenda_ie_central_voltar_a_lista": "Voltar à lista",
+    "legenda_ie_central_enviando": "Enviando...",
+    "legenda_ie_central_detalhes_do_confronto": "Detalhes do confronto",
+    "legenda_ie_central_carregando_informacoes": "Carregando informações...",
+    "legenda_ie_central_partida": "Partida",
+    "legenda_ie_central_estatisticas": "Estatísticas",
+    "legenda_ie_central_escalacoes": "Escalações",
+    "legenda_ie_central_classificacao": "Classificação",
+    "legenda_ie_central_informacao": "Informação",
+    "legenda_ie_central_detalhes_indisponiveis": "Detalhes indisponíveis",
+    "legenda_ie_central_carregando_cotacoes": "Carregando cotações...",
+    "legenda_ie_central_cotacoes_indisponiveis": "Cotações indisponíveis",
+    "legenda_ie_central_ainda_nao_ha_cotacoes_atualizadas_para_esta_partida": "Ainda não há cotações atualizadas para esta partida.",
+    "legenda_ie_central_cotacoes_e_analises": "Cotações e análises",
+    "legenda_ie_central_abrir_cotacoes": "Abrir cotações",
+    "legenda_ie_central_abrir_analises": "Abrir análises",
+    "legenda_ie_central_competicao_acompanhada": "Competição acompanhada",
+    "legenda_ie_central_resumo_estatistico_personalizado": "Resumo estatístico personalizado",
+    "legenda_ie_central_time_ou_participante_acompanhado": "Time ou participante acompanhado",
+    "legenda_ie_central_informacoes_completas_na_central": "Informações completas na central",
+    "legenda_ie_central_as_analises_usam_somente_os_dados_disponiveis_para_as_suas_selecoes_e_nao_representam_recomendacao_n": "As análises usam somente os dados disponíveis para as suas seleções e não representam recomendação nem garantia de resultado.",
+    "legenda_ie_central_as_proximas_partidas_resultados_e_dados_relacionados_ficam_disponiveis_nas_areas_correspondentes": "As próximas partidas, resultados e dados relacionados ficam disponíveis nas áreas correspondentes.",
+    "legenda_ie_central_carregando_historico_do_confronto": "Carregando histórico do confronto...",
+    "legenda_ie_central_historico_disponivel_do_confronto": "Histórico disponível do confronto",
+    "legenda_ie_central_carregando_desempenho_geral": "Carregando desempenho geral...",
+    "legenda_ie_central_desempenho_geral_indisponivel_no_momento": "Desempenho geral indisponível no momento.",
+    "legenda_ie_central_analise_indisponivel": "Análise indisponível",
+    "legenda_ie_central_fase_atual": "Fase atual",
+    "legenda_ie_central_em_atualizacao": "Em atualização",
+    "legenda_ie_central_inicio_2": "Início",
+    "legenda_ie_central_fim_2": "Fim",
+    "legenda_ie_central_informacoes_da_competicao": "Informações da competição",
+    "legenda_ie_central_carregando_competicoes": "Carregando competições...",
+    "legenda_ie_central_competicoes_em_que_participa": "Competições em que participa",
+    "legenda_ie_central_nenhuma_competicao_disponivel": "Nenhuma competição disponível",
+    "legenda_ie_central_ainda_nao_ha_competicoes_relacionadas_a_este_participante": "Ainda não há competições relacionadas a este participante.",
+    "legenda_ie_central_competicoes_indisponiveis": "Competições indisponíveis",
+    "legenda_ie_central_proximos_confrontos": "Próximos confrontos",
+    "legenda_ie_central_nenhum_confronto_programado": "Nenhum confronto programado",
+    "legenda_ie_central_ainda_nao_ha_confrontos_futuros_disponiveis_nesta_fase": "Ainda não há confrontos futuros disponíveis nesta fase.",
+    "legenda_ie_central_confrontos_indisponiveis": "Confrontos indisponíveis",
+    "legenda_ie_central_a_fonte_desta_noticia_nao_forneceu_um_endereco_https_valido": "A fonte desta notícia não forneceu um endereço HTTPS válido.",
+    "legenda_ie_central_fonte_da_noticia": "Fonte da notícia",
+    "legenda_ie_central_a_noticia_original_so_pode_ser_aberta_pelo_aplicativo": "A notícia original só pode ser aberta pelo aplicativo.",
+    "legenda_ie_central_nao_foi_possivel_salvar": "Não foi possível salvar.",
+    "legenda_ie_central_notificacoes_atualizadas": "Notificações atualizadas.",
+    "legenda_ie_central_favoritos_atualizados": "Favoritos atualizados.",
+    "legenda_ie_central_simulacao_de_impacto_apostas_simples_pre_jogo": "Simulação de impacto — apostas simples, pré-jogo",
+    "legenda_ie_central_nao_foi_possivel_compartilhar_o_bilhete": "Não foi possível compartilhar o bilhete.",
+    "legenda_ie_central_voce_pode_usar_ate_20_casas_em_cada_simulacao": "Você pode usar até 20 casas em cada simulação.",
+    "legenda_ie_central_escolha_um_time_adversario_diferente_do_seu_time": "Escolha um time adversário diferente do seu time.",
+    "legenda_ie_central_atualizado_minuto": "Dados atualizados há {quantidade} minuto.",
+    "legenda_ie_central_atualizado_minutos": "Dados atualizados há {quantidade} minutos.",
+    "legenda_ie_central_atualizado_hora": "Dados atualizados há {quantidade} hora.",
+    "legenda_ie_central_atualizado_horas": "Dados atualizados há {quantidade} horas.",
+    "legenda_ie_central_atualizado_data": "Dados atualizados em {data}.",
+    "legenda_ie_central_casa_selecionada": "{quantidade} selecionada",
+    "legenda_ie_central_casas_selecionadas": "{quantidade} selecionadas",
+    "legenda_ie_central_intervalo_anos": "Informe um ano entre {inicio} e {fim}.",
+    "legenda_ie_central_confronto_participantes": "{casa} e {visitante}",
+    "legenda_ie_central_conjuncao_lista": "{anteriores} e {ultimo}",
+    "legenda_ie_central_periodo_datas": "{inicio} a {fim}",
+    "legenda_ie_central_antecedencia_minutos": "{quantidade} min",
+    "legenda_ie_central_abreviatura_jogos": "J",
+    "legenda_ie_central_abreviatura_vitorias": "V",
+    "legenda_ie_central_abreviatura_empates": "E",
+    "legenda_ie_central_abreviatura_derrotas": "D",
+    "legenda_ie_central_abreviatura_saldo_gols": "SG",
+    "legenda_ie_central_esporte_generico": "esporte",
+    "legenda_ie_central_enviar_confronto_ausente": "Enviar um confronto não localizado"
+  };
+  if (window.TurboTigerLegendas) window.TurboTigerLegendas.registrar(fontesLegendasCentral);
+  function legendaCentral(chave, parametros) {
+    if (window.TurboTigerLegendas) return window.TurboTigerLegendas.texto(chave, parametros);
+    return String(fontesLegendasCentral[chave] || chave).replace(/\{([a-z][a-z0-9_]*)\}/g, function (marca, nome) { return parametros && Object.prototype.hasOwnProperty.call(parametros, nome) ? String(parametros[nome]) : marca; });
+  }
+
+  var reapresentandoIdiomaCentral = false;
+  function apresentarHTMLCentral(elemento, html) {
+    if (reapresentandoIdiomaCentral) {
+      var motor = window.TurboTigerLegendas;
+      if (motor && typeof motor.atualizarApresentacao === "function") motor.atualizarApresentacao(elemento, html);
+      return;
+    }
+    elemento.innerHTML = html;
+  }
+  function atualizarIdiomaCentral() {
+    if (!state.bootstrap || byId("ieApp").hidden || !window.TurboTigerLegendas || typeof window.TurboTigerLegendas.atualizarApresentacao !== "function") return;
+    reapresentandoIdiomaCentral = true;
+    try {
+      renderSportsNav(); renderHome(); renderGames(); renderNewsFilters();
+      renderNews(); renderEntities(); renderSettings(); setSourceFreshness();
+    } finally { reapresentandoIdiomaCentral = false; }
+  }
+
   var CONFIG = {
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
@@ -10,14 +811,14 @@
   };
 
   var ALERT_EVENTS = [
-    { code: "pre_inicio", label: "Antes do início" },
-    { code: "inicio_evento", label: "Partida iniciada" },
-    { code: "escalacao_disponivel", label: "Escalação disponível" },
-    { code: "gol", label: "Gol" },
-    { code: "cartao_vermelho", label: "Cartão vermelho" },
-    { code: "intervalo", label: "Intervalo" },
-    { code: "encerramento", label: "Encerramento" },
-    { code: "mudanca_horario", label: "Mudança de horário" }
+    { code: "pre_inicio", get label() { return legendaCentral("legenda_ie_central_antes_do_inicio"); } },
+    { code: "inicio_evento", get label() { return legendaCentral("legenda_ie_central_partida_iniciada"); } },
+    { code: "escalacao_disponivel", get label() { return legendaCentral("legenda_ie_central_escalacao_disponivel"); } },
+    { code: "gol", get label() { return legendaCentral("legenda_ie_central_gol"); } },
+    { code: "cartao_vermelho", get label() { return legendaCentral("legenda_ie_central_cartao_vermelho"); } },
+    { code: "intervalo", get label() { return legendaCentral("legenda_ie_central_intervalo"); } },
+    { code: "encerramento", get label() { return legendaCentral("legenda_ie_central_encerramento"); } },
+    { code: "mudanca_horario", get label() { return legendaCentral("legenda_ie_central_mudanca_de_horario"); } }
   ];
 
   var ALERT_TIMES = [15, 30, 60, 120];
@@ -368,14 +1169,14 @@
     if (!value) return "";
     var date = new Date(value);
     if (Number.isNaN(date.getTime())) return "";
-    if (!Number.isFinite(serverNow())) return "Sincronizando horário";
+    if (!Number.isFinite(serverNow())) return legendaCentral("legenda_ie_central_sincronizando_horario");
     var seconds = Math.max(0, Math.round((serverNow() - date.getTime()) / 1000));
-    if (seconds < 60) return "Dados atualizados agora.";
+    if (seconds < 60) return legendaCentral("legenda_ie_central_dados_atualizados_agora");
     var minutes = Math.round(seconds / 60);
-    if (minutes < 60) return "Dados atualizados há " + minutes + (minutes === 1 ? " minuto." : " minutos.");
+    if (minutes < 60) return legendaCentral(minutes === 1 ? "legenda_ie_central_atualizado_minuto" : "legenda_ie_central_atualizado_minutos", { quantidade: minutes });
     var hours = Math.round(minutes / 60);
-    if (hours < 24) return "Dados atualizados há " + hours + (hours === 1 ? " hora." : " horas.");
-    return "Dados atualizados em " + date.toLocaleDateString("pt-BR") + ".";
+    if (hours < 24) return legendaCentral(hours === 1 ? "legenda_ie_central_atualizado_hora" : "legenda_ie_central_atualizado_horas", { quantidade: hours });
+    return legendaCentral("legenda_ie_central_atualizado_data", { data: date.toLocaleDateString("pt-BR") });
   }
 
   function latestSourceUpdatedAt(value) {
@@ -512,91 +1313,91 @@
   }
 
   function detailAttributes(kind, id, url, title) {
-    var label = String(title || "Abrir informações");
+    var label = String(title || legendaCentral("legenda_ie_central_abrir_informacoes"));
     return " data-detail-kind=\"" + escapeHtml(kind || "generic") + "\" data-detail-id=\"" + escapeHtml(id || "") + "\" data-detail-url=\"" + escapeHtml(url || "") + "\" data-detail-title=\"" + escapeHtml(title || "") + "\" role=\"button\" tabindex=\"0\" aria-label=\"" + escapeHtml(label) + "\"";
   }
 
   function friendlyError(error) {
     var manualErrors = {
-      confirme_regras_simulacao: "Confirme o confronto e o período das odds informadas.",
-      cotacao_invalida: "Informe odds maiores que 1 e até 1.000, com até quatro casas decimais.",
-      mercado_incompleto: "Informe pelo menos uma odd para Casa, Empate e Fora.",
-      casa_sem_odd_informada: "Preencha ao menos uma odd de cada casa selecionada, ou desmarque a casa.",
-      manual_somente_1x2: "A entrada manual está disponível para Resultado 1X2 em 90 minutos.",
-      sino_indisponivel_odds_manuais: "O sino não acompanha odds digitadas manualmente. Salve sem o sino."
+      confirme_regras_simulacao: legendaCentral("legenda_ie_central_confirme_o_confronto_e_o_periodo_das_odds_informadas"),
+      cotacao_invalida: legendaCentral("legenda_ie_central_informe_odds_maiores_que_1_e_ate_1_000_com_ate_quatro_casas_decimais"),
+      mercado_incompleto: legendaCentral("legenda_ie_central_informe_pelo_menos_uma_odd_para_casa_empate_e_fora"),
+      casa_sem_odd_informada: legendaCentral("legenda_ie_central_preencha_ao_menos_uma_odd_de_cada_casa_selecionada_ou_desmarque_a_casa"),
+      manual_somente_1x2: legendaCentral("legenda_ie_central_a_entrada_manual_esta_disponivel_para_resultado_1x2_em_90_minutos"),
+      sino_indisponivel_odds_manuais: legendaCentral("legenda_ie_central_o_sino_nao_acompanha_odds_digitadas_manualmente_salve_sem_o_sino")
     };
     var manualMessage = String(error && error.message || error || "");
     if (manualErrors[manualMessage]) return manualErrors[manualMessage];
     var raw = String(error && (error.message || error.error) || error || "").trim();
     var messages = {
-      app_session_timeout: "O aplicativo demorou para validar sua sessão.",
-      app_session_unavailable: "Não foi possível validar sua sessão pelo aplicativo.",
+      app_session_timeout: legendaCentral("legenda_ie_central_o_aplicativo_demorou_para_validar_sua_sessao"),
+      app_session_unavailable: legendaCentral("legenda_ie_central_nao_foi_possivel_validar_sua_sessao_pelo_aplicativo"),
       session_context_invalidated: "",
-      sessao_expirada: "Sua sessão expirou. Volte ao aplicativo e tente novamente.",
-      nao_autenticado: "Sua sessão não está disponível.",
-      usuario_nao_autenticado: "Sua sessão não está disponível.",
-      Failed_to_fetch: "Não foi possível acessar a central. Verifique sua conexão."
-      ,ano_e_time_obrigatorios: "Escolha o ano e o time antes de pesquisar."
-      ,ano_fora_da_base: "O ano escolhido está fora do período disponível."
-      ,time_historico_invalido: "Escolha um time na lista de resultados."
-      ,campos_essenciais_obrigatorios: "Preencha data, times, placar, competição e temporada."
-      ,confronto_historico_no_futuro: "A data informada ainda não ocorreu."
-      ,placar_invalido: "Confira os números do placar informado."
-      ,placar_intervalo_incompleto: "Informe os dois placares do intervalo."
-      ,placar_intervalo_invalido: "O placar do intervalo não pode ser maior que o placar final."
-      ,times_invalidos: "Os times precisam ser diferentes e válidos."
-      ,competicao_invalida: "Informe uma competição válida."
-      ,campos_inclusao_obrigatorios: "Preencha todos os dados do confronto antes de enviar."
-      ,dados_contribuicao_invalidos: "Revise os dados informados."
-      ,dados_contribuicao_excedem_limite: "As informações ultrapassaram o limite permitido."
-      ,dados_invalidos: "Revise os dados informados."
-      ,dados_excedem_limite: "As informações ultrapassaram o limite permitido."
-      ,observacao_excede_limite: "A observação ultrapassou o limite permitido."
-      ,campos_texto_excedem_limite: "Um dos textos ultrapassou o limite permitido."
-      ,nenhuma_correcao_informada: "Altere pelo menos uma informação ou escreva uma observação."
-      ,confronto_historico_nao_encontrado: "Este confronto não foi localizado na base."
-      ,chave_idempotencia_invalida: "Não foi possível identificar este envio. Tente novamente."
-      ,forma_experiencia_invalida: "Escolha se acompanhou no local ou pela TV/outro meio."
-      ,experiencia_nao_encontrada: "Esta experiência não foi localizada."
-      ,experiencia_presencial_conflitante: "Este horário coincide com outro confronto marcado no local."
-      ,sobreposicao_horario: "Este horário coincide com outro confronto marcado no local."
-      ,horario_indisponivel: "Não há horário suficiente para validar a presença no local."
-      ,acompanhante_nome_invalido: "Informe o nome da pessoa que assistiu com você."
-      ,nome_acompanhante_invalido: "Informe o nome da pessoa que assistiu com você."
-      ,acompanhante_email_invalido: "Informe um e-mail válido."
-      ,email_acompanhante_invalido: "Informe um e-mail válido."
-      ,autorizacao_envio_obrigatoria: "Confirme a autorização antes de enviar o convite."
-      ,consentimento_envio_obrigatorio: "Confirme a autorização antes de enviar o convite."
-      ,destinatario_optout: "Esta pessoa pediu para não receber novos convites."
-      ,historia_esportiva_privada: "Sua história esportiva está privada."
-      ,historia_publica_indisponivel: "Esta história esportiva não está disponível."
-      ,codigo_historia_invalido: "Não foi possível gerar um código seguro para esta história."
-      ,evento_nao_disponivel_para_usuario: "Este confronto não está disponível nas suas seleções."
-      ,simulacao_disponivel_somente_pre_jogo: "O simulador está disponível somente antes do início confirmado do confronto."
-      ,valor_comprometido_invalido: "Informe um valor válido para a simulação."
-      ,valor_insuficiente_para_mercados: "O valor precisa permitir ao menos um centavo para cada mercado escolhido."
-      ,limite_perda_invalido: "Informe um limite pessoal entre 0% e 100%."
-      ,casas_selecionadas_invalidas: "Selecione de 1 a 20 casas brasileiras autorizadas."
-      ,selecione_ao_menos_uma_casa: "Selecione ao menos uma casa brasileira autorizada."
-      ,casa_nao_autorizada: "Uma das casas selecionadas não está mais na lista brasileira vigente."
-      ,mercados_invalidos: "Selecione ao menos um mercado disponível."
-      ,mercado_nao_suportado: "Um dos mercados ainda não possui regras comparáveis para simulação."
-      ,periodo_mercado_incompativel: "O período informado não corresponde às regras atuais do mercado."
-      ,margem_alerta_invalida: "Informe uma margem de alerta entre 0,01 e 100 pontos percentuais."
-      ,simulacao_nao_encontrada: "Esta simulação não está mais disponível."
-      ,campos_da_simulacao_invalidos: "Revise os campos da simulação antes de continuar."
-      ,casas_selecionadas_duplicadas: "A mesma casa foi selecionada mais de uma vez."
-      ,mercados_duplicados: "O mesmo mercado foi selecionado mais de uma vez."
-      ,limite_simulacoes_abertas_atingido: "Você atingiu o limite de simulações abertas. Arquive uma para salvar outra."
-      ,limite_simulacoes_evento_atingido: "Você atingiu o limite de simulações para este confronto."
-      ,versao_regras_alterada: "As regras verificadas mudaram. Recalcule a simulação antes de reativar o sino."
-      ,lista_autorizada_desatualizada: "A lista oficial brasileira precisa ser atualizada antes de novos cálculos."
-      ,cotacoes_alteradas_durante_calculo: "As cotações mudaram durante o cálculo. Confira os dados e calcule novamente."
-      ,cotacoes_brasileiras_indisponiveis: "Não há cotações brasileiras atuais e completas, com regras e limites verificados, para esta seleção."
-      ,casas_sem_cotacoes_elegiveis: "Uma das casas não possui mais cotações elegíveis para este confronto. Atualize antes de calcular."
-      ,sem_cotacoes_brasileiras_elegiveis: "Sem dados brasileiros elegíveis, não é possível salvar uma simulação calculável."
+      sessao_expirada: legendaCentral("legenda_ie_central_sua_sessao_expirou_volte_ao_aplicativo_e_tente_novamente"),
+      nao_autenticado: legendaCentral("legenda_ie_central_sua_sessao_nao_esta_disponivel"),
+      usuario_nao_autenticado: legendaCentral("legenda_ie_central_sua_sessao_nao_esta_disponivel"),
+      Failed_to_fetch: legendaCentral("legenda_ie_central_nao_foi_possivel_acessar_a_central_verifique_sua_conexao")
+      ,ano_e_time_obrigatorios: legendaCentral("legenda_ie_central_escolha_o_ano_e_o_time_antes_de_pesquisar")
+      ,ano_fora_da_base: legendaCentral("legenda_ie_central_o_ano_escolhido_esta_fora_do_periodo_disponivel")
+      ,time_historico_invalido: legendaCentral("legenda_ie_central_escolha_um_time_na_lista_de_resultados")
+      ,campos_essenciais_obrigatorios: legendaCentral("legenda_ie_central_preencha_data_times_placar_competicao_e_temporada")
+      ,confronto_historico_no_futuro: legendaCentral("legenda_ie_central_a_data_informada_ainda_nao_ocorreu")
+      ,placar_invalido: legendaCentral("legenda_ie_central_confira_os_numeros_do_placar_informado")
+      ,placar_intervalo_incompleto: legendaCentral("legenda_ie_central_informe_os_dois_placares_do_intervalo")
+      ,placar_intervalo_invalido: legendaCentral("legenda_ie_central_o_placar_do_intervalo_nao_pode_ser_maior_que_o_placar_final")
+      ,times_invalidos: legendaCentral("legenda_ie_central_os_times_precisam_ser_diferentes_e_validos")
+      ,competicao_invalida: legendaCentral("legenda_ie_central_informe_uma_competicao_valida")
+      ,campos_inclusao_obrigatorios: legendaCentral("legenda_ie_central_preencha_todos_os_dados_do_confronto_antes_de_enviar")
+      ,dados_contribuicao_invalidos: legendaCentral("legenda_ie_central_revise_os_dados_informados")
+      ,dados_contribuicao_excedem_limite: legendaCentral("legenda_ie_central_as_informacoes_ultrapassaram_o_limite_permitido")
+      ,dados_invalidos: legendaCentral("legenda_ie_central_revise_os_dados_informados")
+      ,dados_excedem_limite: legendaCentral("legenda_ie_central_as_informacoes_ultrapassaram_o_limite_permitido")
+      ,observacao_excede_limite: legendaCentral("legenda_ie_central_a_observacao_ultrapassou_o_limite_permitido")
+      ,campos_texto_excedem_limite: legendaCentral("legenda_ie_central_um_dos_textos_ultrapassou_o_limite_permitido")
+      ,nenhuma_correcao_informada: legendaCentral("legenda_ie_central_altere_pelo_menos_uma_informacao_ou_escreva_uma_observacao")
+      ,confronto_historico_nao_encontrado: legendaCentral("legenda_ie_central_este_confronto_nao_foi_localizado_na_base")
+      ,chave_idempotencia_invalida: legendaCentral("legenda_ie_central_nao_foi_possivel_identificar_este_envio_tente_novamente")
+      ,forma_experiencia_invalida: legendaCentral("legenda_ie_central_escolha_se_acompanhou_no_local_ou_pela_tv_outro_meio")
+      ,experiencia_nao_encontrada: legendaCentral("legenda_ie_central_esta_experiencia_nao_foi_localizada")
+      ,experiencia_presencial_conflitante: legendaCentral("legenda_ie_central_este_horario_coincide_com_outro_confronto_marcado_no_local")
+      ,sobreposicao_horario: legendaCentral("legenda_ie_central_este_horario_coincide_com_outro_confronto_marcado_no_local")
+      ,horario_indisponivel: legendaCentral("legenda_ie_central_nao_ha_horario_suficiente_para_validar_a_presenca_no_local")
+      ,acompanhante_nome_invalido: legendaCentral("legenda_ie_central_informe_o_nome_da_pessoa_que_assistiu_com_voce")
+      ,nome_acompanhante_invalido: legendaCentral("legenda_ie_central_informe_o_nome_da_pessoa_que_assistiu_com_voce")
+      ,acompanhante_email_invalido: legendaCentral("legenda_ie_central_informe_um_e_mail_valido")
+      ,email_acompanhante_invalido: legendaCentral("legenda_ie_central_informe_um_e_mail_valido")
+      ,autorizacao_envio_obrigatoria: legendaCentral("legenda_ie_central_confirme_a_autorizacao_antes_de_enviar_o_convite")
+      ,consentimento_envio_obrigatorio: legendaCentral("legenda_ie_central_confirme_a_autorizacao_antes_de_enviar_o_convite")
+      ,destinatario_optout: legendaCentral("legenda_ie_central_esta_pessoa_pediu_para_nao_receber_novos_convites")
+      ,historia_esportiva_privada: legendaCentral("legenda_ie_central_sua_historia_esportiva_esta_privada")
+      ,historia_publica_indisponivel: legendaCentral("legenda_ie_central_esta_historia_esportiva_nao_esta_disponivel")
+      ,codigo_historia_invalido: legendaCentral("legenda_ie_central_nao_foi_possivel_gerar_um_codigo_seguro_para_esta_historia")
+      ,evento_nao_disponivel_para_usuario: legendaCentral("legenda_ie_central_este_confronto_nao_esta_disponivel_nas_suas_selecoes")
+      ,simulacao_disponivel_somente_pre_jogo: legendaCentral("legenda_ie_central_o_simulador_esta_disponivel_somente_antes_do_inicio_confirmado_do_confronto")
+      ,valor_comprometido_invalido: legendaCentral("legenda_ie_central_informe_um_valor_valido_para_a_simulacao")
+      ,valor_insuficiente_para_mercados: legendaCentral("legenda_ie_central_o_valor_precisa_permitir_ao_menos_um_centavo_para_cada_mercado_escolhido")
+      ,limite_perda_invalido: legendaCentral("legenda_ie_central_informe_um_limite_pessoal_entre_0_e_100")
+      ,casas_selecionadas_invalidas: legendaCentral("legenda_ie_central_selecione_de_1_a_20_casas_brasileiras_autorizadas")
+      ,selecione_ao_menos_uma_casa: legendaCentral("legenda_ie_central_selecione_ao_menos_uma_casa_brasileira_autorizada")
+      ,casa_nao_autorizada: legendaCentral("legenda_ie_central_uma_das_casas_selecionadas_nao_esta_mais_na_lista_brasileira_vigente")
+      ,mercados_invalidos: legendaCentral("legenda_ie_central_selecione_ao_menos_um_mercado_disponivel")
+      ,mercado_nao_suportado: legendaCentral("legenda_ie_central_um_dos_mercados_ainda_nao_possui_regras_comparaveis_para_simulacao")
+      ,periodo_mercado_incompativel: legendaCentral("legenda_ie_central_o_periodo_informado_nao_corresponde_as_regras_atuais_do_mercado")
+      ,margem_alerta_invalida: legendaCentral("legenda_ie_central_informe_uma_margem_de_alerta_entre_0_01_e_100_pontos_percentuais")
+      ,simulacao_nao_encontrada: legendaCentral("legenda_ie_central_esta_simulacao_nao_esta_mais_disponivel")
+      ,campos_da_simulacao_invalidos: legendaCentral("legenda_ie_central_revise_os_campos_da_simulacao_antes_de_continuar")
+      ,casas_selecionadas_duplicadas: legendaCentral("legenda_ie_central_a_mesma_casa_foi_selecionada_mais_de_uma_vez")
+      ,mercados_duplicados: legendaCentral("legenda_ie_central_o_mesmo_mercado_foi_selecionado_mais_de_uma_vez")
+      ,limite_simulacoes_abertas_atingido: legendaCentral("legenda_ie_central_voce_atingiu_o_limite_de_simulacoes_abertas_arquive_uma_para_salvar_outra")
+      ,limite_simulacoes_evento_atingido: legendaCentral("legenda_ie_central_voce_atingiu_o_limite_de_simulacoes_para_este_confronto")
+      ,versao_regras_alterada: legendaCentral("legenda_ie_central_as_regras_verificadas_mudaram_recalcule_a_simulacao_antes_de_reativar_o_sino")
+      ,lista_autorizada_desatualizada: legendaCentral("legenda_ie_central_a_lista_oficial_brasileira_precisa_ser_atualizada_antes_de_novos_calculos")
+      ,cotacoes_alteradas_durante_calculo: legendaCentral("legenda_ie_central_as_cotacoes_mudaram_durante_o_calculo_confira_os_dados_e_calcule_novamente")
+      ,cotacoes_brasileiras_indisponiveis: legendaCentral("legenda_ie_central_nao_ha_cotacoes_brasileiras_atuais_e_completas_com_regras_e_limites_verificados_para_esta_selecao")
+      ,casas_sem_cotacoes_elegiveis: legendaCentral("legenda_ie_central_uma_das_casas_nao_possui_mais_cotacoes_elegiveis_para_este_confronto_atualize_antes_de_calcular")
+      ,sem_cotacoes_brasileiras_elegiveis: legendaCentral("legenda_ie_central_sem_dados_brasileiros_elegiveis_nao_e_possivel_salvar_uma_simulacao_calculavel")
     };
-    return messages[raw] || messages[raw.replace(/\s+/g, "_")] || raw || "Não foi possível carregar as informações.";
+    return messages[raw] || messages[raw.replace(/\s+/g, "_")] || raw || legendaCentral("legenda_ie_central_nao_foi_possivel_carregar_as_informacoes");
   }
 
   function showToast(message, isError) {
@@ -880,8 +1681,8 @@
     var home = item.participante_casa || item.mandante || item.time_casa || item.home || homeFromList;
     var away = item.participante_fora || item.visitante || item.time_fora || item.away || awayFromList;
     return {
-      home: { name: home.nome || home.nome_curto || item.time_casa_nome || item.mandante_nome || "Casa", abbreviation: home.sigla || home.tla || item.time_casa_sigla, logo: home.imagem_url || home.logo_url || home.logo || item.time_casa_logo, score: home.placar_numerico == null ? home.placar : home.placar_numerico },
-      away: { name: away.nome || away.nome_curto || item.time_fora_nome || item.visitante_nome || "Visitante", abbreviation: away.sigla || away.tla || item.time_fora_sigla, logo: away.imagem_url || away.logo_url || away.logo || item.time_fora_logo, score: away.placar_numerico == null ? away.placar : away.placar_numerico }
+      home: { name: home.nome || home.nome_curto || item.time_casa_nome || item.mandante_nome || legendaCentral("legenda_ie_central_casa"), abbreviation: home.sigla || home.tla || item.time_casa_sigla, logo: home.imagem_url || home.logo_url || home.logo || item.time_casa_logo, score: home.placar_numerico == null ? home.placar : home.placar_numerico },
+      away: { name: away.nome || away.nome_curto || item.time_fora_nome || item.visitante_nome || legendaCentral("legenda_ie_central_visitante"), abbreviation: away.sigla || away.tla || item.time_fora_sigla, logo: away.imagem_url || away.logo_url || away.logo || item.time_fora_logo, score: away.placar_numerico == null ? away.placar : away.placar_numerico }
     };
   }
 
@@ -921,8 +1722,8 @@
 
   function comingSoonState(sport) {
     sport = sport || activeSport();
-    var name = sport && sport.nome || "Este esporte";
-    return "<section class=\"ie-coming-soon\"><span>" + escapeHtml(name) + "</span><strong>Em breve!</strong><p>Estamos preparando esta modalidade para você acompanhar competições, participantes e confrontos em um só lugar.</p></section>";
+    var name = sport && sport.nome || legendaCentral("legenda_ie_central_este_esporte");
+    return "<section class=\"ie-coming-soon\"><span>" + escapeHtml(name) + ("</span><strong>" + escapeHtml(legendaCentral("legenda_ie_central_em_breve")) + "</strong><p>" + escapeHtml(legendaCentral("legenda_ie_central_estamos_preparando_esta_modalidade_para_voce_acompanhar_competicoes_participantes_e_confrontos_em_um")) + "</p></section>");
   }
 
   function normalizeSportFavoriteOrder(preferences) {
@@ -968,8 +1769,8 @@
     return followedSelections("competition", state.activeSportId).map(function (item, index) { return { item: item, index: index }; }).sort(function (a, b) {
       var aOrder = selectionFavoriteOrder(a.item, a.index);
       var bOrder = selectionFavoriteOrder(b.item, b.index);
-      var aName = competitionDisplayName(a.item.nome || a.item.nome_exibicao || a.item.competicao_nome || "Competição");
-      var bName = competitionDisplayName(b.item.nome || b.item.nome_exibicao || b.item.competicao_nome || "Competição");
+      var aName = competitionDisplayName(a.item.nome || a.item.nome_exibicao || a.item.competicao_nome || legendaCentral("legenda_ie_central_competicao"));
+      var bName = competitionDisplayName(b.item.nome || b.item.nome_exibicao || b.item.competicao_nome || legendaCentral("legenda_ie_central_competicao"));
       return aOrder - bOrder || aName.localeCompare(bName, "pt-BR");
     }).map(function (entry) { return entry.item; });
   }
@@ -1121,7 +1922,7 @@
       var names = eventCompetitors(item).map(function (participant) { return participant.nome || participant.nome_curto || ""; }).filter(Boolean);
       if (names.length === 2) return names.join(" × ");
     }
-    return String(item && item.titulo || "Evento esportivo");
+    return String(item && item.titulo || legendaCentral("legenda_ie_central_evento_esportivo"));
   }
 
   function resultFieldText(value) {
@@ -1146,7 +1947,7 @@
       return true;
     }).slice().sort(function (a, b) { return numberOf(a.ordem, 0) - numberOf(b.ordem, 0); }).slice(0, 100);
     if (!periods.length) return "";
-    return "<div class=\"ie-score-periods\" aria-label=\"Parciais, na ordem dos participantes\">" + periods.map(function (period) {
+    return ("<div class=\"ie-score-periods\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_parciais_na_ordem_dos_participantes")) + "\">") + periods.map(function (period) {
       return "<span><small>" + escapeHtml(resultFieldText(period.nome) || period.codigo) + "</small><b>" + escapeHtml(usableScore(period.casa)) + " – " + escapeHtml(usableScore(period.fora)) + "</b></span>";
     }).join("") + "</div>";
   }
@@ -1177,15 +1978,15 @@
     var rows = eventRankingRows(item, result);
     if (!rows.length) return "";
     var visible = expanded ? rows : rows.slice(0, 3);
-    return "<section class=\"ie-event-ranking\" aria-label=\"Classificação do evento\"><h3>" + (confirmed ? "Classificação final" : "Classificação parcial") + "</h3>" + visible.map(function (entry) {
+    return ("<section class=\"ie-event-ranking\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_classificacao_do_evento")) + "\"><h3>") + (confirmed ? escapeHtml(legendaCentral("legenda_ie_central_classificacao_final")) : escapeHtml(legendaCentral("legenda_ie_central_classificacao_parcial"))) + "</h3>" + visible.map(function (entry) {
       var participant = entry.participant;
       var row = entry.result;
-      var details = [["Tempo", row.tempo], ["Diferença", row.diferenca], ["Voltas", row.voltas], ["Grid", row.grid], ["Paradas", row.pits], ["Status", row.status]].filter(function (field) {
+      var details = [[legendaCentral("legenda_ie_central_tempo"), row.tempo], [legendaCentral("legenda_ie_central_diferenca"), row.diferenca], [legendaCentral("legenda_ie_central_voltas"), row.voltas], [legendaCentral("legenda_ie_central_grid"), row.grid], [legendaCentral("legenda_ie_central_paradas"), row.pits], [legendaCentral("legenda_ie_central_status"), row.status]].filter(function (field) {
         return resultFieldText(field[1]) !== "";
       }).map(function (field) { return field[0] + ": " + resultFieldText(field[1]); });
-      var name = participant.nome || participant.nome_curto || "Participante";
-      return "<div class=\"ie-event-ranking-row\"><b>" + (entry.position === null ? "—" : escapeHtml(entry.position) + "º") + "</b>" + logoHtml(participant.imagem_url, name, "ie-entity-logo", participant.sigla) + "<span><strong>" + escapeHtml(name) + "</strong>" + (details.length ? "<small>" + escapeHtml(details.join(" · ")) + "</small>" : "") + "</span></div>";
-    }).join("") + (visible.length < rows.length ? "<small class=\"ie-event-ranking-more\">Classificação completa em Detalhes</small>" : "") + "</section>";
+      var name = participant.nome || participant.nome_curto || legendaCentral("legenda_ie_central_participante");
+      return "<div class=\"ie-event-ranking-row\"><b>" + (entry.position === null ? "—" : escapeHtml(legendaCentral("legenda_ie_central_posicao_ordinal", { posicao: entry.position }))) + "</b>" + logoHtml(participant.imagem_url, name, "ie-entity-logo", participant.sigla) + "<span><strong>" + escapeHtml(name) + "</strong>" + (details.length ? "<small>" + escapeHtml(details.join(" · ")) + "</small>" : "") + "</span></div>";
+    }).join("") + (visible.length < rows.length ? ("<small class=\"ie-event-ranking-more\">" + escapeHtml(legendaCentral("legenda_ie_central_classificacao_completa_em_detalhes")) + "</small>") : "") + "</section>";
   }
 
   function renderEventDecision(item, result, confirmed) {
@@ -1196,11 +1997,11 @@
       || Number(result.participantes[0]) === Number(result.participantes[1])
       || !result.participantes.every(function (id) { return ids.indexOf(usableScore(id)) >= 0; })) return "";
     var winner = participants.find(function (participant) { return Number(participant.id_participante || participant.id) === usableScore(result.vencedor_id); });
-    var text = result.situacao === "vitoria" && winner ? "Vitória de " + (winner.nome || winner.nome_curto || "Participante")
-      : result.situacao === "empate" && result.vencedor_id == null ? "Empate"
-        : result.situacao === "sem_resultado" && result.vencedor_id == null ? "Sem resultado" : "";
+    var text = result.situacao === "vitoria" && winner ? legendaCentral("legenda_ie_central_vitoria_de") + (winner.nome || winner.nome_curto || legendaCentral("legenda_ie_central_participante"))
+      : result.situacao === "empate" && result.vencedor_id == null ? legendaCentral("legenda_ie_central_empate")
+        : result.situacao === "sem_resultado" && result.vencedor_id == null ? legendaCentral("legenda_ie_central_sem_resultado") : "";
     if (!text) return "";
-    var details = [resultFieldText(result.metodo), resultFieldText(result.round) ? "Round " + resultFieldText(result.round) : "", resultFieldText(result.tempo)].filter(Boolean);
+    var details = [resultFieldText(result.metodo), resultFieldText(result.round) ? legendaCentral("legenda_ie_central_round") + resultFieldText(result.round) : "", resultFieldText(result.tempo)].filter(Boolean);
     return "<div class=\"ie-event-decision\"><strong>" + escapeHtml(text) + "</strong>" + (details.length ? "<span>" + escapeHtml(details.join(" · ")) + "</span>" : "") + "</div>";
   }
 
@@ -1208,20 +2009,20 @@
     var format = eventResultFormat(item);
     var title = eventDisplayTitle(item);
     var id = matchCanonicalId(item);
-    var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Evento", 25);
+    var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || legendaCentral("legenda_ie_central_evento"), 25);
     var result = item.resultado || item.placar || {};
     var startAt = item.inicio_em || item.data_partida || item.data_inicio;
     var metadata = [resultFieldText(item.subtipo_evento), resultFieldText(item.fase), resultFieldText(item.rodada), [resultFieldText(item.local_nome), resultFieldText(item.local_cidade)].filter(Boolean).join(" · ")].filter(Boolean);
     var eventStatus = String(item.status_normalizado || item.status || item.status_canonico || "").toLowerCase();
-    var statusLabels = { cancelada: "Cancelada", adiada: "Adiada", abandonada: "Abandonada", suspensa: "Suspensa", interrompida: "Interrompida" };
-    var status = visibility.confirmed ? "Encerrado" : visibility.live ? "Ao vivo" : statusLabels[eventStatus] || "";
-    var liveClock = visibility.live ? (eventStatus === "intervalo" ? "Intervalo" : resultFieldText(item.relogio && item.relogio.texto) || resultFieldText(item.periodo)) : "";
-    var actions = interactive === false || !id ? "" : "<button type=\"button\" class=\"ie-text-action\"" + detailAttributes("event", id, "", title) + ">Detalhes</button>";
+    var statusLabels = { cancelada: legendaCentral("legenda_ie_central_cancelada"), adiada: legendaCentral("legenda_ie_central_adiada"), abandonada: legendaCentral("legenda_ie_central_abandonada"), suspensa: legendaCentral("legenda_ie_central_suspensa"), interrompida: legendaCentral("legenda_ie_central_interrompida") };
+    var status = visibility.confirmed ? legendaCentral("legenda_ie_central_encerrado") : visibility.live ? legendaCentral("legenda_ie_central_ao_vivo") : statusLabels[eventStatus] || "";
+    var liveClock = visibility.live ? (eventStatus === "intervalo" ? legendaCentral("legenda_ie_central_intervalo") : resultFieldText(item.relogio && item.relogio.texto) || resultFieldText(item.periodo)) : "";
+    var actions = interactive === false || !id ? "" : "<button type=\"button\" class=\"ie-text-action\"" + detailAttributes("event", id, "", title) + (">" + escapeHtml(legendaCentral("legenda_ie_central_detalhes")) + "</button>");
     var body = "<h3 class=\"ie-event-title\">" + escapeHtml(title) + "</h3>";
     if (format === "duelo_decisao") {
       var participants = eventCompetitors(item);
       body += "<div class=\"ie-event-competitors\">" + participants.map(function (participant) {
-        var name = participant.nome || participant.nome_curto || "Participante";
+        var name = participant.nome || participant.nome_curto || legendaCentral("legenda_ie_central_participante");
         return "<div class=\"ie-side\">" + logoHtml(participant.imagem_url, name, "", participant.sigla) + "<strong>" + escapeHtml(name) + "</strong></div>";
       }).join("") + "</div>";
       body += renderEventDecision(item, result, visibility.confirmed);
@@ -1242,7 +2043,7 @@
     var terminalStatus = ["encerrada", "encerrado", "finished", "finalizada", "finalizado"].indexOf(status) >= 0;
     var liveStatus = ["ao_vivo", "live", "em_andamento", "intervalo", "prorrogacao", "penaltis"].indexOf(status) >= 0;
     var scheduledStatus = ["agendado", "agendada", "scheduled", "timed", "not_started", "nao_iniciado", "nao_iniciada", "ns"].indexOf(status) >= 0;
-    var exceptionalStatusLabels = { cancelada: "Cancelada", adiada: "Adiada", abandonada: "Abandonada", suspensa: "Suspensa", interrompida: "Interrompida" };
+    var exceptionalStatusLabels = { cancelada: legendaCentral("legenda_ie_central_cancelada"), adiada: legendaCentral("legenda_ie_central_adiada"), abandonada: legendaCentral("legenda_ie_central_abandonada"), suspensa: legendaCentral("legenda_ie_central_suspensa"), interrompida: legendaCentral("legenda_ie_central_interrompida") };
     var exceptionalStatusText = exceptionalStatusLabels[status] || "";
     var futureSchedule = !terminalStatus && !liveStatus && (scheduledStatus || (!Number.isNaN(startTimestamp) && startTimestamp > serverNow()));
     var pendingResult = !futureSchedule && (["pendente", "confirmando", "em_confirmacao", "aguardando_confirmacao", "pending", "pending_confirmation", "awaiting_confirmation"].indexOf(resultState) >= 0
@@ -1274,34 +2075,34 @@
     var statusText = technicalStatus ? "" : rawStatusText;
     if (pendingResult) statusText = "";
     else if (staleLive) statusText = "";
-    else if (!statusText && confirmedResult && ["encerrada", "finished", "finalizada"].indexOf(status) >= 0) statusText = "Encerrado";
-    else if (!statusText) statusText = exceptionalStatusText || (live ? "Ao vivo" : formatDateTime(startAt, false));
+    else if (!statusText && confirmedResult && ["encerrada", "finished", "finalizada"].indexOf(status) >= 0) statusText = legendaCentral("legenda_ie_central_encerrado");
+    else if (!statusText) statusText = exceptionalStatusText || (live ? legendaCentral("legenda_ie_central_ao_vivo") : formatDateTime(startAt, false));
     if (live) {
       // O backend normaliza o relógio informado na coleta autoritativa; nunca cronometre pelo início previsto.
-      statusText = status === "intervalo" ? "Intervalo"
+      statusText = status === "intervalo" ? legendaCentral("legenda_ie_central_intervalo")
         : resultFieldText(item.relogio && item.relogio.texto)
           || (scoreUnitLabel(item) ? resultFieldText(item.periodo) : "")
           || "";
     }
-    var dateText = live ? "Ao vivo" : formatDate(startAt);
-    var center = hasScore ? "<span class=\"ie-score\">" + escapeHtml(scoreHome) + " – " + escapeHtml(scoreAway) + "</span>" : (pendingResult || staleLive || live) ? "<span class=\"ie-score\">×</span>" : "<span class=\"ie-match-time\">" + escapeHtml(formatDateTime(startAt, false) || "A definir") + "</span>";
+    var dateText = live ? legendaCentral("legenda_ie_central_ao_vivo") : formatDate(startAt);
+    var center = hasScore ? "<span class=\"ie-score\">" + escapeHtml(scoreHome) + " – " + escapeHtml(scoreAway) + "</span>" : (pendingResult || staleLive || live) ? "<span class=\"ie-score\">×</span>" : "<span class=\"ie-match-time\">" + escapeHtml(formatDateTime(startAt, false) || legendaCentral("legenda_ie_central_a_definir")) + "</span>";
     if (hasScore && scoreUnitLabel(item)) center += "<span class=\"ie-score-unit\">" + escapeHtml(scoreUnitLabel(item)) + "</span>";
     if (dateText) center += "<span class=\"ie-match-date\">" + escapeHtml(dateText) + "</span>";
     if ((hasScore || live || exceptionalStatusText) && statusText) center += "<span class=\"ie-match-time\">" + escapeHtml(statusText) + "</span>";
-    var availabilityNotice = staleLive ? "<small class=\"ie-match-update-state\">Atualização indisponível para este confronto</small>" : "";
-    var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || "Confronto", 25);
-    if (id) center = '<button type="button" class="ieb-event-ticket" data-bet-event-id="' + escapeHtml(id) + '" data-personal-bets-open aria-label="Abrir Minhas apostas"></button>' + center;
+    var availabilityNotice = staleLive ? ("<small class=\"ie-match-update-state\">" + escapeHtml(legendaCentral("legenda_ie_central_atualizacao_indisponivel_para_este_confronto")) + "</small>") : "";
+    var competition = competitionDisplayName(item.competicao_nome || item.competicao && (item.competicao.nome || item.competicao) || label || legendaCentral("legenda_ie_central_confronto"), 25);
+    if (id) center = '<button type="button" class="ieb-event-ticket" data-bet-event-id="' + escapeHtml(id) + ("\" data-personal-bets-open aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_abrir_minhas_apostas")) + "\"></button>") + center;
     var compareAction = typeof compareSelection !== "undefined" && compareSelection && String(item.esporte || "").toLowerCase() === "futebol"
       && (scheduledStatus || status === "adiada") && !item.ao_vivo && startTimestamp > serverNow()
-      ? compareSelection.button(id, sides.home.name + " e " + sides.away.name, startTimestamp) : "";
-    var actions = interactive === false || !id ? "" : "<div class=\"ie-match-actions\"><button type=\"button\" data-match-action=\"odds\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir cotações de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("chart") + "</button>" + compareAction + "<button type=\"button\" data-match-action=\"analysis\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"Abrir análises de " + escapeHtml(sides.home.name + " e " + sides.away.name) + "\">" + icon("analysis") + "</button></div>";
+      ? compareSelection.button(id, legendaCentral("legenda_ie_central_confronto_participantes", { casa: sides.home.name, visitante: sides.away.name }), startTimestamp) : "";
+    var actions = interactive === false || !id ? "" : "<div class=\"ie-match-actions\"><button type=\"button\" data-match-action=\"odds\" data-event-id=\"" + escapeHtml(id) + ("\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_abrir_cotacoes_de"))) + escapeHtml(legendaCentral("legenda_ie_central_confronto_participantes", { casa: sides.home.name, visitante: sides.away.name })) + "\">" + icon("chart") + "</button>" + compareAction + "<button type=\"button\" data-match-action=\"analysis\" data-event-id=\"" + escapeHtml(id) + ("\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_abrir_analises_de"))) + escapeHtml(legendaCentral("legenda_ie_central_confronto_participantes", { casa: sides.home.name, visitante: sides.away.name })) + "\">" + icon("analysis") + "</button></div>";
     return "<article class=\"ie-feed-card ie-wide ie-match-card" + (live ? " is-live" : "") + (live && item.relogio && item.relogio.alem_regulamentar === true ? " is-regulation-exceeded" : "") + "\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon(live ? "live" : "trophy") + "</span>" + escapeHtml(competition) + "</span>" + actions + "</div><div class=\"ie-match\"><div class=\"ie-side\">" + logoHtml(sides.home.logo, sides.home.name, "", sides.home.abbreviation) + "<strong>" + escapeHtml(sides.home.name) + "</strong></div><div class=\"ie-match-center\">" + center + "</div><div class=\"ie-side\">" + logoHtml(sides.away.logo, sides.away.name, "", sides.away.abbreviation) + "<strong>" + escapeHtml(sides.away.name) + "</strong></div></div><div class=\"ieb-event-summary\" data-bet-event-id=\"" + escapeHtml(id) + "\"></div>" + availabilityNotice + renderScorePeriods(item, currentScoreShown) + "</article>";
   }
 
   function renderNewsCard(item) {
     var id = item.id_noticia || item.id || "";
     var url = item.url_original || item.url || "";
-    return "<article class=\"ie-feed-card\"" + detailAttributes("news", id, url, item.titulo || "Notícia esportiva") + "><h3 class=\"ie-news-title\">" + escapeHtml(item.titulo || "Notícia esportiva") + "</h3>" + (item.resumo || item.descricao ? "<p class=\"ie-news-description\">" + escapeHtml(item.resumo || item.descricao) + "</p>" : "") + "<span class=\"ie-source\">Fonte: " + escapeHtml(item.fonte_nome || item.fonte || "não informada") + (item.publicado_em ? " · " + escapeHtml(formatDateTime(item.publicado_em)) : "") + "</span></article>";
+    return "<article class=\"ie-feed-card\"" + detailAttributes("news", id, url, item.titulo || escapeHtml(legendaCentral("legenda_ie_central_noticia_esportiva"))) + "><h3 class=\"ie-news-title\">" + escapeHtml(item.titulo || legendaCentral("legenda_ie_central_noticia_esportiva")) + "</h3>" + (item.resumo || item.descricao ? "<p class=\"ie-news-description\">" + escapeHtml(item.resumo || item.descricao) + "</p>" : "") + ("<span class=\"ie-source\">" + escapeHtml(legendaCentral("legenda_ie_central_fonte"))) + escapeHtml(item.fonte_nome || item.fonte || legendaCentral("legenda_ie_central_nao_informada")) + (item.publicado_em ? " · " + escapeHtml(formatDateTime(item.publicado_em)) : "") + "</span></article>";
   }
 
   function renderOddsCard(item, prediction) {
@@ -1318,10 +2119,10 @@
       firstValue([item.odd_fora, item.fora])
     ];
     var suffix = prediction ? "%" : "";
-    var labels = ["Casa", "Empate", "Fora"];
+    var labels = [legendaCentral("legenda_ie_central_casa"), legendaCentral("legenda_ie_central_empate"), legendaCentral("legenda_ie_central_fora")];
     var detailKind = prediction ? "analysis" : "odds";
-    var detailTitle = prediction ? "Análises estatísticas" : "Cotações informativas";
-    return "<article class=\"ie-feed-card\"" + detailAttributes(detailKind, item.id_evento || item.id_partida || "", "", detailTitle) + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span>" + (prediction ? "Probabilidade estatística" : "Cotações informativas") + "</span></div><div class=\"ie-stat-row\"><span>" + labels[0] + "<strong>" + escapeHtml(values[0] == null ? "—" : values[0] + suffix) + "</strong></span><span>" + labels[1] + "<strong>" + escapeHtml(values[1] == null ? "—" : values[1] + suffix) + "</strong></span><span>" + labels[2] + "<strong>" + escapeHtml(values[2] == null ? "—" : values[2] + suffix) + "</strong></span></div>" + (prediction ? "<p class=\"ie-disclaimer\">Estimativa estatística. Não representa recomendação nem garantia de resultado.</p>" : "<p class=\"ie-disclaimer\">Informação neutra, sem indicação ou direcionamento para apostas.</p>") + "</article>";
+    var detailTitle = prediction ? legendaCentral("legenda_ie_central_analises_estatisticas") : legendaCentral("legenda_ie_central_cotacoes_informativas");
+    return "<article class=\"ie-feed-card\"" + detailAttributes(detailKind, item.id_evento || item.id_partida || "", "", detailTitle) + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span>" + (prediction ? escapeHtml(legendaCentral("legenda_ie_central_probabilidade_estatistica")) : escapeHtml(legendaCentral("legenda_ie_central_cotacoes_informativas"))) + "</span></div><div class=\"ie-stat-row\"><span>" + labels[0] + "<strong>" + escapeHtml(values[0] == null ? "—" : values[0] + suffix) + "</strong></span><span>" + labels[1] + "<strong>" + escapeHtml(values[1] == null ? "—" : values[1] + suffix) + "</strong></span><span>" + labels[2] + "<strong>" + escapeHtml(values[2] == null ? "—" : values[2] + suffix) + "</strong></span></div>" + (prediction ? ("<p class=\"ie-disclaimer\">" + escapeHtml(legendaCentral("legenda_ie_central_estimativa_estatistica_nao_representa_recomendacao_nem_garantia_de_resultado")) + "</p>") : ("<p class=\"ie-disclaimer\">" + escapeHtml(legendaCentral("legenda_ie_central_informacao_neutra_sem_indicacao_ou_direcionamento_para_apostas")) + "</p>")) + "</article>";
   }
 
   function renderAnalysisCard(item) {
@@ -1331,13 +2132,13 @@
     if (historicalType && numberOf(historicalSummary.jogos, 0) > 0) {
       var teamA = item.time_a || item.participante_a || {};
       var teamB = item.time_b || item.participante_b || {};
-      var teamAName = item.time_a_nome || item.nome_time_a || teamA.nome || item.participante_casa_nome || "Time A";
-      var teamBName = item.time_b_nome || item.nome_time_b || teamB.nome || item.participante_fora_nome || "Time B";
+      var teamAName = item.time_a_nome || item.nome_time_a || teamA.nome || item.participante_casa_nome || legendaCentral("legenda_ie_central_time_a");
+      var teamBName = item.time_b_nome || item.nome_time_b || teamB.nome || item.participante_fora_nome || legendaCentral("legenda_ie_central_time_b");
       var id = item.id_evento || item.id_partida || item.id || "";
-      return "<article class=\"ie-feed-card ie-analysis-summary\"" + detailAttributes("analysis", id, "", teamAName + " x " + teamBName) + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span>Análises estatísticas</span></div><div class=\"ie-h2h-card-title\"><strong>" + escapeHtml(numberOf(historicalSummary.jogos, 0)) + " jogos</strong><span>" + escapeHtml(teamAName) + " × " + escapeHtml(teamBName) + "</span></div><div class=\"ie-stat-row\"><span>" + escapeHtml(teamAName) + "<strong>" + escapeHtml(numberOf(historicalSummary.vitorias_time_a, 0)) + "</strong><small>vitórias</small></span><span>Empates<strong>" + escapeHtml(numberOf(historicalSummary.empates, 0)) + "</strong><small>resultados</small></span><span>" + escapeHtml(teamBName) + "<strong>" + escapeHtml(numberOf(historicalSummary.vitorias_time_b, 0)) + "</strong><small>vitórias</small></span></div><p class=\"ie-disclaimer\">Estatística histórica. Resultados passados não garantem resultados futuros.</p></article>";
+      return "<article class=\"ie-feed-card ie-analysis-summary\"" + detailAttributes("analysis", id, "", teamAName + " x " + teamBName) + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + ("</span>" + escapeHtml(legendaCentral("legenda_ie_central_analises_estatisticas")) + "</span></div><div class=\"ie-h2h-card-title\"><strong>") + escapeHtml(numberOf(historicalSummary.jogos, 0)) + (escapeHtml(legendaCentral("legenda_ie_central_jogos")) + "</strong><span>") + escapeHtml(teamAName) + " × " + escapeHtml(teamBName) + "</span></div><div class=\"ie-stat-row\"><span>" + escapeHtml(teamAName) + "<strong>" + escapeHtml(numberOf(historicalSummary.vitorias_time_a, 0)) + ("</strong><small>" + escapeHtml(legendaCentral("legenda_ie_central_vitorias")) + "</small></span><span>" + escapeHtml(legendaCentral("legenda_ie_central_empates")) + "<strong>") + escapeHtml(numberOf(historicalSummary.empates, 0)) + ("</strong><small>" + escapeHtml(legendaCentral("legenda_ie_central_resultados")) + "</small></span><span>") + escapeHtml(teamBName) + "<strong>" + escapeHtml(numberOf(historicalSummary.vitorias_time_b, 0)) + ("</strong><small>" + escapeHtml(legendaCentral("legenda_ie_central_vitorias")) + "</small></span></div><p class=\"ie-disclaimer\">" + escapeHtml(legendaCentral("legenda_ie_central_estatistica_historica_resultados_passados_nao_garantem_resultados_futuros")) + "</p></article>");
     }
     if (type === "resumo_personalizado" || item.proximos !== undefined || item.ao_vivo !== undefined || item.encerrados !== undefined) {
-      return "<article class=\"ie-feed-card\"" + detailAttributes("analysis", item.id_evento || item.id || "", "", item.titulo || "Análises estatísticas") + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span>Análises</span></div><h3 class=\"ie-news-title\">" + escapeHtml(item.titulo || "Resumo dos seus acompanhamentos") + "</h3><div class=\"ie-stat-row\"><span>Próximos<strong>" + escapeHtml(numberOf(item.proximos, 0)) + "</strong></span><span>Ao vivo<strong>" + escapeHtml(numberOf(item.ao_vivo, 0)) + "</strong></span><span>Encerrados<strong>" + escapeHtml(numberOf(item.encerrados, 0)) + "</strong></span></div><p class=\"ie-disclaimer\">Resumo informativo das suas seleções esportivas.</p></article>";
+      return "<article class=\"ie-feed-card\"" + detailAttributes("analysis", item.id_evento || item.id || "", "", item.titulo || escapeHtml(legendaCentral("legenda_ie_central_analises_estatisticas"))) + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + ("</span>" + escapeHtml(legendaCentral("legenda_ie_central_analises")) + "</span></div><h3 class=\"ie-news-title\">") + escapeHtml(item.titulo || legendaCentral("legenda_ie_central_resumo_dos_seus_acompanhamentos")) + ("</h3><div class=\"ie-stat-row\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_proximos")) + "<strong>") + escapeHtml(numberOf(item.proximos, 0)) + ("</strong></span><span>" + escapeHtml(legendaCentral("legenda_ie_central_ao_vivo")) + "<strong>") + escapeHtml(numberOf(item.ao_vivo, 0)) + ("</strong></span><span>" + escapeHtml(legendaCentral("legenda_ie_central_encerrados")) + "<strong>") + escapeHtml(numberOf(item.encerrados, 0)) + ("</strong></span></div><p class=\"ie-disclaimer\">" + escapeHtml(legendaCentral("legenda_ie_central_resumo_informativo_das_suas_selecoes_esportivas")) + "</p></article>");
     }
 
     var probabilityType = /probabil|predi|estimativa/.test(type);
@@ -1346,15 +2147,15 @@
     var completeProbability = probabilityValues.every(function (value) { return value !== null && value !== undefined && value !== ""; });
     if ((probabilityType || explicitProbability) && completeProbability) return renderOddsCard(item, true);
 
-    return "<article class=\"ie-feed-card\"" + detailAttributes("analysis", item.id_evento || item.id || "", "", item.titulo || "Análises estatísticas") + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span>Análises</span></div><h3 class=\"ie-news-title\">" + escapeHtml(item.titulo || "Análise esportiva") + "</h3>" + (item.resumo || item.descricao ? "<p class=\"ie-news-description\">" + escapeHtml(item.resumo || item.descricao) + "</p>" : "") + "<p class=\"ie-disclaimer\">Estimativas, quando disponíveis, são estatísticas e não representam recomendação nem garantia de resultado.</p></article>";
+    return "<article class=\"ie-feed-card\"" + detailAttributes("analysis", item.id_evento || item.id || "", "", item.titulo || escapeHtml(legendaCentral("legenda_ie_central_analises_estatisticas"))) + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + ("</span>" + escapeHtml(legendaCentral("legenda_ie_central_analises")) + "</span></div><h3 class=\"ie-news-title\">") + escapeHtml(item.titulo || legendaCentral("legenda_ie_central_analise_esportiva")) + "</h3>" + (item.resumo || item.descricao ? "<p class=\"ie-news-description\">" + escapeHtml(item.resumo || item.descricao) + "</p>" : "") + ("<p class=\"ie-disclaimer\">" + escapeHtml(legendaCentral("legenda_ie_central_estimativas_quando_disponiveis_sao_estatisticas_e_nao_representam_recomendacao_nem_garantia_de_resul")) + "</p></article>");
   }
 
   function renderCompetitionCard(item) {
-    var period = [item.data_inicio ? "Início " + formatDate(item.data_inicio) : "", item.data_fim ? "Fim " + formatDate(item.data_fim) : ""].filter(Boolean).join(" • ");
+    var period = [item.data_inicio ? legendaCentral("legenda_ie_central_inicio") + formatDate(item.data_inicio) : "", item.data_fim ? legendaCentral("legenda_ie_central_fim") + formatDate(item.data_fim) : ""].filter(Boolean).join(" • ");
     var summary = (item.fase_atual ? "<p class=\"ie-news-description\"><strong>" + escapeHtml(item.fase_atual) + "</strong></p>" : "") + (period ? "<span class=\"ie-source\">" + escapeHtml(period) + "</span>" : "");
     var body = summary + renderCompetitionStandings(item.classificacao, item.id_competicao || item.id, item.fase_atual, true);
-    var name = competitionDisplayName(item.nome || item.competicao_nome || "Competição");
-    return "<article class=\"ie-feed-card\"" + detailAttributes("competition", item.id_competicao || item.id || "", "", name) + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("trophy") + "</span>Competição</span></div><h3 class=\"ie-news-title\">" + escapeHtml(name) + "</h3>" + body + "</article>";
+    var name = competitionDisplayName(item.nome || item.competicao_nome || legendaCentral("legenda_ie_central_competicao"));
+    return "<article class=\"ie-feed-card\"" + detailAttributes("competition", item.id_competicao || item.id || "", "", name) + "><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("trophy") + ("</span>" + escapeHtml(legendaCentral("legenda_ie_central_competicao")) + "</span></div><h3 class=\"ie-news-title\">") + escapeHtml(name) + "</h3>" + body + "</article>";
   }
 
   function competitionNumber(value, position) {
@@ -1377,22 +2178,22 @@
 
   function competitionSourceHtml(data) {
     data = data || {};
-    var parts = [data.fonte_dominio ? "Fonte: " + data.fonte_dominio : "", data.atualizado_em ? "Recebido em " + formatDateTime(data.atualizado_em) : ""].filter(Boolean);
+    var parts = [data.fonte_dominio ? legendaCentral("legenda_ie_central_fonte") + data.fonte_dominio : "", data.atualizado_em ? legendaCentral("legenda_ie_central_recebido_em") + formatDateTime(data.atualizado_em) : ""].filter(Boolean);
     return parts.length ? "<p class=\"ie-competition-source\">" + escapeHtml(parts.join(" · ")) + "</p>" : "";
   }
 
   function competitionParticipantAttributes(team, competitionId, phase) {
     var participantId = competitionNumber(team && team.id_participante, true);
     if (participantId === null || !competitionId) return "";
-    return detailAttributes("competition-participant", participantId, "", team.nome || "Participante") + " data-participant-id=\"" + escapeHtml(participantId) + "\" data-competition-id=\"" + escapeHtml(competitionId) + "\" data-phase=\"" + escapeHtml(phase || "") + "\"";
+    return detailAttributes("competition-participant", participantId, "", team.nome || legendaCentral("legenda_ie_central_participante")) + " data-participant-id=\"" + escapeHtml(participantId) + "\" data-competition-id=\"" + escapeHtml(competitionId) + "\" data-phase=\"" + escapeHtml(phase || "") + "\"";
   }
 
   function renderCompetitionStandings(classification, competitionId, phase, compact) {
     classification = classification || {};
     if (classification.status === "nao_aplicavel") return "";
     var rows = competitionStandingRows(classification);
-    if (!rows.length) return "<p class=\"ie-competition-notice\">" + (classification.status === "indisponivel" ? "Classificação indisponível nas fontes habilitadas." : "Classificação em atualização. As colocações ainda não foram confirmadas pela fonte.") + "</p>";
-    var status = classification.status === "desatualizada" ? "Última classificação recebida — atualização pendente." : "Classificação recebida da fonte.";
+    if (!rows.length) return "<p class=\"ie-competition-notice\">" + (classification.status === "indisponivel" ? escapeHtml(legendaCentral("legenda_ie_central_classificacao_indisponivel_nas_fontes_habilitadas")) : escapeHtml(legendaCentral("legenda_ie_central_classificacao_em_atualizacao_as_colocacoes_ainda_nao_foram_confirmadas_pela_fonte"))) + "</p>";
+    var status = classification.status === "desatualizada" ? legendaCentral("legenda_ie_central_ultima_classificacao_recebida_atualizacao_pendente") : legendaCentral("legenda_ie_central_classificacao_recebida_da_fonte");
     var grouped = [];
     rows.forEach(function (row) {
       var groupName = String(row.grupo || "");
@@ -1400,30 +2201,30 @@
       if (!group) { group = { name: groupName, rows: [] }; grouped.push(group); }
       group.rows.push(row);
     });
-    var fields = compact ? [["pontos", "Pts", "Pontos"], ["jogos", "J", "Jogos"]] : [["pontos", "Pts", "Pontos"], ["jogos", "J", "Jogos"], ["vitorias", "V", "Vitórias"], ["empates", "E", "Empates"], ["derrotas", "D", "Derrotas"], ["saldo_gols", "SG", "Saldo de gols"]];
+    var fields = compact ? [["pontos", legendaCentral("legenda_ie_central_pts"), legendaCentral("legenda_ie_central_pontos")], ["jogos", legendaCentral("legenda_ie_central_abreviatura_jogos"), legendaCentral("legenda_ie_central_jogos_2")]] : [["pontos", legendaCentral("legenda_ie_central_pts"), legendaCentral("legenda_ie_central_pontos")], ["jogos", legendaCentral("legenda_ie_central_abreviatura_jogos"), legendaCentral("legenda_ie_central_jogos_2")], ["vitorias", legendaCentral("legenda_ie_central_abreviatura_vitorias"), legendaCentral("legenda_ie_central_vitorias_2")], ["empates", legendaCentral("legenda_ie_central_abreviatura_empates"), legendaCentral("legenda_ie_central_empates")], ["derrotas", legendaCentral("legenda_ie_central_abreviatura_derrotas"), legendaCentral("legenda_ie_central_derrotas")], ["saldo_gols", legendaCentral("legenda_ie_central_abreviatura_saldo_gols"), legendaCentral("legenda_ie_central_saldo_de_gols")]];
     var tables = grouped.map(function (group) {
       var shown = compact ? group.rows.slice(0, 4) : group.rows;
-      var heading = "<tr><th scope=\"col\">Pos.</th><th scope=\"col\">Participante</th>" + fields.map(function (field) { return "<th scope=\"col\"><abbr title=\"" + field[2] + "\">" + field[1] + "</abbr></th>"; }).join("") + "</tr>";
+      var heading = ("<tr><th scope=\"col\">" + escapeHtml(legendaCentral("legenda_ie_central_pos")) + "</th><th scope=\"col\">" + escapeHtml(legendaCentral("legenda_ie_central_participante")) + "</th>") + fields.map(function (field) { return "<th scope=\"col\"><abbr title=\"" + field[2] + "\">" + field[1] + "</abbr></th>"; }).join("") + "</tr>";
       var body = shown.map(function (team) {
         var position = competitionNumber(team.posicao, true);
         var name = "<span>" + escapeHtml(team.nome) + "</span>";
         var teamHtml = compact ? name : "<button type=\"button\" class=\"ie-competition-team\"" + competitionParticipantAttributes(team, competitionId, phase) + ">" + logoHtml(team.imagem_url, team.nome, "ie-entity-logo", team.sigla) + name + "</button>";
-        return "<tr><td>" + (position === null ? "<span aria-label=\"Colocação não informada\">—</span>" : escapeHtml(position) + "º") + "</td><th scope=\"row\">" + teamHtml + "</th>" + fields.map(function (field) {
+        return "<tr><td>" + (position === null ? ("<span aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_colocacao_nao_informada")) + "\">—</span>") : escapeHtml(legendaCentral("legenda_ie_central_posicao_ordinal", { posicao: position }))) + "</td><th scope=\"row\">" + teamHtml + "</th>" + fields.map(function (field) {
           var value = competitionNumber(team[field[0]], false);
-          return "<td>" + (value === null ? "<span aria-label=\"Não informado\">—</span>" : escapeHtml(value.toLocaleString("pt-BR"))) + "</td>";
+          return "<td>" + (value === null ? ("<span aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_nao_informado")) + "\">—</span>") : escapeHtml(value.toLocaleString("pt-BR"))) + "</td>";
         }).join("") + "</tr>";
       }).join("");
-      return "<div class=\"ie-competition-table-wrap\"><table class=\"ie-competition-table" + (compact ? " is-compact" : "") + "\"><caption>" + escapeHtml(group.name || "Classificação geral") + "</caption><thead>" + heading + "</thead><tbody>" + body + "</tbody></table></div>" + (compact && shown.length < group.rows.length ? "<p class=\"ie-competition-source\">Veja todos os participantes em Detalhes.</p>" : "");
+      return "<div class=\"ie-competition-table-wrap\"><table class=\"ie-competition-table" + (compact ? " is-compact" : "") + "\"><caption>" + escapeHtml(group.name || legendaCentral("legenda_ie_central_classificacao_geral")) + "</caption><thead>" + heading + "</thead><tbody>" + body + "</tbody></table></div>" + (compact && shown.length < group.rows.length ? ("<p class=\"ie-competition-source\">" + escapeHtml(legendaCentral("legenda_ie_central_veja_todos_os_participantes_em_detalhes")) + "</p>") : "");
     }).join("");
-    return "<div class=\"ie-competition-standings\"><p class=\"ie-competition-notice" + (classification.status === "desatualizada" ? " is-pending" : "") + "\">" + escapeHtml(status) + "</p>" + competitionSourceHtml(classification) + tables + (compact ? "" : "<p class=\"ie-competition-source\">Pts: pontos · J: jogos · V: vitórias · E: empates · D: derrotas · SG: saldo de gols. Deslize a tabela para ver todas as colunas.</p>") + "</div>";
+    return "<div class=\"ie-competition-standings\"><p class=\"ie-competition-notice" + (classification.status === "desatualizada" ? " is-pending" : "") + "\">" + escapeHtml(status) + "</p>" + competitionSourceHtml(classification) + tables + (compact ? "" : ("<p class=\"ie-competition-source\">" + escapeHtml(legendaCentral("legenda_ie_central_pts_pontos_j_jogos_v_vitorias_e_empates_d_derrotas_sg_saldo_de_gols_deslize_a_tabela_para_ver_todas")) + "</p>")) + "</div>";
   }
 
   function renderCompetitionParticipants(teams, competitionId, phase, qualified) {
     return "<div class=\"ie-classified-list\">" + arrayOf(teams).filter(function (team) {
       return team && competitionNumber(team.id_participante, true) !== null && team.nome;
     }).map(function (team) {
-      var name = team.nome || "Participante";
-      var status = qualified ? "Classificação confirmada" : "Participante da temporada";
+      var name = team.nome || legendaCentral("legenda_ie_central_participante");
+      var status = qualified ? legendaCentral("legenda_ie_central_classificacao_confirmada") : legendaCentral("legenda_ie_central_participante_da_temporada");
       var participantPhase = qualified ? team.fase || phase : "";
       return "<article class=\"ie-classified-row ie-competition-participant\"" + competitionParticipantAttributes(team, competitionId, participantPhase) + ">" + logoHtml(team.imagem_url, name, "ie-entity-logo", team.sigla) + "<span><strong>" + escapeHtml(name) + "</strong><small>" + escapeHtml(status + (participantPhase ? " · " + participantPhase : "")) + "</small></span>" + icon("chevron") + "</article>";
     }).join("") + "</div>";
@@ -1436,15 +2237,15 @@
     var qualified = data.classificados || {};
     var rows = competitionStandingRows(classification);
     var confirmed = ["confirmado", "parcial"].indexOf(qualified.status) >= 0 ? arrayOf(qualified.itens).filter(function (team) { return team && team.situacao === "classificado" && competitionNumber(team.id_participante, true) !== null && team.nome; }) : [];
-    var html = detailSection("Colocação", renderCompetitionStandings(classification, competitionId, classification.fase || competition.fase_atual, false));
+    var html = detailSection(legendaCentral("legenda_ie_central_colocacao"), renderCompetitionStandings(classification, competitionId, classification.fase || competition.fase_atual, false));
     if (confirmed.length) {
-      html += detailSection("Classificados confirmados", (qualified.fase ? "<p class=\"ie-competition-notice\">Fase: " + escapeHtml(qualified.fase) + "</p>" : "") + (qualified.status === "parcial" ? "<p class=\"ie-competition-notice is-pending\">Lista parcial: os demais classificados ainda estão em atualização.</p>" : "") + competitionSourceHtml(qualified) + renderCompetitionParticipants(confirmed, competitionId, qualified.fase, true));
+      html += detailSection(legendaCentral("legenda_ie_central_classificados_confirmados"), (qualified.fase ? ("<p class=\"ie-competition-notice\">" + escapeHtml(legendaCentral("legenda_ie_central_fase"))) + escapeHtml(qualified.fase) + "</p>" : "") + (qualified.status === "parcial" ? ("<p class=\"ie-competition-notice is-pending\">" + escapeHtml(legendaCentral("legenda_ie_central_lista_parcial_os_demais_classificados_ainda_estao_em_atualizacao")) + "</p>") : "") + competitionSourceHtml(qualified) + renderCompetitionParticipants(confirmed, competitionId, qualified.fase, true));
     } else if (classification.status === "nao_aplicavel") {
-      html += detailSection("Avanço de fase", "<p class=\"ie-competition-notice\">Esta fase não usa tabela de colocação. Os classificados serão exibidos quando o avanço estiver confirmado; participar de um confronto não comprova classificação.</p>");
+      html += detailSection(legendaCentral("legenda_ie_central_avanco_de_fase"), ("<p class=\"ie-competition-notice\">" + escapeHtml(legendaCentral("legenda_ie_central_esta_fase_nao_usa_tabela_de_colocacao_os_classificados_serao_exibidos_quando_o_avanco_estiver_confir")) + "</p>"));
     }
     if (!rows.length) {
       var participants = arrayOf(data.participantes);
-      html += detailSection("Participantes da temporada", participants.length ? renderCompetitionParticipants(participants, competitionId, "", false) : "<p class=\"ie-competition-notice\">Participantes em atualização.</p>");
+      html += detailSection(legendaCentral("legenda_ie_central_participantes_da_temporada"), participants.length ? renderCompetitionParticipants(participants, competitionId, "", false) : ("<p class=\"ie-competition-notice\">" + escapeHtml(legendaCentral("legenda_ie_central_participantes_em_atualizacao")) + "</p>"));
     }
     return html;
   }
@@ -1468,9 +2269,9 @@
     }
     var first = data.data_inicio || data.periodo_inicio || data.primeiro_jogo_em;
     var last = data.data_fim || data.periodo_fim || data.ultimo_jogo_em;
-    if (first && last) return dateOnly(first) + " a " + dateOnly(last);
-    if (first) return "Desde " + dateOnly(first);
-    if (last) return "Até " + dateOnly(last);
+    if (first && last) return legendaCentral("legenda_ie_central_periodo_datas", { inicio: dateOnly(first), fim: dateOnly(last) });
+    if (first) return legendaCentral("legenda_ie_central_desde") + dateOnly(first);
+    if (last) return legendaCentral("legenda_ie_central_ate") + dateOnly(last);
     return "";
   }
 
@@ -1478,18 +2279,18 @@
     if (!data || data.pais !== "Brasil" || data.modalidade !== "Futebol") return "";
     function total(value) { return numberOf(value, 0).toLocaleString("pt-BR"); }
     var period = formatDatabasePeriod(data);
-    return "<article class=\"ie-feed-card ie-wide ie-base-summary-card\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span>Base própria</span></div><h3 class=\"ie-news-title\">Futebol do Brasil</h3><p class=\"ie-news-description\">Acervo histórico organizado pelo Turbo Tiger" + (period ? " · " + escapeHtml(period) : "") + "</p><div class=\"ie-stat-row\"><span>Partidas<strong>" + escapeHtml(total(data.total_registros)) + "</strong></span><span>Competições<strong>" + escapeHtml(total(data.total_competicoes)) + "</strong></span><span>Times<strong>" + escapeHtml(total(data.total_times)) + "</strong></span></div>" + historyContributionLinkHtml() + "</article>";
+    return "<article class=\"ie-feed-card ie-wide ie-base-summary-card\"><div class=\"ie-feed-head\"><span class=\"ie-feed-label\"><span class=\"ie-feed-icon\">" + icon("chart") + ("</span>" + escapeHtml(legendaCentral("legenda_ie_central_base_propria")) + "</span></div><h3 class=\"ie-news-title\">" + escapeHtml(legendaCentral("legenda_ie_central_futebol_do_brasil")) + "</h3><p class=\"ie-news-description\">" + escapeHtml(legendaCentral("legenda_ie_central_acervo_historico_organizado_pelo_turbo_tiger"))) + (period ? " · " + escapeHtml(period) : "") + ("</p><div class=\"ie-stat-row\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_partidas")) + "<strong>") + escapeHtml(total(data.total_registros)) + ("</strong></span><span>" + escapeHtml(legendaCentral("legenda_ie_central_competicoes")) + "<strong>") + escapeHtml(total(data.total_competicoes)) + ("</strong></span><span>" + escapeHtml(legendaCentral("legenda_ie_central_times")) + "<strong>") + escapeHtml(total(data.total_times)) + "</strong></span></div>" + historyContributionLinkHtml() + "</article>";
   }
 
   function renderHome() {
     var card = state.card || {};
     var filteredSection = String(state.homeSectionFilter || "").toLowerCase();
     if (!activeSport()) {
-      byId("homeContent").innerHTML = emptyState("Escolha seus esportes", "Defina um esporte favorito e acompanhe os times, participantes e competições que realmente interessam a você.", true);
+      apresentarHTMLCentral(byId("homeContent"), emptyState(legendaCentral("legenda_ie_central_escolha_seus_esportes"), legendaCentral("legenda_ie_central_defina_um_esporte_favorito_e_acompanhe_os_times_participantes_e_competicoes_que_realmente_interessam"), true));
       return;
     }
     if (!activeSportIsOperational()) {
-      byId("homeContent").innerHTML = comingSoonState();
+      apresentarHTMLCentral(byId("homeContent"), comingSoonState());
       return;
     }
     var html = [];
@@ -1508,18 +2309,18 @@
       });
     } else {
       [
-        ["sports-story", "Minha história esportiva", "Seus registros e sua privacidade", "team"],
-        ["ranking", "Top 10 dos colaboradores", "Colaborações aprovadas para nossa base", "trophy"],
-        ["experience-ranking", "Top 10 dos que assistiram ao vivo", "Histórias compartilhadas pelos membros", "stadium"]
+        ["sports-story", legendaCentral("legenda_ie_central_minha_historia_esportiva"), legendaCentral("legenda_ie_central_seus_registros_e_sua_privacidade"), "team"],
+        ["ranking", legendaCentral("legenda_ie_central_top_10_dos_colaboradores"), legendaCentral("legenda_ie_central_colaboracoes_aprovadas_para_nossa_base"), "trophy"],
+        ["experience-ranking", legendaCentral("legenda_ie_central_top_10_dos_que_assistiram_ao_vivo"), legendaCentral("legenda_ie_central_historias_compartilhadas_pelos_membros"), "stadium"]
       ].forEach(function (entry) {
-        html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-history-action=\"" + entry[0] + "\"><span class=\"ie-feed-icon\">" + icon(entry[3]) + "</span><span class=\"ie-entity-copy\"><strong>" + entry[1] + "</strong><span>" + entry[2] + "</span></span>" + icon("chevron") + "</button>");
+        html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-history-action=\"" + entry[0] + "\"><span class=\"ie-feed-icon\">" + icon(entry[3]) + "</span><span class=\"ie-entity-copy\"><strong>" + escapeHtml(entry[1]) + "</strong><span>" + escapeHtml(entry[2]) + "</span></span>" + icon("chevron") + "</button>");
       });
-      html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-simulator-action=\"list\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span><span class=\"ie-entity-copy\"><strong>Simulações salvas</strong><span>Consulte as simulações da sua conta</span></span>" + icon("chevron") + "</button>");
-      html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-compare-open><span class=\"ie-feed-icon\">" + icon("chart") + "</span><span class=\"ie-entity-copy\"><strong>Comparar Confrontos</strong><span>Teste os cenários de até três jogos</span></span>" + icon("chevron") + "</button>");
-      html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-personal-bets-open><span class=\"ie-feed-icon\">" + icon("news") + "</span><span class=\"ie-entity-copy\"><strong>Minhas apostas</strong><span>Bilhetes, resultados e controle pessoal</span></span>" + icon("chevron") + "</button>");
+      html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-simulator-action=\"list\"><span class=\"ie-feed-icon\">" + icon("chart") + ("</span><span class=\"ie-entity-copy\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_simulacoes_salvas")) + "</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_consulte_as_simulacoes_da_sua_conta")) + "</span></span>") + icon("chevron") + "</button>");
+      html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-compare-open><span class=\"ie-feed-icon\">" + icon("chart") + ("</span><span class=\"ie-entity-copy\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_comparar_confrontos")) + "</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_teste_os_cenarios_de_ate_tres_jogos")) + "</span></span>") + icon("chevron") + "</button>");
+      html.push("<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-personal-bets-open><span class=\"ie-feed-icon\">" + icon("news") + ("</span><span class=\"ie-entity-copy\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_minhas_apostas")) + "</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_bilhetes_resultados_e_controle_pessoal")) + "</span></span>") + icon("chevron") + "</button>");
     }
-    var content = html.join("") || emptyState(filteredSection ? "Nenhuma informação disponível" : "Nenhum favorito neste esporte", filteredSection ? "Esta seção ainda não possui dados atualizados para suas escolhas." : "Acompanhe times ou competições deste esporte para montar o seu espaço.", false);
-    byId("homeContent").innerHTML = modeSwitcher + content;
+    var content = html.join("") || emptyState(filteredSection ? legendaCentral("legenda_ie_central_nenhuma_informacao_disponivel") : legendaCentral("legenda_ie_central_nenhum_favorito_neste_esporte"), filteredSection ? legendaCentral("legenda_ie_central_esta_secao_ainda_nao_possui_dados_atualizados_para_suas_escolhas") : legendaCentral("legenda_ie_central_acompanhe_times_ou_competicoes_deste_esporte_para_montar_o_seu_espaco"), false);
+    apresentarHTMLCentral(byId("homeContent"), modeSwitcher + content);
   }
 
   function renderGames() {
@@ -1528,35 +2329,35 @@
     var toolbar = filter.closest(".ie-games-filter-toolbar");
     if (!activeSport()) {
       if (toolbar) toolbar.hidden = true;
-      byId("gamesContent").innerHTML = emptyState("Escolha seus esportes", "Defina ao menos um esporte favorito para acompanhar confrontos.", true);
+      apresentarHTMLCentral(byId("gamesContent"), emptyState(legendaCentral("legenda_ie_central_escolha_seus_esportes"), legendaCentral("legenda_ie_central_defina_ao_menos_um_esporte_favorito_para_acompanhar_confrontos"), true));
       return;
     }
     if (!activeSportIsOperational()) {
       if (toolbar) toolbar.hidden = true;
-      byId("gamesContent").innerHTML = comingSoonState();
+      apresentarHTMLCentral(byId("gamesContent"), comingSoonState());
       return;
     }
     if (toolbar) toolbar.hidden = false;
     var competitions = gameCompetitionSelections();
     var competitionId = selectedGameCompetitionId();
-    var filterOptions = "<option value=\"\">Todas as favoritas</option>" + competitions.map(function (item) {
+    var filterOptions = ("<option value=\"\">" + escapeHtml(legendaCentral("legenda_ie_central_todas_as_favoritas")) + "</option>") + competitions.map(function (item) {
       var identity = selectionIdentity(item);
-      var name = competitionDisplayName(item.nome || item.nome_exibicao || item.competicao_nome || "Competição");
+      var name = competitionDisplayName(item.nome || item.nome_exibicao || item.competicao_nome || legendaCentral("legenda_ie_central_competicao"));
       return "<option value=\"" + escapeHtml(identity.id) + "\">" + escapeHtml(name) + "</option>";
     }).join("");
-    if (filter.innerHTML !== filterOptions) filter.innerHTML = filterOptions;
-    filter.value = competitionId ? String(competitionId) : "";
-    filter.disabled = !competitions.length;
-    filter.setAttribute("aria-busy", state.gameCompetitionLoading ? "true" : "false");
+    if (filter.innerHTML !== filterOptions) apresentarHTMLCentral(filter, filterOptions);
+    if (!reapresentandoIdiomaCentral) filter.value = competitionId ? String(competitionId) : "";
+    if (!reapresentandoIdiomaCentral) filter.disabled = !competitions.length;
+    if (!reapresentandoIdiomaCentral) filter.setAttribute("aria-busy", state.gameCompetitionLoading ? "true" : "false");
 
     var rows = competitionId ? state.gameCompetitionGames[state.gameFilter] || [] : state.games[state.gameFilter] || [];
     rows = orderMatchesByFavorites(rows, state.activeSportId, state.gameFilter);
     if (competitionId && state.gameCompetitionLoading && !rows.length) {
-      byId("gamesContent").innerHTML = emptyState("Carregando confrontos", "Buscando os confrontos desta competição.", false);
+      apresentarHTMLCentral(byId("gamesContent"), emptyState(legendaCentral("legenda_ie_central_carregando_confrontos"), legendaCentral("legenda_ie_central_buscando_os_confrontos_desta_competicao"), false));
       return;
     }
-    var content = rows.length ? rows.map(function (item) { return renderMatchCard(item); }).join("") : emptyState("Nenhum confronto", "Não há confrontos nesta seção para os times e competições acompanhados.", false);
-    if (byId("gamesContent").innerHTML !== content) byId("gamesContent").innerHTML = content;
+    var content = rows.length ? rows.map(function (item) { return renderMatchCard(item); }).join("") : emptyState(legendaCentral("legenda_ie_central_nenhum_confronto"), legendaCentral("legenda_ie_central_nao_ha_confrontos_nesta_secao_para_os_times_e_competicoes_acompanhados"), false);
+    if (byId("gamesContent").innerHTML !== content) apresentarHTMLCentral(byId("gamesContent"), content);
   }
 
   function liveRefreshIsVisible() {
@@ -1695,14 +2496,14 @@
 
   function renderNews() {
     if (!activeSport()) {
-      byId("newsContent").innerHTML = emptyState("Escolha seus esportes", "Defina ao menos um esporte favorito para acompanhar notícias.", true);
+      apresentarHTMLCentral(byId("newsContent"), emptyState(legendaCentral("legenda_ie_central_escolha_seus_esportes"), legendaCentral("legenda_ie_central_defina_ao_menos_um_esporte_favorito_para_acompanhar_noticias"), true));
       return;
     }
     if (!activeSportIsOperational()) {
-      byId("newsContent").innerHTML = comingSoonState();
+      apresentarHTMLCentral(byId("newsContent"), comingSoonState());
       return;
     }
-    byId("newsContent").innerHTML = state.news.length ? state.news.map(renderNewsCard).join("") : emptyState("Nenhuma notícia", "Ainda não encontramos notícias autorizadas relacionadas às suas seleções.", false);
+    apresentarHTMLCentral(byId("newsContent"), state.news.length ? state.news.map(renderNewsCard).join("") : emptyState(legendaCentral("legenda_ie_central_nenhuma_noticia"), legendaCentral("legenda_ie_central_ainda_nao_encontramos_noticias_autorizadas_relacionadas_as_suas_selecoes"), false));
   }
 
   function orderedSports() {
@@ -1719,13 +2520,13 @@
   function renderSportsNav() {
     var sports = orderedSports().filter(function (item) { return state.sportFavoriteOrder.indexOf(sportId(item)) >= 0; });
     var nav = byId("sportsNav");
-    nav.innerHTML = sports.map(function (item) {
+    apresentarHTMLCentral(nav, sports.map(function (item) {
       var id = sportId(item);
       var favorite = state.sportFavoriteOrder.indexOf(id) >= 0;
       var operational = sportIsOperational(item);
-      var name = item.nome || "Esporte";
-      return "<button type=\"button\" data-sport-id=\"" + id + "\" class=\"" + (id === Number(state.activeSportId) ? "is-active" : "") + (favorite ? " is-favorite" : "") + (operational ? "" : " is-coming-soon") + "\" aria-label=\"" + escapeHtml(name + (operational ? "" : " — Em breve!")) + "\" aria-pressed=\"" + (id === Number(state.activeSportId)) + "\">" + escapeHtml(name) + "</button>";
-    }).join("");
+      var name = item.nome || legendaCentral("legenda_ie_central_esporte");
+      return "<button type=\"button\" data-sport-id=\"" + id + "\" class=\"" + (id === Number(state.activeSportId) ? "is-active" : "") + (favorite ? " is-favorite" : "") + (operational ? "" : " is-coming-soon") + "\" aria-label=\"" + escapeHtml(name + (operational ? "" : legendaCentral("legenda_ie_central_em_breve_2"))) + "\" aria-pressed=\"" + (id === Number(state.activeSportId)) + "\">" + escapeHtml(name) + "</button>";
+    }).join(""));
     nav.hidden = !sports.length || state.activeTab === "settings";
   }
 
@@ -1738,12 +2539,12 @@
     if (controls) controls.hidden = false;
     var teams = followedSelections("participant", state.activeSportId);
     var competitions = followedSelections("competition", state.activeSportId);
-    if (!teams.some(function (item) { return Number(selectionIdentity(item).id) === Number(state.newsFilters.participantId); })) state.newsFilters.participantId = null;
-    if (!competitions.some(function (item) { return Number(selectionIdentity(item).id) === Number(state.newsFilters.competitionId); })) state.newsFilters.competitionId = null;
-    byId("newsTeamFilter").innerHTML = "<option value=\"\">Todos</option>" + teams.map(function (item) { return "<option value=\"" + escapeHtml(selectionIdentity(item).id) + "\">" + escapeHtml(item.nome || item.nome_exibicao || "Time") + "</option>"; }).join("");
-    byId("newsCompetitionFilter").innerHTML = "<option value=\"\">Todas</option>" + competitions.map(function (item) { return "<option value=\"" + escapeHtml(selectionIdentity(item).id) + "\">" + escapeHtml(competitionDisplayName(item.nome || item.nome_exibicao || "Competição")) + "</option>"; }).join("");
-    byId("newsTeamFilter").value = state.newsFilters.participantId ? String(state.newsFilters.participantId) : "";
-    byId("newsCompetitionFilter").value = state.newsFilters.competitionId ? String(state.newsFilters.competitionId) : "";
+    if (!reapresentandoIdiomaCentral && !teams.some(function (item) { return Number(selectionIdentity(item).id) === Number(state.newsFilters.participantId); })) state.newsFilters.participantId = null;
+    if (!reapresentandoIdiomaCentral && !competitions.some(function (item) { return Number(selectionIdentity(item).id) === Number(state.newsFilters.competitionId); })) state.newsFilters.competitionId = null;
+    apresentarHTMLCentral(byId("newsTeamFilter"), ("<option value=\"\">" + escapeHtml(legendaCentral("legenda_ie_central_todos")) + "</option>") + teams.map(function (item) { return "<option value=\"" + escapeHtml(selectionIdentity(item).id) + "\">" + escapeHtml(item.nome || item.nome_exibicao || legendaCentral("legenda_ie_central_time")) + "</option>"; }).join(""));
+    apresentarHTMLCentral(byId("newsCompetitionFilter"), ("<option value=\"\">" + escapeHtml(legendaCentral("legenda_ie_central_todas")) + "</option>") + competitions.map(function (item) { return "<option value=\"" + escapeHtml(selectionIdentity(item).id) + "\">" + escapeHtml(competitionDisplayName(item.nome || item.nome_exibicao || legendaCentral("legenda_ie_central_competicao"))) + "</option>"; }).join(""));
+    if (!reapresentandoIdiomaCentral) byId("newsTeamFilter").value = state.newsFilters.participantId ? String(state.newsFilters.participantId) : "";
+    if (!reapresentandoIdiomaCentral) byId("newsCompetitionFilter").value = state.newsFilters.competitionId ? String(state.newsFilters.competitionId) : "";
   }
 
   function selectionRows(targetType) {
@@ -1808,9 +2609,9 @@
       var busy = !!state.selectionBusy[key];
       var canReorder = targetType === "participant" && follow;
       var reorderControl = canReorder
-        ? "<button class=\"ie-drag-handle\" type=\"button\" data-favorite-drag-id=\"" + escapeHtml(id) + "\" aria-label=\"Arrastar para ordenar " + escapeHtml(name) + "\"><span aria-hidden=\"true\"></span></button>"
+        ? "<button class=\"ie-drag-handle\" type=\"button\" data-favorite-drag-id=\"" + escapeHtml(id) + ("\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_arrastar_para_ordenar"))) + escapeHtml(name) + "\"><span aria-hidden=\"true\"></span></button>"
         : "<span class=\"ie-drag-placeholder\" aria-hidden=\"true\"></span>";
-      return "<div class=\"ie-selection-row" + (busy ? " is-saving" : "") + "\"" + (canReorder ? " data-favorite-row-id=\"" + escapeHtml(id) + "\"" : "") + ">" + reorderControl + logoHtml(item.imagem_url || item.logo_url || item.logo, name, "ie-entity-logo") + "<strong>" + escapeHtml(name) + "</strong><div class=\"ie-selection-actions\"><button class=\"ie-selection-action" + (follow ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"follow\" aria-label=\"Acompanhar\" aria-pressed=\"" + follow + "\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button>" + (targetType === "participant" ? "<button class=\"ie-selection-action" + (notify ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + "\" data-selection-kind=\"notify\" aria-label=\"Notificar\" aria-pressed=\"" + notify + "\"" + (busy ? " disabled" : "") + ">" + icon("bell") + "</button>" : "") + "</div></div>";
+      return "<div class=\"ie-selection-row" + (busy ? " is-saving" : "") + "\"" + (canReorder ? " data-favorite-row-id=\"" + escapeHtml(id) + "\"" : "") + ">" + reorderControl + logoHtml(item.imagem_url || item.logo_url || item.logo, name, "ie-entity-logo") + "<strong>" + escapeHtml(name) + "</strong><div class=\"ie-selection-actions\"><button class=\"ie-selection-action" + (follow ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + ("\" data-selection-kind=\"follow\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_acompanhar")) + "\" aria-pressed=\"") + follow + "\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button>" + (targetType === "participant" ? "<button class=\"ie-selection-action" + (notify ? " is-active" : "") + "\" type=\"button\" data-selection-key=\"" + escapeHtml(key) + ("\" data-selection-kind=\"notify\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_notificar")) + "\" aria-pressed=\"") + notify + "\"" + (busy ? " disabled" : "") + ">" + icon("bell") + "</button>" : "") + "</div></div>";
     }).join("");
   }
 
@@ -1909,49 +2710,49 @@
     var merged = Object.assign({}, selectionMap(), state.selectionChanges);
     var teamCount = Object.keys(merged).filter(function (key) { return key.indexOf("participant:") === 0 && merged[key].acompanhar; }).length;
     var competitionCount = Object.keys(merged).filter(function (key) { return key.indexOf("competition:") === 0 && merged[key].acompanhar; }).length;
-    byId("teamSelectionCount").textContent = teamCount + " selecionado" + (teamCount === 1 ? "" : "s");
-    byId("competitionSelectionCount").textContent = competitionCount + " selecionado" + (competitionCount === 1 ? "" : "s");
+    byId("teamSelectionCount").textContent = legendaCentral(teamCount === 1 ? "legenda_ie_central_quantidade_selecionado" : "legenda_ie_central_quantidade_selecionados", { quantidade: teamCount });
+    byId("competitionSelectionCount").textContent = legendaCentral(competitionCount === 1 ? "legenda_ie_central_quantidade_selecionado" : "legenda_ie_central_quantidade_selecionados", { quantidade: competitionCount });
     var selectedSportId = Number(byId("sportSelect") && byId("sportSelect").value || 0);
     if (selectedSportId && !sportIsOperational(sportById(selectedSportId))) {
       var message = comingSoonState(sportById(selectedSportId));
-      byId("teamSelectionList").innerHTML = message;
-      byId("competitionSelectionList").innerHTML = message;
+      apresentarHTMLCentral(byId("teamSelectionList"), message);
+      apresentarHTMLCentral(byId("competitionSelectionList"), message);
       return;
     }
-    byId("teamSelectionList").innerHTML = selectionRows("participant") || emptyState("Nenhum resultado", "Ajuste os filtros ou a busca.", false);
-    byId("competitionSelectionList").innerHTML = selectionRows("competition") || emptyState("Nenhum resultado", "Ajuste os filtros ou a busca.", false);
+    apresentarHTMLCentral(byId("teamSelectionList"), selectionRows("participant") || emptyState(legendaCentral("legenda_ie_central_nenhum_resultado"), legendaCentral("legenda_ie_central_ajuste_os_filtros_ou_a_busca"), false));
+    apresentarHTMLCentral(byId("competitionSelectionList"), selectionRows("competition") || emptyState(legendaCentral("legenda_ie_central_nenhum_resultado"), legendaCentral("legenda_ie_central_ajuste_os_filtros_ou_a_busca"), false));
   }
 
   function renderEntities() {
     if (!activeSport()) {
-      byId("teamsContent").innerHTML = emptyState("Escolha seus esportes", "Defina ao menos um esporte favorito para acompanhar times e participantes.", true);
-      byId("competitionsContent").innerHTML = emptyState("Escolha seus esportes", "Defina ao menos um esporte favorito para acompanhar competições.", true);
+      apresentarHTMLCentral(byId("teamsContent"), emptyState(legendaCentral("legenda_ie_central_escolha_seus_esportes"), legendaCentral("legenda_ie_central_defina_ao_menos_um_esporte_favorito_para_acompanhar_times_e_participantes"), true));
+      apresentarHTMLCentral(byId("competitionsContent"), emptyState(legendaCentral("legenda_ie_central_escolha_seus_esportes"), legendaCentral("legenda_ie_central_defina_ao_menos_um_esporte_favorito_para_acompanhar_competicoes"), true));
       return;
     }
     if (!activeSportIsOperational()) {
-      byId("teamsContent").innerHTML = comingSoonState();
-      byId("competitionsContent").innerHTML = comingSoonState();
+      apresentarHTMLCentral(byId("teamsContent"), comingSoonState());
+      apresentarHTMLCentral(byId("competitionsContent"), comingSoonState());
       return;
     }
     var participants = followedSelections("participant", state.activeSportId);
     var competitions = state.favoriteCompetitions;
     var selected = selectionMap();
-    byId("teamsContent").innerHTML = participants.length ? participants.map(function (item) {
-      var name = item.nome || item.nome_exibicao || "Time ou participante";
+    apresentarHTMLCentral(byId("teamsContent"), participants.length ? participants.map(function (item) {
+      var name = item.nome || item.nome_exibicao || legendaCentral("legenda_ie_central_time_ou_participante");
       var abbreviation = String(item.sigla || item.abreviacao || "").trim().toUpperCase();
       var displayName = abbreviation ? abbreviation + " - " + name : name;
       var key = "participant:" + selectionIdentity(item).id;
       var current = state.selectionChanges[key] || selected[key] || item;
       var busy = !!state.selectionBusy[key];
-      return "<article class=\"ie-entity-row" + (busy ? " is-saving" : "") + "\"><div class=\"ie-entity-main\"" + detailAttributes("participant", selectionIdentity(item).id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", abbreviation) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(displayName) + "</strong></div>" + icon("chevron") + "</div><div class=\"ie-entity-actions\"><button class=\"ie-selection-action is-active\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + "\" data-entity-selection-kind=\"follow\" aria-label=\"Remover " + escapeHtml(name) + " dos favoritos\" aria-pressed=\"true\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button><button class=\"ie-selection-action" + (current.notificar ? " is-active" : "") + "\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + "\" data-entity-selection-kind=\"notify\" aria-label=\"" + (current.notificar ? "Desativar" : "Ativar") + " notificações de " + escapeHtml(name) + "\" aria-pressed=\"" + (!!current.notificar) + "\"" + (busy ? " disabled" : "") + ">" + icon("bell") + "</button></div></article>";
-    }).join("") : emptyState("Nenhum time acompanhado", "Use as configurações para escolher times ou participantes deste esporte.", true);
-    byId("competitionsContent").innerHTML = competitions.length ? competitions.map(function (item) {
-      var name = competitionDisplayName(item.nome || item.competicao_nome || "Competição");
+      return "<article class=\"ie-entity-row" + (busy ? " is-saving" : "") + "\"><div class=\"ie-entity-main\"" + detailAttributes("participant", selectionIdentity(item).id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", abbreviation) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(displayName) + "</strong></div>" + icon("chevron") + "</div><div class=\"ie-entity-actions\"><button class=\"ie-selection-action is-active\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + ("\" data-entity-selection-kind=\"follow\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_remover"))) + escapeHtml(name) + " dos favoritos\" aria-pressed=\"true\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button><button class=\"ie-selection-action" + (current.notificar ? " is-active" : "") + "\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + "\" data-entity-selection-kind=\"notify\" aria-label=\"" + (current.notificar ? escapeHtml(legendaCentral("legenda_ie_central_desativar")) : escapeHtml(legendaCentral("legenda_ie_central_ativar"))) + escapeHtml(legendaCentral("legenda_ie_central_notificacoes_de")) + escapeHtml(name) + "\" aria-pressed=\"" + (!!current.notificar) + "\"" + (busy ? " disabled" : "") + ">" + icon("bell") + "</button></div></article>";
+    }).join("") : emptyState(legendaCentral("legenda_ie_central_nenhum_time_acompanhado"), legendaCentral("legenda_ie_central_use_as_configuracoes_para_escolher_times_ou_participantes_deste_esporte"), true));
+    apresentarHTMLCentral(byId("competitionsContent"), competitions.length ? competitions.map(function (item) {
+      var name = competitionDisplayName(item.nome || item.competicao_nome || legendaCentral("legenda_ie_central_competicao"));
       var id = item.id_competicao || item.id;
       var key = "competition:" + id;
       var busy = !!state.selectionBusy[key];
-      return "<article class=\"ie-entity-row" + (busy ? " is-saving" : "") + "\"><div class=\"ie-entity-main\"" + detailAttributes("competition", id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", item.sigla) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(name) + "</strong><span>" + escapeHtml(item.fase_atual || item.temporada || "") + "</span></div>" + icon("chevron") + "</div><div class=\"ie-entity-actions\"><button class=\"ie-selection-action is-active\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + "\" data-entity-selection-kind=\"follow\" aria-label=\"Remover " + escapeHtml(name) + " dos favoritos\" aria-pressed=\"true\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button></div></article>";
-    }).join("") : emptyState("Nenhuma competição acompanhada", "Use as configurações para escolher suas competições deste esporte.", true);
+      return "<article class=\"ie-entity-row" + (busy ? " is-saving" : "") + "\"><div class=\"ie-entity-main\"" + detailAttributes("competition", id, "", name) + ">" + logoHtml(item.imagem_url || item.logo_url, name, "ie-entity-logo", item.sigla) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(name) + "</strong><span>" + escapeHtml(item.fase_atual || item.temporada || "") + "</span></div>" + icon("chevron") + "</div><div class=\"ie-entity-actions\"><button class=\"ie-selection-action is-active\" type=\"button\" data-entity-selection-key=\"" + escapeHtml(key) + ("\" data-entity-selection-kind=\"follow\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_remover"))) + escapeHtml(name) + " dos favoritos\" aria-pressed=\"true\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button></div></article>";
+    }).join("") : emptyState(legendaCentral("legenda_ie_central_nenhuma_competicao_acompanhada"), legendaCentral("legenda_ie_central_use_as_configuracoes_para_escolher_suas_competicoes_deste_esporte"), true));
   }
 
   function favoriteSport() {
@@ -1961,23 +2762,23 @@
   function renderSportFavoriteSettings() {
     var favorites = state.sportFavoriteOrder.slice();
     var rows = orderedSports();
-    byId("sportFavoriteList").innerHTML = rows.length ? rows.map(function (item) {
+    apresentarHTMLCentral(byId("sportFavoriteList"), rows.length ? rows.map(function (item) {
       var id = sportId(item);
       var index = favorites.indexOf(id);
       var selected = index >= 0;
-      var name = item.nome || "Esporte";
+      var name = item.nome || legendaCentral("legenda_ie_central_esporte");
       var operational = sportIsOperational(item);
       var busy = !!state.selectionBusy["sport:" + id];
       var reorderControl = selected
-        ? "<button class=\"ie-drag-handle\" type=\"button\" data-sport-favorite-drag-id=\"" + id + "\" aria-label=\"Arrastar para ordenar " + escapeHtml(name) + "\"><span aria-hidden=\"true\"></span></button>"
+        ? "<button class=\"ie-drag-handle\" type=\"button\" data-sport-favorite-drag-id=\"" + id + ("\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_arrastar_para_ordenar"))) + escapeHtml(name) + "\"><span aria-hidden=\"true\"></span></button>"
         : "<span class=\"ie-drag-placeholder\" aria-hidden=\"true\"></span>";
-      return "<div class=\"ie-sport-favorite-row" + (selected ? " is-selected" : "") + (operational ? "" : " is-coming-soon") + (busy ? " is-saving" : "") + "\"" + (selected ? " data-sport-favorite-row-id=\"" + id + "\"" : "") + ">" + reorderControl + "<span class=\"ie-sport-favorite-copy\"><strong>" + escapeHtml(name) + "</strong>" + (operational ? "" : "<small>Em breve!</small>") + "</span><div class=\"ie-sport-favorite-actions\"><button class=\"ie-selection-action" + (selected ? " is-active" : "") + "\" type=\"button\" data-sport-favorite-id=\"" + id + "\" data-sport-favorite-action=\"toggle\" aria-label=\"" + (selected ? "Remover " : "Favoritar ") + escapeHtml(item.nome || "esporte") + "\" aria-pressed=\"" + selected + "\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button></div></div>";
-    }).join("") : emptyState("Nenhum esporte disponível", "O catálogo esportivo ainda não foi disponibilizado.", false);
+      return "<div class=\"ie-sport-favorite-row" + (selected ? " is-selected" : "") + (operational ? "" : " is-coming-soon") + (busy ? " is-saving" : "") + "\"" + (selected ? " data-sport-favorite-row-id=\"" + id + "\"" : "") + ">" + reorderControl + "<span class=\"ie-sport-favorite-copy\"><strong>" + escapeHtml(name) + "</strong>" + (operational ? "" : ("<small>" + escapeHtml(legendaCentral("legenda_ie_central_em_breve")) + "</small>")) + "</span><div class=\"ie-sport-favorite-actions\"><button class=\"ie-selection-action" + (selected ? " is-active" : "") + "\" type=\"button\" data-sport-favorite-id=\"" + id + "\" data-sport-favorite-action=\"toggle\" aria-label=\"" + (selected ? escapeHtml(legendaCentral("legenda_ie_central_remover")) : escapeHtml(legendaCentral("legenda_ie_central_favoritar"))) + escapeHtml(item.nome || legendaCentral("legenda_ie_central_esporte_generico")) + "\" aria-pressed=\"" + selected + "\"" + (busy ? " disabled" : "") + ">" + icon("star") + "</button></div></div>";
+    }).join("") : emptyState(legendaCentral("legenda_ie_central_nenhum_esporte_disponivel"), legendaCentral("legenda_ie_central_o_catalogo_esportivo_ainda_nao_foi_disponibilizado"), false));
   }
 
   function fillSelect(select, items, placeholder, value) {
-    select.innerHTML = "<option value=\"\">" + escapeHtml(placeholder) + "</option>" + arrayOf(items).map(function (item) { return "<option value=\"" + escapeHtml(item.id || item.id_esporte || item.id_continente || item.id_pais) + "\">" + escapeHtml(item.nome) + "</option>"; }).join("");
-    select.value = value == null ? "" : String(value);
+    apresentarHTMLCentral(select, "<option value=\"\">" + escapeHtml(placeholder) + "</option>" + arrayOf(items).map(function (item) { return "<option value=\"" + escapeHtml(item.id || item.id_esporte || item.id_continente || item.id_pais) + "\">" + escapeHtml(item.nome) + "</option>"; }).join(""));
+    if (!reapresentandoIdiomaCentral) select.value = value == null ? "" : String(value);
   }
 
   function fillCountrySelect(continentId, countryId) {
@@ -1989,7 +2790,7 @@
       var brazilB = normalizeSearchText(b.nome) === "brasil";
       return brazilA !== brazilB ? (brazilA ? -1 : 1) : displayText(a.nome).localeCompare(displayText(b.nome), "pt-BR", { sensitivity: "base" });
     });
-    fillSelect(byId("countrySelect"), countries, "Todos", countryId);
+    fillSelect(byId("countrySelect"), countries, legendaCentral("legenda_ie_central_todos"), countryId);
   }
 
   function normalizeAlerts(value, preferences) {
@@ -2007,25 +2808,25 @@
     var prefs = state.bootstrap && state.bootstrap.preferencias || {};
     var filters = state.bootstrap && state.bootstrap.filtros || {};
     var alerts = normalizeAlerts(state.bootstrap && state.bootstrap.alertas, prefs);
-    if (!state.settingsSavePending) setSettingsSaveStatus("", false);
+    if (!reapresentandoIdiomaCentral && !state.settingsSavePending) setSettingsSaveStatus("", false);
     renderSportFavoriteSettings();
     var selectedContinent = arrayOf(filters.ids_continentes)[0];
     var continents = arrayOf(catalog.continentes).filter(function (item) { return normalizeSearchText(item.nome) !== "global"; });
-    fillSelect(byId("continentSelect"), continents, "Todos", selectedContinent);
+    fillSelect(byId("continentSelect"), continents, legendaCentral("legenda_ie_central_todos"), selectedContinent);
     fillCountrySelect(byId("continentSelect").value, arrayOf(filters.ids_paises)[0]);
-    fillSelect(byId("sportSelect"), catalog.esportes, "Todos", arrayOf(filters.ids_esportes)[0]);
-    byId("notificationsEnabled").checked = alerts.ativo === true || prefs.notificacoes_ativas === true;
+    fillSelect(byId("sportSelect"), catalog.esportes, legendaCentral("legenda_ie_central_todos"), arrayOf(filters.ids_esportes)[0]);
+    if (!reapresentandoIdiomaCentral) byId("notificationsEnabled").checked = alerts.ativo === true || prefs.notificacoes_ativas === true;
     var chosen = arrayOf(alerts.antecedencias_minutos);
     var availableTimes = arrayOf(catalog.antecedencias_alerta).map(function (item) {
       var minutes = Number(item.minutos || item.antecedencia_minutos || item.valor);
-      return { minutes: minutes, label: item.nome || item.label || (minutes + " min") };
+      return { minutes: minutes, label: item.nome || item.label || (legendaCentral("legenda_ie_central_antecedencia_minutos", { quantidade: minutes })) };
     }).filter(function (item) { return Number.isInteger(item.minutes) && item.minutes > 0; });
-    if (!availableTimes.length) availableTimes = ALERT_TIMES.map(function (minutes) { return { minutes: minutes, label: minutes + " min" }; });
-    byId("alertTimes").innerHTML = availableTimes.map(function (item) { return "<label class=\"ie-time-option\"><input type=\"checkbox\" name=\"alertTime\" value=\"" + item.minutes + "\"" + (chosen.indexOf(item.minutes) >= 0 ? " checked" : "") + "><span>" + escapeHtml(item.label) + "</span></label>"; }).join("");
+    if (!availableTimes.length) availableTimes = ALERT_TIMES.map(function (minutes) { return { minutes: minutes, label: legendaCentral("legenda_ie_central_antecedencia_minutos", { quantidade: minutes }) }; });
+    apresentarHTMLCentral(byId("alertTimes"), availableTimes.map(function (item) { return "<label class=\"ie-time-option\"><input type=\"checkbox\" name=\"alertTime\" value=\"" + item.minutes + "\"" + (chosen.indexOf(item.minutes) >= 0 ? " checked" : "") + "><span>" + escapeHtml(item.label) + "</span></label>"; }).join(""));
     var chosenEvents = arrayOf(alerts.tipos_evento);
     var availableEvents = arrayOf(catalog.tipos_alerta).map(function (item) { return { code: item.codigo || item.codigo_tipo_alerta || item.code, label: item.nome || item.nome_tipo_alerta || item.label }; }).filter(function (item) { return item.code; });
     if (!availableEvents.length) availableEvents = ALERT_EVENTS;
-    byId("alertEvents").innerHTML = availableEvents.map(function (eventType) { return "<label class=\"ie-event-option\"><input type=\"checkbox\" name=\"alertEvent\" value=\"" + escapeHtml(eventType.code) + "\"" + (chosenEvents.indexOf(eventType.code) >= 0 ? " checked" : "") + "><span>" + escapeHtml(eventType.label) + "</span></label>"; }).join("");
+    apresentarHTMLCentral(byId("alertEvents"), availableEvents.map(function (eventType) { return "<label class=\"ie-event-option\"><input type=\"checkbox\" name=\"alertEvent\" value=\"" + escapeHtml(eventType.code) + "\"" + (chosenEvents.indexOf(eventType.code) >= 0 ? " checked" : "") + "><span>" + escapeHtml(eventType.label) + "</span></label>"; }).join(""));
     renderSelectionLists();
   }
 
@@ -2266,7 +3067,7 @@
       if (result.stale || context !== state.sportRequestId) return;
       saveCache();
       setSourceFreshness();
-      if (result.errors.length) showToast("Algumas informações deste esporte não puderam ser atualizadas.", true);
+      if (result.errors.length) showToast(legendaCentral("legenda_ie_central_algumas_informacoes_deste_esporte_nao_puderam_ser_atualizadas"), true);
     } catch (error) {
       if (context !== state.sportRequestId) return;
       showToast(friendlyError(error), true);
@@ -2441,7 +3242,7 @@
     if (!loadIsCurrent(generation)) return;
     showApp(true);
     state.loading = false;
-    byId("headerFreshness").textContent = "Atualizando...";
+    byId("headerFreshness").textContent = legendaCentral("legenda_ie_central_atualizando");
     notifyInitialOpeningReady();
 
     var backgroundErrors = openingErrors.slice();
@@ -2479,7 +3280,7 @@
     renderNewsFilters();
     renderNews();
     renderEntities();
-    if (backgroundErrors.length || backgroundIncomplete) byId("headerFreshness").textContent = "Atualização parcial";
+    if (backgroundErrors.length || backgroundIncomplete) byId("headerFreshness").textContent = legendaCentral("legenda_ie_central_atualizacao_parcial");
     else {
       setSourceFreshness();
       saveCache();
@@ -2537,7 +3338,7 @@
     var generation = ++state.loadGeneration;
     state.loading = true;
     if (manual) {
-      byId("headerFreshness").textContent = "Atualizando...";
+      byId("headerFreshness").textContent = legendaCentral("legenda_ie_central_atualizando");
       setPullRefreshState(1, true);
     }
     try {
@@ -2550,7 +3351,7 @@
         }
       }
       if (!loadIsCurrent(generation)) return;
-      if (manual) showToast("Informações atualizadas.", false);
+      if (manual) showToast(legendaCentral("legenda_ie_central_informacoes_atualizadas"), false);
     } catch (error) {
       if (!loadIsCurrent(generation)) return;
       var cached = state.session ? loadCache() : null;
@@ -2563,8 +3364,8 @@
         }
         if (!loadIsCurrent(generation)) return;
         showApp(true);
-        byId("headerFreshness").textContent = "Sem conexão";
-        showToast("Sem conexão. Os confrontos e resultados não foram restaurados.", true);
+        byId("headerFreshness").textContent = legendaCentral("legenda_ie_central_sem_conexao");
+        showToast(legendaCentral("legenda_ie_central_sem_conexao_os_confrontos_e_resultados_nao_foram_restaurados"), true);
         notifyInitialOpeningReady();
       } else if (state.bootstrap) {
         renderAll();
@@ -2574,8 +3375,8 @@
         }
         if (!loadIsCurrent(generation)) return;
         showApp(true);
-        byId("headerFreshness").textContent = "Atualização parcial";
-        showToast("Algumas informações não puderam ser atualizadas.", true);
+        byId("headerFreshness").textContent = legendaCentral("legenda_ie_central_atualizacao_parcial");
+        showToast(legendaCentral("legenda_ie_central_algumas_informacoes_nao_puderam_ser_atualizadas"), true);
         notifyInitialOpeningReady();
       } else {
         if (initialOpening) state.bootstrap = null;
@@ -2625,11 +3426,11 @@
 
   function settingsContextDefinition(context) {
     var definitions = {
-      partidas: { label: "Partidas", target: "settingsParticipants" },
-      campeonatos: { label: "Competição", target: "settingsCompetitions" },
-      noticias: { label: "Notícias", target: "settingsParticipants" },
-      cotacoes: { label: "Cotações", target: "settingsParticipants" },
-      analises: { label: "Análises", target: "settingsFavoriteSport" }
+      partidas: { label: legendaCentral("legenda_ie_central_partidas"), target: "settingsParticipants" },
+      campeonatos: { label: legendaCentral("legenda_ie_central_competicao"), target: "settingsCompetitions" },
+      noticias: { label: legendaCentral("legenda_ie_central_noticias"), target: "settingsParticipants" },
+      cotacoes: { label: legendaCentral("legenda_ie_central_cotacoes"), target: "settingsParticipants" },
+      analises: { label: legendaCentral("legenda_ie_central_analises"), target: "settingsFavoriteSport" }
     };
     return definitions[String(context || "").toLowerCase()] || null;
   }
@@ -2705,10 +3506,10 @@
       activateTab("home");
       renderHome();
     }
-    if (requested.eventId > 0 && requested.section === "analises") await openAnalysisDetail(requested.eventId, "Análises estatísticas");
-    else if (requested.eventId > 0 && requested.section === "cotacoes") await openOddsDetail(requested.eventId, "Cotações informativas");
-    else if (requested.eventId > 0) await openEventDetail(requested.eventId, "Detalhes da partida");
-    else if (requested.competitionId > 0) await openCompetitionDetail(requested.competitionId, "Detalhes da competição");
+    if (requested.eventId > 0 && requested.section === "analises") await openAnalysisDetail(requested.eventId, legendaCentral("legenda_ie_central_analises_estatisticas"));
+    else if (requested.eventId > 0 && requested.section === "cotacoes") await openOddsDetail(requested.eventId, legendaCentral("legenda_ie_central_cotacoes_informativas"));
+    else if (requested.eventId > 0) await openEventDetail(requested.eventId, legendaCentral("legenda_ie_central_detalhes_da_partida"));
+    else if (requested.competitionId > 0) await openCompetitionDetail(requested.competitionId, legendaCentral("legenda_ie_central_detalhes_da_competicao"));
   }
 
   function setDetailBackgroundInert(inert) {
@@ -2793,7 +3594,7 @@
     } else if (pushCurrent !== "replace") {
       state.detailStack = [];
     }
-    byId("detailTitle").textContent = displayText(title || "Detalhes");
+    byId("detailTitle").textContent = displayText(title || legendaCentral("legenda_ie_central_detalhes"));
     byId("detailSubtitle").textContent = displayText(subtitle || "");
     detailContent.removeAttribute("data-detail-view");
     detailContent.innerHTML = "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>";
@@ -2856,7 +3657,7 @@
   }
 
   function automaticSaveStatusHtml() {
-    return '<div class="ie-autosave-status" role="status" aria-live="polite"><span data-autosave-status></span><button type="button" class="ie-text-action" data-autosave-retry hidden>Tentar novamente</button></div>';
+    return ("<div class=\"ie-autosave-status\" role=\"status\" aria-live=\"polite\"><span data-autosave-status></span><button type=\"button\" class=\"ie-text-action\" data-autosave-retry hidden>" + escapeHtml(legendaCentral("legenda_ie_central_tentar_novamente")) + "</button></div>");
   }
 
   function formAutosave(form, save) {
@@ -2872,7 +3673,7 @@
         var label = form.querySelector("[data-autosave-status]");
         var retry = form.querySelector("[data-autosave-retry]");
         if (label) {
-          label.textContent = status === "saved" ? "Salvo." : status === "invalid" ? "Complete os campos válidos para salvar." : status === "error" ? "Não foi possível confirmar o salvamento. " + friendlyError(error) : "Salvando...";
+          label.textContent = status === "saved" ? legendaCentral("legenda_ie_central_salvo") : status === "invalid" ? legendaCentral("legenda_ie_central_complete_os_campos_validos_para_salvar") : status === "error" ? legendaCentral("legenda_ie_central_nao_foi_possivel_confirmar_o_salvamento") + friendlyError(error) : legendaCentral("legenda_ie_central_salvando");
           label.classList.toggle("is-error", status === "error" || status === "invalid");
         }
         if (retry) retry.hidden = status !== "error";
@@ -2892,13 +3693,13 @@
     var jobs = state.automaticSaves || [];
     if (jobs.some(function (entry) { return entry.job.busy(); })) {
       jobs.forEach(function (entry) { if (entry.job.busy()) entry.job.flush(); });
-      showToast("Aguarde a confirmação do salvamento antes de sair.", false);
+      showToast(legendaCentral("legenda_ie_central_aguarde_a_confirmacao_do_salvamento_antes_de_sair"), false);
       return false;
     }
     var unsaved = jobs.filter(function (entry) { return entry.form.isConnected && entry.job.unsaved(); });
     if (unsaved.length) {
-      if (requireConfirmed) { showToast("Confirme o salvamento usando Tentar novamente antes de compartilhar ou abrir a prévia.", true); return false; }
-      if (!window.confirm("Há alterações sem confirmação de salvamento. Sair mesmo assim e conferir ao reabrir?")) return false;
+      if (requireConfirmed) { showToast(legendaCentral("legenda_ie_central_confirme_o_salvamento_usando_tentar_novamente_antes_de_compartilhar_ou_abrir_a_previa"), true); return false; }
+      if (!window.confirm(legendaCentral("legenda_ie_central_ha_alteracoes_sem_confirmacao_de_salvamento_sair_mesmo_assim_e_conferir_ao_reabrir"))) return false;
       unsaved.forEach(function (entry) { entry.job.cancel(); });
       if (historyDetailView() === "sports-story" && state.historyContribution.story) renderMySportsStory(state.historyContribution.story);
     }
@@ -2906,31 +3707,31 @@
   }
 
   function outcomeCopy(code, sides) {
-    var home = sides && sides.home && sides.home.name || "Time da casa";
-    var away = sides && sides.away && sides.away.name || "Time visitante";
-    if (code === "casa") return { short: "Casa", name: home, help: "Vitória de " + home };
-    if (code === "empate") return { short: "Empate", name: "Empate", help: "Nenhum time vence" };
-    if (code === "fora") return { short: "Fora", name: away, help: "Vitória de " + away };
-    return { short: code || "Resultado", name: code || "Resultado", help: "Resultado do mercado" };
+    var home = sides && sides.home && sides.home.name || legendaCentral("legenda_ie_central_time_da_casa");
+    var away = sides && sides.away && sides.away.name || legendaCentral("legenda_ie_central_time_visitante");
+    if (code === "casa") return { short: legendaCentral("legenda_ie_central_casa"), name: home, help: legendaCentral("legenda_ie_central_vitoria_de") + home };
+    if (code === "empate") return { short: legendaCentral("legenda_ie_central_empate"), name: legendaCentral("legenda_ie_central_empate"), help: legendaCentral("legenda_ie_central_nenhum_time_vence") };
+    if (code === "fora") return { short: legendaCentral("legenda_ie_central_fora"), name: away, help: legendaCentral("legenda_ie_central_vitoria_de") + away };
+    return { short: code || legendaCentral("legenda_ie_central_resultado"), name: code || legendaCentral("legenda_ie_central_resultado"), help: legendaCentral("legenda_ie_central_resultado_do_mercado") };
   }
 
   function renderGlobalReference(markets, sides, compact, availability) {
     var rows = arrayOf(markets);
-    if (!rows.length) return "<div class=\"ie-reference-empty\"><strong>Referência global indisponível</strong><span>" + escapeHtml(availability && availability.mensagem || "Nenhuma cotação global atual e completa foi confirmada para este confronto.") + "</span></div>";
+    if (!rows.length) return ("<div class=\"ie-reference-empty\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_referencia_global_indisponivel")) + "</strong><span>") + escapeHtml(availability && availability.mensagem || legendaCentral("legenda_ie_central_nenhuma_cotacao_global_atual_e_completa_foi_confirmada_para_este_confronto")) + "</span></div>";
     return "<div class=\"ie-global-reference" + (compact ? " is-compact" : "") + "\">" + rows.map(function (market) {
       var selections = arrayOf(market.selecoes);
       var sources = numberOf(market.fontes, 0);
       var metrics = selections.map(function (selection) {
         var copy = outcomeCopy(String(selection.codigo_selecao || ""), sides);
-        return "<div class=\"ie-reference-outcome\"><span>" + escapeHtml(copy.short) + "</span><b>" + escapeHtml(copy.name) + "</b><strong>" + escapeHtml(formatOdd(selection.odd_referencia)) + "</strong><small>Estimativa sem margem: " + escapeHtml(formatPercent(selection.probabilidade_referencia_pct)) + "</small><em>Máxima global observada: " + escapeHtml(formatOdd(selection.odd_maxima_global)) + (selection.operador_odd_maxima ? " · " + escapeHtml(selection.operador_odd_maxima) : "") + "</em><i>Média global observada: " + escapeHtml(formatOdd(selection.odd_media_bruta)) + "</i><i>Mediana: " + escapeHtml(formatOdd(selection.odd_mediana)) + "</i></div>";
+        return "<div class=\"ie-reference-outcome\"><span>" + escapeHtml(copy.short) + "</span><b>" + escapeHtml(copy.name) + "</b><strong>" + escapeHtml(formatOdd(selection.odd_referencia)) + ("</strong><small>" + escapeHtml(legendaCentral("legenda_ie_central_estimativa_sem_margem"))) + escapeHtml(formatPercent(selection.probabilidade_referencia_pct)) + ("</small><em>" + escapeHtml(legendaCentral("legenda_ie_central_maxima_global_observada"))) + escapeHtml(formatOdd(selection.odd_maxima_global)) + (selection.operador_odd_maxima ? " · " + escapeHtml(selection.operador_odd_maxima) : "") + ("</em><i>" + escapeHtml(legendaCentral("legenda_ie_central_media_global_observada"))) + escapeHtml(formatOdd(selection.odd_media_bruta)) + ("</i><i>" + escapeHtml(legendaCentral("legenda_ie_central_mediana"))) + escapeHtml(formatOdd(selection.odd_mediana)) + "</i></div>";
       }).join("");
       var houses = arrayOf(market.casas).map(function (house) {
         var values = {};
         arrayOf(house.selecoes).forEach(function (selection) { values[String(selection.codigo_selecao || "")] = selection.valor; });
-        return "<div class=\"ie-global-house-row\"><strong>" + escapeHtml(house.casa || "Casa") + "</strong><span>Casa " + escapeHtml(formatOdd(values.casa)) + "</span><span>Empate " + escapeHtml(formatOdd(values.empate)) + "</span><span>Fora " + escapeHtml(formatOdd(values.fora)) + "</span></div>";
+        return "<div class=\"ie-global-house-row\"><strong>" + escapeHtml(house.casa || legendaCentral("legenda_ie_central_casa_apostas")) + ("</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_casa_2"))) + escapeHtml(formatOdd(values.casa)) + ("</span><span>" + escapeHtml(legendaCentral("legenda_ie_central_empate_2"))) + escapeHtml(formatOdd(values.empate)) + ("</span><span>" + escapeHtml(legendaCentral("legenda_ie_central_fora_2"))) + escapeHtml(formatOdd(values.fora)) + "</span></div>";
       }).join("");
-      return "<article class=\"ie-reference-card\"><header><div><strong>" + escapeHtml(market.nome_mercado || "Resultado da partida") + "</strong><span>Referência global identificada · " + escapeHtml(sources) + (sources === 1 ? " casa completa" : " casas completas") + "</span></div><b>Somente referência</b></header><div class=\"ie-reference-grid\">" + metrics + "</div>" + (houses ? "<div class=\"ie-global-house-list\">" + houses + "</div>" : "") + "<footer><span>Margem média observada: " + escapeHtml(formatPercent(market.margem_media_pct)) + "</span><span>" + escapeHtml(relativeFreshness(market.observado_em) || "Horário da fonte indisponível") + "</span></footer></article>";
-    }).join("") + "<p class=\"ie-reference-note\">A estimativa sem margem resume o mercado; não é chance real nem previsão. A máxima global nunca entra na distribuição do simulador.</p></div>";
+      return "<article class=\"ie-reference-card\"><header><div><strong>" + escapeHtml(market.nome_mercado || legendaCentral("legenda_ie_central_resultado_da_partida")) + ("</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_referencia_global_identificada"))) + escapeHtml(sources) + (sources === 1 ? escapeHtml(legendaCentral("legenda_ie_central_casa_completa")) : escapeHtml(legendaCentral("legenda_ie_central_casas_completas"))) + ("</span></div><b>" + escapeHtml(legendaCentral("legenda_ie_central_somente_referencia")) + "</b></header><div class=\"ie-reference-grid\">") + metrics + "</div>" + (houses ? "<div class=\"ie-global-house-list\">" + houses + "</div>" : "") + ("<footer><span>" + escapeHtml(legendaCentral("legenda_ie_central_margem_media_observada"))) + escapeHtml(formatPercent(market.margem_media_pct)) + "</span><span>" + escapeHtml(relativeFreshness(market.observado_em) || legendaCentral("legenda_ie_central_horario_da_fonte_indisponivel")) + "</span></footer></article>";
+    }).join("") + ("<p class=\"ie-reference-note\">" + escapeHtml(legendaCentral("legenda_ie_central_a_estimativa_sem_margem_resume_o_mercado_nao_e_chance_real_nem_previsao_a_maxima_global_nunca_entra")) + "</p></div>");
   }
 
   function renderBrazilianOdds(items, sides, availability) {
@@ -2941,7 +3742,7 @@
       });
       return ["casa", "empate", "fora"].every(function (code) { return Number.isFinite(values[code]) && values[code] > 1; });
     });
-    if (!rows.length) return "<div class=\"ie-local-odds-empty\"><strong>Sem cotações brasileiras disponíveis</strong><p>" + escapeHtml(availability && availability.mensagem || "Ainda não recebemos um conjunto brasileiro atual e completo para este confronto.") + " A autorização de uma casa não significa que a fonte forneça suas cotações. Sem dados verificados, não há seleção nem cálculo.</p></div>";
+    if (!rows.length) return ("<div class=\"ie-local-odds-empty\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_sem_cotacoes_brasileiras_disponiveis")) + "</strong><p>") + escapeHtml(availability && availability.mensagem || legendaCentral("legenda_ie_central_ainda_nao_recebemos_um_conjunto_brasileiro_atual_e_completo_para_este_confronto")) + (escapeHtml(legendaCentral("legenda_ie_central_a_autorizacao_de_uma_casa_nao_significa_que_a_fonte_forneca_suas_cotacoes_sem_dados_verificados_nao")) + "</p></div>");
     return "<div class=\"ie-odds-providers\">" + rows.map(function (group) {
       var selections = arrayOf(group.selecoes);
       var values = {};
@@ -2950,9 +3751,9 @@
         var copy = outcomeCopy(code, sides);
         return "<div><span class=\"ie-odds-label\">" + escapeHtml(copy.short) + "</span><small>" + escapeHtml(copy.help) + "</small><b>" + escapeHtml(copy.name) + "</b><strong>" + escapeHtml(formatOdd(values[code])) + "</strong></div>";
       }).join("");
-      var limits = group.limites_stake_conhecidos === true ? "Limites informados pela fonte" : "Limites individuais ainda precisam ser conferidos";
-      if (group.cotacoes_desatualizadas === true) limits = "Cotação desatualizada — última coleta aceita somente para teste. Coleta: " + formatDateTime(group.observado_em) + " · " + limits;
-      return "<article class=\"ie-odds-provider ie-odds-brazil\"><header><div><strong>" + escapeHtml(group.bet || "Casa autorizada") + "</strong><span>Operação brasileira autorizada · " + escapeHtml(group.codigo_mercado === "resultado_1x2" ? "Resultado da partida" : group.codigo_mercado || "Mercado") + "</span></div><small>" + (group.modo_teste === true ? "Teste: origem declarada pela fonte" : "Conjunto nacional verificado") + "</small></header><div class=\"ie-odds-grid\">" + selectionHtml + "</div><footer>" + escapeHtml(relativeFreshness(group.observado_em) || "Horário da fonte indisponível") + " · " + escapeHtml(limits) + "</footer></article>";
+      var limits = group.limites_stake_conhecidos === true ? legendaCentral("legenda_ie_central_limites_informados_pela_fonte") : legendaCentral("legenda_ie_central_limites_individuais_ainda_precisam_ser_conferidos");
+      if (group.cotacoes_desatualizadas === true) limits = legendaCentral("legenda_ie_central_cotacao_desatualizada_ultima_coleta_aceita_somente_para_teste_coleta") + formatDateTime(group.observado_em) + " · " + limits;
+      return "<article class=\"ie-odds-provider ie-odds-brazil\"><header><div><strong>" + escapeHtml(group.bet || legendaCentral("legenda_ie_central_casa_autorizada")) + ("</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_operacao_brasileira_autorizada"))) + escapeHtml(group.codigo_mercado === "resultado_1x2" ? legendaCentral("legenda_ie_central_resultado_da_partida") : group.codigo_mercado || legendaCentral("legenda_ie_central_mercado")) + "</span></div><small>" + (group.modo_teste === true ? escapeHtml(legendaCentral("legenda_ie_central_teste_origem_declarada_pela_fonte")) : escapeHtml(legendaCentral("legenda_ie_central_conjunto_nacional_verificado"))) + "</small></header><div class=\"ie-odds-grid\">" + selectionHtml + "</div><footer>" + escapeHtml(relativeFreshness(group.observado_em) || legendaCentral("legenda_ie_central_horario_da_fonte_indisponivel")) + " · " + escapeHtml(limits) + "</footer></article>";
     }).join("") + "</div>";
   }
 
@@ -2964,18 +3765,18 @@
     var availability = data.odds_status || {};
     var event = data.evento || {};
     var eventId = event.id_evento || event.id || data.id_evento || "";
-    var home = sides && sides.home && sides.home.name || "time da casa";
-    var away = sides && sides.away && sides.away.name || "time visitante";
-    var explanation = "<div class=\"ie-odds-help\"><strong>Como interpretar</strong><span><b>Casa</b> vitória de " + escapeHtml(home) + "</span><span><b>Empate</b> nenhum time vence</span><span><b>Fora</b> vitória de " + escapeHtml(away) + "</span></div>";
+    var home = sides && sides.home && sides.home.name || legendaCentral("legenda_ie_central_time_da_casa_2");
+    var away = sides && sides.away && sides.away.name || legendaCentral("legenda_ie_central_time_visitante_2");
+    var explanation = ("<div class=\"ie-odds-help\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_como_interpretar")) + "</strong><span><b>" + escapeHtml(legendaCentral("legenda_ie_central_casa")) + "</b>" + escapeHtml(legendaCentral("legenda_ie_central_vitoria_de_2"))) + escapeHtml(home) + ("</span><span><b>" + escapeHtml(legendaCentral("legenda_ie_central_empate")) + "</b>" + escapeHtml(legendaCentral("legenda_ie_central_nenhum_time_vence_2")) + "</span><span><b>" + escapeHtml(legendaCentral("legenda_ie_central_fora")) + "</b>" + escapeHtml(legendaCentral("legenda_ie_central_vitoria_de_2"))) + escapeHtml(away) + "</span></div>";
     // Abrir o formulario nao libera calculo sem cotacoes atuais no backend.
     var buttonDisabled = !eventId;
-    var simulatorAction = "<section class=\"ie-simulator-entry\"><div><span>Simulador de Impacto Financeiro</span><strong>Entenda os cenários de perda e exposição financeira.</strong><p>O cálculo usa cotações brasileiras atuais. No modo de teste, a origem declarada pela fonte é aceita e limites desconhecidos geram avisos.</p></div><button type=\"button\" class=\"ie-button ie-button-primary\" data-simulator-action=\"open\" data-event-id=\"" + escapeHtml(eventId) + "\"" + (buttonDisabled ? " disabled" : "") + ">Simular Impacto Financeiro</button>" + (buttonDisabled ? "<small>" + escapeHtml(simulator.mensagem || "Ainda não há dados elegíveis para simular este confronto.") + "</small>" : "") + "</section>";
+    var simulatorAction = ("<section class=\"ie-simulator-entry\"><div><span>" + escapeHtml(legendaCentral("legenda_ie_central_simulador_de_impacto_financeiro")) + "</span><strong>" + escapeHtml(legendaCentral("legenda_ie_central_entenda_os_cenarios_de_perda_e_exposicao_financeira")) + "</strong><p>" + escapeHtml(legendaCentral("legenda_ie_central_o_calculo_usa_cotacoes_brasileiras_atuais_no_modo_de_teste_a_origem_declarada_pela_fonte_e_aceita_e")) + "</p></div><button type=\"button\" class=\"ie-button ie-button-primary\" data-simulator-action=\"open\" data-event-id=\"") + escapeHtml(eventId) + "\"" + (buttonDisabled ? " disabled" : "") + (">" + escapeHtml(legendaCentral("legenda_ie_central_simular_impacto_financeiro")) + "</button>") + (buttonDisabled ? "<small>" + escapeHtml(simulator.mensagem || legendaCentral("legenda_ie_central_ainda_nao_ha_dados_elegiveis_para_simular_este_confronto")) + "</small>" : "") + "</section>";
     return explanation
-      + detailSection("Referências globais por casa", renderGlobalReference(globalReference, sides, false, availability.referencia_global))
-      + detailSection("Casas brasileiras autorizadas", renderBrazilianOdds(brazilianOdds, sides, availability.brasil))
+      + detailSection(legendaCentral("legenda_ie_central_referencias_globais_por_casa"), renderGlobalReference(globalReference, sides, false, availability.referencia_global))
+      + detailSection(legendaCentral("legenda_ie_central_casas_brasileiras_autorizadas"), renderBrazilianOdds(brazilianOdds, sides, availability.brasil))
       + simulatorAction
-      + "<section class=\"ie-simulator-entry\"><div><strong>Comparar Confrontos</strong><p>Distribuição e cenários combinados de até três jogos, com odds editáveis.</p></div><button type=\"button\" class=\"ie-button ie-button-secondary\" data-compare-open data-event-id=\"" + escapeHtml(eventId) + "\">Comparar Confrontos</button></section>"
-      + "<p class=\"ie-odds-notice\">" + escapeHtml(data.odds_aviso || "Referências informativas, sem recomendação ou garantia de resultado.") + " O Turbo Tiger não abre casas, não usa links afiliados e não executa apostas.</p>";
+      + ("<section class=\"ie-simulator-entry\"><div><strong>" + escapeHtml(legendaCentral("legenda_ie_central_comparar_confrontos")) + "</strong><p>" + escapeHtml(legendaCentral("legenda_ie_central_distribuicao_e_cenarios_combinados_de_ate_tres_jogos_com_odds_editaveis")) + "</p></div><button type=\"button\" class=\"ie-button ie-button-secondary\" data-compare-open data-event-id=\"") + escapeHtml(eventId) + ("\">" + escapeHtml(legendaCentral("legenda_ie_central_comparar_confrontos")) + "</button></section>")
+      + "<p class=\"ie-odds-notice\">" + escapeHtml(data.odds_aviso || legendaCentral("legenda_ie_central_referencias_informativas_sem_recomendacao_ou_garantia_de_resultado")) + (escapeHtml(legendaCentral("legenda_ie_central_o_turbo_tiger_nao_abre_casas_nao_usa_links_afiliados_e_nao_executa_apostas")) + "</p>");
   }
 
   function simulatorProviderHouses(context) {
@@ -3014,7 +3815,7 @@
       var available = arrayOf(context && context.mercados).find(function (item) { return item.codigo_mercado === market.codigo_mercado; }) || {};
       return String(available.sigla || labels[market.codigo_mercado] || market.codigo_mercado).toUpperCase();
     }).filter(function (code, index, values) { return code && values.indexOf(code) === index; });
-    var base = ["Simulação", home + "x" + away, date, codes.join("+")].filter(Boolean).join("  ").slice(0, 120);
+    var base = [legendaCentral("legenda_ie_central_simulacao"), home + "x" + away, date, codes.join("+")].filter(Boolean).join("  ").slice(0, 120);
     var usedNames = arrayOf(context && context.simulacoes_salvas).map(function (simulation) { return String(simulation.nome || "").trim(); });
     var name = base;
     var increment = 0;
@@ -3082,60 +3883,60 @@
   }
 
   function simulatorRiskLabel(metrics, status) {
-    if (status === "indisponivel") return "Cálculo indisponível";
-    if (status === "parcial") return "Simulação incompleta";
+    if (status === "indisponivel") return legendaCentral("legenda_ie_central_calculo_indisponivel");
+    if (status === "parcial") return legendaCentral("legenda_ie_central_simulacao_incompleta");
     var labels = {
-      cobertura_matematica_condicional: "Cobertura teórica condicionada",
-      menor_impacto_dentro_limite: "Menor impacto dentro do limite pessoal",
-      dentro_limite_definido: "Dentro do limite pessoal definido",
-      acima_limite_definido: "Acima do limite pessoal definido"
+      cobertura_matematica_condicional: legendaCentral("legenda_ie_central_cobertura_teorica_condicionada"),
+      menor_impacto_dentro_limite: legendaCentral("legenda_ie_central_menor_impacto_dentro_do_limite_pessoal"),
+      dentro_limite_definido: legendaCentral("legenda_ie_central_dentro_do_limite_pessoal_definido"),
+      acima_limite_definido: legendaCentral("legenda_ie_central_acima_do_limite_pessoal_definido")
     };
-    return labels[String(metrics && metrics.faixa_risco_financeiro || "")] || "Impacto financeiro calculado";
+    return labels[String(metrics && metrics.faixa_risco_financeiro || "")] || legendaCentral("legenda_ie_central_impacto_financeiro_calculado");
   }
 
   function renderSimulatorResult(result) {
-    if (!result || result.ok !== true) return "<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty\" tabindex=\"-1\" aria-live=\"polite\"><strong>Pronto para simular</strong><p>Selecione as casas, o mercado e informe o valor. Nenhuma aposta será aberta ou executada.</p></section>";
+    if (!result || result.ok !== true) return ("<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty\" tabindex=\"-1\" aria-live=\"polite\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_pronto_para_simular")) + "</strong><p>" + escapeHtml(legendaCentral("legenda_ie_central_selecione_as_casas_o_mercado_e_informe_o_valor_nenhuma_aposta_sera_aberta_ou_executada")) + "</p></section>");
     var metrics = result.metricas || {};
-    var testWarning = result.modo_teste === true ? "<p class=\"ie-simulator-closed\"><strong>Modo de teste.</strong> Origem brasileira declarada pelo provedor, sem confirmação independente. Limites desconhecidos não impedem este cálculo. Regras de liquidação e aceitação não foram verificadas; os valores abaixo são apenas cenários teóricos, não limites garantidos de perda.</p>" : "";
+    var testWarning = result.modo_teste === true ? ("<p class=\"ie-simulator-closed\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_modo_de_teste")) + "</strong>" + escapeHtml(legendaCentral("legenda_ie_central_origem_brasileira_declarada_pelo_provedor_sem_confirmacao_independente_limites_desconhecidos_nao_imp")) + "</p>") : "";
     var status = String(result.status || "");
-    if (result.modo_manual === true) testWarning += '<p class="ie-simulator-closed"><strong>Simulação com odds informadas.</strong> Valores digitados ou copiados da fonte, sem confirmação de disponibilidade, limites ou equivalência das regras. Taxas e impostos não incluídos.</p>';
-    if (result.cotacoes_desatualizadas === true) testWarning += "<p class=\"ie-simulator-closed\"><strong>Cotações desatualizadas.</strong> Última coleta: " + escapeHtml(formatDateTime(result.observado_em_fonte) || "horário indisponível") + ". Valores aceitos somente para teste; não representam ofertas atuais.</p>";
+    if (result.modo_manual === true) testWarning += ("<p class=\"ie-simulator-closed\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_simulacao_com_odds_informadas")) + "</strong>" + escapeHtml(legendaCentral("legenda_ie_central_valores_digitados_ou_copiados_da_fonte_sem_confirmacao_de_disponibilidade_limites_ou_equivalencia_da")) + "</p>");
+    if (result.cotacoes_desatualizadas === true) testWarning += ("<p class=\"ie-simulator-closed\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_cotacoes_desatualizadas")) + "</strong>" + escapeHtml(legendaCentral("legenda_ie_central_ultima_coleta"))) + escapeHtml(formatDateTime(result.observado_em_fonte) || legendaCentral("legenda_ie_central_horario_indisponivel")) + ". Valores aceitos somente para teste; não representam ofertas atuais.</p>";
     var unavailable = status === "indisponivel";
     var partial = status === "parcial";
     var riskClass = unavailable ? " is-unavailable" : partial ? " is-partial" : String(metrics.faixa_risco_financeiro) === "acima_limite_definido" ? " is-above" : "";
-    var overview = "<div class=\"ie-simulator-metrics\"><div><span>Valor considerado</span><strong>" + escapeHtml(formatMoneyFromCents(metrics.valor_comprometido_centavos)) + "</strong></div><div><span>Limite conservador máximo</span><strong>" + escapeHtml(formatMoneyFromCents(metrics.perda_maxima_centavos)) + "</strong></div><div><span>Impacto máximo</span><strong>" + escapeHtml(formatPercent(metrics.perda_maxima_pct)) + "</strong></div><div><span>Limite pessoal</span><strong>" + escapeHtml(formatPercent(metrics.limite_perda_pct)) + "</strong></div></div>";
-    var availability = partial || unavailable ? "<p class=\"ie-simulator-availability\">Valor com cálculo completo: <strong>" + escapeHtml(formatMoneyFromCents(metrics.valor_calculado_centavos)) + "</strong> · Valor sem dados suficientes: <strong>" + escapeHtml(formatMoneyFromCents(metrics.valor_indisponivel_centavos)) + "</strong>. A parte indisponível foi tratada como perda integral no limite conservador.</p>" : "";
+    var overview = ("<div class=\"ie-simulator-metrics\"><div><span>" + escapeHtml(legendaCentral("legenda_ie_central_valor_considerado")) + "</span><strong>") + escapeHtml(formatMoneyFromCents(metrics.valor_comprometido_centavos)) + ("</strong></div><div><span>" + escapeHtml(legendaCentral("legenda_ie_central_limite_conservador_maximo")) + "</span><strong>") + escapeHtml(formatMoneyFromCents(metrics.perda_maxima_centavos)) + ("</strong></div><div><span>" + escapeHtml(legendaCentral("legenda_ie_central_impacto_maximo")) + "</span><strong>") + escapeHtml(formatPercent(metrics.perda_maxima_pct)) + ("</strong></div><div><span>" + escapeHtml(legendaCentral("legenda_ie_central_limite_pessoal")) + "</span><strong>") + escapeHtml(formatPercent(metrics.limite_perda_pct)) + "</strong></div></div>";
+    var availability = partial || unavailable ? ("<p class=\"ie-simulator-availability\">" + escapeHtml(legendaCentral("legenda_ie_central_valor_com_calculo_completo")) + "<strong>") + escapeHtml(formatMoneyFromCents(metrics.valor_calculado_centavos)) + ("</strong>" + escapeHtml(legendaCentral("legenda_ie_central_valor_sem_dados_suficientes")) + "<strong>") + escapeHtml(formatMoneyFromCents(metrics.valor_indisponivel_centavos)) + ("</strong>" + escapeHtml(legendaCentral("legenda_ie_central_a_parte_indisponivel_foi_tratada_como_perda_integral_no_limite_conservador")) + "</p>") : "";
     var markets = arrayOf(result.mercados).map(function (market) {
-      var marketTitle = market.codigo_mercado === "resultado_1x2" ? "Resultado da partida · 90 minutos" : market.codigo_mercado || "Mercado";
-      if (market.ok !== true) return "<article class=\"ie-simulator-market is-unavailable\"><header><strong>" + escapeHtml(marketTitle) + "</strong><span>Sem cálculo</span></header><p>" + escapeHtml(market.motivo || "Não há cotações atuais, completas e equivalentes nas casas escolhidas.") + "</p><small>Valor tratado conservadoramente: " + escapeHtml(formatMoneyFromCents(market.valor_comprometido_centavos)) + "</small></article>";
+      var marketTitle = market.codigo_mercado === "resultado_1x2" ? legendaCentral("legenda_ie_central_resultado_da_partida_90_minutos") : market.codigo_mercado || legendaCentral("legenda_ie_central_mercado");
+      if (market.ok !== true) return "<article class=\"ie-simulator-market is-unavailable\"><header><strong>" + escapeHtml(marketTitle) + ("</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_sem_calculo")) + "</span></header><p>") + escapeHtml(market.motivo || legendaCentral("legenda_ie_central_nao_ha_cotacoes_atuais_completas_e_equivalentes_nas_casas_escolhidas")) + ("</p><small>" + escapeHtml(legendaCentral("legenda_ie_central_valor_tratado_conservadoramente"))) + escapeHtml(formatMoneyFromCents(market.valor_comprometido_centavos)) + "</small></article>";
       var marketMetrics = market.metricas || {};
       var legs = arrayOf(market.pernas).map(function (leg) {
         var net = Number(leg.resultado_liquido_centavos || 0);
         var impliedProbability = Number(leg.odd) > 0 ? 100 / Number(leg.odd) : NaN;
-        var originLabel = { manual: "Manual", editada_usuario: "Editada pelo usuário", provedor: "Provedor (cópia)" }[leg.origem] || "Provedor";
-        var minimumOdd = leg.odd_minima_limite == null ? "Não calculável" : Number(leg.odd_minima_limite).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 4 });
-        var detailFields = '<div><dt>Origem</dt><dd>' + escapeHtml(originLabel) + '</dd></div><div><dt>Odd mínima para o limite pessoal</dt><dd>' + escapeHtml(minimumOdd) + (leg.odd_minima_limite != null && Number(leg.odd) < Number(leg.odd_minima_limite) ? ' · cotação abaixo do mínimo' : '') + '</dd></div>';
-        return "<div class=\"ie-simulator-leg\"><div><span>" + escapeHtml(leg.nome_selecao || leg.codigo_selecao || "Resultado") + "</span><strong>" + escapeHtml(leg.bet || "Casa brasileira autorizada") + "</strong></div><dl><div><dt>Odd</dt><dd>" + escapeHtml(Number(leg.odd).toLocaleString("pt-BR", { maximumFractionDigits: 4 })) + "</dd></div>" + detailFields + "<div><dt>Prob. implícita</dt><dd>" + escapeHtml(formatPercent(impliedProbability)) + "</dd></div><div><dt>Valor simulado</dt><dd>" + escapeHtml(formatMoneyFromCents(leg.valor_centavos)) + "</dd></div><div><dt>Retorno bruto</dt><dd>" + escapeHtml(formatMoneyFromCents(leg.retorno_bruto_centavos)) + "</dd></div><div><dt>Após o valor, antes de custos</dt><dd class=\"" + (net > 0 ? "is-positive" : net < 0 ? "is-negative" : "") + "\">" + escapeHtml(formatMoneyFromCents(net, true)) + "</dd></div></dl></div>";
+        var originLabel = { manual: legendaCentral("legenda_ie_central_manual"), editada_usuario: legendaCentral("legenda_ie_central_editada_pelo_usuario"), provedor: legendaCentral("legenda_ie_central_provedor_copia") }[leg.origem] || legendaCentral("legenda_ie_central_provedor");
+        var minimumOdd = leg.odd_minima_limite == null ? legendaCentral("legenda_ie_central_nao_calculavel") : Number(leg.odd_minima_limite).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+        var detailFields = ("<div><dt>" + escapeHtml(legendaCentral("legenda_ie_central_origem")) + "</dt><dd>") + escapeHtml(originLabel) + ("</dd></div><div><dt>" + escapeHtml(legendaCentral("legenda_ie_central_odd_minima_para_o_limite_pessoal")) + "</dt><dd>") + escapeHtml(minimumOdd) + (leg.odd_minima_limite != null && Number(leg.odd) < Number(leg.odd_minima_limite) ? escapeHtml(legendaCentral("legenda_ie_central_cotacao_abaixo_do_minimo")) : '') + '</dd></div>';
+        return "<div class=\"ie-simulator-leg\"><div><span>" + escapeHtml(leg.nome_selecao || leg.codigo_selecao || legendaCentral("legenda_ie_central_resultado")) + "</span><strong>" + escapeHtml(leg.bet || legendaCentral("legenda_ie_central_casa_brasileira_autorizada")) + ("</strong></div><dl><div><dt>" + escapeHtml(legendaCentral("legenda_ie_central_odd")) + "</dt><dd>") + escapeHtml(Number(leg.odd).toLocaleString("pt-BR", { maximumFractionDigits: 4 })) + "</dd></div>" + detailFields + ("<div><dt>" + escapeHtml(legendaCentral("legenda_ie_central_prob_implicita")) + "</dt><dd>") + escapeHtml(formatPercent(impliedProbability)) + ("</dd></div><div><dt>" + escapeHtml(legendaCentral("legenda_ie_central_valor_simulado")) + "</dt><dd>") + escapeHtml(formatMoneyFromCents(leg.valor_centavos)) + ("</dd></div><div><dt>" + escapeHtml(legendaCentral("legenda_ie_central_retorno_bruto")) + "</dt><dd>") + escapeHtml(formatMoneyFromCents(leg.retorno_bruto_centavos)) + ("</dd></div><div><dt>" + escapeHtml(legendaCentral("legenda_ie_central_apos_o_valor_antes_de_custos")) + "</dt><dd class=\"") + (net > 0 ? "is-positive" : net < 0 ? "is-negative" : "") + "\">" + escapeHtml(formatMoneyFromCents(net, true)) + "</dd></div></dl></div>";
       }).join("");
-      return "<article class=\"ie-simulator-market\"><header><div><strong>" + escapeHtml(marketTitle) + "</strong><span>Índice de cobertura: " + escapeHtml(formatPercent(numberOf(market.indice_cobertura, 0) * 100, 3)) + "</span></div><b>Pior resultado: " + escapeHtml(formatMoneyFromCents(marketMetrics.pior_resultado_centavos, true)) + "<br>Maior resultado teórico: " + escapeHtml(formatMoneyFromCents(marketMetrics.melhor_resultado_centavos, true)) + "</b></header><div class=\"ie-simulator-legs\">" + legs + "</div><footer>Fonte observada: " + escapeHtml(formatDateTime(market.observado_em) || "horário indisponível") + ". Limites observados não garantem aceitação individual; taxas, comissões e impostos não estão incluídos.</footer></article>";
+      return "<article class=\"ie-simulator-market\"><header><div><strong>" + escapeHtml(marketTitle) + ("</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_indice_de_cobertura"))) + escapeHtml(formatPercent(numberOf(market.indice_cobertura, 0) * 100, 3)) + ("</span></div><b>" + escapeHtml(legendaCentral("legenda_ie_central_pior_resultado"))) + escapeHtml(formatMoneyFromCents(marketMetrics.pior_resultado_centavos, true)) + ("<br>" + escapeHtml(legendaCentral("legenda_ie_central_maior_resultado_teorico"))) + escapeHtml(formatMoneyFromCents(marketMetrics.melhor_resultado_centavos, true)) + "</b></header><div class=\"ie-simulator-legs\">" + legs + ("</div><footer>" + escapeHtml(legendaCentral("legenda_ie_central_fonte_observada"))) + escapeHtml(formatDateTime(market.observado_em) || legendaCentral("legenda_ie_central_horario_indisponivel")) + ". Limites observados não garantem aceitação individual; taxas, comissões e impostos não estão incluídos.</footer></article>";
     }).join("");
     var precision = metrics.risco_combinado_preciso === true
-      ? "O pior cenário é exato para o único mercado calculado, antes de taxas e mudanças operacionais."
-      : "Há mais de um mercado ou parte indisponível: o resultado usa um limite conservador. Probabilidades não foram somadas.";
+      ? legendaCentral("legenda_ie_central_o_pior_cenario_e_exato_para_o_unico_mercado_calculado_antes_de_taxas_e_mudancas_operacionais")
+      : legendaCentral("legenda_ie_central_ha_mais_de_um_mercado_ou_parte_indisponivel_o_resultado_usa_um_limite_conservador_probabilidades_nao");
     availability = testWarning + availability;
-    availability += '<p class="ie-simulator-availability">A odd mínima preserva o limite pessoal apenas mantendo os valores distribuídos, com todas as partes aceitas e liquidadas nas mesmas condições. Se alterar um valor, recalcule. Não é garantia de perda máxima na prática.</p>';
-    return "<section id=\"simulatorResult\" class=\"ie-simulator-result" + riskClass + "\" tabindex=\"-1\" aria-live=\"polite\"><header><span>Resultado da simulação</span><strong>" + escapeHtml(simulatorRiskLabel(metrics, status)) + "</strong><p>" + escapeHtml(unavailable ? "Não há dados brasileiros elegíveis suficientes para calcular agora." : partial ? "Somente parte da configuração pôde ser calculada." : "Dentro do limite significa apenas o limite escolhido por você; não significa que seja seguro.") + "</p></header>" + overview + availability + "<div class=\"ie-simulator-market-list\">" + markets + "</div><div class=\"ie-simulator-warnings\"><strong>Antes de qualquer decisão</strong><p>" + escapeHtml(precision) + "</p><ul><li>As odds podem mudar antes da confirmação.</li><li>A probabilidade implícita vem da cotação e não prevê o resultado.</li><li>A casa pode limitar, recusar ou anular uma aposta.</li><li>Prorrogação, pênaltis, abandono e devolução precisam seguir regras equivalentes.</li><li>Taxas, impostos, limites e arredondamentos podem alterar o impacto.</li></ul><p>O menor risco financeiro é não apostar. O Turbo Tiger não executa nem encaminha apostas.</p></div></section>";
+    availability += ("<p class=\"ie-simulator-availability\">" + escapeHtml(legendaCentral("legenda_ie_central_a_odd_minima_preserva_o_limite_pessoal_apenas_mantendo_os_valores_distribuidos_com_todas_as_partes_a")) + "</p>");
+    return "<section id=\"simulatorResult\" class=\"ie-simulator-result" + riskClass + ("\" tabindex=\"-1\" aria-live=\"polite\"><header><span>" + escapeHtml(legendaCentral("legenda_ie_central_resultado_da_simulacao")) + "</span><strong>") + escapeHtml(simulatorRiskLabel(metrics, status)) + "</strong><p>" + escapeHtml(unavailable ? legendaCentral("legenda_ie_central_nao_ha_dados_brasileiros_elegiveis_suficientes_para_calcular_agora") : partial ? legendaCentral("legenda_ie_central_somente_parte_da_configuracao_pode_ser_calculada") : legendaCentral("legenda_ie_central_dentro_do_limite_significa_apenas_o_limite_escolhido_por_voce_nao_significa_que_seja_seguro")) + "</p></header>" + overview + availability + "<div class=\"ie-simulator-market-list\">" + markets + ("</div><div class=\"ie-simulator-warnings\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_antes_de_qualquer_decisao")) + "</strong><p>") + escapeHtml(precision) + ("</p><ul><li>" + escapeHtml(legendaCentral("legenda_ie_central_as_odds_podem_mudar_antes_da_confirmacao")) + "</li><li>" + escapeHtml(legendaCentral("legenda_ie_central_a_probabilidade_implicita_vem_da_cotacao_e_nao_preve_o_resultado")) + "</li><li>" + escapeHtml(legendaCentral("legenda_ie_central_a_casa_pode_limitar_recusar_ou_anular_uma_aposta")) + "</li><li>" + escapeHtml(legendaCentral("legenda_ie_central_prorrogacao_penaltis_abandono_e_devolucao_precisam_seguir_regras_equivalentes")) + "</li><li>" + escapeHtml(legendaCentral("legenda_ie_central_taxas_impostos_limites_e_arredondamentos_podem_alterar_o_impacto")) + "</li></ul><p>" + escapeHtml(legendaCentral("legenda_ie_central_o_menor_risco_financeiro_e_nao_apostar_o_turbo_tiger_nao_executa_nem_encaminha_apostas")) + "</p></div></section>");
   }
 
   function renderSimulatorStaleResult() {
-    return "<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty is-stale\" tabindex=\"-1\" aria-live=\"polite\"><strong>Parâmetros alterados</strong><p>O resultado anterior não corresponde mais às escolhas atuais. Calcule novamente antes de interpretar os valores.</p></section>";
+    return ("<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty is-stale\" tabindex=\"-1\" aria-live=\"polite\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_parametros_alterados")) + "</strong><p>" + escapeHtml(legendaCentral("legenda_ie_central_o_resultado_anterior_nao_corresponde_mais_as_escolhas_atuais_calcule_novamente_antes_de_interpretar")) + "</p></section>");
   }
 
   function renderSimulatorUnverifiedResult(context) {
     var message = simulatorCanOperate(context)
-      ? "Recalcule para conferir o cenário com os dados disponíveis agora."
-      : context && context.simulador && context.simulador.mensagem || "Os dados atuais não permitem revalidar este cálculo.";
-    return "<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty is-stale\" tabindex=\"-1\" aria-live=\"polite\"><strong>Resultado anterior não revalidado</strong><p>" + escapeHtml(message) + " Os valores anteriores ficam ocultos até uma nova validação.</p></section>";
+      ? legendaCentral("legenda_ie_central_recalcule_para_conferir_o_cenario_com_os_dados_disponiveis_agora")
+      : context && context.simulador && context.simulador.mensagem || legendaCentral("legenda_ie_central_os_dados_atuais_nao_permitem_revalidar_este_calculo");
+    return ("<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty is-stale\" tabindex=\"-1\" aria-live=\"polite\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_resultado_anterior_nao_revalidado")) + "</strong><p>") + escapeHtml(message) + (escapeHtml(legendaCentral("legenda_ie_central_os_valores_anteriores_ficam_ocultos_ate_uma_nova_validacao")) + "</p></section>");
   }
 
   function invalidateSimulatorResult() {
@@ -3151,12 +3952,12 @@
 
   function renderSavedSimulations(items, currentId) {
     var rows = arrayOf(items);
-    if (!rows.length) return "<div class=\"ie-simulator-saved-empty\">Nenhuma simulação salva para este confronto.</div>";
+    if (!rows.length) return ("<div class=\"ie-simulator-saved-empty\">" + escapeHtml(legendaCentral("legenda_ie_central_nenhuma_simulacao_salva_para_este_confronto")) + "</div>");
     return "<div class=\"ie-simulator-saved-list\">" + rows.map(function (item) {
       var current = Number(item.id_simulacao) === Number(currentId);
       var calculatedAt = formatDateTime(item.calculado_em);
-      var summary = (calculatedAt ? "Calculada em " + escapeHtml(calculatedAt) + " · " : "") + "Requer nova validação";
-      return "<article class=\"" + (current ? "is-current" : "") + "\"><button type=\"button\" data-simulator-action=\"load\" data-simulation-id=\"" + escapeHtml(item.id_simulacao) + "\"" + (current ? " aria-current=\"true\"" : "") + "><span><strong>" + escapeHtml(item.nome || "Simulação") + "</strong><small>" + summary + "</small></span>" + (item.sino_ativo === true ? icon("bell") : icon("chevron")) + "</button><button type=\"button\" class=\"ie-simulator-archive\" data-simulator-action=\"archive\" data-simulation-id=\"" + escapeHtml(item.id_simulacao) + "\" aria-label=\"Arquivar " + escapeHtml(item.nome || "simulação") + "\">Arquivar</button></article>";
+      var summary = (calculatedAt ? legendaCentral("legenda_ie_central_calculada_em") + escapeHtml(calculatedAt) + " · " : "") + legendaCentral("legenda_ie_central_requer_nova_validacao");
+      return "<article class=\"" + (current ? "is-current" : "") + "\"><button type=\"button\" data-simulator-action=\"load\" data-simulation-id=\"" + escapeHtml(item.id_simulacao) + "\"" + (current ? " aria-current=\"true\"" : "") + "><span><strong>" + escapeHtml(item.nome || legendaCentral("legenda_ie_central_simulacao")) + "</strong><small>" + summary + "</small></span>" + (item.sino_ativo === true ? icon("bell") : icon("chevron")) + "</button><button type=\"button\" class=\"ie-simulator-archive\" data-simulator-action=\"archive\" data-simulation-id=\"" + escapeHtml(item.id_simulacao) + ("\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_arquivar"))) + escapeHtml(item.nome || legendaCentral("legenda_ie_central_simulacao_2")) + ("\">" + escapeHtml(legendaCentral("legenda_ie_central_arquivar_2")) + "</button></article>");
     }).join("") + "</div>";
   }
 
@@ -3177,37 +3978,37 @@
       var id = Number(house.id_bet || 0);
       var checked = formState.houseIds.indexOf(id) >= 0;
       var hasProviderOdds = providerHouses.some(function (available) { return Number(available.id_bet) === id; });
-      var status = hasProviderOdds ? (testMode ? "Teste: origem brasileira declarada pela fonte; limites desconhecidos não bloqueiam" : "Odds da fonte disponíveis para este confronto") : "Sem cotação da fonte: você pode informar as odds observadas";
+      var status = hasProviderOdds ? (testMode ? legendaCentral("legenda_ie_central_teste_origem_brasileira_declarada_pela_fonte_limites_desconhecidos_nao_bloqueiam") : legendaCentral("legenda_ie_central_odds_da_fonte_disponiveis_para_este_confronto")) : legendaCentral("legenda_ie_central_sem_cotacao_da_fonte_voce_pode_informar_as_odds_observadas");
       if (!manualMode && testMode && context.simulador.cotacoes_desatualizadas === true) status += ". Cotações desatualizadas: usando a última coleta para teste";
-      return "<label class=\"ie-simulator-house\" data-simulator-house-row data-house-search-name=\"" + escapeHtml(normalizeSearchText(house.bet || "")) + "\"><input type=\"checkbox\" name=\"simulator_bet\" value=\"" + escapeHtml(id) + "\"" + (checked ? " checked" : "") + "><span><strong>" + escapeHtml(house.bet || "Casa autorizada") + "</strong><small>" + escapeHtml(status) + "</small></span>" + (house.favorita === true ? "<em>Favorita</em>" : "") + "</label>";
-    }).join("") : "<div class=\"ie-simulator-inline-empty\">" + escapeHtml(authorizationValid ? "Nenhuma casa possui dados elegíveis para este confronto. A lista regulatória não será oferecida como se tivesse cotações disponíveis." : "A lista oficial brasileira precisa ser atualizada antes de novos cálculos.") + "</div>";
+      return "<label class=\"ie-simulator-house\" data-simulator-house-row data-house-search-name=\"" + escapeHtml(normalizeSearchText(house.bet || "")) + "\"><input type=\"checkbox\" name=\"simulator_bet\" value=\"" + escapeHtml(id) + "\"" + (checked ? " checked" : "") + "><span><strong>" + escapeHtml(house.bet || legendaCentral("legenda_ie_central_casa_autorizada")) + "</strong><small>" + escapeHtml(status) + "</small></span>" + (house.favorita === true ? ("<em>" + escapeHtml(legendaCentral("legenda_ie_central_favorita")) + "</em>") : "") + "</label>";
+    }).join("") : "<div class=\"ie-simulator-inline-empty\">" + escapeHtml(authorizationValid ? legendaCentral("legenda_ie_central_nenhuma_casa_possui_dados_elegiveis_para_este_confronto_a_lista_regulatoria_nao_sera_oferecida_como") : legendaCentral("legenda_ie_central_a_lista_oficial_brasileira_precisa_ser_atualizada_antes_de_novos_calculos")) + "</div>";
     var marketsHtml = arrayOf(context.mercados).map(function (market) {
       var enabled = simulatorMarketAvailable(market);
       var selected = enabled && simulatorMarketSelected(formState, market.codigo_mercado);
-      var availability = enabled ? (market.elegivel_para_calculo === true ? (testMode ? "Teste teórico com dados da fonte, sem confirmação de aceitação" : "Dados da fonte disponíveis") : "Pode ser preenchido com odds observadas por você") : market.mensagem || "Sem conjunto brasileiro elegível para cálculo";
-      return "<label class=\"ie-simulator-market-option" + (enabled ? "" : " is-disabled") + "\"><input type=\"checkbox\" name=\"simulator_market\" value=\"" + escapeHtml(market.codigo_mercado) + "\" data-period=\"" + escapeHtml(market.periodo_codigo || "90_minutos") + "\" data-line=\"\"" + (selected ? " checked" : "") + (enabled ? "" : " disabled") + "><span><strong>" + escapeHtml(market.nome_mercado || market.codigo_mercado) + "</strong><small>" + escapeHtml((market.periodo_codigo === "90_minutos" ? "90 minutos · " : "") + availability) + "</small></span>" + (enabled ? "<em>Habilitado no simulador</em>" : "<em>Indisponível para cálculo</em>") + "</label>";
+      var availability = enabled ? (market.elegivel_para_calculo === true ? (testMode ? legendaCentral("legenda_ie_central_teste_teorico_com_dados_da_fonte_sem_confirmacao_de_aceitacao") : legendaCentral("legenda_ie_central_dados_da_fonte_disponiveis")) : legendaCentral("legenda_ie_central_pode_ser_preenchido_com_odds_observadas_por_voce")) : market.mensagem || legendaCentral("legenda_ie_central_sem_conjunto_brasileiro_elegivel_para_calculo");
+      return "<label class=\"ie-simulator-market-option" + (enabled ? "" : " is-disabled") + "\"><input type=\"checkbox\" name=\"simulator_market\" value=\"" + escapeHtml(market.codigo_mercado) + "\" data-period=\"" + escapeHtml(market.periodo_codigo || "90_minutos") + "\" data-line=\"\"" + (selected ? " checked" : "") + (enabled ? "" : " disabled") + "><span><strong>" + escapeHtml(market.nome_mercado || market.codigo_mercado) + "</strong><small>" + escapeHtml((market.periodo_codigo === "90_minutos" ? "90 minutos · " : "") + availability) + "</small></span>" + (enabled ? ("<em>" + escapeHtml(legendaCentral("legenda_ie_central_habilitado_no_simulador")) + "</em>") : ("<em>" + escapeHtml(legendaCentral("legenda_ie_central_indisponivel_para_calculo")) + "</em>")) + "</label>";
     }).join("");
-    var authorizationDate = context.autorizacao_snapshot_verificado_em ? formatDateTime(context.autorizacao_snapshot_verificado_em) : "verificação ainda não informada";
+    var authorizationDate = context.autorizacao_snapshot_verificado_em ? formatDateTime(context.autorizacao_snapshot_verificado_em) : legendaCentral("legenda_ie_central_verificacao_ainda_nao_informada");
     var canOperate = simulatorCanOperate(context);
     var canPrepare = canOperate || context.entrada_manual_habilitada === true && future && authorizationValid && houses.length > 0 && arrayOf(context.mercados).some(simulatorMarketAvailable);
     var currentId = formState.idSimulation || null;
     var result = state.simulator.result || context.simulacao && context.simulacao.resultado || null;
     var canSave = state.simulator.resultValidated === true && !state.simulator.resultStale && !!result;
     if (manualMode) formState.bell = false;
-    byId("detailTitle").textContent = "Simulador de Impacto Financeiro";
+    byId("detailTitle").textContent = legendaCentral("legenda_ie_central_simulador_de_impacto_financeiro");
     byId("detailSubtitle").textContent = displayText(sides.home.name + " × " + sides.away.name);
     byId("detailContent").setAttribute("data-detail-view", "financial-simulator:" + Number(state.simulator.eventId || 0));
-    byId("detailContent").innerHTML = "<div class=\"ie-financial-simulator\"><section class=\"ie-simulator-intro\"><span>Decisão mais consciente</span><strong>Compare consequências financeiras, não promessas de resultado.</strong><p>Referências globais são informativas. O cálculo usa casas autorizadas e odds da fonte ou informadas por você. No modo de teste, origem declarada e limites desconhecidos são indicados sem impedir a simulação.</p></section>"
-      + detailSection("Referências globais por casa", renderGlobalReference(context.referencia_global, sides, true, context.odds_status && context.odds_status.referencia_global))
-      + "<form data-financial-simulator-form data-event-id=\"" + escapeHtml(state.simulator.eventId) + "\"><section class=\"ie-simulator-fields\"><label><span>Nome da simulação</span><input type=\"text\" name=\"simulator_name\" maxlength=\"120\" value=\"" + escapeHtml(formState.name) + "\"></label><label><span>Valor total a considerar</span><div class=\"ie-money-input\"><b>R$</b><input type=\"number\" name=\"simulator_value\" min=\"0.01\" max=\"1000000000\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(Number(formState.value).toFixed(2)) + "\" required></div></label><label><span>Limite pessoal de perda</span><div class=\"ie-percent-input\"><input type=\"number\" name=\"simulator_loss_limit\" min=\"0\" max=\"100\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(formState.lossLimit) + "\" required><b>%</b></div><small>É um limite escolhido por você; não torna o cenário seguro.</small></label></section>"
-      + "<fieldset class=\"ie-simulator-choice\"><legend>Casas brasileiras autorizadas <span id=\"simulatorHouseCount\" aria-live=\"polite\">" + escapeHtml(selectedCount) + " selecionada" + (selectedCount === 1 ? "" : "s") + "</span></legend><p>Escolha até 20 casas. As cotações disponíveis serão exibidas automaticamente e as ausentes poderão ser informadas por você. Sem links, logotipos ou direcionamento.</p><label class=\"ie-simulator-search\">" + icon("search") + "<input type=\"search\" data-simulator-house-search aria-label=\"Buscar casa brasileira autorizada\" placeholder=\"Buscar pelo nome da casa\" autocomplete=\"off\"" + (authorizationValid ? "" : " disabled") + "></label><div class=\"ie-simulator-house-list\">" + housesHtml + "</div><button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"favorites\"" + (authorizationValid ? "" : " disabled data-simulator-locked") + ">Salvar seleção como minhas favoritas</button><small>Lista autorizada verificada em " + escapeHtml(authorizationDate) + ". Autorização regulatória não significa ausência de risco ou reclamações.</small></fieldset>"
-      + "<fieldset class=\"ie-simulator-choice\"><legend>Mercados</legend><p>Você pode escolher um ou mais mercados quando suas regras estiverem normalizadas. O orçamento é dividido entre eles; probabilidades nunca são somadas.</p><div class=\"ie-simulator-market-options\">" + marketsHtml + "</div></fieldset>"
-      + "<section class=\"ie-simulator-bell\"><label class=\"ie-simulator-bell-toggle\"><span class=\"ie-simulator-bell-copy\">" + icon("bell") + "<span><strong>Sino exclusivo desta simulação</strong><small data-simulator-bell-help>" + (manualMode ? "Odds alteradas manualmente não podem ser monitoradas automaticamente." : "Toque nesta área para ativar ou desativar o aviso desta simulação.") + "</small></span></span><span class=\"ie-switch\"><input type=\"checkbox\" name=\"simulator_bell\" aria-label=\"Ativar sino desta simulação\"" + (formState.bell ? " checked" : "") + (manualMode ? " disabled" : "") + "><span aria-hidden=\"true\"></span></span></label><label class=\"ie-simulator-alert-margin\"><span>Avisar quando a perda máxima mudar pelo menos</span><div class=\"ie-percent-input\"><input type=\"number\" name=\"simulator_alert_margin\" min=\"0.01\" max=\"100\" step=\"0.01\" inputmode=\"decimal\" value=\"" + escapeHtml(formState.alertMargin) + "\"" + (formState.bell && !manualMode ? "" : " disabled") + "><b>p.p.</b></div><small>Ao salvar novamente, o cenário atual passa a ser a nova referência.</small></label></section>"
-      + (future ? "" : "<div class=\"ie-simulator-closed\">O horário de início não está confirmado no futuro. Novos cálculos e salvamentos ficam bloqueados.</div>")
-      + (authorizationValid ? "" : "<div class=\"ie-simulator-closed\">A verificação da lista oficial brasileira está vencida ou indisponível. O simulador permanece bloqueado preventivamente até a atualização.</div>")
-      + "<div class=\"ie-simulator-actions\"><button type=\"submit\" class=\"ie-button ie-button-primary\" data-simulator-working" + (canOperate ? "" : " disabled data-simulator-locked") + ">Calcular impacto</button>" + (canSave ? "<button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"save\" data-simulator-working>Salvar simulação</button>" : "") + "<span class=\"ie-simulator-busy-status\" data-simulator-busy-label aria-live=\"polite\"></span></div></form>"
-      + (state.simulator.resultStale ? renderSimulatorStaleResult() : result && (!canOperate || state.simulator.resultValidated !== true) ? renderSimulatorUnverifiedResult(context) : result ? renderSimulatorResult(result) : canPrepare ? renderSimulatorResult(null) : "<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty\" aria-live=\"polite\"><strong>Cálculo indisponível</strong><p>" + escapeHtml(context.simulador && context.simulador.mensagem || "Aguardando dados brasileiros atuais e completos, com regras e limites verificados para este confronto.") + "</p></section>")
-      + detailSection("Simulações deste confronto", renderSavedSimulations(context.simulacoes_salvas, currentId))
+    byId("detailContent").innerHTML = ("<div class=\"ie-financial-simulator\"><section class=\"ie-simulator-intro\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_decisao_mais_consciente")) + "</span><strong>" + escapeHtml(legendaCentral("legenda_ie_central_compare_consequencias_financeiras_nao_promessas_de_resultado")) + "</strong><p>" + escapeHtml(legendaCentral("legenda_ie_central_referencias_globais_sao_informativas_o_calculo_usa_casas_autorizadas_e_odds_da_fonte_ou_informadas_p")) + "</p></section>")
+      + detailSection(legendaCentral("legenda_ie_central_referencias_globais_por_casa"), renderGlobalReference(context.referencia_global, sides, true, context.odds_status && context.odds_status.referencia_global))
+      + "<form data-financial-simulator-form data-event-id=\"" + escapeHtml(state.simulator.eventId) + ("\"><section class=\"ie-simulator-fields\"><label><span>" + escapeHtml(legendaCentral("legenda_ie_central_nome_da_simulacao")) + "</span><input type=\"text\" name=\"simulator_name\" maxlength=\"120\" value=\"") + escapeHtml(formState.name) + ("\"></label><label><span>" + escapeHtml(legendaCentral("legenda_ie_central_valor_total_a_considerar")) + "</span><div class=\"ie-money-input\"><b>" + escapeHtml(legendaCentral("legenda_ie_central_r")) + "</b><input type=\"number\" name=\"simulator_value\" min=\"0.01\" max=\"1000000000\" step=\"0.01\" inputmode=\"decimal\" value=\"") + escapeHtml(Number(formState.value).toFixed(2)) + ("\" required></div></label><label><span>" + escapeHtml(legendaCentral("legenda_ie_central_limite_pessoal_de_perda")) + "</span><div class=\"ie-percent-input\"><input type=\"number\" name=\"simulator_loss_limit\" min=\"0\" max=\"100\" step=\"0.01\" inputmode=\"decimal\" value=\"") + escapeHtml(formState.lossLimit) + ("\" required><b>%</b></div><small>" + escapeHtml(legendaCentral("legenda_ie_central_e_um_limite_escolhido_por_voce_nao_torna_o_cenario_seguro")) + "</small></label></section>")
+      + ("<fieldset class=\"ie-simulator-choice\"><legend>" + escapeHtml(legendaCentral("legenda_ie_central_casas_brasileiras_autorizadas_2")) + "<span id=\"simulatorHouseCount\" aria-live=\"polite\">") + escapeHtml(selectedCount) + " selecionada" + (selectedCount === 1 ? "" : "s") + ("</span></legend><p>" + escapeHtml(legendaCentral("legenda_ie_central_escolha_ate_20_casas_as_cotacoes_disponiveis_serao_exibidas_automaticamente_e_as_ausentes_poderao_se")) + "</p><label class=\"ie-simulator-search\">") + icon("search") + ("<input type=\"search\" data-simulator-house-search aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_buscar_casa_brasileira_autorizada")) + "\" placeholder=\"" + escapeHtml(legendaCentral("legenda_ie_central_buscar_pelo_nome_da_casa")) + "\" autocomplete=\"off\"") + (authorizationValid ? "" : " disabled") + "></label><div class=\"ie-simulator-house-list\">" + housesHtml + "</div><button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"favorites\"" + (authorizationValid ? "" : " disabled data-simulator-locked") + (">" + escapeHtml(legendaCentral("legenda_ie_central_salvar_selecao_como_minhas_favoritas")) + "</button><small>" + escapeHtml(legendaCentral("legenda_ie_central_lista_autorizada_verificada_em"))) + escapeHtml(authorizationDate) + ". Autorização regulatória não significa ausência de risco ou reclamações.</small></fieldset>"
+      + ("<fieldset class=\"ie-simulator-choice\"><legend>" + escapeHtml(legendaCentral("legenda_ie_central_mercados")) + "</legend><p>" + escapeHtml(legendaCentral("legenda_ie_central_voce_pode_escolher_um_ou_mais_mercados_quando_suas_regras_estiverem_normalizadas_o_orcamento_e_divid")) + "</p><div class=\"ie-simulator-market-options\">") + marketsHtml + "</div></fieldset>"
+      + "<section class=\"ie-simulator-bell\"><label class=\"ie-simulator-bell-toggle\"><span class=\"ie-simulator-bell-copy\">" + icon("bell") + ("<span><strong>" + escapeHtml(legendaCentral("legenda_ie_central_sino_exclusivo_desta_simulacao")) + "</strong><small data-simulator-bell-help>") + (manualMode ? escapeHtml(legendaCentral("legenda_ie_central_odds_alteradas_manualmente_nao_podem_ser_monitoradas_automaticamente")) : escapeHtml(legendaCentral("legenda_ie_central_toque_nesta_area_para_ativar_ou_desativar_o_aviso_desta_simulacao"))) + ("</small></span></span><span class=\"ie-switch\"><input type=\"checkbox\" name=\"simulator_bell\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_ativar_sino_desta_simulacao")) + "\"") + (formState.bell ? " checked" : "") + (manualMode ? " disabled" : "") + ("><span aria-hidden=\"true\"></span></span></label><label class=\"ie-simulator-alert-margin\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_avisar_quando_a_perda_maxima_mudar_pelo_menos")) + "</span><div class=\"ie-percent-input\"><input type=\"number\" name=\"simulator_alert_margin\" min=\"0.01\" max=\"100\" step=\"0.01\" inputmode=\"decimal\" value=\"") + escapeHtml(formState.alertMargin) + "\"" + (formState.bell && !manualMode ? "" : " disabled") + ("><b>" + escapeHtml(legendaCentral("legenda_ie_central_p_p")) + "</b></div><small>" + escapeHtml(legendaCentral("legenda_ie_central_ao_salvar_novamente_o_cenario_atual_passa_a_ser_a_nova_referencia")) + "</small></label></section>")
+      + (future ? "" : ("<div class=\"ie-simulator-closed\">" + escapeHtml(legendaCentral("legenda_ie_central_o_horario_de_inicio_nao_esta_confirmado_no_futuro_novos_calculos_e_salvamentos_ficam_bloqueados")) + "</div>"))
+      + (authorizationValid ? "" : ("<div class=\"ie-simulator-closed\">" + escapeHtml(legendaCentral("legenda_ie_central_a_verificacao_da_lista_oficial_brasileira_esta_vencida_ou_indisponivel_o_simulador_permanece_bloquea")) + "</div>"))
+      + "<div class=\"ie-simulator-actions\"><button type=\"submit\" class=\"ie-button ie-button-primary\" data-simulator-working" + (canOperate ? "" : " disabled data-simulator-locked") + (">" + escapeHtml(legendaCentral("legenda_ie_central_calcular_impacto")) + "</button>") + (canSave ? ("<button type=\"button\" class=\"ie-button ie-button-secondary\" data-simulator-action=\"save\" data-simulator-working>" + escapeHtml(legendaCentral("legenda_ie_central_salvar_simulacao")) + "</button>") : "") + "<span class=\"ie-simulator-busy-status\" data-simulator-busy-label aria-live=\"polite\"></span></div></form>"
+      + (state.simulator.resultStale ? renderSimulatorStaleResult() : result && (!canOperate || state.simulator.resultValidated !== true) ? renderSimulatorUnverifiedResult(context) : result ? renderSimulatorResult(result) : canPrepare ? renderSimulatorResult(null) : ("<section id=\"simulatorResult\" class=\"ie-simulator-result is-empty\" aria-live=\"polite\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_calculo_indisponivel")) + "</strong><p>") + escapeHtml(context.simulador && context.simulador.mensagem || legendaCentral("legenda_ie_central_aguardando_dados_brasileiros_atuais_e_completos_com_regras_e_limites_verificados_para_este_confronto")) + "</p></section>")
+      + detailSection(legendaCentral("legenda_ie_central_simulacoes_deste_confronto"), renderSavedSimulations(context.simulacoes_salvas, currentId))
       + "</div>";
     var renderedForm = context.entrada_manual_habilitada === true ? document.querySelector("[data-financial-simulator-form]") : null;
     if (context.entrada_manual_habilitada === true && renderedForm) {
@@ -3239,16 +4040,16 @@
         var reference = saved ? saved.id_cotacao_referencia : source.id_cotacao;
         var base = saved ? saved.odd_referencia : source.valor;
         var observed = saved ? saved.observado_em_fonte : source.observado_em;
-        var sourceOdd = Number(base) > 1 ? formatOdd(base) : "Sem cotação";
+        var sourceOdd = Number(base) > 1 ? formatOdd(base) : legendaCentral("legenda_ie_central_sem_cotacao");
         var best = Number(base) > 1 && Number(base) === Number(bestBySelection[code]);
-        return '<label class="ie-manual-odd' + (best ? ' is-best' : '') + '"><span>' + escapeHtml(outcomeCopy(code, sides).name) + '</span><small class="ie-manual-house-name">' + escapeHtml(house.bet || "Casa autorizada") + '</small><strong>' + escapeHtml(sourceOdd) + (best ? '<em>Melhor odd</em>' : '') + '</strong><input type="text" inputmode="decimal" maxlength="12" autocomplete="off" aria-label="Informar outra odd para ' + escapeHtml(outcomeCopy(code, sides).name) + ' em ' + escapeHtml(house.bet || "casa autorizada") + '" data-manual-odd data-bet="' + escapeHtml(house.id_bet) + '" data-selection="' + code + '" data-reference="' + escapeHtml(reference || "") + '" data-base="' + escapeHtml(base == null ? "" : base) + '" data-observed="' + escapeHtml(observed || "") + '" value="' + escapeHtml(value) + '" placeholder="Digite para substituir"><small data-manual-origin>' + (value === "" ? "Usando a odd exibida" : "Odd informada por você") + '</small>' + (observed ? '<small>Coleta: ' + escapeHtml(formatDateTime(observed)) + '</small>' : '') + '</label>';
+        return '<label class="ie-manual-odd' + (best ? ' is-best' : '') + '"><span>' + escapeHtml(outcomeCopy(code, sides).name) + '</span><small class="ie-manual-house-name">' + escapeHtml(house.bet || legendaCentral("legenda_ie_central_casa_autorizada")) + '</small><strong>' + escapeHtml(sourceOdd) + (best ? ("<em>" + escapeHtml(legendaCentral("legenda_ie_central_melhor_odd")) + "</em>") : '') + ("</strong><input type=\"text\" inputmode=\"decimal\" maxlength=\"12\" autocomplete=\"off\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_informar_outra_odd_para"))) + escapeHtml(outcomeCopy(code, sides).name) + ' em ' + escapeHtml(house.bet || legendaCentral("legenda_ie_central_casa_autorizada_2")) + '" data-manual-odd data-bet="' + escapeHtml(house.id_bet) + '" data-selection="' + code + '" data-reference="' + escapeHtml(reference || "") + '" data-base="' + escapeHtml(base == null ? "" : base) + '" data-observed="' + escapeHtml(observed || "") + '" value="' + escapeHtml(value) + ("\" placeholder=\"" + escapeHtml(legendaCentral("legenda_ie_central_digite_para_substituir")) + "\"><small data-manual-origin>") + (value === "" ? escapeHtml(legendaCentral("legenda_ie_central_usando_a_odd_exibida")) : escapeHtml(legendaCentral("legenda_ie_central_odd_informada_por_voce"))) + '</small>' + (observed ? ("<small>" + escapeHtml(legendaCentral("legenda_ie_central_coleta"))) + escapeHtml(formatDateTime(observed)) + '</small>' : '') + '</label>';
       }).join("") + '</div></article>';
     }).join("");
     var hasOverrides = arrayOf(formState.manualOdds).some(function (row) { return row.informada_usuario !== false && String(row.odd == null ? "" : row.odd).trim() !== ""; });
-    return '<fieldset class="ie-simulator-choice" data-manual-odds><legend>Odds das casas selecionadas</legend><p>As maiores cotações recebidas estão destacadas. Se alguma estiver diferente no momento, digite a nova odd no campo logo abaixo.</p>' +
-      (rows || '<p>Selecione uma ou mais casas acima para visualizar ou informar as odds.</p>') +
-      '<label class="ie-manual-confirm" data-manual-confirmation' + (hasOverrides ? '' : ' hidden') + '><input type="checkbox" name="simulator_manual_rules"' + (formState.manualRules ? ' checked' : '') + '>Confirmo que os dados informados correspondem a este confronto e ao resultado em 90 minutos, incluindo acréscimos e excluindo prorrogação e pênaltis.</label>' +
-      '<p>Condições de liquidação, limites e aceitação não foram verificadas. Ao informar uma odd manualmente, o sino fica indisponível porque esse número não pode ser monitorado automaticamente.</p></fieldset>';
+    return ("<fieldset class=\"ie-simulator-choice\" data-manual-odds><legend>" + escapeHtml(legendaCentral("legenda_ie_central_odds_das_casas_selecionadas")) + "</legend><p>" + escapeHtml(legendaCentral("legenda_ie_central_as_maiores_cotacoes_recebidas_estao_destacadas_se_alguma_estiver_diferente_no_momento_digite_a_nova")) + "</p>") +
+      (rows || ("<p>" + escapeHtml(legendaCentral("legenda_ie_central_selecione_uma_ou_mais_casas_acima_para_visualizar_ou_informar_as_odds")) + "</p>")) +
+      '<label class="ie-manual-confirm" data-manual-confirmation' + (hasOverrides ? '' : ' hidden') + '><input type="checkbox" name="simulator_manual_rules"' + (formState.manualRules ? ' checked' : '') + (">" + escapeHtml(legendaCentral("legenda_ie_central_confirmo_que_os_dados_informados_correspondem_a_este_confronto_e_ao_resultado_em_90_minutos_incluind")) + "</label>") +
+      ("<p>" + escapeHtml(legendaCentral("legenda_ie_central_condicoes_de_liquidacao_limites_e_aceitacao_nao_foram_verificadas_ao_informar_uma_odd_manualmente_o")) + "</p></fieldset>");
   }
 
   function readSimulatorManualOdds(form) {
@@ -3340,7 +4141,7 @@
     var form = document.querySelector("[data-financial-simulator-form]");
     if (form) form.setAttribute("aria-busy", busy ? "true" : "false");
     var busyLabel = document.querySelector("[data-simulator-busy-label]");
-    if (busyLabel) busyLabel.textContent = busy ? "Calculando com as odds selecionadas..." : "";
+    if (busyLabel) busyLabel.textContent = busy ? legendaCentral("legenda_ie_central_calculando_com_as_odds_selecionadas") : "";
     all("[data-financial-simulator-form] input, [data-financial-simulator-form] select, [data-financial-simulator-form] textarea, [data-simulator-working], [data-simulator-action]", byId("detailContent")).forEach(function (control) {
       if (busy) {
         if (!control.hasAttribute("data-simulator-disabled-before")) control.setAttribute("data-simulator-disabled-before", control.disabled ? "1" : "0");
@@ -3394,7 +4195,7 @@
 
   async function openSavedSimulations(offset) {
     offset = Math.max(0, Number(offset) || 0);
-    beginDetail("Simulações salvas", "Somente as simulações da sua conta", "replace");
+    beginDetail(legendaCentral("legenda_ie_central_simulacoes_salvas"), legendaCentral("legenda_ie_central_somente_as_simulacoes_da_sua_conta"), "replace");
     var view = "saved-simulations:" + offset;
     var revision = state.savedSimulationsRevision = (state.savedSimulationsRevision || 0) + 1;
     byId("detailContent").setAttribute("data-detail-view", view);
@@ -3402,17 +4203,17 @@
       var result = await rpc("ie_simulacoes_listar_rpc", { p_limite: 20, p_offset: offset });
       if (revision !== state.savedSimulationsRevision || historyDetailView() !== view) return;
       var rows = arrayOf(result);
-      var labels = { salva: "Salva", monitorando: "Monitorando", revisao_necessaria: "Revisão necessária", expirada: "Expirada" };
+      var labels = { salva: legendaCentral("legenda_ie_central_salva"), monitorando: legendaCentral("legenda_ie_central_monitorando"), revisao_necessaria: legendaCentral("legenda_ie_central_revisao_necessaria"), expirada: legendaCentral("legenda_ie_central_expirada") };
       var html = rows.map(function (item) {
-        return "<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-simulator-action=\"open-saved\" data-event-id=\"" + escapeHtml(item.id_evento) + "\" data-simulation-id=\"" + escapeHtml(item.id_simulacao) + "\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span><span class=\"ie-entity-copy\"><strong>" + escapeHtml(item.nome || "Simulação") + "</strong><span>" + escapeHtml(item.evento_nome || "Confronto") + "</span><span>" + escapeHtml(labels[item.status] || "Salva") + " · " + escapeHtml(formatDateTime(item.atualizado_em)) + "</span></span>" + icon("chevron") + "</button>";
+        return "<button type=\"button\" class=\"ie-feed-card ie-entity-main ie-personal-link\" data-simulator-action=\"open-saved\" data-event-id=\"" + escapeHtml(item.id_evento) + "\" data-simulation-id=\"" + escapeHtml(item.id_simulacao) + "\"><span class=\"ie-feed-icon\">" + icon("chart") + "</span><span class=\"ie-entity-copy\"><strong>" + escapeHtml(item.nome || legendaCentral("legenda_ie_central_simulacao")) + "</strong><span>" + escapeHtml(item.evento_nome || legendaCentral("legenda_ie_central_confronto")) + "</span><span>" + escapeHtml(labels[item.status] || legendaCentral("legenda_ie_central_salva")) + " · " + escapeHtml(formatDateTime(item.atualizado_em)) + "</span></span>" + icon("chevron") + "</button>";
       }).join("");
-      if (!html) html = emptyState("Nenhuma simulação salva", "As simulações que você salvar aparecerão aqui.", false);
+      if (!html) html = emptyState(legendaCentral("legenda_ie_central_nenhuma_simulacao_salva"), legendaCentral("legenda_ie_central_as_simulacoes_que_voce_salvar_aparecerao_aqui"), false);
       if (offset > 0 || result.tem_mais) {
-        html += "<nav class=\"ie-history-pager\" aria-label=\"Páginas de simulações\">" + (offset > 0 ? "<button type=\"button\" data-simulator-action=\"list-more\" data-offset=\"" + Math.max(0, offset - 20) + "\">Anterior</button>" : "") + (result.tem_mais ? "<button type=\"button\" data-simulator-action=\"list-more\" data-offset=\"" + (offset + 20) + "\">Próxima</button>" : "") + "</nav>";
+        html += ("<nav class=\"ie-history-pager\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_paginas_de_simulacoes")) + "\">") + (offset > 0 ? "<button type=\"button\" data-simulator-action=\"list-more\" data-offset=\"" + Math.max(0, offset - 20) + ("\">" + escapeHtml(legendaCentral("legenda_ie_central_anterior")) + "</button>") : "") + (result.tem_mais ? "<button type=\"button\" data-simulator-action=\"list-more\" data-offset=\"" + (offset + 20) + ("\">" + escapeHtml(legendaCentral("legenda_ie_central_proxima")) + "</button>") : "") + "</nav>";
       }
       byId("detailContent").innerHTML = "<div class=\"ie-feed\">" + html + "</div>";
     } catch (error) {
-      if (revision === state.savedSimulationsRevision && historyDetailView() === view) byId("detailContent").innerHTML = emptyState("Não foi possível carregar", friendlyError(error), false);
+      if (revision === state.savedSimulationsRevision && historyDetailView() === view) byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_nao_foi_possivel_carregar"), friendlyError(error), false);
     }
   }
 
@@ -3421,7 +4222,7 @@
     if (!eventId) return;
     var openRevision = ++simulatorOpenRevision;
     var mode = navigationMode == null ? (!byId("detailModal").hidden ? true : false) : navigationMode;
-    beginDetail("Simulador de Impacto Financeiro", "Carregando casas e mercados...", mode);
+    beginDetail(legendaCentral("legenda_ie_central_simulador_de_impacto_financeiro"), legendaCentral("legenda_ie_central_carregando_casas_e_mercados"), mode);
     var view = "financial-simulator:" + eventId;
     byId("detailContent").setAttribute("data-detail-view", view);
     state.simulator = {
@@ -3444,7 +4245,7 @@
       };
       renderFinancialSimulator();
     } catch (error) {
-      if (openRevision === simulatorOpenRevision && byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState("Simulador indisponível", friendlyError(error), false);
+      if (openRevision === simulatorOpenRevision && byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_simulador_indisponivel"), friendlyError(error), false);
     }
   }
 
@@ -3512,7 +4313,7 @@
       state.simulator.resultStale = false;
       state.simulator.resultValidated = true;
       renderFinancialSimulator();
-      showToast(formState.bell ? "Simulação salva com sino independente ativo." : "Simulação salva.", false);
+      showToast(formState.bell ? legendaCentral("legenda_ie_central_simulacao_salva_com_sino_independente_ativo") : legendaCentral("legenda_ie_central_simulacao_salva"), false);
     } catch (error) {
       if (simulatorOperationIsCurrent(operationState, view)) {
         state.simulator.resultValidated = false;
@@ -3543,7 +4344,7 @@
       if (!simulatorOperationIsCurrent(operationState, view)) return;
       arrayOf(state.simulator.context.casas_autorizadas).concat(arrayOf(state.simulator.context.casas_disponiveis)).forEach(function (house) { house.favorita = savedIds.indexOf(Number(house.id_bet)) >= 0; });
       renderFinancialSimulator();
-      showToast("Casas favoritas atualizadas.", false);
+      showToast(legendaCentral("legenda_ie_central_casas_favoritas_atualizadas"), false);
     } catch (error) {
       if (simulatorOperationIsCurrent(operationState, view)) showToast(friendlyError(error), true);
     } finally {
@@ -3553,7 +4354,7 @@
 
   async function archiveFinancialSimulation(simulationId) {
     if (state.simulator.busy || !Number(simulationId)) return;
-    if (!window.confirm("Arquivar esta simulação? O sino exclusivo também será desativado.")) return;
+    if (!window.confirm(legendaCentral("legenda_ie_central_arquivar_esta_simulacao_o_sino_exclusivo_tambem_sera_desativado"))) return;
     var operationState = state.simulator;
     var view = "financial-simulator:" + Number(operationState.eventId || 0);
     try {
@@ -3578,7 +4379,7 @@
         state.simulator.resultValidated = false;
       }
       renderFinancialSimulator();
-      showToast("Simulação arquivada e sino desativado.", false);
+      showToast(legendaCentral("legenda_ie_central_simulacao_arquivada_e_sino_desativado"), false);
     } catch (error) {
       if (simulatorOperationIsCurrent(operationState, view)) showToast(friendlyError(error), true);
     } finally {
@@ -3595,46 +4396,46 @@
     var total = numberOf(summary.jogos, 0);
     var historyStatus = String(data && data.status_historico || "");
     var unavailableCopy = historyStatus === "identidade_pendente"
-      ? ["Identificação histórica em revisão", "O vínculo de uma das equipes com o acervo ainda precisa ser confirmado. Isso não significa que elas nunca se enfrentaram."]
+      ? [legendaCentral("legenda_ie_central_identificacao_historica_em_revisao"), legendaCentral("legenda_ie_central_o_vinculo_de_uma_das_equipes_com_o_acervo_ainda_precisa_ser_confirmado_isso_nao_significa_que_elas_n")]
       : historyStatus === "fora_da_cobertura"
-        ? ["Histórico fora da cobertura atual", "O acervo histórico disponível ainda não cobre este confronto ou esporte."]
+        ? [legendaCentral("legenda_ie_central_historico_fora_da_cobertura_atual"), legendaCentral("legenda_ie_central_o_acervo_historico_disponivel_ainda_nao_cobre_este_confronto_ou_esporte")]
         : historyStatus === "sem_confrontos"
-          ? ["Nenhum confronto neste recorte", "As equipes foram identificadas, mas não há confrontos no recorte histórico disponível. A base pode não reunir todos os jogos já realizados."]
-          : ["Histórico temporariamente indisponível", "Não foi possível confirmar os dados históricos deste confronto agora."];
+          ? [legendaCentral("legenda_ie_central_nenhum_confronto_neste_recorte"), legendaCentral("legenda_ie_central_as_equipes_foram_identificadas_mas_nao_ha_confrontos_no_recorte_historico_disponivel_a_base_pode_nao")]
+          : [legendaCentral("legenda_ie_central_historico_temporariamente_indisponivel"), legendaCentral("legenda_ie_central_nao_foi_possivel_confirmar_os_dados_historicos_deste_confronto_agora")];
     function resultGrid(values, label) {
-      return "<section class=\"ie-h2h-block\"><h4>" + escapeHtml(label) + " <small>" + escapeHtml(numberOf(values.jogos, 0)) + " jogos</small></h4><div class=\"ie-h2h-results\"><div><strong>" + escapeHtml(numberOf(values.vitorias_time_a, 0)) + "</strong><span>Vitórias<br>" + escapeHtml(teamA.nome || "Time A") + "</span></div><div><strong>" + escapeHtml(numberOf(values.empates, 0)) + "</strong><span>Empates</span></div><div><strong>" + escapeHtml(numberOf(values.vitorias_time_b, 0)) + "</strong><span>Vitórias<br>" + escapeHtml(teamB.nome || "Time B") + "</span></div></div></section>";
+      return "<section class=\"ie-h2h-block\"><h4>" + escapeHtml(label) + " <small>" + escapeHtml(numberOf(values.jogos, 0)) + (escapeHtml(legendaCentral("legenda_ie_central_jogos")) + "</small></h4><div class=\"ie-h2h-results\"><div><strong>") + escapeHtml(numberOf(values.vitorias_time_a, 0)) + ("</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_vitorias_2")) + "<br>") + escapeHtml(teamA.nome || legendaCentral("legenda_ie_central_time_a")) + "</span></div><div><strong>" + escapeHtml(numberOf(values.empates, 0)) + ("</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_empates")) + "</span></div><div><strong>") + escapeHtml(numberOf(values.vitorias_time_b, 0)) + ("</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_vitorias_2")) + "<br>") + escapeHtml(teamB.nome || legendaCentral("legenda_ie_central_time_b")) + "</span></div></div></section>";
     }
     function performanceBlock(team, performance) {
       function row(label, values) {
         values = values || {};
-        return "<div class=\"ie-performance-row\"><strong>" + escapeHtml(label) + "</strong><div class=\"ie-performance-metrics\"><span><b>" + escapeHtml(numberOf(values.jogos, 0)) + "</b><small>Jogos</small></span><span><b>" + escapeHtml(numberOf(values.vitorias, 0)) + "</b><small>Vitórias</small></span><span><b>" + escapeHtml(numberOf(values.empates, 0)) + "</b><small>Empates</small></span><span><b>" + escapeHtml(numberOf(values.derrotas, 0)) + "</b><small>Derrotas</small></span><span><b>" + escapeHtml(numberOf(values.aproveitamento, 0).toLocaleString("pt-BR")) + "%</b><small>Aproveit.</small></span></div><p>Vitórias em " + escapeHtml(numberOf(values.percentual_vitorias, 0).toLocaleString("pt-BR")) + "% dos jogos</p></div>";
+        return "<div class=\"ie-performance-row\"><strong>" + escapeHtml(label) + "</strong><div class=\"ie-performance-metrics\"><span><b>" + escapeHtml(numberOf(values.jogos, 0)) + ("</b><small>" + escapeHtml(legendaCentral("legenda_ie_central_jogos_2")) + "</small></span><span><b>") + escapeHtml(numberOf(values.vitorias, 0)) + ("</b><small>" + escapeHtml(legendaCentral("legenda_ie_central_vitorias_2")) + "</small></span><span><b>") + escapeHtml(numberOf(values.empates, 0)) + ("</b><small>" + escapeHtml(legendaCentral("legenda_ie_central_empates")) + "</small></span><span><b>") + escapeHtml(numberOf(values.derrotas, 0)) + ("</b><small>" + escapeHtml(legendaCentral("legenda_ie_central_derrotas")) + "</small></span><span><b>") + escapeHtml(numberOf(values.aproveitamento, 0).toLocaleString("pt-BR")) + ("%</b><small>" + escapeHtml(legendaCentral("legenda_ie_central_aproveit")) + "</small></span></div><p>" + escapeHtml(legendaCentral("legenda_ie_central_vitorias_em"))) + escapeHtml(numberOf(values.percentual_vitorias, 0).toLocaleString("pt-BR")) + (escapeHtml(legendaCentral("legenda_ie_central_dos_jogos")) + "</p></div>");
       }
-      return "<article class=\"ie-performance-team\"><h4>" + escapeHtml(team.nome || "Time") + "</h4>" + row("Em casa", performance && performance.casa) + row("Fora de casa", performance && performance.fora) + "</article>";
+      return "<article class=\"ie-performance-team\"><h4>" + escapeHtml(team.nome || legendaCentral("legenda_ie_central_time")) + "</h4>" + row(legendaCentral("legenda_ie_central_em_casa"), performance && performance.casa) + row(legendaCentral("legenda_ie_central_fora_de_casa"), performance && performance.fora) + "</article>";
     }
-    var overall = "<div class=\"ie-h2h-hero\"><p>Em todos os confrontos registrados</p><strong>" + escapeHtml(total) + " jogos</strong><div class=\"ie-h2h-results ie-h2h-overall\"><div><strong>" + escapeHtml(numberOf(summary.vitorias_time_a, 0)) + "</strong><span>" + escapeHtml(teamA.nome || "Time A") + "</span><small>" + escapeHtml(numberOf(summary.percentual_time_a, 0).toLocaleString("pt-BR")) + "%</small></div><div><strong>" + escapeHtml(numberOf(summary.empates, 0)) + "</strong><span>Empates</span><small>" + escapeHtml(numberOf(summary.percentual_empates, 0).toLocaleString("pt-BR")) + "%</small></div><div><strong>" + escapeHtml(numberOf(summary.vitorias_time_b, 0)) + "</strong><span>" + escapeHtml(teamB.nome || "Time B") + "</span><small>" + escapeHtml(numberOf(summary.percentual_time_b, 0).toLocaleString("pt-BR")) + "%</small></div></div></div>";
+    var overall = ("<div class=\"ie-h2h-hero\"><p>" + escapeHtml(legendaCentral("legenda_ie_central_em_todos_os_confrontos_registrados")) + "</p><strong>") + escapeHtml(total) + (escapeHtml(legendaCentral("legenda_ie_central_jogos")) + "</strong><div class=\"ie-h2h-results ie-h2h-overall\"><div><strong>") + escapeHtml(numberOf(summary.vitorias_time_a, 0)) + "</strong><span>" + escapeHtml(teamA.nome || legendaCentral("legenda_ie_central_time_a")) + "</span><small>" + escapeHtml(numberOf(summary.percentual_time_a, 0).toLocaleString("pt-BR")) + "%</small></div><div><strong>" + escapeHtml(numberOf(summary.empates, 0)) + ("</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_empates")) + "</span><small>") + escapeHtml(numberOf(summary.percentual_empates, 0).toLocaleString("pt-BR")) + "%</small></div><div><strong>" + escapeHtml(numberOf(summary.vitorias_time_b, 0)) + "</strong><span>" + escapeHtml(teamB.nome || legendaCentral("legenda_ie_central_time_b")) + "</span><small>" + escapeHtml(numberOf(summary.percentual_time_b, 0).toLocaleString("pt-BR")) + "%</small></div></div></div>";
     var competitions = arrayOf(data.competicoes);
-    var competitionsHtml = competitions.length ? "<div class=\"ie-h2h-competitions\">" + competitions.map(function (item) { return "<div><span>" + escapeHtml(competitionDisplayName(item.competicao || "Competição")) + "</span><strong>" + escapeHtml(numberOf(item.jogos, 0)) + " jogos</strong></div>"; }).join("") + "</div>" : "";
+    var competitionsHtml = competitions.length ? "<div class=\"ie-h2h-competitions\">" + competitions.map(function (item) { return "<div><span>" + escapeHtml(competitionDisplayName(item.competicao || legendaCentral("legenda_ie_central_competicao"))) + "</span><strong>" + escapeHtml(numberOf(item.jogos, 0)) + (escapeHtml(legendaCentral("legenda_ie_central_jogos")) + "</strong></div>"); }).join("") + "</div>" : "";
     var games = arrayOf(data.jogos);
     var gamesHtml = games.length ? "<div class=\"ie-h2h-games\">" + games.map(function (game) { return "<div><time>" + escapeHtml(historyDate(game.data)) + "</time><span><b>" + escapeHtml(game.time_casa) + "</b> " + escapeHtml(game.placar_casa) + " – " + escapeHtml(game.placar_fora) + " <b>" + escapeHtml(game.time_fora) + "</b><small>" + escapeHtml(competitionDisplayName(game.competicao || "")) + "</small></span></div>"; }).join("") + "</div>" : "";
     var performanceHtml = data.desempenho_time_a && data.desempenho_time_b ? "<div class=\"ie-performance-compare\">" + performanceBlock(teamA, data.desempenho_time_a) + performanceBlock(teamB, data.desempenho_time_b) + "</div>" : "";
     var general = data.desempenho_geral || {};
-    var generalHtml = general.desempenho_time_a && general.desempenho_time_b ? "<p class=\"ie-performance-scope\">" + escapeHtml(general.escopo || "Todos os jogos oficiais disponíveis, independentemente do adversário.") + "</p><div class=\"ie-performance-compare\">" + performanceBlock(teamA, general.desempenho_time_a) + performanceBlock(teamB, general.desempenho_time_b) + "</div>" : "";
-    if (generalOnly) return generalHtml ? detailSection("Desempenho geral: casa e fora", generalHtml) : "";
-    if (!total) return emptyState(unavailableCopy[0], unavailableCopy[1], false) + (generalHtml ? detailSection("Desempenho geral: casa e fora", generalHtml) : "");
+    var generalHtml = general.desempenho_time_a && general.desempenho_time_b ? "<p class=\"ie-performance-scope\">" + escapeHtml(general.escopo || legendaCentral("legenda_ie_central_todos_os_jogos_oficiais_disponiveis_independentemente_do_adversario")) + "</p><div class=\"ie-performance-compare\">" + performanceBlock(teamA, general.desempenho_time_a) + performanceBlock(teamB, general.desempenho_time_b) + "</div>" : "";
+    if (generalOnly) return generalHtml ? detailSection(legendaCentral("legenda_ie_central_desempenho_geral_casa_e_fora"), generalHtml) : "";
+    if (!total) return emptyState(unavailableCopy[0], unavailableCopy[1], false) + (generalHtml ? detailSection(legendaCentral("legenda_ie_central_desempenho_geral_casa_e_fora"), generalHtml) : "");
     var scopeNotice = data.cobertura && data.cobertura.oficialidade_auditada === false
-      ? "<p class=\"ie-performance-scope\">Acervo parcial em revisão: categoria e oficialidade dos jogos ainda não foram totalmente verificadas. As contagens abaixo não representam um total oficial certificado.</p>" : "";
-    return "<div class=\"ie-h2h\">" + scopeNotice + overall + resultGrid(homeA, "Com mando de " + (teamA.nome || "Time A")) + resultGrid(homeB, "Com mando de " + (teamB.nome || "Time B")) + (performanceHtml ? detailSection("Somente neste confronto: casa e fora", performanceHtml) : "") + (generalHtml ? detailSection("Desempenho geral: casa e fora", generalHtml) : "") + (competitionsHtml ? detailSection("Competições", competitionsHtml) : "") + (gamesHtml ? detailSection("Confrontos mais recentes", gamesHtml) : "") + "<p class=\"ie-h2h-notice\">" + escapeHtml(data.aviso || "Resultados passados não garantem resultados futuros.") + "</p></div>";
+      ? ("<p class=\"ie-performance-scope\">" + escapeHtml(legendaCentral("legenda_ie_central_acervo_parcial_em_revisao_categoria_e_oficialidade_dos_jogos_ainda_nao_foram_totalmente_verificadas")) + "</p>") : "";
+    return "<div class=\"ie-h2h\">" + scopeNotice + overall + resultGrid(homeA, escapeHtml(legendaCentral("legenda_ie_central_com_mando_de")) + (teamA.nome || escapeHtml(legendaCentral("legenda_ie_central_time_a")))) + resultGrid(homeB, escapeHtml(legendaCentral("legenda_ie_central_com_mando_de")) + (teamB.nome || escapeHtml(legendaCentral("legenda_ie_central_time_b")))) + (performanceHtml ? detailSection(legendaCentral("legenda_ie_central_somente_neste_confronto_casa_e_fora"), performanceHtml) : "") + (generalHtml ? detailSection(legendaCentral("legenda_ie_central_desempenho_geral_casa_e_fora"), generalHtml) : "") + (competitionsHtml ? detailSection(legendaCentral("legenda_ie_central_competicoes"), competitionsHtml) : "") + (gamesHtml ? detailSection(legendaCentral("legenda_ie_central_confrontos_mais_recentes"), gamesHtml) : "") + "<p class=\"ie-h2h-notice\">" + escapeHtml(data.aviso || legendaCentral("legenda_ie_central_resultados_passados_nao_garantem_resultados_futuros")) + "</p></div>";
   }
 
   function renderBrazilDatabaseSummary(data) {
     if (!data || data.pais !== "Brasil" || data.modalidade !== "Futebol") return "";
     function total(value) { return numberOf(value, 0).toLocaleString("pt-BR"); }
     var period = formatDatabasePeriod(data);
-    return "<section class=\"ie-database-summary\"><div><span>Base própria</span><strong>Futebol do Brasil</strong><small>Acervo histórico organizado pelo Turbo Tiger" + (period ? " · " + escapeHtml(period) : "") + "</small></div><dl><div><dt>Partidas</dt><dd>" + escapeHtml(total(data.total_registros)) + "</dd></div><div><dt>Competições</dt><dd>" + escapeHtml(total(data.total_competicoes)) + "</dd></div><div><dt>" + escapeHtml(data.total_times_rotulo || "Times catalogados") + "</dt><dd>" + escapeHtml(total(data.total_times)) + "</dd></div></dl>" + historyContributionLinkHtml() + "</section>";
+    return ("<section class=\"ie-database-summary\"><div><span>" + escapeHtml(legendaCentral("legenda_ie_central_base_propria")) + "</span><strong>" + escapeHtml(legendaCentral("legenda_ie_central_futebol_do_brasil")) + "</strong><small>" + escapeHtml(legendaCentral("legenda_ie_central_acervo_historico_organizado_pelo_turbo_tiger"))) + (period ? " · " + escapeHtml(period) : "") + ("</small></div><dl><div><dt>" + escapeHtml(legendaCentral("legenda_ie_central_partidas")) + "</dt><dd>") + escapeHtml(total(data.total_registros)) + ("</dd></div><div><dt>" + escapeHtml(legendaCentral("legenda_ie_central_competicoes")) + "</dt><dd>") + escapeHtml(total(data.total_competicoes)) + "</dd></div><div><dt>" + escapeHtml(data.total_times_rotulo || legendaCentral("legenda_ie_central_times_catalogados")) + "</dt><dd>" + escapeHtml(total(data.total_times)) + "</dd></div></dl>" + historyContributionLinkHtml() + "</section>";
   }
 
   function historyContributionLinkHtml() {
-    return "<button class=\"ie-base-collaborate-link\" type=\"button\" data-history-action=\"open\">Ajude a completar esta história: confira e contribua com informações do seu time.<span aria-hidden=\"true\">›</span></button>";
+    return ("<button class=\"ie-base-collaborate-link\" type=\"button\" data-history-action=\"open\">" + escapeHtml(legendaCentral("legenda_ie_central_ajude_a_completar_esta_historia_confira_e_contribua_com_informacoes_do_seu_time")) + "<span aria-hidden=\"true\">›</span></button>");
   }
 
   function historyDate(value) {
@@ -3652,7 +4453,7 @@
     if (!match) return "";
     var date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12, 0, 0, 0);
     if (Number.isNaN(date.getTime())) return "";
-    return ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"][date.getDay()];
+    return [legendaCentral("legenda_ie_central_dom"), legendaCentral("legenda_ie_central_seg"), legendaCentral("legenda_ie_central_ter"), legendaCentral("legenda_ie_central_qua"), legendaCentral("legenda_ie_central_qui"), legendaCentral("legenda_ie_central_sex"), legendaCentral("legenda_ie_central_sab")][date.getDay()];
   }
 
   function historySelectOptions(items, selected, placeholder, valueOf, labelOf) {
@@ -3778,10 +4579,10 @@
     var suggestionTeams = arrayOf(opponent ? history.opponentSuggestions : history.teamSuggestions).filter(function (team) { return !opponent || ownKeys.indexOf(String(team.time_chave)) < 0; });
     container.innerHTML = suggestionTeams.length ? suggestionTeams.map(function (team) {
       var period = [team.primeiro_jogo_em ? historyDate(team.primeiro_jogo_em) : "", team.ultimo_jogo_em ? historyDate(team.ultimo_jogo_em) : ""].filter(Boolean).join(" a ");
-      var name = team.nome_exibicao || team.nome || "Time";
+      var name = team.nome_exibicao || team.nome || legendaCentral("legenda_ie_central_time");
       var checked = selectedKeys.indexOf(String(team.time_chave)) >= 0;
-      return "<div class=\"ie-history-suggestion\" role=\"option\" aria-selected=\"" + (checked ? "true" : "false") + "\"><button type=\"button\" data-history-action=\"" + (opponent ? "select-opponent" : "select-team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(name) + "\"><strong>" + escapeHtml(name) + "</strong>" + (team.uf || period ? "<small>" + escapeHtml([team.cidade, team.uf, period].filter(Boolean).join(" · ")) + "</small>" : "") + "</button><input type=\"checkbox\" class=\"ie-history-suggestion-check\" data-history-action=\"toggle-" + (opponent ? "opponent" : "team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(name) + "\" aria-label=\"" + (checked ? "Desmarcar " : "Marcar ") + escapeHtml(name) + "\"" + (checked ? " checked" : "") + "></div>";
-    }).join("") : "<span>Nenhum time encontrado.</span>";
+      return "<div class=\"ie-history-suggestion\" role=\"option\" aria-selected=\"" + (checked ? "true" : "false") + "\"><button type=\"button\" data-history-action=\"" + (opponent ? "select-opponent" : "select-team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(name) + "\"><strong>" + escapeHtml(name) + "</strong>" + (team.uf || period ? "<small>" + escapeHtml([team.cidade, team.uf, period].filter(Boolean).join(" · ")) + "</small>" : "") + "</button><input type=\"checkbox\" class=\"ie-history-suggestion-check\" data-history-action=\"toggle-" + (opponent ? "opponent" : "team") + "\" data-history-team-key=\"" + escapeHtml(team.time_chave) + "\" data-history-team-name=\"" + escapeHtml(name) + "\" aria-label=\"" + (checked ? escapeHtml(legendaCentral("legenda_ie_central_desmarcar")) : escapeHtml(legendaCentral("legenda_ie_central_marcar"))) + escapeHtml(name) + "\"" + (checked ? " checked" : "") + "></div>";
+    }).join("") : ("<span>" + escapeHtml(legendaCentral("legenda_ie_central_nenhum_time_encontrado")) + "</span>");
     container.hidden = false;
     container.scrollTop = numberOf(history.suggestionScroll && history.suggestionScroll[target], 0);
     if (input) input.setAttribute("aria-expanded", "true");
@@ -3808,10 +4609,10 @@
     if (yearInput) {
       yearInput.disabled = !teamSelected;
       yearInput.setAttribute("aria-invalid", yearValid ? "false" : "true");
-      yearInput.setCustomValidity(yearValid ? "" : yearPeriod ? "Informe um ano entre " + history.yearStart + " e " + history.yearEnd + "." : "Informe um ano válido com 4 dígitos.");
+      yearInput.setCustomValidity(yearValid ? "" : yearPeriod ? legendaCentral("legenda_ie_central_intervalo_anos", { inicio: history.yearStart, fim: history.yearEnd }) : legendaCentral("legenda_ie_central_informe_um_ano_valido_com_4_digitos"));
     }
     if (button) button.disabled = !ready || history.loading;
-    if (hint) hint.textContent = !teamSelected ? "Primeiro, selecione o seu time na lista." : !yearValid ? (yearPeriod ? "Informe um ano entre " + history.yearStart + " e " + history.yearEnd + "." : "Se informar o ano, digite os 4 dígitos.") : history.filters.scope === "estadual" && !history.filters.uf ? "Selecione a UF da competição estadual." : history.requiresSearch ? "Toque em Pesquisar para atualizar os confrontos." : "Os confrontos são atualizados automaticamente.";
+    if (hint) hint.textContent = !teamSelected ? legendaCentral("legenda_ie_central_primeiro_selecione_o_seu_time_na_lista") : !yearValid ? (yearPeriod ? legendaCentral("legenda_ie_central_intervalo_anos", { inicio: history.yearStart, fim: history.yearEnd }) : legendaCentral("legenda_ie_central_se_informar_o_ano_digite_os_4_digitos")) : history.filters.scope === "estadual" && !history.filters.uf ? legendaCentral("legenda_ie_central_selecione_a_uf_da_competicao_estadual") : history.requiresSearch ? legendaCentral("legenda_ie_central_toque_em_pesquisar_para_atualizar_os_confrontos") : legendaCentral("legenda_ie_central_os_confrontos_sao_atualizados_automaticamente");
     all("[data-history-filter]").forEach(function (select) {
       var name = select.getAttribute("data-history-filter");
       select.disabled = !baseReady || (name === "uf" && history.filters.scope !== "estadual");
@@ -3822,15 +4623,15 @@
     var history = state.historyContribution;
     var filters = history.filters;
     var facets = history.facets;
-    var competitionOptions = historySelectOptions(facets.competitions, filters.competitionKey, "Todas", function (item) { return item.chave; }, function (item) { return competitionDisplayName(item.nome || "Competição"); });
-    var seasonOptions = historySelectOptions(facets.seasons, filters.season, "Todas", null, null);
-    var scopeOptions = historySelectOptions(facets.scopes, filters.scope, "Todas", null, function (value) { return value === "nacional" ? "Nacional" : value === "estadual" ? "Estadual" : value; });
-    var ufOptions = historySelectOptions(facets.ufs, filters.uf, "Selecione", null, null);
-    var titleOptions = "<option value=\"\"" + (filters.titleFilter ? "" : " selected") + ">Não selecionado</option><option value=\"todos\"" + (filters.titleFilter === "todos" ? " selected" : "") + ">Todos</option><option value=\"campeao\"" + (filters.titleFilter === "campeao" ? " selected" : "") + ">Campeão</option><option value=\"vice\"" + (filters.titleFilter === "vice" ? " selected" : "") + ">Vice</option>";
+    var competitionOptions = historySelectOptions(facets.competitions, filters.competitionKey, legendaCentral("legenda_ie_central_todas"), function (item) { return item.chave; }, function (item) { return competitionDisplayName(item.nome || legendaCentral("legenda_ie_central_competicao")); });
+    var seasonOptions = historySelectOptions(facets.seasons, filters.season, legendaCentral("legenda_ie_central_todas"), null, null);
+    var scopeOptions = historySelectOptions(facets.scopes, filters.scope, legendaCentral("legenda_ie_central_todas"), null, function (value) { return value === "nacional" ? legendaCentral("legenda_ie_central_nacional") : value === "estadual" ? legendaCentral("legenda_ie_central_estadual") : value; });
+    var ufOptions = historySelectOptions(facets.ufs, filters.uf, legendaCentral("legenda_ie_central_selecione"), null, null);
+    var titleOptions = "<option value=\"\"" + (filters.titleFilter ? "" : " selected") + (">" + escapeHtml(legendaCentral("legenda_ie_central_nao_selecionado")) + "</option><option value=\"todos\"") + (filters.titleFilter === "todos" ? " selected" : "") + (">" + escapeHtml(legendaCentral("legenda_ie_central_todos")) + "</option><option value=\"campeao\"") + (filters.titleFilter === "campeao" ? " selected" : "") + (">" + escapeHtml(legendaCentral("legenda_ie_central_campeao")) + "</option><option value=\"vice\"") + (filters.titleFilter === "vice" ? " selected" : "") + (">" + escapeHtml(legendaCentral("legenda_ie_central_vice")) + "</option>");
     var baseReady = historySelectedKeys(false).length > 0 && (!filters.year || historyYearIsValid(history));
-    var ufField = filters.scope === "estadual" ? "<label class=\"ie-history-field\"><span>UF *</span><select data-history-filter=\"uf\"" + (!baseReady ? " disabled" : "") + ">" + ufOptions + "</select></label>" : "";
+    var ufField = filters.scope === "estadual" ? ("<label class=\"ie-history-field\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_uf")) + "</span><select data-history-filter=\"uf\"") + (!baseReady ? " disabled" : "") + ">" + ufOptions + "</select></label>" : "";
     var yearPeriod = history.yearStart && history.yearEnd ? " <small class=\"ie-history-year-period\">(" + history.yearStart + " - " + history.yearEnd + ")</small>" : "";
-    return "<section class=\"ie-history-search\"><div class=\"ie-history-search-intro\"><strong>Encontre um confronto</strong><span>Os filtros com * são obrigatórios.</span></div><div class=\"ie-history-filters\"><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Seu time *</span><input id=\"historyTeamInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.teamQuery) + "\" placeholder=\"Digite e selecione um ou mais times\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyTeamSuggestions\" aria-expanded=\"false\"><div id=\"historyTeamSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>" + historySelectionChips(false) + "</label><label class=\"ie-history-field is-wide ie-history-team-field\"><span>Time adversário</span><input id=\"historyOpponentInput\" type=\"search\" maxlength=\"120\" value=\"" + escapeHtml(filters.opponentQuery) + "\" placeholder=\"Opcional: selecione um ou mais\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyOpponentSuggestions\" aria-expanded=\"false\"" + (!baseReady ? " disabled" : "") + "><div id=\"historyOpponentSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>" + historySelectionChips(true) + "</label><label class=\"ie-history-field\"><span>Ano" + yearPeriod + "</span><input id=\"historyYearInput\" type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]{4}\" maxlength=\"4\" value=\"" + escapeHtml(filters.year) + "\" placeholder=\"Opcional\"" + (!baseReady ? " disabled" : "") + "></label><label class=\"ie-history-field\"><span>Temporada</span><select data-history-filter=\"season\"" + (!baseReady ? " disabled" : "") + ">" + seasonOptions + "</select></label><label class=\"ie-history-field\"><span>Abrangência</span><select data-history-filter=\"scope\"" + (!baseReady ? " disabled" : "") + ">" + scopeOptions + "</select></label><label class=\"ie-history-field\"><span>Títulos</span><select data-history-filter=\"titleFilter\"" + (!baseReady ? " disabled" : "") + ">" + titleOptions + "</select></label>" + ufField + "<label class=\"ie-history-field is-wide\"><span>Competição</span><select data-history-filter=\"competitionKey\"" + (!baseReady ? " disabled" : "") + ">" + competitionOptions + "</select></label></div><span id=\"historySearchHint\" class=\"ie-history-search-hint\" aria-live=\"polite\"></span><div class=\"ie-history-search-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" id=\"historySearchButton\" data-history-action=\"search\"" + (!historyRequiredFiltersReady(history) || history.loading ? " disabled" : "") + ">Pesquisar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"clear\">Limpar filtros</button></div></section>";
+    return ("<section class=\"ie-history-search\"><div class=\"ie-history-search-intro\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_encontre_um_confronto")) + "</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_os_filtros_com_sao_obrigatorios")) + "</span></div><div class=\"ie-history-filters\"><label class=\"ie-history-field is-wide ie-history-team-field\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_seu_time")) + "</span><input id=\"historyTeamInput\" type=\"search\" maxlength=\"120\" value=\"") + escapeHtml(filters.teamQuery) + ("\" placeholder=\"" + escapeHtml(legendaCentral("legenda_ie_central_digite_e_selecione_um_ou_mais_times")) + "\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyTeamSuggestions\" aria-expanded=\"false\"><div id=\"historyTeamSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>") + historySelectionChips(false) + ("</label><label class=\"ie-history-field is-wide ie-history-team-field\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_time_adversario")) + "</span><input id=\"historyOpponentInput\" type=\"search\" maxlength=\"120\" value=\"") + escapeHtml(filters.opponentQuery) + ("\" placeholder=\"" + escapeHtml(legendaCentral("legenda_ie_central_opcional_selecione_um_ou_mais")) + "\" autocomplete=\"off\" aria-autocomplete=\"list\" aria-controls=\"historyOpponentSuggestions\" aria-expanded=\"false\"") + (!baseReady ? " disabled" : "") + "><div id=\"historyOpponentSuggestions\" class=\"ie-history-suggestions\" role=\"listbox\" hidden></div>" + historySelectionChips(true) + ("</label><label class=\"ie-history-field\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_ano"))) + yearPeriod + "</span><input id=\"historyYearInput\" type=\"text\" inputmode=\"numeric\" pattern=\"[0-9]{4}\" maxlength=\"4\" value=\"" + escapeHtml(filters.year) + ("\" placeholder=\"" + escapeHtml(legendaCentral("legenda_ie_central_opcional")) + "\"") + (!baseReady ? " disabled" : "") + ("></label><label class=\"ie-history-field\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_temporada")) + "</span><select data-history-filter=\"season\"") + (!baseReady ? " disabled" : "") + ">" + seasonOptions + ("</select></label><label class=\"ie-history-field\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_abrangencia")) + "</span><select data-history-filter=\"scope\"") + (!baseReady ? " disabled" : "") + ">" + scopeOptions + ("</select></label><label class=\"ie-history-field\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_titulos")) + "</span><select data-history-filter=\"titleFilter\"") + (!baseReady ? " disabled" : "") + ">" + titleOptions + "</select></label>" + ufField + ("<label class=\"ie-history-field is-wide\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_competicao")) + "</span><select data-history-filter=\"competitionKey\"") + (!baseReady ? " disabled" : "") + ">" + competitionOptions + "</select></label></div><span id=\"historySearchHint\" class=\"ie-history-search-hint\" aria-live=\"polite\"></span><div class=\"ie-history-search-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" id=\"historySearchButton\" data-history-action=\"search\"" + (!historyRequiredFiltersReady(history) || history.loading ? " disabled" : "") + (">" + escapeHtml(legendaCentral("legenda_ie_central_pesquisar")) + "</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"clear\">" + escapeHtml(legendaCentral("legenda_ie_central_limpar_filtros")) + "</button></div></section>");
   }
 
   function historyExperience(id) {
@@ -3847,9 +4648,9 @@
       return "<button type=\"button\" data-history-action=\"experience-toggle\" data-history-row-id=\"" + escapeHtml(id) + "\" data-experience-form=\"" + form + "\" aria-label=\"" + escapeHtml(label) + "\" aria-pressed=\"" + (active ? "true" : "false") + "\"" + (busy ? " disabled" : "") + ">" + icon(iconName) + "</button>";
     }
     var companions = selected
-      ? "<button type=\"button\" class=\"ie-history-companions-button\" data-history-action=\"experience-companions\" data-history-row-id=\"" + escapeHtml(id) + "\" aria-label=\"Conte com quem você assistiu\"" + (busy ? " disabled" : "") + ">" + icon("group") + (numberOf(experience.total_acompanhantes, 0) > 0 ? "<b>" + escapeHtml(numberOf(experience.total_acompanhantes, 0)) + "</b>" : "") + "<span>Com quem?</span></button>"
+      ? "<button type=\"button\" class=\"ie-history-companions-button\" data-history-action=\"experience-companions\" data-history-row-id=\"" + escapeHtml(id) + ("\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_conte_com_quem_voce_assistiu")) + "\"") + (busy ? " disabled" : "") + ">" + icon("group") + (numberOf(experience.total_acompanhantes, 0) > 0 ? "<b>" + escapeHtml(numberOf(experience.total_acompanhantes, 0)) + "</b>" : "") + ("<span>" + escapeHtml(legendaCentral("legenda_ie_central_com_quem")) + "</span></button>")
       : "";
-    return "<div class=\"ie-history-experience-actions\" role=\"group\" aria-label=\"Como você acompanhou este confronto\">" + option("local", "stadium", "Marcar que assistiu no local do evento") + option("remoto", "tv", "Marcar que assistiu pela TV ou outro meio") + companions + "</div>";
+    return ("<div class=\"ie-history-experience-actions\" role=\"group\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_como_voce_acompanhou_este_confronto")) + "\">") + option("local", "stadium", legendaCentral("legenda_ie_central_marcar_que_assistiu_no_local_do_evento")) + option("remoto", "tv", legendaCentral("legenda_ie_central_marcar_que_assistiu_pela_tv_ou_outro_meio")) + companions + "</div>";
   }
 
   function historyTitleContexts(id) {
@@ -3860,31 +4661,31 @@
 
   function historyTitleRoleLabel(value) {
     var labels = {
-      final_unica: "Final",
-      final_ida: "Final · ida",
-      final_volta: "Final · volta",
-      desempate: "Desempate da decisão",
-      confirmacao_titulo: "Título confirmado",
-      rodada_decisiva: "Rodada decisiva",
-      entrega_taca: "Entrega da taça",
-      final_fase: "Final da fase",
-      relacionado: "Relacionado ao título"
+      final_unica: legendaCentral("legenda_ie_central_final"),
+      final_ida: legendaCentral("legenda_ie_central_final_ida"),
+      final_volta: legendaCentral("legenda_ie_central_final_volta"),
+      desempate: legendaCentral("legenda_ie_central_desempate_da_decisao"),
+      confirmacao_titulo: legendaCentral("legenda_ie_central_titulo_confirmado"),
+      rodada_decisiva: legendaCentral("legenda_ie_central_rodada_decisiva"),
+      entrega_taca: legendaCentral("legenda_ie_central_entrega_da_taca"),
+      final_fase: legendaCentral("legenda_ie_central_final_da_fase"),
+      relacionado: legendaCentral("legenda_ie_central_relacionado_ao_titulo")
     };
     var code = String(value || "").toLowerCase();
-    return labels[code] || "Confronto de título";
+    return labels[code] || legendaCentral("legenda_ie_central_confronto_de_titulo");
   }
 
   function historyTitleDefinitionLabel(value) {
     var labels = {
       final_unica: "",
       final_ida_volta: "",
-      quadrangular: "Quadrangular",
-      quadrangular_final: "Quadrangular final",
-      triangular: "Triangular",
-      triangular_final: "Triangular final",
-      pontos_corridos: "Pontos corridos",
-      mata_mata: "Mata-mata",
-      fase_final: "Fase final"
+      quadrangular: legendaCentral("legenda_ie_central_quadrangular"),
+      quadrangular_final: legendaCentral("legenda_ie_central_quadrangular_final"),
+      triangular: legendaCentral("legenda_ie_central_triangular"),
+      triangular_final: legendaCentral("legenda_ie_central_triangular_final"),
+      pontos_corridos: legendaCentral("legenda_ie_central_pontos_corridos"),
+      mata_mata: legendaCentral("legenda_ie_central_mata_mata"),
+      fase_final: legendaCentral("legenda_ie_central_fase_final")
     };
     var code = String(value || "").toLowerCase().trim();
     if (!code) return "";
@@ -3902,7 +4703,7 @@
     var parts = [
       historyTitleRoleLabel(role),
       definition,
-      titleFlag(item.confronto_principal) ? "Principal" : ""
+      titleFlag(item.confronto_principal) ? legendaCentral("legenda_ie_central_principal") : ""
     ];
     var seen = {};
     return parts.filter(function (part) {
@@ -3920,7 +4721,7 @@
   function historyMatchPhaseBadges(row) {
     var phase = displayText(row.fase || "").trim();
     var round = displayText(row.rodada || "").trim();
-    if (/^\d+$/.test(round)) round = "Rodada " + round;
+    if (/^\d+$/.test(round)) round = legendaCentral("legenda_ie_central_rodada") + round;
     if (phase && normalizeSearchText(round).indexOf(normalizeSearchText(phase)) >= 0) phase = "";
     var parts = [phase, round].filter(Boolean);
     if (!parts.length) return "";
@@ -3948,8 +4749,8 @@
   function titleNaturalList(values) {
     values = arrayOf(values);
     if (values.length < 2) return values[0] || "";
-    if (values.length === 2) return values[0] + " e " + values[1];
-    return values.slice(0, -1).join(", ") + " e " + values[values.length - 1];
+    if (values.length === 2) return legendaCentral("legenda_ie_central_conjuncao_lista", { anteriores: values[0], ultimo: values[1] });
+    return legendaCentral("legenda_ie_central_conjuncao_lista", { anteriores: values.slice(0, -1).join(", "), ultimo: values[values.length - 1] });
   }
 
   function titleParticipantsText(item) {
@@ -3958,8 +4759,8 @@
     var runnersUp = titleEntityNames(item.vices, item.vice || item.vice_nome || item.vice_campeao);
     var shared = titleFlag(item.titulo_compartilhado) || champions.length > 1;
     var parts = [];
-    if (champions.length) parts.push((champions.length > 1 ? "Campeões: " : "Campeão: ") + titleNaturalList(champions));
-    if (runnersUp.length) parts.push((runnersUp.length > 1 ? "Vices: " : "Vice: ") + titleNaturalList(runnersUp));
+    if (champions.length) parts.push((champions.length > 1 ? legendaCentral("legenda_ie_central_campeoes") : legendaCentral("legenda_ie_central_campeao_2")) + titleNaturalList(champions));
+    if (runnersUp.length) parts.push((runnersUp.length > 1 ? legendaCentral("legenda_ie_central_vices") : legendaCentral("legenda_ie_central_vice_2")) + titleNaturalList(runnersUp));
     return { champions: champions, runnersUp: runnersUp, shared: shared, text: parts.join(" · ") };
   }
 
@@ -3983,10 +4784,10 @@
       var participants = titleParticipantsText(item);
       var badges = historyTitleGameTypeParts(item).map(function (part) {
         return "<b>" + escapeHtml(part) + "</b>";
-      }).join("") + (participants.shared ? "<b>Título compartilhado</b>" : "");
+      }).join("") + (participants.shared ? ("<b>" + escapeHtml(legendaCentral("legenda_ie_central_titulo_compartilhado")) + "</b>") : "");
       return "<span class=\"ie-history-title-item\"><span class=\"ie-history-title-name\">" + icon("trophy") + "<span class=\"ie-history-title-badges\">" + badges + "</span></span>" + (participants.text ? "<small>" + escapeHtml(participants.text) + "</small>" : "") + "</span>";
     }).join("");
-    var remaining = contexts.length > 2 ? "<small class=\"ie-history-title-more\">+" + escapeHtml(contexts.length - 2) + " contexto" + (contexts.length - 2 === 1 ? "" : "s") + " de título</small>" : "";
+    var remaining = contexts.length > 2 ? "<small class=\"ie-history-title-more\">+" + escapeHtml(contexts.length - 2) + " contexto" + (contexts.length - 2 === 1 ? "" : "s") + (escapeHtml(legendaCentral("legenda_ie_central_de_titulo")) + "</small>") : "";
     return "<span class=\"ie-history-title-contexts\">" + visible + remaining + "</span>";
   }
 
@@ -4003,24 +4804,24 @@
     var collaborators = row.colaboradores || {};
     var totalCollaborators = Number(collaborators.total_colaboradores || 0);
     var collaboratorHtml = totalCollaborators > 0
-      ? "<div class=\"ie-history-row-contributors\"><span>Contribuído por <strong>" + escapeHtml(collaborators.primeiro_codinome || "Anônimo") + "</strong></span>" + (totalCollaborators > 1 ? "<button type=\"button\" data-history-action=\"contributors\" data-history-row-id=\"" + escapeHtml(id) + "\">e mais " + escapeHtml(totalCollaborators - 1) + (totalCollaborators - 1 === 1 ? " usuário" : " usuários") + "</button>" : "") + "</div>"
+      ? ("<div class=\"ie-history-row-contributors\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_contribuido_por")) + "<strong>") + escapeHtml(collaborators.primeiro_codinome || legendaCentral("legenda_ie_central_anonimo")) + "</strong></span>" + (totalCollaborators > 1 ? "<button type=\"button\" data-history-action=\"contributors\" data-history-row-id=\"" + escapeHtml(id) + ("\">" + escapeHtml(legendaCentral("legenda_ie_central_e_mais"))) + escapeHtml(totalCollaborators - 1) + (totalCollaborators - 1 === 1 ? escapeHtml(legendaCentral("legenda_ie_central_usuario")) : escapeHtml(legendaCentral("legenda_ie_central_usuarios"))) + "</button>" : "") + "</div>"
       : "";
-    return "<article class=\"ie-history-row-wrap\"><button type=\"button\" class=\"ie-history-row\" data-history-action=\"correct\" data-history-row-id=\"" + escapeHtml(id) + "\" aria-label=\"Conferir " + escapeHtml(label) + "\"><time datetime=\"" + escapeHtml(row.data_partida || "") + "\"><strong>" + escapeHtml(historyDate(row.data_partida)) + "</strong>" + (dayAndTime ? "<span>" + escapeHtml(dayAndTime) + "</span>" : "") + (wo ? "<em class=\"ie-history-wo\">W.O.</em>" : "") + "</time><span class=\"ie-history-row-copy\"><strong><span" + homeClass + ">" + escapeHtml(row.time_casa || "Casa") + "</span><b>" + escapeHtml(score) + "</b><span" + awayClass + ">" + escapeHtml(row.time_fora || "Visitante") + "</span></strong><small>" + escapeHtml(meta || "Competição não informada") + "</small>" + (place ? "<small>" + escapeHtml(place) + "</small>" : "") + renderHistoryTitleContexts(row) + "</span>" + icon("chevron") + "</button>" + renderHistoryExperienceActions(row) + collaboratorHtml + "</article>";
+    return "<article class=\"ie-history-row-wrap\"><button type=\"button\" class=\"ie-history-row\" data-history-action=\"correct\" data-history-row-id=\"" + escapeHtml(id) + ("\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_conferir"))) + escapeHtml(label) + "\"><time datetime=\"" + escapeHtml(row.data_partida || "") + "\"><strong>" + escapeHtml(historyDate(row.data_partida)) + "</strong>" + (dayAndTime ? "<span>" + escapeHtml(dayAndTime) + "</span>" : "") + (wo ? ("<em class=\"ie-history-wo\">" + escapeHtml(legendaCentral("legenda_ie_central_w_o")) + "</em>") : "") + "</time><span class=\"ie-history-row-copy\"><strong><span" + homeClass + ">" + escapeHtml(row.time_casa || legendaCentral("legenda_ie_central_casa")) + "</span><b>" + escapeHtml(score) + "</b><span" + awayClass + ">" + escapeHtml(row.time_fora || legendaCentral("legenda_ie_central_visitante")) + "</span></strong><small>" + escapeHtml(meta || legendaCentral("legenda_ie_central_competicao_nao_informada")) + "</small>" + (place ? "<small>" + escapeHtml(place) + "</small>" : "") + renderHistoryTitleContexts(row) + "</span>" + icon("chevron") + "</button>" + renderHistoryExperienceActions(row) + collaboratorHtml + "</article>";
   }
 
   function renderHistoryResults(history) {
-    var listTitle = history.mode === "pesquisa" ? history.totalRows.toLocaleString("pt-BR") + (history.totalRows === 1 ? " confronto encontrado" : " confrontos encontrados") : "Confrontos";
+    var listTitle = history.mode === "pesquisa" ? history.totalRows.toLocaleString("pt-BR") + (history.totalRows === 1 ? legendaCentral("legenda_ie_central_confronto_encontrado") : legendaCentral("legenda_ie_central_confrontos_encontrados")) : legendaCentral("legenda_ie_central_confrontos");
     var hasSelectedTeam = historySelectedKeys(false).length > 0;
     var waitingState = !hasSelectedTeam
-      ? emptyState("Selecione o seu time", "Os confrontos mais recentes aparecerão automaticamente.", false)
+      ? emptyState(legendaCentral("legenda_ie_central_selecione_o_seu_time"), legendaCentral("legenda_ie_central_os_confrontos_mais_recentes_aparecerao_automaticamente"), false)
       : history.filters.year && !historyYearIsValid(history)
-        ? emptyState("Ano fora do período disponível", "Informe um ano entre " + history.yearStart + " e " + history.yearEnd + ".", false)
+        ? emptyState(legendaCentral("legenda_ie_central_ano_fora_do_periodo_disponivel"), legendaCentral("legenda_ie_central_intervalo_anos", { inicio: history.yearStart, fim: history.yearEnd }), false)
         : history.requiresSearch
-          ? emptyState("Filtros alterados", "Toque em Pesquisar para atualizar os confrontos.", false)
-          : emptyState("Filtros prontos", "Os confrontos serão atualizados automaticamente.", false);
-    var rows = history.mode !== "pesquisa" ? waitingState : history.rows.length ? "<div class=\"ie-history-table\">" + history.rows.map(renderHistoryRow).join("") + "</div>" : emptyState("Nenhum confronto encontrado", "Revise os filtros informados ou envie um confronto que ainda não está na base.", false);
-    var pager = history.totalPages > 1 ? "<nav class=\"ie-history-pager\" aria-label=\"Paginação dos confrontos\"><button type=\"button\" data-history-action=\"previous\"" + (history.page <= 1 || history.loading ? " disabled" : "") + ">Anterior</button><span>Página " + escapeHtml(history.page) + " de " + escapeHtml(history.totalPages) + "</span><button type=\"button\" data-history-action=\"next\"" + (!history.hasMore || history.loading ? " disabled" : "") + ">Próxima</button></nav>" : "";
-    return "<section class=\"ie-history-results\"><header><div><strong>" + escapeHtml(listTitle) + "</strong><span>Toque em um confronto para sugerir correção ou no + ao lado para incluir algum. Também marque se assistiu no local " + icon("stadium") + " ou pela TV/outro meio " + icon("tv") + ".</span></div><button class=\"ie-history-add\" type=\"button\" data-history-action=\"new\" aria-label=\"Enviar um confronto não localizado\">+</button></header>" + (history.loading ? "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>" : rows + pager) + "</section>";
+          ? emptyState(legendaCentral("legenda_ie_central_filtros_alterados"), legendaCentral("legenda_ie_central_toque_em_pesquisar_para_atualizar_os_confrontos"), false)
+          : emptyState(legendaCentral("legenda_ie_central_filtros_prontos"), legendaCentral("legenda_ie_central_os_confrontos_serao_atualizados_automaticamente"), false);
+    var rows = history.mode !== "pesquisa" ? waitingState : history.rows.length ? "<div class=\"ie-history-table\">" + history.rows.map(renderHistoryRow).join("") + "</div>" : emptyState(legendaCentral("legenda_ie_central_nenhum_confronto_encontrado"), legendaCentral("legenda_ie_central_revise_os_filtros_informados_ou_envie_um_confronto_que_ainda_nao_esta_na_base"), false);
+    var pager = history.totalPages > 1 ? ("<nav class=\"ie-history-pager\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_paginacao_dos_confrontos")) + "\"><button type=\"button\" data-history-action=\"previous\"") + (history.page <= 1 || history.loading ? " disabled" : "") + (">" + escapeHtml(legendaCentral("legenda_ie_central_anterior")) + "</button><span>" + escapeHtml(legendaCentral("legenda_ie_central_pagina"))) + escapeHtml(history.page) + " de " + escapeHtml(history.totalPages) + "</span><button type=\"button\" data-history-action=\"next\"" + (!history.hasMore || history.loading ? " disabled" : "") + (">" + escapeHtml(legendaCentral("legenda_ie_central_proxima")) + "</button></nav>") : "";
+    return "<section class=\"ie-history-results\"><header><div><strong>" + escapeHtml(listTitle) + ("</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_toque_em_um_confronto_para_sugerir_correcao_ou_no_ao_lado_para_incluir_algum_tambem_marque_se_assist"))) + icon("stadium") + escapeHtml(legendaCentral("legenda_ie_central_ou_pela_tv_outro_meio")) + icon("tv") + ".</span></div><button class=\"ie-history-add\" type=\"button\" data-history-action=\"new\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_enviar_confronto_ausente")) + "\">+</button></header>" + (history.loading ? "<div class=\"ie-empty\"><span class=\"ie-spinner\"></span></div>" : rows + pager) + "</section>";
   }
 
   function renderHistoryContributionPage() {
@@ -4028,9 +4829,9 @@
     captureHistorySuggestionScroll("team");
     captureHistorySuggestionScroll("opponent");
     byId("detailContent").setAttribute("data-detail-view", "history-list");
-    byId("detailTitle").textContent = "Colabore com nossa base";
+    byId("detailTitle").textContent = legendaCentral("legenda_ie_central_colabore_com_nossa_base");
     var totalPartidas = numberOf(state.baseSummary && state.baseSummary.total_registros, 0);
-    byId("detailSubtitle").textContent = "Futebol do Brasil" + (totalPartidas > 0 ? " · " + totalPartidas.toLocaleString("pt-BR") + " partidas" : "");
+    byId("detailSubtitle").textContent = legendaCentral("legenda_ie_central_futebol_do_brasil") + (totalPartidas > 0 ? " · " + totalPartidas.toLocaleString("pt-BR") + " partidas" : "");
     byId("detailContent").innerHTML = renderHistoryFilters() + renderHistoryResults(history);
     updateHistorySearchControls();
     renderHistoryTeamSuggestions("team");
@@ -4230,7 +5031,7 @@
 
   async function openHistoryContribution(pushCurrent) {
     state.historyContribution = emptyHistoryContributionState();
-    beginDetail("Colabore com nossa base", "Carregando filtros...", !!pushCurrent);
+    beginDetail(legendaCentral("legenda_ie_central_colabore_com_nossa_base"), legendaCentral("legenda_ie_central_carregando_filtros"), !!pushCurrent);
     byId("detailContent").setAttribute("data-detail-view", "history-loading");
     var history = state.historyContribution;
     history.loading = true;
@@ -4248,7 +5049,7 @@
     } catch (error) {
       if (history !== state.historyContribution || historyDetailView() !== "history-loading") return;
       history.loading = false;
-      byId("detailContent").innerHTML = emptyState("Não foi possível abrir a colaboração", friendlyError(error), false);
+      byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_nao_foi_possivel_abrir_a_colaboracao"), friendlyError(error), false);
     }
   }
 
@@ -4314,27 +5115,27 @@
     var correction = type === "correcao";
     var requiredForInclusion = !correction;
     row = row || {};
-    var intro = correction ? "Encontrou algo diferente? Corrija os dados abaixo e envie para nossa análise." : "Não encontrou uma partida? Preencha todos os dados do confronto e envie para conferência.";
+    var intro = correction ? legendaCentral("legenda_ie_central_encontrou_algo_diferente_corrija_os_dados_abaixo_e_envie_para_nossa_analise") : legendaCentral("legenda_ie_central_nao_encontrou_uma_partida_preencha_todos_os_dados_do_confronto_e_envie_para_conferencia");
     var html = "<form class=\"ie-history-form\" data-history-contribution-form><input type=\"hidden\" name=\"contribution_type\" value=\"" + (correction ? "correcao" : "inclusao") + "\"><input type=\"hidden\" name=\"confrontation_id\" value=\"" + escapeHtml(correction ? row.id || row.cod_confronto || "" : "") + "\"><input type=\"hidden\" name=\"idempotency_key\" value=\"" + escapeHtml(historyIdempotencyKey()) + "\"><p class=\"ie-history-form-intro\">" + escapeHtml(intro) + "</p><div class=\"ie-history-form-grid\">";
-    html += historyFormField("Data", "data_partida", "date", String(row.data_partida || "").slice(0, 10), { required: true });
-    html += historyFormField("Horário", "hora_partida", "time", historyTime(row.hora_partida), { required: requiredForInclusion });
-    html += historyFormField("Time da casa", "time_casa", "text", row.time_casa, { required: true, wide: true, maxLength: 200 });
-    html += historyFormField("Placar casa", "placar_casa", "number", row.placar_casa, { required: true, min: 0, max: 99, step: 1 });
-    html += historyFormField("Intervalo casa", "placar_intervalo_casa", "number", row.placar_intervalo_casa, { required: requiredForInclusion, min: 0, max: 99, step: 1 });
-    html += historyFormField("Time visitante", "time_fora", "text", row.time_fora, { required: true, wide: true, maxLength: 200 });
-    html += historyFormField("Placar visitante", "placar_fora", "number", row.placar_fora, { required: true, min: 0, max: 99, step: 1 });
-    html += historyFormField("Intervalo visitante", "placar_intervalo_fora", "number", row.placar_intervalo_fora, { required: requiredForInclusion, min: 0, max: 99, step: 1 });
-    html += historyFormField("Competição", "competicao", "text", row.competicao, { required: true, wide: true, maxLength: 240 });
-    html += historyFormField("Temporada", "temporada", "text", row.temporada, { required: true, maxLength: 80 });
-    html += historyFormField("Fase", "fase", "text", row.fase, { required: requiredForInclusion, maxLength: 120 });
-    html += historyFormField("Rodada", "rodada", "text", row.rodada, { required: requiredForInclusion, maxLength: 120 });
-    html += historyFormField("Estádio", "estadio", "text", row.estadio, { required: requiredForInclusion, wide: true, maxLength: 200 });
-    html += historyFormField("Cidade", "cidade", "text", row.cidade, { required: requiredForInclusion, wide: true, maxLength: 160 });
+    html += historyFormField(legendaCentral("legenda_ie_central_data"), "data_partida", "date", String(row.data_partida || "").slice(0, 10), { required: true });
+    html += historyFormField(legendaCentral("legenda_ie_central_horario"), "hora_partida", "time", historyTime(row.hora_partida), { required: requiredForInclusion });
+    html += historyFormField(legendaCentral("legenda_ie_central_time_da_casa"), "time_casa", "text", row.time_casa, { required: true, wide: true, maxLength: 200 });
+    html += historyFormField(legendaCentral("legenda_ie_central_placar_casa"), "placar_casa", "number", row.placar_casa, { required: true, min: 0, max: 99, step: 1 });
+    html += historyFormField(legendaCentral("legenda_ie_central_intervalo_casa"), "placar_intervalo_casa", "number", row.placar_intervalo_casa, { required: requiredForInclusion, min: 0, max: 99, step: 1 });
+    html += historyFormField(legendaCentral("legenda_ie_central_time_visitante"), "time_fora", "text", row.time_fora, { required: true, wide: true, maxLength: 200 });
+    html += historyFormField(legendaCentral("legenda_ie_central_placar_visitante"), "placar_fora", "number", row.placar_fora, { required: true, min: 0, max: 99, step: 1 });
+    html += historyFormField(legendaCentral("legenda_ie_central_intervalo_visitante"), "placar_intervalo_fora", "number", row.placar_intervalo_fora, { required: requiredForInclusion, min: 0, max: 99, step: 1 });
+    html += historyFormField(legendaCentral("legenda_ie_central_competicao"), "competicao", "text", row.competicao, { required: true, wide: true, maxLength: 240 });
+    html += historyFormField(legendaCentral("legenda_ie_central_temporada"), "temporada", "text", row.temporada, { required: true, maxLength: 80 });
+    html += historyFormField(legendaCentral("legenda_ie_central_fase_2"), "fase", "text", row.fase, { required: requiredForInclusion, maxLength: 120 });
+    html += historyFormField(legendaCentral("legenda_ie_central_rodada_2"), "rodada", "text", row.rodada, { required: requiredForInclusion, maxLength: 120 });
+    html += historyFormField(legendaCentral("legenda_ie_central_estadio"), "estadio", "text", row.estadio, { required: requiredForInclusion, wide: true, maxLength: 200 });
+    html += historyFormField(legendaCentral("legenda_ie_central_cidade"), "cidade", "text", row.cidade, { required: requiredForInclusion, wide: true, maxLength: 160 });
     var officialSelected = correction && row.partida_oficial !== false;
     var friendlySelected = correction && row.partida_oficial === false;
-    html += "<fieldset class=\"ie-history-match-type is-wide\"><legend>Tipo da partida *</legend><div><label><input type=\"radio\" name=\"partida_oficial\" value=\"true\" required" + (officialSelected ? " checked" : "") + "><span>Partida oficial</span></label><label><input type=\"radio\" name=\"partida_oficial\" value=\"false\" required" + (friendlySelected ? " checked" : "") + "><span>Amistoso</span></label></div></fieldset>" + (correction && String(row.obs_visivel || "").trim() ? "<div class=\"ie-history-base-observation is-wide\"><span>Observações da base</span><p>" + escapeHtml(row.obs_visivel) + "</p></div>" : "") + "<label class=\"ie-history-form-field is-wide\"><span>Sua observação</span><textarea name=\"observacao\" maxlength=\"1000\" rows=\"3\" placeholder=\"Se desejar, explique o que deve ser conferido.\"></textarea></label></div><label class=\"ie-history-anonymous-option\"><input type=\"checkbox\" name=\"contribuir_anonimamente\"><span><strong>Contribuir anonimamente</strong><small>Seu codinome não será mostrado nesta contribuição.</small></span></label><small class=\"ie-history-author-note\">Por padrão, seu codinome será exibido após a aprovação da contribuição.</small><button class=\"ie-button ie-button-primary ie-history-submit\" type=\"submit\">Enviar para análise</button></form>";
-    byId("detailTitle").textContent = correction ? "Corrigir confronto" : "Enviar confronto";
-    byId("detailSubtitle").textContent = correction ? historyDate(row.data_partida) + " · " + (row.time_casa || "Casa") + " × " + (row.time_fora || "Visitante") : "Nova informação para análise";
+    html += ("<fieldset class=\"ie-history-match-type is-wide\"><legend>" + escapeHtml(legendaCentral("legenda_ie_central_tipo_da_partida")) + "</legend><div><label><input type=\"radio\" name=\"partida_oficial\" value=\"true\" required") + (officialSelected ? " checked" : "") + ("><span>" + escapeHtml(legendaCentral("legenda_ie_central_partida_oficial")) + "</span></label><label><input type=\"radio\" name=\"partida_oficial\" value=\"false\" required") + (friendlySelected ? " checked" : "") + ("><span>" + escapeHtml(legendaCentral("legenda_ie_central_amistoso")) + "</span></label></div></fieldset>") + (correction && String(row.obs_visivel || "").trim() ? ("<div class=\"ie-history-base-observation is-wide\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_observacoes_da_base")) + "</span><p>") + escapeHtml(row.obs_visivel) + "</p></div>" : "") + ("<label class=\"ie-history-form-field is-wide\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_sua_observacao")) + "</span><textarea name=\"observacao\" maxlength=\"1000\" rows=\"3\" placeholder=\"" + escapeHtml(legendaCentral("legenda_ie_central_se_desejar_explique_o_que_deve_ser_conferido")) + "\"></textarea></label></div><label class=\"ie-history-anonymous-option\"><input type=\"checkbox\" name=\"contribuir_anonimamente\"><span><strong>" + escapeHtml(legendaCentral("legenda_ie_central_contribuir_anonimamente")) + "</strong><small>" + escapeHtml(legendaCentral("legenda_ie_central_seu_codinome_nao_sera_mostrado_nesta_contribuicao")) + "</small></span></label><small class=\"ie-history-author-note\">" + escapeHtml(legendaCentral("legenda_ie_central_por_padrao_seu_codinome_sera_exibido_apos_a_aprovacao_da_contribuicao")) + "</small><button class=\"ie-button ie-button-primary ie-history-submit\" type=\"submit\">" + escapeHtml(legendaCentral("legenda_ie_central_enviar_para_analise")) + "</button></form>");
+    byId("detailTitle").textContent = correction ? legendaCentral("legenda_ie_central_corrigir_confronto") : legendaCentral("legenda_ie_central_enviar_confronto");
+    byId("detailSubtitle").textContent = correction ? historyDate(row.data_partida) + " · " + (row.time_casa || legendaCentral("legenda_ie_central_casa")) + " × " + (row.time_fora || legendaCentral("legenda_ie_central_visitante")) : legendaCentral("legenda_ie_central_nova_informacao_para_analise");
     byId("detailContent").innerHTML = html;
     byId("detailContent").setAttribute("data-detail-view", "history-form");
   }
@@ -4355,27 +5156,27 @@
   function openHistoryCorrection(id, fallbackRow) {
     var row = state.historyContribution.rows.find(function (item) { return Number(item.id || item.cod_confronto) === Number(id); }) || historyConflictCorrectionRow(fallbackRow);
     if (!row) {
-      showToast("Não foi possível carregar os dados deste confronto.", true);
+      showToast(legendaCentral("legenda_ie_central_nao_foi_possivel_carregar_os_dados_deste_confronto"), true);
       return;
     }
     if (!row.time_casa || !row.time_fora || row.placar_casa == null || row.placar_fora == null || !row.competicao || !row.temporada || typeof row.partida_oficial !== "boolean") {
-      showToast("Este confronto não pertence à base histórica editável.", true);
+      showToast(legendaCentral("legenda_ie_central_este_confronto_nao_pertence_a_base_historica_editavel"), true);
       return;
     }
     state.historyContribution.currentRow = row;
-    beginDetail("Corrigir confronto", "Preparando informações...", true);
+    beginDetail(legendaCentral("legenda_ie_central_corrigir_confronto"), legendaCentral("legenda_ie_central_preparando_informacoes"), true);
     renderHistoryContributionForm("correcao", row);
   }
 
   function openHistoryInclusion() {
     state.historyContribution.currentRow = null;
-    beginDetail("Enviar confronto", "Nova informação para análise", true);
+    beginDetail(legendaCentral("legenda_ie_central_enviar_confronto"), legendaCentral("legenda_ie_central_nova_informacao_para_analise"), true);
     renderHistoryContributionForm("inclusao", {});
   }
 
   async function openHistoryContributors(id) {
     var row = state.historyContribution.rows.find(function (item) { return Number(item.id || item.cod_confronto) === Number(id); }) || {};
-    beginDetail("Colaboradores", historyDate(row.data_partida) + " · " + (row.time_casa || "Casa") + " × " + (row.time_fora || "Visitante"), true);
+    beginDetail(legendaCentral("legenda_ie_central_colaboradores"), historyDate(row.data_partida) + " · " + (row.time_casa || legendaCentral("legenda_ie_central_casa")) + " × " + (row.time_fora || legendaCentral("legenda_ie_central_visitante")), true);
     byId("detailContent").setAttribute("data-detail-view", "history-contributors");
     try {
       var result = await rpc("ie_hist_futebol_brasil_colaboradores_detalhe_rpc", { p_id_confronto: Number(id) });
@@ -4383,35 +5184,35 @@
       var contributors = arrayOf(result);
       byId("detailContent").innerHTML = contributors.length
         ? "<div class=\"ie-history-contributor-list\">" + contributors.map(function (item, index) {
-          return "<div><b>" + escapeHtml(index + 1) + "</b><span><strong>" + escapeHtml(item.codinome || "Anônimo") + "</strong><small>Contribuiu em " + escapeHtml(formatDateTime(item.contribuiu_em)) + "</small></span></div>";
+          return "<div><b>" + escapeHtml(index + 1) + "</b><span><strong>" + escapeHtml(item.codinome || legendaCentral("legenda_ie_central_anonimo")) + ("</strong><small>" + escapeHtml(legendaCentral("legenda_ie_central_contribuiu_em"))) + escapeHtml(formatDateTime(item.contribuiu_em)) + "</small></span></div>";
         }).join("") + "</div>"
-        : emptyState("Nenhuma autoria pública", "Ainda não há colaboradores aprovados para este confronto.", false);
+        : emptyState(legendaCentral("legenda_ie_central_nenhuma_autoria_publica"), legendaCentral("legenda_ie_central_ainda_nao_ha_colaboradores_aprovados_para_este_confronto"), false);
     } catch (error) {
-      if (historyDetailView() === "history-contributors") byId("detailContent").innerHTML = emptyState("Não foi possível carregar", friendlyError(error), false);
+      if (historyDetailView() === "history-contributors") byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_nao_foi_possivel_carregar"), friendlyError(error), false);
     }
   }
 
   async function openHistoryContributorRanking() {
-    beginDetail("Ranking de colaboradores", "Contribuições aprovadas para nossa base", true);
+    beginDetail(legendaCentral("legenda_ie_central_ranking_de_colaboradores"), legendaCentral("legenda_ie_central_contribuicoes_aprovadas_para_nossa_base"), true);
     byId("detailContent").setAttribute("data-detail-view", "history-ranking");
     try {
       var result = await rpc("ie_hist_futebol_brasil_colaboradores_ranking_rpc", {});
       if (historyDetailView() !== "history-ranking") return;
       var ranking = arrayOf(result);
       if (!ranking.length) {
-        byId("detailContent").innerHTML = emptyState("Ranking em formação", "As primeiras contribuições aprovadas aparecerão aqui.", false);
+        byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_ranking_em_formacao"), legendaCentral("legenda_ie_central_as_primeiras_contribuicoes_aprovadas_aparecerao_aqui"), false);
         return;
       }
       var top = ranking.slice(0, 10).map(function (item) {
         var position = Number(item.posicao || 0);
-        return "<article class=\"ie-history-ranking-highlight is-position-" + escapeHtml(position) + "\"><b>" + escapeHtml(position) + "º</b><strong>" + escapeHtml(item.codinome || "Colaborador") + "</strong><span>" + escapeHtml(item.quantidade_contribuicoes || 0) + (Number(item.quantidade_contribuicoes) === 1 ? " contribuição" : " contribuições") + "</span></article>";
+        return "<article class=\"ie-history-ranking-highlight is-position-" + escapeHtml(position) + "\"><b>" + escapeHtml(legendaCentral("legenda_ie_central_posicao_ordinal", { posicao: position })) + ("</b><strong>") + escapeHtml(item.codinome || legendaCentral("legenda_ie_central_colaborador")) + "</strong><span>" + escapeHtml(item.quantidade_contribuicoes || 0) + (Number(item.quantidade_contribuicoes) === 1 ? escapeHtml(legendaCentral("legenda_ie_central_contribuicao")) : escapeHtml(legendaCentral("legenda_ie_central_contribuicoes"))) + "</span></article>";
       }).join("");
       var allContributors = ranking.map(function (item) {
-        return "<div class=\"ie-history-ranking-row\"><b>" + escapeHtml(item.posicao) + "º</b><strong>" + escapeHtml(item.codinome || "Colaborador") + "</strong><span>" + escapeHtml(item.quantidade_contribuicoes || 0) + "</span></div>";
+        return "<div class=\"ie-history-ranking-row\"><b>" + escapeHtml(legendaCentral("legenda_ie_central_posicao_ordinal", { posicao: item.posicao })) + ("</b><strong>") + escapeHtml(item.codinome || legendaCentral("legenda_ie_central_colaborador")) + "</strong><span>" + escapeHtml(item.quantidade_contribuicoes || 0) + "</span></div>";
       }).join("");
-      byId("detailContent").innerHTML = "<section class=\"ie-history-ranking-top\"><header><strong>Top 10</strong><span>Quem mais ajudou a fortalecer nossa base</span></header><div>" + top + "</div></section><section class=\"ie-history-ranking-all\"><header><strong>Todos os colaboradores</strong><span>Contribuições aprovadas</span></header>" + allContributors + "</section>";
+      byId("detailContent").innerHTML = ("<section class=\"ie-history-ranking-top\"><header><strong>" + escapeHtml(legendaCentral("legenda_ie_central_top_10")) + "</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_quem_mais_ajudou_a_fortalecer_nossa_base")) + "</span></header><div>") + top + ("</div></section><section class=\"ie-history-ranking-all\"><header><strong>" + escapeHtml(legendaCentral("legenda_ie_central_todos_os_colaboradores")) + "</strong><span>" + escapeHtml(legendaCentral("legenda_ie_central_contribuicoes_aprovadas")) + "</span></header>") + allContributors + "</section>";
     } catch (error) {
-      if (historyDetailView() === "history-ranking") byId("detailContent").innerHTML = emptyState("Não foi possível carregar", friendlyError(error), false);
+      if (historyDetailView() === "history-ranking") byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_nao_foi_possivel_carregar"), friendlyError(error), false);
     }
   }
 
@@ -4426,7 +5227,7 @@
     var score = row.placar_casa == null || row.placar_fora == null ? "" : row.placar_casa + " × " + row.placar_fora;
     var date = row.data_partida || row.data || "";
     var time = row.hora_partida || row.hora || "";
-    var title = row.titulo || ((row.time_casa || "Casa") + (score ? " " + score + " " : " × ") + (row.time_fora || "Visitante"));
+    var title = row.titulo || ((row.time_casa || legendaCentral("legenda_ie_central_casa")) + (score ? " " + score + " " : " × ") + (row.time_fora || legendaCentral("legenda_ie_central_visitante")));
     return "<article class=\"ie-exp-match-summary\"><time>" + escapeHtml(historyDate(date)) + (historyTime(time) ? " · " + escapeHtml(historyTime(time)) : "") + "</time><strong>" + escapeHtml(title) + "</strong><span>" + escapeHtml([competitionDisplayName(row.competicao || ""), row.estadio || row.local, row.cidade].filter(Boolean).join(" · ")) + "</span></article>";
   }
 
@@ -4450,10 +5251,10 @@
   function renderHistoryExperienceConflict(conflict, requestedRow) {
     var items = arrayOf(conflict && conflict.itens);
     var reason = String(conflict && conflict.motivo || "");
-    byId("detailTitle").textContent = "Horários coincidentes";
-    byId("detailSubtitle").textContent = "Você só pode estar em um local por vez";
+    byId("detailTitle").textContent = legendaCentral("legenda_ie_central_horarios_coincidentes");
+    byId("detailSubtitle").textContent = legendaCentral("legenda_ie_central_voce_so_pode_estar_em_um_local_por_vez");
     byId("detailContent").setAttribute("data-detail-view", "experience-conflict");
-    byId("detailContent").innerHTML = "<section class=\"ie-exp-conflict\"><div class=\"ie-exp-conflict-heading\">" + icon("warning") + "<div><strong>Confira onde você estava</strong><p>" + escapeHtml(reason === "horario_indisponivel" ? "Um dos confrontos não tem horário suficiente para validar a presença no local." : "A margem de deslocamento deste confronto coincide com outro já marcado no local.") + "</p></div></div><div class=\"ie-exp-conflict-matches\">" + historyMatchCompactHtml(requestedRow) + items.map(historyMatchCompactHtml).join("") + "</div><div class=\"ie-exp-conflict-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" data-history-action=\"experience-conflict-replace\">Marcar este confronto</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"experience-conflict-keep\">Manter o que já estava</button><button type=\"button\" class=\"ie-text-action\" data-history-action=\"experience-conflict-correct\">Sugerir correção do confronto em conflito</button><button type=\"button\" class=\"ie-text-action\" data-history-action=\"experience-conflict-cancel\">Cancelar</button></div></section>";
+    byId("detailContent").innerHTML = "<section class=\"ie-exp-conflict\"><div class=\"ie-exp-conflict-heading\">" + icon("warning") + ("<div><strong>" + escapeHtml(legendaCentral("legenda_ie_central_confira_onde_voce_estava")) + "</strong><p>") + escapeHtml(reason === "horario_indisponivel" ? legendaCentral("legenda_ie_central_um_dos_confrontos_nao_tem_horario_suficiente_para_validar_a_presenca_no_local") : legendaCentral("legenda_ie_central_a_margem_de_deslocamento_deste_confronto_coincide_com_outro_ja_marcado_no_local")) + "</p></div></div><div class=\"ie-exp-conflict-matches\">" + historyMatchCompactHtml(requestedRow) + items.map(historyMatchCompactHtml).join("") + ("</div><div class=\"ie-exp-conflict-actions\"><button type=\"button\" class=\"ie-button ie-button-primary\" data-history-action=\"experience-conflict-replace\">" + escapeHtml(legendaCentral("legenda_ie_central_marcar_este_confronto")) + "</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"experience-conflict-keep\">" + escapeHtml(legendaCentral("legenda_ie_central_manter_o_que_ja_estava")) + "</button><button type=\"button\" class=\"ie-text-action\" data-history-action=\"experience-conflict-correct\">" + escapeHtml(legendaCentral("legenda_ie_central_sugerir_correcao_do_confronto_em_conflito")) + "</button><button type=\"button\" class=\"ie-text-action\" data-history-action=\"experience-conflict-cancel\">" + escapeHtml(legendaCentral("legenda_ie_central_cancelar")) + "</button></div></section>");
   }
 
   async function toggleHistoryExperience(id, form) {
@@ -4470,13 +5271,13 @@
       if (history !== state.historyContribution) return;
       if (result && result.salvo === false && result.conflito) {
         history.pendingConflict = { id: id, forma: form, conflict: result.conflito, row: historyRowById(id) };
-        beginDetail("Horários coincidentes", "Validando sua presença", true);
+        beginDetail(legendaCentral("legenda_ie_central_horarios_coincidentes"), legendaCentral("legenda_ie_central_validando_sua_presenca"), true);
         renderHistoryExperienceConflict(result.conflito, history.pendingConflict.row);
         return;
       }
       await refreshHistoryExperience(id);
       if (historyDetailView() === "history-list") renderHistoryContributionPage();
-      showToast(wanted ? (wanted === "local" ? "Marcado: você assistiu no local." : "Marcado: você assistiu pela TV/outro meio.") : "Marcação removida.", false);
+      showToast(wanted ? (wanted === "local" ? legendaCentral("legenda_ie_central_marcado_voce_assistiu_no_local") : legendaCentral("legenda_ie_central_marcado_voce_assistiu_pela_tv_outro_meio")) : legendaCentral("legenda_ie_central_marcacao_removida"), false);
     } catch (error) {
       showToast(friendlyError(error), true);
     } finally {
@@ -4506,7 +5307,7 @@
       history.pendingConflict = null;
       backDetail();
       if (historyDetailView() === "history-list") renderHistoryContributionPage();
-      showToast(action === "substituir_pelo_atual" ? "Presença atualizada para este confronto." : action === "cancelar" ? "Nenhuma alteração foi feita." : "A marcação anterior foi mantida.", false);
+      showToast(action === "substituir_pelo_atual" ? legendaCentral("legenda_ie_central_presenca_atualizada_para_este_confronto") : action === "cancelar" ? legendaCentral("legenda_ie_central_nenhuma_alteracao_foi_feita") : legendaCentral("legenda_ie_central_a_marcacao_anterior_foi_mantida"), false);
     } catch (error) {
       showToast(friendlyError(error), true);
     }
@@ -4518,21 +5319,21 @@
     var experienceId = Number(experience.id_experiencia || 0);
     var list = arrayOf(companions);
     var listHtml = list.length ? "<div class=\"ie-exp-companion-list\">" + list.map(function (item) {
-      var status = item.status_label || item.status || "Convite registrado";
-      return "<article><span><strong>" + escapeHtml(item.nome || "Pessoa") + "</strong><small>" + escapeHtml(item.email_mascarado || status) + "</small></span><em>" + escapeHtml(status) + "</em>" + (item.id_acompanhante ? "<button type=\"button\" data-history-action=\"experience-companion-remove\" data-companion-id=\"" + escapeHtml(item.id_acompanhante) + "\" aria-label=\"Remover\">×</button>" : "") + "</article>";
-    }).join("") + "</div>" : "<p class=\"ie-exp-companion-empty\">Você ainda não informou com quem assistiu.</p>";
-    byId("detailTitle").textContent = "Com quem você assistiu?";
-    byId("detailSubtitle").textContent = historyDate(row.data_partida) + " · " + (row.time_casa || "Casa") + " × " + (row.time_fora || "Visitante");
+      var status = item.status_label || item.status || legendaCentral("legenda_ie_central_convite_registrado");
+      return "<article><span><strong>" + escapeHtml(item.nome || legendaCentral("legenda_ie_central_pessoa")) + "</strong><small>" + escapeHtml(item.email_mascarado || status) + "</small></span><em>" + escapeHtml(status) + "</em>" + (item.id_acompanhante ? "<button type=\"button\" data-history-action=\"experience-companion-remove\" data-companion-id=\"" + escapeHtml(item.id_acompanhante) + ("\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_remover_2")) + "\">×</button>") : "") + "</article>";
+    }).join("") + "</div>" : ("<p class=\"ie-exp-companion-empty\">" + escapeHtml(legendaCentral("legenda_ie_central_voce_ainda_nao_informou_com_quem_assistiu")) + "</p>");
+    byId("detailTitle").textContent = legendaCentral("legenda_ie_central_com_quem_voce_assistiu");
+    byId("detailSubtitle").textContent = historyDate(row.data_partida) + " · " + (row.time_casa || legendaCentral("legenda_ie_central_casa")) + " × " + (row.time_fora || legendaCentral("legenda_ie_central_visitante"));
     byId("detailContent").setAttribute("data-detail-view", "experience-companions");
-    byId("detailContent").innerHTML = "<section class=\"ie-exp-companions\">" + listHtml + "<form data-experience-companion-form><input type=\"hidden\" name=\"confrontation_id\" value=\"" + escapeHtml(id) + "\"><input type=\"hidden\" name=\"experience_id\" value=\"" + escapeHtml(experienceId) + "\"><input type=\"hidden\" name=\"idempotency_key\" value=\"" + escapeHtml(historyIdempotencyKey()) + "\"><h3>Nos conte com quem você assistiu</h3><label><span>Nome</span><input name=\"name\" type=\"text\" maxlength=\"120\" autocomplete=\"name\" required></label><label><span>E-mail <small>(opcional)</small></span><input name=\"email\" type=\"email\" maxlength=\"254\" autocomplete=\"email\" placeholder=\"nome@exemplo.com\"></label><label class=\"ie-exp-consent\"><input name=\"consent\" type=\"checkbox\"><span>Se informar o e-mail, confirme que conhece esta pessoa e autoriza o Turbo Tiger a enviar um único convite relacionado a este confronto.</span></label><small>Sem e-mail, o nome fica apenas na sua lembrança privada. Com e-mail, a pessoa poderá confirmar, contestar ou recusar o registro. O endereço nunca será exibido publicamente.</small><button type=\"submit\" class=\"ie-button ie-button-primary\">Salvar</button></form></section>";
+    byId("detailContent").innerHTML = "<section class=\"ie-exp-companions\">" + listHtml + "<form data-experience-companion-form><input type=\"hidden\" name=\"confrontation_id\" value=\"" + escapeHtml(id) + "\"><input type=\"hidden\" name=\"experience_id\" value=\"" + escapeHtml(experienceId) + "\"><input type=\"hidden\" name=\"idempotency_key\" value=\"" + escapeHtml(historyIdempotencyKey()) + ("\"><h3>" + escapeHtml(legendaCentral("legenda_ie_central_nos_conte_com_quem_voce_assistiu")) + "</h3><label><span>" + escapeHtml(legendaCentral("legenda_ie_central_nome")) + "</span><input name=\"name\" type=\"text\" maxlength=\"120\" autocomplete=\"name\" required></label><label><span>" + escapeHtml(legendaCentral("legenda_ie_central_e_mail")) + "<small>" + escapeHtml(legendaCentral("legenda_ie_central_opcional_2")) + "</small></span><input name=\"email\" type=\"email\" maxlength=\"254\" autocomplete=\"email\" placeholder=\"" + escapeHtml(legendaCentral("legenda_ie_central_nome_exemplo_com")) + "\"></label><label class=\"ie-exp-consent\"><input name=\"consent\" type=\"checkbox\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_se_informar_o_e_mail_confirme_que_conhece_esta_pessoa_e_autoriza_o_turbo_tiger_a_enviar_um_unico_con")) + "</span></label><small>" + escapeHtml(legendaCentral("legenda_ie_central_sem_e_mail_o_nome_fica_apenas_na_sua_lembranca_privada_com_e_mail_a_pessoa_podera_confirmar_contesta")) + "</small><button type=\"submit\" class=\"ie-button ie-button-primary\">" + escapeHtml(legendaCentral("legenda_ie_central_salvar")) + "</button></form></section>");
   }
 
   async function openHistoryCompanions(id) {
     var row = historyRowById(id);
     if (!row.id && !row.cod_confronto) return;
     var experienceId = Number((historyExperience(id) || {}).id_experiencia || 0);
-    if (!experienceId) { showToast("Marque primeiro como você acompanhou este confronto.", true); return; }
-    beginDetail("Com quem você assistiu?", "Carregando...", true);
+    if (!experienceId) { showToast(legendaCentral("legenda_ie_central_marque_primeiro_como_voce_acompanhou_este_confronto"), true); return; }
+    beginDetail(legendaCentral("legenda_ie_central_com_quem_voce_assistiu"), legendaCentral("legenda_ie_central_carregando"), true);
     byId("detailContent").setAttribute("data-detail-view", "experience-companions-loading");
     try {
       var result = await rpc("ie_experiencia_acompanhantes_listar_rpc", { p_id_experiencia: experienceId });
@@ -4541,7 +5342,7 @@
       state.historyContribution.companions = arrayOf(result);
       renderHistoryCompanions(row, state.historyContribution.companions);
     } catch (error) {
-      if (historyDetailView() === "experience-companions-loading") byId("detailContent").innerHTML = emptyState("Não foi possível carregar", friendlyError(error), false);
+      if (historyDetailView() === "experience-companions-loading") byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_nao_foi_possivel_carregar"), friendlyError(error), false);
     }
   }
 
@@ -4549,7 +5350,7 @@
     var button = form.querySelector("button[type=submit]");
     var values = new FormData(form);
     button.disabled = true;
-    button.textContent = "Salvando...";
+    button.textContent = legendaCentral("legenda_ie_central_salvando");
     try {
       var email = String(values.get("email") || "").trim();
       var consent = values.get("consent") === "on";
@@ -4562,13 +5363,13 @@
         p_chave_idempotencia: String(values.get("idempotency_key") || "")
       });
       if (!form.isConnected || historyDetailView() !== "experience-companions") return;
-      showToast(email ? "Convite registrado para envio." : "Salvo na sua lembrança.", false);
+      showToast(email ? legendaCentral("legenda_ie_central_convite_registrado_para_envio") : legendaCentral("legenda_ie_central_salvo_na_sua_lembranca"), false);
       await refreshHistoryExperience(Number(values.get("confrontation_id")));
       var companions = await rpc("ie_experiencia_acompanhantes_listar_rpc", { p_id_experiencia: Number(values.get("experience_id")) });
       if (historyDetailView() === "experience-companions") renderHistoryCompanions(state.historyContribution.currentRow || {}, companions);
     } catch (error) {
       showToast(friendlyError(error), true);
-      if (button.isConnected) { button.disabled = false; button.textContent = "Salvar"; }
+      if (button.isConnected) { button.disabled = false; button.textContent = legendaCentral("legenda_ie_central_salvar"); }
     }
   }
 
@@ -4581,29 +5382,29 @@
       var companions = experienceId ? await rpc("ie_experiencia_acompanhantes_listar_rpc", { p_id_experiencia: experienceId }) : [];
       await refreshHistoryExperience(confrontationId);
       if (historyDetailView() === "experience-companions") renderHistoryCompanions(row, companions);
-      showToast("Removido.", false);
+      showToast(legendaCentral("legenda_ie_central_removido"), false);
     } catch (error) {
       showToast(friendlyError(error), true);
     }
   }
 
   async function openExperienceRanking() {
-    beginDetail("Top 10 dos que assistiram ao vivo", "Registros declarados pelos membros", true);
+    beginDetail(legendaCentral("legenda_ie_central_top_10_dos_que_assistiram_ao_vivo"), legendaCentral("legenda_ie_central_registros_declarados_pelos_membros"), true);
     byId("detailContent").setAttribute("data-detail-view", "experience-ranking");
     try {
       var result = await rpc("ie_experiencias_ranking_rpc", { p_id_esporte: state.activeSportId || null, p_limite: 10 });
       if (historyDetailView() !== "experience-ranking") return;
       var ranking = arrayOf(result);
       if (!ranking.length) {
-        byId("detailContent").innerHTML = emptyState("Ranking em formação", "Os primeiros registros de quem acompanhou confrontos aparecerão aqui.", false);
+        byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_ranking_em_formacao"), legendaCentral("legenda_ie_central_os_primeiros_registros_de_quem_acompanhou_confrontos_aparecerao_aqui"), false);
         return;
       }
-      byId("detailContent").innerHTML = "<p class=\"ie-exp-ranking-note\">O ranking considera registros declarados. A presença no local recebe peso maior que TV/outro meio.</p><div class=\"ie-exp-ranking-list\">" + ranking.map(function (item, index) {
+      byId("detailContent").innerHTML = ("<p class=\"ie-exp-ranking-note\">" + escapeHtml(legendaCentral("legenda_ie_central_o_ranking_considera_registros_declarados_a_presenca_no_local_recebe_peso_maior_que_tv_outro_meio")) + "</p><div class=\"ie-exp-ranking-list\">") + ranking.map(function (item, index) {
         var position = Number(item.posicao || index + 1);
-        return "<article class=\"" + (position <= 3 ? "is-top" : "") + "\"><b>" + position + "º</b><span><strong>" + escapeHtml(item.codinome || item.nome_publico || "Membro") + "</strong><small>" + escapeHtml(numberOf(item.total_local || item.presenciais, 0)) + " no local · " + escapeHtml(numberOf(item.total_remoto || item.remotos, 0)) + " por TV/outro</small></span><em>" + escapeHtml(numberOf(item.pontos, 0)) + " pts</em></article>";
+        return "<article class=\"" + (position <= 3 ? "is-top" : "") + "\"><b>" + escapeHtml(legendaCentral("legenda_ie_central_posicao_ordinal", { posicao: position })) + ("</b><span><strong>") + escapeHtml(item.codinome || item.nome_publico || legendaCentral("legenda_ie_central_membro")) + "</strong><small>" + escapeHtml(numberOf(item.total_local || item.presenciais, 0)) + escapeHtml(legendaCentral("legenda_ie_central_no_local")) + escapeHtml(numberOf(item.total_remoto || item.remotos, 0)) + (escapeHtml(legendaCentral("legenda_ie_central_por_tv_outro")) + "</small></span><em>") + escapeHtml(numberOf(item.pontos, 0)) + (escapeHtml(legendaCentral("legenda_ie_central_pts_2")) + "</em></article>");
       }).join("") + "</div>";
     } catch (error) {
-      if (historyDetailView() === "experience-ranking") byId("detailContent").innerHTML = emptyState("Não foi possível carregar", friendlyError(error), false);
+      if (historyDetailView() === "experience-ranking") byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_nao_foi_possivel_carregar"), friendlyError(error), false);
     }
   }
 
@@ -4634,12 +5435,12 @@
     var titleSummary = titleData.resumo || titleData.summary || {};
     var followedTitles = arrayOf(titleData.titulos || titleData.items || titleData.edicoes);
     state.historyContribution.story = data;
-    byId("detailTitle").textContent = "Minha história esportiva";
-    byId("detailSubtitle").textContent = displayText(profile.esporte || data.esporte_nome || "Esporte");
+    byId("detailTitle").textContent = legendaCentral("legenda_ie_central_minha_historia_esportiva");
+    byId("detailSubtitle").textContent = displayText(profile.esporte || data.esporte_nome || legendaCentral("legenda_ie_central_esporte"));
     byId("detailContent").setAttribute("data-detail-view", "sports-story");
-    byId("detailContent").innerHTML = "<section class=\"ie-exp-story-owner\"><div class=\"ie-exp-story-preview\"><span>Prévia privada</span><strong>" + escapeHtml(profile.nome_exibicao || profile.codinome || "Sua história") + "</strong><small>" + escapeHtml(numberOf(summary.total, 0)) + " confrontos · " + escapeHtml(numberOf(summary.total_local, 0)) + " no local · " + escapeHtml(numberOf(summary.total_remoto, 0)) + " por TV/outro · " + escapeHtml(contributions.length) + " contribuições</small></div>" + renderMySportsStoryTitles(titleSummary, followedTitles) + "<p class=\"ie-exp-story-declaration\">História formada por registros declarados pelo membro. Você controla o que fica visível.</p><form data-sports-story-form><input type=\"hidden\" name=\"sport_id\" value=\"" + escapeHtml(sportId) + "\"><label class=\"ie-switch-row\"><span><strong>Página pública</strong><small>Você decide quando sua história pode ser vista pelo código seguro.</small></span><span class=\"ie-switch\"><input type=\"checkbox\" name=\"active\"" + (profile.ativo === true ? " checked" : "") + "><span aria-hidden=\"true\"></span></span></label><fieldset><legend>Informações visíveis</legend><label><input type=\"checkbox\" name=\"show_real_name\"" + (profile.exibir_nome_real === true ? " checked" : "") + "><span>Meu nome real</span></label><label><input type=\"checkbox\" name=\"show_surname\"" + (profile.exibir_sobrenome === true ? " checked" : "") + "><span>Meu sobrenome</span></label><label><input type=\"checkbox\" name=\"show_codename\"" + (profile.exibir_codinome !== false ? " checked" : "") + "><span>Meu codinome</span></label><label><input type=\"checkbox\" name=\"show_matches\"" + (profile.exibir_confrontos !== false ? " checked" : "") + "><span>Linha do tempo</span></label><label><input type=\"checkbox\" name=\"show_places\"" + (profile.exibir_locais !== false ? " checked" : "") + "><span>Locais dos eventos</span></label><label><input type=\"checkbox\" name=\"show_companions\"" + (profile.exibir_acompanhantes !== false ? " checked" : "") + "><span>Com quem assistiu</span></label><label><input type=\"checkbox\" name=\"show_contributions\"" + (profile.exibir_colaboracoes !== false ? " checked" : "") + "><span>Colaborações aprovadas</span></label><label><input type=\"checkbox\" name=\"show_ranking\"" + (profile.exibir_ranking !== false ? " checked" : "") + "><span>Participação no ranking</span></label></fieldset>"+ automaticSaveStatusHtml() + "</form><div class=\"ie-exp-story-share\"><strong>Código público revogável</strong><code>" + escapeHtml(profile.codigo_publico || "Ainda não gerado") + "</code><div><button type=\"button\" class=\"ie-button ie-button-primary\" data-history-action=\"sports-story-share\"" + (!publicUrl || profile.ativo !== true ? " disabled" : "") + ">" + icon("share") + " Compartilhar</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"sports-story-renew\">Gerar novo código</button></div><small>Ao gerar outro código, o anterior deixa de funcionar. IDs internos e dados privados nunca fazem parte do link.</small></div></section>";
+    byId("detailContent").innerHTML = ("<section class=\"ie-exp-story-owner\"><div class=\"ie-exp-story-preview\"><span>" + escapeHtml(legendaCentral("legenda_ie_central_previa_privada")) + "</span><strong>") + escapeHtml(profile.nome_exibicao || profile.codinome || legendaCentral("legenda_ie_central_sua_historia")) + "</strong><small>" + escapeHtml(numberOf(summary.total, 0)) + " confrontos · " + escapeHtml(numberOf(summary.total_local, 0)) + escapeHtml(legendaCentral("legenda_ie_central_no_local")) + escapeHtml(numberOf(summary.total_remoto, 0)) + escapeHtml(legendaCentral("legenda_ie_central_por_tv_outro_2")) + escapeHtml(contributions.length) + (escapeHtml(legendaCentral("legenda_ie_central_contribuicoes")) + "</small></div>") + renderMySportsStoryTitles(titleSummary, followedTitles) + ("<p class=\"ie-exp-story-declaration\">" + escapeHtml(legendaCentral("legenda_ie_central_historia_formada_por_registros_declarados_pelo_membro_voce_controla_o_que_fica_visivel")) + "</p><form data-sports-story-form><input type=\"hidden\" name=\"sport_id\" value=\"") + escapeHtml(sportId) + ("\"><label class=\"ie-switch-row\"><span><strong>" + escapeHtml(legendaCentral("legenda_ie_central_pagina_publica")) + "</strong><small>" + escapeHtml(legendaCentral("legenda_ie_central_voce_decide_quando_sua_historia_pode_ser_vista_pelo_codigo_seguro")) + "</small></span><span class=\"ie-switch\"><input type=\"checkbox\" name=\"active\"") + (profile.ativo === true ? " checked" : "") + ("><span aria-hidden=\"true\"></span></span></label><fieldset><legend>" + escapeHtml(legendaCentral("legenda_ie_central_informacoes_visiveis")) + "</legend><label><input type=\"checkbox\" name=\"show_real_name\"") + (profile.exibir_nome_real === true ? " checked" : "") + ("><span>" + escapeHtml(legendaCentral("legenda_ie_central_meu_nome_real")) + "</span></label><label><input type=\"checkbox\" name=\"show_surname\"") + (profile.exibir_sobrenome === true ? " checked" : "") + ("><span>" + escapeHtml(legendaCentral("legenda_ie_central_meu_sobrenome")) + "</span></label><label><input type=\"checkbox\" name=\"show_codename\"") + (profile.exibir_codinome !== false ? " checked" : "") + ("><span>" + escapeHtml(legendaCentral("legenda_ie_central_meu_codinome")) + "</span></label><label><input type=\"checkbox\" name=\"show_matches\"") + (profile.exibir_confrontos !== false ? " checked" : "") + ("><span>" + escapeHtml(legendaCentral("legenda_ie_central_linha_do_tempo")) + "</span></label><label><input type=\"checkbox\" name=\"show_places\"") + (profile.exibir_locais !== false ? " checked" : "") + ("><span>" + escapeHtml(legendaCentral("legenda_ie_central_locais_dos_eventos")) + "</span></label><label><input type=\"checkbox\" name=\"show_companions\"") + (profile.exibir_acompanhantes !== false ? " checked" : "") + ("><span>" + escapeHtml(legendaCentral("legenda_ie_central_com_quem_assistiu")) + "</span></label><label><input type=\"checkbox\" name=\"show_contributions\"") + (profile.exibir_colaboracoes !== false ? " checked" : "") + ("><span>" + escapeHtml(legendaCentral("legenda_ie_central_colaboracoes_aprovadas")) + "</span></label><label><input type=\"checkbox\" name=\"show_ranking\"") + (profile.exibir_ranking !== false ? " checked" : "") + ("><span>" + escapeHtml(legendaCentral("legenda_ie_central_participacao_no_ranking")) + "</span></label></fieldset>")+ automaticSaveStatusHtml() + ("</form><div class=\"ie-exp-story-share\"><strong>" + escapeHtml(legendaCentral("legenda_ie_central_codigo_publico_revogavel")) + "</strong><code>") + escapeHtml(profile.codigo_publico || legendaCentral("legenda_ie_central_ainda_nao_gerado")) + "</code><div><button type=\"button\" class=\"ie-button ie-button-primary\" data-history-action=\"sports-story-share\"" + (!publicUrl || profile.ativo !== true ? " disabled" : "") + ">" + icon("share") + (escapeHtml(legendaCentral("legenda_ie_central_compartilhar")) + "</button><button type=\"button\" class=\"ie-button ie-button-secondary\" data-history-action=\"sports-story-renew\">" + escapeHtml(legendaCentral("legenda_ie_central_gerar_novo_codigo")) + "</button></div><small>" + escapeHtml(legendaCentral("legenda_ie_central_ao_gerar_outro_codigo_o_anterior_deixa_de_funcionar_ids_internos_e_dados_privados_nunca_fazem_parte")) + "</small></div></section>");
     var preview = byId("detailContent").querySelector(".ie-exp-story-preview");
-    if (preview) { preview.setAttribute("role", "button"); preview.setAttribute("tabindex", "0"); preview.setAttribute("aria-label", "Visualizar como seus amigos verão sua história"); }
+    if (preview) { preview.setAttribute("role", "button"); preview.setAttribute("tabindex", "0"); preview.setAttribute("aria-label", legendaCentral("legenda_ie_central_visualizar_como_seus_amigos_verao_sua_historia")); }
   }
 
   function renderMySportsStoryTitles(summary, titles) {
@@ -4649,19 +5450,19 @@
     var totalTitleMatches = numberOf(summary.confrontos_titulo_assistidos, 0);
     if (!totalTitles && !totalTitleMatches && !titles.length) return "";
     var metrics = [
-      ["Títulos acompanhados", totalTitles],
-      ["Confrontos de título", totalTitleMatches],
-      ["Decisões completas", numberOf(summary.decisoes_completas, 0)],
-      ["Confirmações assistidas", numberOf(summary.confirmacoes_titulo_assistidas, 0)],
-      ["Principais no local", numberOf(summary.confrontos_principais_local, 0)],
-      ["Clubes campeões", numberOf(summary.clubes_campeoes, 0)],
-      ["Competições", numberOf(summary.competicoes, 0)]
+      [legendaCentral("legenda_ie_central_titulos_acompanhados"), totalTitles],
+      [legendaCentral("legenda_ie_central_confrontos_de_titulo"), totalTitleMatches],
+      [legendaCentral("legenda_ie_central_decisoes_completas"), numberOf(summary.decisoes_completas, 0)],
+      [legendaCentral("legenda_ie_central_confirmacoes_assistidas"), numberOf(summary.confirmacoes_titulo_assistidas, 0)],
+      [legendaCentral("legenda_ie_central_principais_no_local"), numberOf(summary.confrontos_principais_local, 0)],
+      [legendaCentral("legenda_ie_central_clubes_campeoes"), numberOf(summary.clubes_campeoes, 0)],
+      [legendaCentral("legenda_ie_central_competicoes"), numberOf(summary.competicoes, 0)]
     ];
     var metricsHtml = metrics.map(function (item) {
       return "<span><strong>" + escapeHtml(item[1]) + "</strong><small>" + escapeHtml(item[0]) + "</small></span>";
     }).join("");
     var titlesHtml = titles.length ? "<div class=\"ie-exp-story-title-list\">" + titles.map(function (item) {
-      var competition = competitionDisplayName(item.competicao || item.competicao_nome || "Título");
+      var competition = competitionDisplayName(item.competicao || item.competicao_nome || legendaCentral("legenda_ie_central_titulo"));
       var season = item.temporada || item.edicao || "";
       var participants = titleParticipantsText(item);
       var watched = item.confrontos_titulo_assistidos !== null && item.confrontos_titulo_assistidos !== undefined
@@ -4676,14 +5477,14 @@
       var decisionApplies = decisionStatus !== "nao_aplicavel" && required > 0;
       var principalLocal = titleFlag(item.confronto_principal_local) || titleFlag(item.assistiu_principal_local);
       var countText = decisionApplies
-        ? decisionWatched + " de " + required + (required === 1 ? " confronto da decisão acompanhado" : " confrontos da decisão acompanhados")
-        : watched + (watched === 1 ? " confronto de título acompanhado" : " confrontos de título acompanhados");
-      var participantText = participants.text || "Campeão não informado";
-      if (participants.shared) participantText += " · Título compartilhado";
-      var statusText = complete ? "Decisão completa" : decisionStatus === "incompleta" ? "Decisão incompleta" : principalLocal ? "Principal no local" : "Acompanhado";
+        ? decisionWatched + " de " + required + (required === 1 ? legendaCentral("legenda_ie_central_confronto_da_decisao_acompanhado") : legendaCentral("legenda_ie_central_confrontos_da_decisao_acompanhados"))
+        : watched + (watched === 1 ? legendaCentral("legenda_ie_central_confronto_de_titulo_acompanhado") : legendaCentral("legenda_ie_central_confrontos_de_titulo_acompanhados"));
+      var participantText = participants.text || legendaCentral("legenda_ie_central_campeao_nao_informado");
+      if (participants.shared) participantText += legendaCentral("legenda_ie_central_titulo_compartilhado_2");
+      var statusText = complete ? legendaCentral("legenda_ie_central_decisao_completa") : decisionStatus === "incompleta" ? legendaCentral("legenda_ie_central_decisao_incompleta") : principalLocal ? legendaCentral("legenda_ie_central_principal_no_local") : legendaCentral("legenda_ie_central_acompanhado");
       return "<article><span class=\"ie-exp-story-title-icon\">" + icon("trophy") + "</span><span><strong>" + escapeHtml([competition, season].filter(Boolean).join(" · ")) + "</strong><small>" + escapeHtml(participantText) + "</small><small>" + escapeHtml(countText) + "</small></span><b class=\"" + (complete ? "is-complete" : "") + "\">" + escapeHtml(statusText) + "</b></article>";
     }).join("") + "</div>" : "";
-    return "<section class=\"ie-exp-story-titles\"><header><span>" + icon("trophy") + "</span><div><strong>Títulos na sua história</strong><small>Somente edições e confrontos confirmados na base.</small></div></header><div class=\"ie-exp-story-title-metrics\">" + metricsHtml + "</div>" + titlesHtml + "</section>";
+    return "<section class=\"ie-exp-story-titles\"><header><span>" + icon("trophy") + ("</span><div><strong>" + escapeHtml(legendaCentral("legenda_ie_central_titulos_na_sua_historia")) + "</strong><small>" + escapeHtml(legendaCentral("legenda_ie_central_somente_edicoes_e_confrontos_confirmados_na_base")) + "</small></div></header><div class=\"ie-exp-story-title-metrics\">") + metricsHtml + "</div>" + titlesHtml + "</section>";
   }
 
   async function loadMySportsStoryData(sportId) {
@@ -4703,13 +5504,13 @@
   }
 
   async function openMySportsStory() {
-    beginDetail("Minha história esportiva", "Carregando sua história...", true);
+    beginDetail(legendaCentral("legenda_ie_central_minha_historia_esportiva"), legendaCentral("legenda_ie_central_carregando_sua_historia"), true);
     byId("detailContent").setAttribute("data-detail-view", "sports-story-loading");
     try {
       var result = await loadMySportsStoryData(state.activeSportId);
       if (historyDetailView() === "sports-story-loading") renderMySportsStory(result || {});
     } catch (error) {
-      if (historyDetailView() === "sports-story-loading") byId("detailContent").innerHTML = emptyState("Não foi possível carregar", friendlyError(error), false);
+      if (historyDetailView() === "sports-story-loading") byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_nao_foi_possivel_carregar"), friendlyError(error), false);
     }
   }
 
@@ -4730,13 +5531,13 @@
     var story = state.historyContribution.story;
     var job = formAutosave(form, async function (next) {
       var result = await rpc("ie_experiencia_historia_config_salvar_rpc", { p_config: next });
-      if (!result || result.ok !== true) throw new Error("Não foi possível confirmar a privacidade.");
+      if (!result || result.ok !== true) throw new Error(legendaCentral("legenda_ie_central_nao_foi_possivel_confirmar_a_privacidade"));
       if (!form.isConnected || historyDetailView() !== "sports-story" || state.historyContribution.story !== story) return;
       story.perfil = Object.assign({}, story.perfil || {}, next, result.perfil || {});
       var share = byId("detailContent").querySelector("[data-history-action=sports-story-share]");
       if (share) share.disabled = story.perfil.ativo !== true || !sportsStoryPublicUrl(story);
       var code = byId("detailContent").querySelector(".ie-exp-story-share code");
-      if (code) code.textContent = story.perfil.codigo_publico || "Ainda não gerado";
+      if (code) code.textContent = story.perfil.codigo_publico || legendaCentral("legenda_ie_central_ainda_nao_gerado");
     });
     job.update(config, 150);
   }
@@ -4747,7 +5548,7 @@
       var sportId = Number(profile.id_esporte || state.activeSportId || 0) || null;
       await rpc("ie_experiencia_historia_codigo_renovar_rpc", { p_id_esporte: sportId });
       await reloadMySportsStory(sportId);
-      showToast("Novo código público gerado.", false);
+      showToast(legendaCentral("legenda_ie_central_novo_codigo_publico_gerado"), false);
     } catch (error) {
       showToast(friendlyError(error), true);
     }
@@ -4757,13 +5558,13 @@
     var data = state.historyContribution.story || {};
     var profile = data.perfil || {};
     var publicUrl = sportsStoryPublicUrl(data);
-    beginDetail("Prévia da sua história", "Como seus amigos verão", true);
+    beginDetail(legendaCentral("legenda_ie_central_previa_da_sua_historia"), legendaCentral("legenda_ie_central_como_seus_amigos_verao"), true);
     byId("detailContent").setAttribute("data-detail-view", "sports-story-preview");
     if (!publicUrl || profile.ativo !== true) {
-      byId("detailContent").innerHTML = emptyState("Ative a página pública", "Ative a opção Página pública para visualizar como seus amigos verão.", false);
+      byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_ative_a_pagina_publica"), legendaCentral("legenda_ie_central_ative_a_opcao_pagina_publica_para_visualizar_como_seus_amigos_verao"), false);
       return;
     }
-    byId("detailContent").innerHTML = "<iframe class=\"ie-exp-public-preview-frame\" title=\"Prévia pública da sua história esportiva\" src=\"" + escapeHtml(publicUrl) + "\" referrerpolicy=\"no-referrer\"></iframe>";
+    byId("detailContent").innerHTML = ("<iframe class=\"ie-exp-public-preview-frame\" title=\"" + escapeHtml(legendaCentral("legenda_ie_central_previa_publica_da_sua_historia_esportiva")) + "\" src=\"") + escapeHtml(publicUrl) + "\" referrerpolicy=\"no-referrer\"></iframe>";
   }
 
   async function copyTransientText(value) {
@@ -4788,13 +5589,13 @@
   async function shareMySportsStory() {
     var story = state.historyContribution.story || {};
     var url = sportsStoryPublicUrl(story);
-    if (!url) { showToast("Ative a página pública antes de compartilhar.", true); return; }
-    var payload = { title: "Minha história esportiva no Turbo Tiger", text: "Veja minha história com o esporte no Turbo Tiger.", url: url };
+    if (!url) { showToast(legendaCentral("legenda_ie_central_ative_a_pagina_publica_antes_de_compartilhar"), true); return; }
+    var payload = { title: legendaCentral("legenda_ie_central_minha_historia_esportiva_no_turbo_tiger"), text: legendaCentral("legenda_ie_central_veja_minha_historia_com_o_esporte_no_turbo_tiger"), url: url };
     if (postNative("share_sports_story", payload)) return;
     try {
       if (!await copyTransientText(url)) throw new Error("compartilhamento_indisponivel");
-      showToast("Link seguro copiado. Agora é só compartilhar.", false);
-    } catch (error) { showToast("Não foi possível compartilhar agora.", true); }
+      showToast(legendaCentral("legenda_ie_central_link_seguro_copiado_agora_e_so_compartilhar"), false);
+    } catch (error) { showToast(legendaCentral("legenda_ie_central_nao_foi_possivel_compartilhar_agora"), true); }
   }
 
   function historyFormPayload(form) {
@@ -4837,17 +5638,17 @@
     var duplicate = !!(result && result.duplicado);
     var pendingDuplicate = !!(result && result.repetida) || (duplicate && result && result.source_status && result.source_status.status === "em_analise");
     var confrontation = result && result.confronto || {};
-    var confrontationHtml = confrontation.time_casa || confrontation.time_fora ? "<div class=\"ie-history-duplicate\"><time>" + escapeHtml(historyDate(confrontation.data_partida)) + "</time><strong>" + escapeHtml(confrontation.time_casa || "Casa") + " × " + escapeHtml(confrontation.time_fora || "Visitante") + "</strong></div>" : "";
-    byId("detailTitle").textContent = pendingDuplicate ? "Colaboração já recebida" : duplicate ? "Confronto já localizado" : "Colaboração recebida";
-    byId("detailSubtitle").textContent = pendingDuplicate ? "Aguardando análise" : duplicate ? "Confira antes de enviar novamente" : "Aguardando análise";
-    byId("detailContent").innerHTML = "<div class=\"ie-history-result" + (duplicate ? " is-duplicate" : "") + "\"><strong>" + escapeHtml(pendingDuplicate ? "Este envio já está aguardando análise." : duplicate ? "Este confronto já está em nossa base." : "Obrigado por colaborar com a nossa base.") + "</strong><p>" + escapeHtml(pendingDuplicate ? "A contribuição já foi registrada em sua conta; não é necessário enviá-la novamente." : duplicate ? "Confira o registro e, se houver alguma diferença, envie uma correção." : "Recebemos as informações em sua conta e vamos conferi-las antes de alterar a base.") + "</p>" + confrontationHtml + "<button type=\"button\" class=\"ie-button ie-button-primary\" data-history-action=\"back-list\">Voltar à lista</button></div>";
+    var confrontationHtml = confrontation.time_casa || confrontation.time_fora ? "<div class=\"ie-history-duplicate\"><time>" + escapeHtml(historyDate(confrontation.data_partida)) + "</time><strong>" + escapeHtml(confrontation.time_casa || legendaCentral("legenda_ie_central_casa")) + " × " + escapeHtml(confrontation.time_fora || legendaCentral("legenda_ie_central_visitante")) + "</strong></div>" : "";
+    byId("detailTitle").textContent = pendingDuplicate ? legendaCentral("legenda_ie_central_colaboracao_ja_recebida") : duplicate ? legendaCentral("legenda_ie_central_confronto_ja_localizado") : legendaCentral("legenda_ie_central_colaboracao_recebida");
+    byId("detailSubtitle").textContent = pendingDuplicate ? legendaCentral("legenda_ie_central_aguardando_analise") : duplicate ? legendaCentral("legenda_ie_central_confira_antes_de_enviar_novamente") : legendaCentral("legenda_ie_central_aguardando_analise");
+    byId("detailContent").innerHTML = "<div class=\"ie-history-result" + (duplicate ? " is-duplicate" : "") + "\"><strong>" + escapeHtml(pendingDuplicate ? legendaCentral("legenda_ie_central_este_envio_ja_esta_aguardando_analise") : duplicate ? legendaCentral("legenda_ie_central_este_confronto_ja_esta_em_nossa_base") : legendaCentral("legenda_ie_central_obrigado_por_colaborar_com_a_nossa_base")) + "</strong><p>" + escapeHtml(pendingDuplicate ? legendaCentral("legenda_ie_central_a_contribuicao_ja_foi_registrada_em_sua_conta_nao_e_necessario_envia_la_novamente") : duplicate ? legendaCentral("legenda_ie_central_confira_o_registro_e_se_houver_alguma_diferenca_envie_uma_correcao") : legendaCentral("legenda_ie_central_recebemos_as_informacoes_em_sua_conta_e_vamos_conferi_las_antes_de_alterar_a_base")) + "</p>" + confrontationHtml + ("<button type=\"button\" class=\"ie-button ie-button-primary\" data-history-action=\"back-list\">" + escapeHtml(legendaCentral("legenda_ie_central_voltar_a_lista")) + "</button></div>");
     byId("detailContent").setAttribute("data-detail-view", "history-result");
   }
 
   async function submitHistoryContribution(form) {
     var button = form.querySelector("button[type=submit]");
     button.disabled = true;
-    button.textContent = "Enviando...";
+    button.textContent = legendaCentral("legenda_ie_central_enviando");
     try {
       var result = await rpc("ie_hist_futebol_brasil_contribuicao_salvar_rpc", historyFormPayload(form));
       if (!form.isConnected || historyDetailView() !== "history-form") return;
@@ -4856,13 +5657,13 @@
       if (!form.isConnected || historyDetailView() !== "history-form") return;
       showToast(friendlyError(error), true);
       button.disabled = false;
-      button.textContent = "Enviar para análise";
+      button.textContent = legendaCentral("legenda_ie_central_enviar_para_analise");
     }
   }
 
   async function openEventDetail(id, title, pushCurrent) {
     var view = "event-detail:" + Number(id);
-    beginDetail(title || "Detalhes do confronto", "Carregando informações...", !!pushCurrent);
+    beginDetail(title || legendaCentral("legenda_ie_central_detalhes_do_confronto"), legendaCentral("legenda_ie_central_carregando_informacoes"), !!pushCurrent);
     byId("detailContent").setAttribute("data-detail-view", view);
     try {
       var data = await rpc("ie_partida_detalhe_rpc", { p_id_evento: Number(id) });
@@ -4871,35 +5672,35 @@
       var sides = matchSides(event);
       var structuredResult = eventResultFormat(event) !== "duelo_placar";
       byId("detailTitle").textContent = displayText(eventDisplayTitle(event));
-      byId("detailSubtitle").textContent = competitionDisplayName(event.competicao_nome || event.status_texto || "Detalhes da partida");
-      var html = renderMatchCard(event, event.status_texto || "Partida", false);
+      byId("detailSubtitle").textContent = competitionDisplayName(event.competicao_nome || event.status_texto || legendaCentral("legenda_ie_central_detalhes_da_partida"));
+      var html = renderMatchCard(event, event.status_texto || legendaCentral("legenda_ie_central_partida"), false);
       var collections = structuredResult ? [] : [
-        ["Linha do tempo", data.linha_tempo],
-        ["Estatísticas", data.estatisticas],
-        ["Escalações", data.escalacoes],
-        ["Classificação", data.classificacao]
+        [legendaCentral("legenda_ie_central_linha_do_tempo"), data.linha_tempo],
+        [legendaCentral("legenda_ie_central_estatisticas"), data.estatisticas],
+        [legendaCentral("legenda_ie_central_escalacoes"), data.escalacoes],
+        [legendaCentral("legenda_ie_central_classificacao"), data.classificacao]
       ];
       collections.forEach(function (entry) {
         var rows = arrayOf(entry[1]);
         if (!rows.length) return;
         html += detailSection(entry[0], "<div class=\"ie-detail-list\">" + rows.slice(0, 20).map(function (row) {
-          var label = row.nome || row.tipo || row.rotulo || row.mercado || row.participante_nome || "Informação";
+          var label = row.nome || row.tipo || row.rotulo || row.mercado || row.participante_nome || legendaCentral("legenda_ie_central_informacao");
           var value = row.valor == null ? (row.detalhe || row.resultado || row.minuto || "") : row.valor;
           return "<div><span>" + escapeHtml(label) + "</span><strong>" + escapeHtml(value) + "</strong></div>";
         }).join("") + "</div>");
       });
       var oddsHtml = structuredResult ? "" : renderOddsDetail(data, sides);
-      if (oddsHtml) html += detailSection("Cotações informativas", oddsHtml);
+      if (oddsHtml) html += detailSection(legendaCentral("legenda_ie_central_cotacoes_informativas"), oddsHtml);
       byId("detailContent").innerHTML = (structuredResult ? "" : detailModeSwitch("", id)) + html;
     } catch (error) {
-      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = (structuredResult ? "" : detailModeSwitch("", id)) + emptyState("Detalhes indisponíveis", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = (structuredResult ? "" : detailModeSwitch("", id)) + emptyState(legendaCentral("legenda_ie_central_detalhes_indisponiveis"), friendlyError(error), false);
     }
   }
 
   async function openOddsDetail(id, title, pushCurrent) {
     if (!Number(id)) { openGenericDetail("odds", id, title, pushCurrent); return; }
     var view = "event-odds:" + Number(id);
-    beginDetail(title || "Cotações informativas", "Carregando cotações...", pushCurrent);
+    beginDetail(title || legendaCentral("legenda_ie_central_cotacoes_informativas"), legendaCentral("legenda_ie_central_carregando_cotacoes"), pushCurrent);
     byId("detailContent").setAttribute("data-detail-view", view);
     try {
       var data = await rpc("ie_partida_detalhe_rpc", { p_id_evento: Number(id) });
@@ -4907,47 +5708,47 @@
       var event = data && data.evento || {};
       var sides = matchSides(event);
       byId("detailTitle").textContent = displayText(sides.home.name + " × " + sides.away.name);
-      byId("detailSubtitle").textContent = displayText("Cotações informativas" + (event.competicao_nome ? " · " + competitionDisplayName(event.competicao_nome) : ""));
+      byId("detailSubtitle").textContent = displayText(legendaCentral("legenda_ie_central_cotacoes_informativas") + (event.competicao_nome ? " · " + competitionDisplayName(event.competicao_nome) : ""));
       var html = renderOddsDetail(data, sides);
-      byId("detailContent").innerHTML = detailModeSwitch("odds", id) + (html || emptyState("Cotações indisponíveis", "Ainda não há cotações atualizadas para esta partida.", false));
+      byId("detailContent").innerHTML = detailModeSwitch("odds", id) + (html || emptyState(legendaCentral("legenda_ie_central_cotacoes_indisponiveis"), legendaCentral("legenda_ie_central_ainda_nao_ha_cotacoes_atualizadas_para_esta_partida"), false));
     } catch (error) {
-      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("odds", id) + emptyState("Cotações indisponíveis", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("odds", id) + emptyState(legendaCentral("legenda_ie_central_cotacoes_indisponiveis"), friendlyError(error), false);
     }
   }
 
   function detailModeSwitch(current, id) {
     function switchButton(mode, iconName, label) {
       var selected = current === mode;
-      return "<button type=\"button\" data-detail-switch=\"" + mode + "\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"" + label + "\"" + (selected ? " aria-current=\"true\"" : "") + ">" + icon(iconName) + "</button>";
+      return "<button type=\"button\" data-detail-switch=\"" + mode + "\" data-event-id=\"" + escapeHtml(id) + "\" aria-label=\"" + escapeHtml(label) + "\"" + (selected ? " aria-current=\"true\"" : "") + ">" + icon(iconName) + "</button>";
     }
-    return "<div class=\"ie-detail-switcher\"><div class=\"ie-match-actions\" role=\"group\" aria-label=\"Cotações e análises\">" + switchButton("odds", "chart", "Abrir cotações") + switchButton("analysis", "analysis", "Abrir análises") + "</div></div>";
+    return ("<div class=\"ie-detail-switcher\"><div class=\"ie-match-actions\" role=\"group\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_cotacoes_e_analises")) + "\">") + switchButton("odds", "chart", legendaCentral("legenda_ie_central_abrir_cotacoes")) + switchButton("analysis", "analysis", legendaCentral("legenda_ie_central_abrir_analises")) + "</div></div>";
   }
 
   function sectionModeSwitch(current) {
     function switchButton(section, iconName, label) {
       var selected = current === section;
-      return "<button type=\"button\" data-section-mode-switch=\"" + section + "\" aria-label=\"" + label + "\"" + (selected ? " aria-current=\"true\"" : "") + ">" + icon(iconName) + "</button>";
+      return "<button type=\"button\" data-section-mode-switch=\"" + section + "\" aria-label=\"" + escapeHtml(label) + "\"" + (selected ? " aria-current=\"true\"" : "") + ">" + icon(iconName) + "</button>";
     }
-    return "<div class=\"ie-detail-switcher\"><div class=\"ie-match-actions\" role=\"group\" aria-label=\"Cotações e análises\">" + switchButton("cotacoes", "chart", "Abrir cotações") + switchButton("analises", "analysis", "Abrir análises") + "</div></div>";
+    return ("<div class=\"ie-detail-switcher\"><div class=\"ie-match-actions\" role=\"group\" aria-label=\"" + escapeHtml(legendaCentral("legenda_ie_central_cotacoes_e_analises")) + "\">") + switchButton("cotacoes", "chart", legendaCentral("legenda_ie_central_abrir_cotacoes")) + switchButton("analises", "analysis", legendaCentral("legenda_ie_central_abrir_analises")) + "</div></div>";
   }
 
   function openGenericDetail(kind, id, title, pushCurrent) {
-    beginDetail(title || "Detalhes", "", pushCurrent);
-    byId("detailSubtitle").textContent = kind === "competition" ? "Competição acompanhada" : kind === "analysis" ? "Resumo estatístico personalizado" : kind === "odds" ? "Cotações informativas" : "Time ou participante acompanhado";
+    beginDetail(title || legendaCentral("legenda_ie_central_detalhes"), "", pushCurrent);
+    byId("detailSubtitle").textContent = kind === "competition" ? legendaCentral("legenda_ie_central_competicao_acompanhada") : kind === "analysis" ? legendaCentral("legenda_ie_central_resumo_estatistico_personalizado") : kind === "odds" ? legendaCentral("legenda_ie_central_cotacoes_informativas") : legendaCentral("legenda_ie_central_time_ou_participante_acompanhado");
     var modeSwitcher = kind === "analysis" || kind === "odds" ? detailModeSwitch(kind, id) : "";
-    byId("detailContent").innerHTML = modeSwitcher + emptyState("Informações completas na central", kind === "analysis" ? "As análises usam somente os dados disponíveis para as suas seleções e não representam recomendação nem garantia de resultado." : kind === "odds" ? "Ainda não há cotações atualizadas para esta partida." : "As próximas partidas, resultados e dados relacionados ficam disponíveis nas áreas correspondentes.", false);
+    byId("detailContent").innerHTML = modeSwitcher + emptyState(legendaCentral("legenda_ie_central_informacoes_completas_na_central"), kind === "analysis" ? legendaCentral("legenda_ie_central_as_analises_usam_somente_os_dados_disponiveis_para_as_suas_selecoes_e_nao_representam_recomendacao_n") : kind === "odds" ? legendaCentral("legenda_ie_central_ainda_nao_ha_cotacoes_atualizadas_para_esta_partida") : legendaCentral("legenda_ie_central_as_proximas_partidas_resultados_e_dados_relacionados_ficam_disponiveis_nas_areas_correspondentes"), false);
   }
 
   async function openAnalysisDetail(id, title, pushCurrent) {
     if (!Number(id)) { openGenericDetail("analysis", id, title, pushCurrent); return; }
     var view = "event-analysis:" + Number(id);
-    beginDetail(title || "Análises estatísticas", "Carregando histórico do confronto...", pushCurrent);
+    beginDetail(title || legendaCentral("legenda_ie_central_analises_estatisticas"), legendaCentral("legenda_ie_central_carregando_historico_do_confronto"), pushCurrent);
     byId("detailContent").setAttribute("data-detail-view", view);
     try {
       var data = await rpc("ie_confronto_evento_rpc", { p_id_evento: Number(id), p_limite: 20, p_offset: 0 });
       if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
-      byId("detailTitle").textContent = displayText((data.time_a && data.time_a.nome || "Time A") + " × " + (data.time_b && data.time_b.nome || "Time B"));
-      byId("detailSubtitle").textContent = "Histórico disponível do confronto";
+      byId("detailTitle").textContent = displayText((data.time_a && data.time_a.nome || legendaCentral("legenda_ie_central_time_a")) + " × " + (data.time_b && data.time_b.nome || legendaCentral("legenda_ie_central_time_b")));
+      byId("detailSubtitle").textContent = legendaCentral("legenda_ie_central_historico_disponivel_do_confronto");
       byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + renderHistoricalComparison(data)
         + '<div data-analysis-general></div><div data-analysis-base></div>';
       // Supplemental all-opponent statistics and archive totals never hold the
@@ -4966,42 +5767,42 @@
           if (current(baseSlot)) baseSlot.innerHTML = renderBrazilDatabaseSummary(summary);
         }).catch(function () { /* Optional archive total must not hide the comparison. */ });
         if (data.status_historico !== "identidade_pendente" && !data.desempenho_geral) {
-          generalSlot.textContent = "Carregando desempenho geral...";
+          generalSlot.textContent = legendaCentral("legenda_ie_central_carregando_desempenho_geral");
           rpc("ie_desempenho_geral_evento_rpc", { p_id_evento: Number(id) }).then(function (general) {
             if (current(generalSlot)) generalSlot.innerHTML = renderHistoricalComparison(Object.assign({}, data, { desempenho_geral: general }), true);
           }).catch(function () {
-            if (current(generalSlot)) generalSlot.textContent = "Desempenho geral indisponível no momento.";
+            if (current(generalSlot)) generalSlot.textContent = legendaCentral("legenda_ie_central_desempenho_geral_indisponivel_no_momento");
           });
         }
       }
     } catch (error) {
-      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + emptyState("Análise indisponível", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = detailModeSwitch("analysis", id) + emptyState(legendaCentral("legenda_ie_central_analise_indisponivel"), friendlyError(error), false);
     }
   }
 
   async function openCompetitionDetail(id, title, pushCurrent) {
-    beginDetail(title || "Detalhes da competição", "Carregando informações...", !!pushCurrent);
+    beginDetail(title || legendaCentral("legenda_ie_central_detalhes_da_competicao"), legendaCentral("legenda_ie_central_carregando_informacoes"), !!pushCurrent);
     var view = "competition:" + Number(id);
     byId("detailContent").setAttribute("data-detail-view", view);
     try {
       var data = await rpc("ie_competicao_detalhe_rpc", { p_id_competicao: Number(id) });
       if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       var competition = data && data.competicao || {};
-      byId("detailTitle").textContent = competitionDisplayName(competition.nome || title || "Competição");
-      byId("detailSubtitle").textContent = displayText([competition.temporada, competition.pais].filter(Boolean).join(" • ") || "Detalhes da competição");
+      byId("detailTitle").textContent = competitionDisplayName(competition.nome || title || legendaCentral("legenda_ie_central_competicao"));
+      byId("detailSubtitle").textContent = displayText([competition.temporada, competition.pais].filter(Boolean).join(" • ") || legendaCentral("legenda_ie_central_detalhes_da_competicao"));
       var overview = "<div class=\"ie-detail-list\">" + [
-        ["Fase atual", competition.fase_atual || "Em atualização"],
-        ["Início", competition.data_inicio ? formatDate(competition.data_inicio) : "Em atualização"],
-        ["Fim", competition.data_fim ? formatDate(competition.data_fim) : "Em atualização"]
+        [legendaCentral("legenda_ie_central_fase_atual"), competition.fase_atual || legendaCentral("legenda_ie_central_em_atualizacao")],
+        [legendaCentral("legenda_ie_central_inicio_2"), competition.data_inicio ? formatDate(competition.data_inicio) : legendaCentral("legenda_ie_central_em_atualizacao")],
+        [legendaCentral("legenda_ie_central_fim_2"), competition.data_fim ? formatDate(competition.data_fim) : legendaCentral("legenda_ie_central_em_atualizacao")]
       ].map(function (row) { return "<div><span>" + escapeHtml(row[0]) + "</span><strong>" + escapeHtml(row[1]) + "</strong></div>"; }).join("") + "</div>";
-      byId("detailContent").innerHTML = detailSection("Informações da competição", overview) + renderCompetitionClassification(data, competition.id_competicao || id);
+      byId("detailContent").innerHTML = detailSection(legendaCentral("legenda_ie_central_informacoes_da_competicao"), overview) + renderCompetitionClassification(data, competition.id_competicao || id);
     } catch (error) {
-      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState("Detalhes indisponíveis", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_detalhes_indisponiveis"), friendlyError(error), false);
     }
   }
 
   async function openParticipantDetail(id, title, pushCurrent) {
-    beginDetail(title || "Time ou participante", "Carregando competições...", !!pushCurrent);
+    beginDetail(title || legendaCentral("legenda_ie_central_time_ou_participante"), legendaCentral("legenda_ie_central_carregando_competicoes"), !!pushCurrent);
     var view = "participant:" + Number(id);
     byId("detailContent").setAttribute("data-detail-view", view);
     try {
@@ -5009,20 +5810,20 @@
       if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       var participant = data && data.participante || followedSelections("participant", state.activeSportId).find(function (item) { return Number(selectionIdentity(item).id) === Number(id); }) || {};
       var competitions = arrayOf(data);
-      byId("detailTitle").textContent = displayText(participant.nome || title || "Time ou participante");
-      byId("detailSubtitle").textContent = "Competições em que participa";
+      byId("detailTitle").textContent = displayText(participant.nome || title || legendaCentral("legenda_ie_central_time_ou_participante"));
+      byId("detailSubtitle").textContent = legendaCentral("legenda_ie_central_competicoes_em_que_participa");
       byId("detailContent").innerHTML = competitions.length ? "<div class=\"ie-detail-entities\">" + competitions.map(function (competition) {
         var competitionId = competition.id_competicao || competition.id;
-        var name = competitionDisplayName(competition.nome || competition.competicao_nome || "Competição");
+        var name = competitionDisplayName(competition.nome || competition.competicao_nome || legendaCentral("legenda_ie_central_competicao"));
         return "<article class=\"ie-entity-row\"" + detailAttributes("participant-competition", competitionId, "", name) + " data-participant-id=\"" + escapeHtml(id) + "\" data-competition-id=\"" + escapeHtml(competitionId) + "\" data-phase=\"" + escapeHtml(competition.fase_atual || "") + "\">" + logoHtml(competition.imagem_url || competition.logo_url, name, "ie-entity-logo", competition.sigla) + "<div class=\"ie-entity-copy\"><strong>" + escapeHtml(name) + "</strong><span>" + escapeHtml(competition.fase_atual || competition.temporada || "") + "</span></div>" + icon("chevron") + "</article>";
-      }).join("") + "</div>" : emptyState("Nenhuma competição disponível", "Ainda não há competições relacionadas a este participante.", false);
+      }).join("") + "</div>" : emptyState(legendaCentral("legenda_ie_central_nenhuma_competicao_disponivel"), legendaCentral("legenda_ie_central_ainda_nao_ha_competicoes_relacionadas_a_este_participante"), false);
     } catch (error) {
-      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState("Competições indisponíveis", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_competicoes_indisponiveis"), friendlyError(error), false);
     }
   }
 
   async function openParticipantCompetitionMatches(participantId, competitionId, phase, title, pushCurrent) {
-    beginDetail(title || "Confrontos", phase || "Próximos confrontos", !!pushCurrent);
+    beginDetail(title || legendaCentral("legenda_ie_central_confrontos"), phase || legendaCentral("legenda_ie_central_proximos_confrontos"), !!pushCurrent);
     var view = "participant-competition:" + Number(participantId) + ":" + Number(competitionId);
     byId("detailContent").setAttribute("data-detail-view", view);
     try {
@@ -5030,33 +5831,33 @@
       var result = await rpc("ie_partidas_listar_rpc", { p_secao: "proximos", p_id_esporte: state.activeSportId ? Number(state.activeSportId) : null, p_id_competicao: Number(competitionId), p_id_participante: Number(participantId), p_fase: phaseFilter, p_limite: 50, p_offset: 0 });
       if (byId("detailContent").getAttribute("data-detail-view") !== view) return;
       var matches = orderMatchesByFavorites(arrayOf(result), state.activeSportId, "upcoming");
-      byId("detailTitle").textContent = displayText(title || "Confrontos");
-      byId("detailSubtitle").textContent = displayText(phase || "Próximos confrontos");
-      byId("detailContent").innerHTML = matches.length ? "<div class=\"ie-feed\">" + matches.map(function (item) { return renderMatchCard(item); }).join("") + "</div>" : emptyState("Nenhum confronto programado", "Ainda não há confrontos futuros disponíveis nesta fase.", false);
+      byId("detailTitle").textContent = displayText(title || legendaCentral("legenda_ie_central_confrontos"));
+      byId("detailSubtitle").textContent = displayText(phase || legendaCentral("legenda_ie_central_proximos_confrontos"));
+      byId("detailContent").innerHTML = matches.length ? "<div class=\"ie-feed\">" + matches.map(function (item) { return renderMatchCard(item); }).join("") + "</div>" : emptyState(legendaCentral("legenda_ie_central_nenhum_confronto_programado"), legendaCentral("legenda_ie_central_ainda_nao_ha_confrontos_futuros_disponiveis_nesta_fase"), false);
     } catch (error) {
-      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState("Confrontos indisponíveis", friendlyError(error), false);
+      if (byId("detailContent").getAttribute("data-detail-view") === view) byId("detailContent").innerHTML = emptyState(legendaCentral("legenda_ie_central_confrontos_indisponiveis"), friendlyError(error), false);
     }
   }
 
   function openNewsSource(url, title) {
     var safe = safeUrl(url);
     if (!safe) {
-      showToast("A fonte desta notícia não forneceu um endereço HTTPS válido.", true);
+      showToast(legendaCentral("legenda_ie_central_a_fonte_desta_noticia_nao_forneceu_um_endereco_https_valido"), true);
       return;
     }
-    if (!postNative("open_news", { url: safe, title: String(title || "Fonte da notícia"), read_only: true })) {
-      showToast("A notícia original só pode ser aberta pelo aplicativo.", true);
+    if (!postNative("open_news", { url: safe, title: String(title || legendaCentral("legenda_ie_central_fonte_da_noticia")), read_only: true })) {
+      showToast(legendaCentral("legenda_ie_central_a_noticia_original_so_pode_ser_aberta_pelo_aplicativo"), true);
     }
   }
 
-  function setSettingsSaveStatus(text, error) {
+  function setSettingsSaveStatus(text, error, operationState) {
     var status = byId("settingsSaveStatus");
     if (!status) return;
     cancelSessionTimeout(state.settingsSaveStatusTimer);
     status.textContent = text;
-    status.classList.toggle("is-saving", text === "Salvando...");
+    status.classList.toggle("is-saving", operationState === "saving");
     status.classList.toggle("is-error", !!error);
-    if (!error && text === "Salvo.") {
+    if (!error && operationState === "saved") {
       state.settingsSaveStatusTimer = scheduleSessionTimeout(function () {
         if (!state.settingsSavePending && status) status.textContent = "";
       }, 1400);
@@ -5067,7 +5868,7 @@
     var epoch = state.sessionEpoch;
     var userId = state.session && state.session.user_id || "";
     state.settingsSavePending += 1;
-    setSettingsSaveStatus("Salvando...", false);
+    setSettingsSaveStatus(legendaCentral("legenda_ie_central_salvando"), false, "saving");
     var execute = async function () {
       if (!sessionWorkIsCurrent(epoch, userId)) return false;
       try {
@@ -5080,13 +5881,13 @@
         if (rollback) {
           try { await rollback(); } catch (rollbackError) {}
         }
-        setSettingsSaveStatus("Não foi possível salvar.", true);
+        setSettingsSaveStatus(legendaCentral("legenda_ie_central_nao_foi_possivel_salvar"), true);
         showToast(friendlyError(error), true);
         return false;
       } finally {
         if (sessionWorkIsCurrent(epoch, userId)) state.settingsSavePending = Math.max(0, state.settingsSavePending - 1);
       }
-      if (sessionWorkIsCurrent(epoch, userId) && !state.settingsSavePending) setSettingsSaveStatus("Salvo.", false);
+      if (sessionWorkIsCurrent(epoch, userId) && !state.settingsSavePending) setSettingsSaveStatus(legendaCentral("legenda_ie_central_salvo"), false, "saved");
       return true;
     };
     state.settingsSaveQueue = state.settingsSaveQueue.then(execute, execute);
@@ -5235,7 +6036,7 @@
       if (!next.acompanhar) state.favoriteOrder = state.favoriteOrder.filter(function (id) { return Number(id) !== targetId; });
     }
     state.settingsSavePending += 1;
-    setSettingsSaveStatus("Salvando...", false);
+    setSettingsSaveStatus(legendaCentral("legenda_ie_central_salvando"), false, "saving");
     renderEntities();
     renderSelectionLists();
 
@@ -5267,13 +6068,13 @@
       setSourceFreshness();
       saveCache();
       postNative("preferences_changed", {});
-      showToast(kind === "notify" ? "Notificações atualizadas." : "Favoritos atualizados.", false);
+      showToast(kind === "notify" ? legendaCentral("legenda_ie_central_notificacoes_atualizadas") : legendaCentral("legenda_ie_central_favoritos_atualizados"), false);
     } catch (error) {
       if (!sessionWorkIsCurrent(epoch, userId)) return;
       if (previousPending) state.selectionChanges[key] = previousPending;
       else delete state.selectionChanges[key];
       state.favoriteOrder = previousFavoriteOrder;
-      setSettingsSaveStatus("Não foi possível salvar.", true);
+      setSettingsSaveStatus(legendaCentral("legenda_ie_central_nao_foi_possivel_salvar"), true);
       showToast(friendlyError(error), true);
     } finally {
       if (!sessionWorkIsCurrent(epoch, userId)) return;
@@ -5281,7 +6082,7 @@
       delete state.selectionBusy[key];
       renderEntities();
       renderSelectionLists();
-      if (!state.settingsSavePending && !byId("settingsSaveStatus").classList.contains("is-error")) setSettingsSaveStatus("Salvo.", false);
+      if (!state.settingsSavePending && !byId("settingsSaveStatus").classList.contains("is-error")) setSettingsSaveStatus(legendaCentral("legenda_ie_central_salvo"), false, "saved");
     }
   }
 
@@ -5343,9 +6144,9 @@
     if (!compareConfrontos) compareConfrontos = window.TurboTigerCompare({
       host: byId("detailContent"), rpc: rpc, now: serverNow,
       active: function () { return !!state.session && !byId("detailModal").hidden; },
-      title: function (item) { var sides = matchSides(item); return item.titulo || item.nome_evento || ((sides.home.name || "Casa") + " × " + (sides.away.name || "Fora")); },
+      title: function (item) { var sides = matchSides(item); return item.titulo || item.nome_evento || ((sides.home.name || legendaCentral("legenda_ie_central_casa")) + " × " + (sides.away.name || legendaCentral("legenda_ie_central_fora"))); },
       error: function (error) { return error && error.message && !/^[a-z_]+$/.test(error.message) ? error.message : friendlyError(error); },
-      begin: function () { beginDetail("Comparar Confrontos", "Simulação de impacto — apostas simples, pré-jogo", false); }
+      begin: function () { beginDetail(legendaCentral("legenda_ie_central_comparar_confrontos"), legendaCentral("legenda_ie_central_simulacao_de_impacto_apostas_simples_pre_jogo"), false); }
     });
     compareConfrontos.open(eventId || null);
   }
@@ -5353,7 +6154,7 @@
   function setupEvents() {
     personalBets = window.TurboTigerBets({ host: byId("detailContent"), rpc: rpc, begin: beginDetail,
       allow: automaticSaveNavigationAllowed, message: showToast,
-      share: function (ticket, element) { window.TurboTigerBetsRendering.share(ticket, element).catch(function (error) { showToast(error.message || "Não foi possível compartilhar o bilhete.", true); }); }
+      share: function (ticket, element) { window.TurboTigerBetsRendering.share(ticket, element).catch(function (error) { showToast(error.message || legendaCentral("legenda_ie_central_nao_foi_possivel_compartilhar_o_bilhete"), true); }); }
     });
     compareSelection = window.TurboTigerCompareSelection({ root: document, now: serverNow,
       active: function () { return !!state.session; }, open: openCompareConfrontos });
@@ -5487,7 +6288,7 @@
     document.addEventListener("input", function (event) {
       if (event.target.matches && event.target.matches("[data-manual-odd]")) {
         var manualInput = event.target;
-        var origin = manualInput.value.trim() === "" ? "Usando a odd exibida" : "Odd informada por você";
+        var origin = manualInput.value.trim() === "" ? legendaCentral("legenda_ie_central_usando_a_odd_exibida") : legendaCentral("legenda_ie_central_odd_informada_por_voce");
         manualInput.parentNode.querySelector("[data-manual-origin]").textContent = origin;
         var simulatorForm = manualInput.closest("[data-financial-simulator-form]");
         var manual = simulatorHasManualOverrides(simulatorForm);
@@ -5503,7 +6304,7 @@
           simulatorForm.elements.simulator_bell.checked = false;
         }
         var bellHelp = simulatorForm.querySelector("[data-simulator-bell-help]");
-        if (bellHelp) bellHelp.textContent = manual ? "Odds alteradas manualmente não podem ser monitoradas automaticamente." : "Toque nesta área para ativar ou desativar o aviso desta simulação.";
+        if (bellHelp) bellHelp.textContent = manual ? legendaCentral("legenda_ie_central_odds_alteradas_manualmente_nao_podem_ser_monitoradas_automaticamente") : legendaCentral("legenda_ie_central_toque_nesta_area_para_ativar_ou_desativar_o_aviso_desta_simulacao");
         invalidateSimulatorResult();
         updateSimulatorSuggestedName();
         updateSimulatorAvailability();
@@ -5573,10 +6374,10 @@
         if (selectedCount > 20) {
           event.target.checked = false;
           selectedCount -= 1;
-          showToast("Você pode usar até 20 casas em cada simulação.", true);
+          showToast(legendaCentral("legenda_ie_central_voce_pode_usar_ate_20_casas_em_cada_simulacao"), true);
         }
         var countLabel = byId("simulatorHouseCount");
-        if (countLabel) countLabel.textContent = selectedCount + " selecionada" + (selectedCount === 1 ? "" : "s");
+        if (countLabel) countLabel.textContent = legendaCentral(selectedCount === 1 ? "legenda_ie_central_casa_selecionada" : "legenda_ie_central_casas_selecionadas", { quantidade: selectedCount });
         invalidateSimulatorResult();
         if (state.simulator.context.entrada_manual_habilitada === true) {
           state.simulator.form = readSimulatorForm();
@@ -5899,7 +6700,7 @@
         } else if (action === "select-opponent") {
           var opponentKey = historyAction.getAttribute("data-history-team-key") || "";
           if (!opponentKey || historySelectedKeys(false).indexOf(opponentKey) >= 0) {
-            showToast("Escolha um time adversário diferente do seu time.", true);
+            showToast(legendaCentral("legenda_ie_central_escolha_um_time_adversario_diferente_do_seu_time"), true);
             return;
           }
           setHistoryTeamSelection(true, opponentKey, historyAction.getAttribute("data-history-team-name") || "", true);
@@ -5911,7 +6712,7 @@
           var togglingOpponent = action === "toggle-opponent";
           var toggledKey = historyAction.getAttribute("data-history-team-key") || "";
           if (togglingOpponent && historySelectedKeys(false).indexOf(toggledKey) >= 0) {
-            showToast("Escolha um time adversário diferente do seu time.", true);
+            showToast(legendaCentral("legenda_ie_central_escolha_um_time_adversario_diferente_do_seu_time"), true);
             return;
           }
           setHistoryTeamSelection(togglingOpponent, toggledKey, historyAction.getAttribute("data-history-team-name") || "", false);
@@ -5959,7 +6760,7 @@
           var pendingConflict = state.historyContribution.pendingConflict;
           var conflictingRow = pendingConflict && arrayOf(pendingConflict.conflict && pendingConflict.conflict.itens)[0];
           var conflictingId = Number(conflictingRow && conflictingRow.id_confronto || 0);
-          if (!conflictingId) { showToast("Este confronto não pertence à base histórica editável.", true); return; }
+          if (!conflictingId) { showToast(legendaCentral("legenda_ie_central_este_confronto_nao_pertence_a_base_historica_editavel"), true); return; }
           openHistoryCorrection(conflictingId, conflictingRow);
         } else if (action === "correct") {
           openHistoryCorrection(historyAction.getAttribute("data-history-row-id"));
@@ -6032,8 +6833,8 @@
         var switchTarget = detailSwitch.getAttribute("data-detail-switch");
         var switchEventId = detailSwitch.getAttribute("data-event-id");
         if (detailSwitch.getAttribute("aria-current") === "true") return;
-        if (switchTarget === "analysis") openAnalysisDetail(switchEventId, "Análises estatísticas", "replace");
-        else openOddsDetail(switchEventId, "Cotações informativas", "replace");
+        if (switchTarget === "analysis") openAnalysisDetail(switchEventId, legendaCentral("legenda_ie_central_analises_estatisticas"), "replace");
+        else openOddsDetail(switchEventId, legendaCentral("legenda_ie_central_cotacoes_informativas"), "replace");
         return;
       }
       var matchAction = event.target.closest("[data-match-action]");
@@ -6042,8 +6843,8 @@
         if (detailGesture && actionCard && detailGesture.target === actionCard && detailGesture.moved) { event.preventDefault(); detailGesture = null; return; }
         detailGesture = null;
         var pushAction = !byId("detailModal").hidden && byId("detailModal").contains(matchAction);
-        if (matchAction.getAttribute("data-match-action") === "odds") openOddsDetail(matchAction.getAttribute("data-event-id"), "Cotações informativas", pushAction);
-        else openAnalysisDetail(matchAction.getAttribute("data-event-id"), "Análises estatísticas", pushAction);
+        if (matchAction.getAttribute("data-match-action") === "odds") openOddsDetail(matchAction.getAttribute("data-event-id"), legendaCentral("legenda_ie_central_cotacoes_informativas"), pushAction);
+        else openAnalysisDetail(matchAction.getAttribute("data-event-id"), legendaCentral("legenda_ie_central_analises_estatisticas"), pushAction);
         return;
       }
       var detail = event.target.closest("[data-detail-kind]");
@@ -6151,6 +6952,7 @@
     });
   }
 
+  if (typeof window.addEventListener === "function") window.addEventListener("turbotiger:idioma", atualizarIdiomaCentral);
   document.addEventListener("DOMContentLoaded", function () {
     setupEvents();
     if (!hasBridge()) {

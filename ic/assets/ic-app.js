@@ -2,6 +2,42 @@
   "use strict";
   var IC = root.TurboTigerIC;
   var Core = IC.Core, UI = IC.UI, Bridge = IC.Bridge;
+
+  var fontesLegendasCentral = {
+    "legenda_ic_central_preparando": "Preparando a Central",
+    "legenda_ic_central_validando_disponibilidade": "Primeiro validamos a sessão, as capacidades e as políticas disponíveis.",
+    "legenda_ic_central_recurso_indisponivel": "Recurso indisponível",
+    "legenda_ic_central_area_desativada_politica": "Esta área está desativada pela política operacional atual.",
+    "legenda_ic_central_area_desativada": "Área temporariamente desativada",
+    "legenda_ic_central_demais_controles_preservados": "Os demais controles e o histórico permanecem preservados.",
+    "legenda_ic_central_captura_nao_informada": "Captura não informada",
+    "legenda_ic_central_sessao_ativa": "Sessão ativa",
+    "legenda_ic_central_sem_sessao": "Nenhuma sessão ativa",
+    "legenda_ic_central_atualizado": "Atualizado ",
+    "legenda_ic_central_falha_atualizacao": "Não foi possível atualizar as informações.",
+    "legenda_ic_central_origem_historico": "Origem efetiva: seu histórico",
+    "legenda_ic_central_origem_comunidade": "Origem efetiva: comunidade elegível",
+    "legenda_ic_central_origem_ambos": "Origem efetiva: seu histórico e comunidade elegível",
+    "legenda_ic_central_origem_indisponivel": "Origem efetiva indisponível",
+    "legenda_ic_central_notificacao": "Notificação",
+    "legenda_ic_central_sem_notificacoes": "Nenhuma notificação",
+    "legenda_ic_central_notificacoes_descricao": "Lembretes, alertas de controle e atualizações aparecerão aqui.",
+    "legenda_ic_central_central_controle": "Central de controle",
+    "legenda_ic_central_notificacoes": "Notificações",
+    "legenda_ic_central_explorar_central": "Explorar a Central",
+    "legenda_ic_central_meu_historico": "Meu histórico",
+    "legenda_ic_central_jogos_passaportes": "Jogos e passaportes",
+    "legenda_ic_central_comunidade": "Comunidade",
+    "legenda_ic_central_regras_pausas": "Regras e pausas",
+    "legenda_ic_central_alertas_configuracoes": "Meus alertas e configurações",
+    "legenda_ic_central_aba_aberta": "Aba {secao} aberta."
+  };
+  if (root.TurboTigerLegendas) root.TurboTigerLegendas.registrar(fontesLegendasCentral);
+  function legendaCentral(chave, valores) {
+    if (root.TurboTigerLegendas) return root.TurboTigerLegendas.texto(chave, valores);
+    return fontesLegendasCentral[chave].replace(/\{([a-z][a-z0-9_]*)\}/g, function (token, nome) { return valores && Object.prototype.hasOwnProperty.call(valores, nome) ? String(valores[nome]) : token; });
+  }
+
   var store = IC.Store.createStore();
   var router = IC.Router;
   var SECTION_POLICIES = {
@@ -93,18 +129,18 @@
     if (section !== "visao-geral" && (!bootstrap || bootstrap.status !== "ready")) {
       var waitingContainer = document.querySelector('[data-panel="' + section + '"]');
       if (waitingContainer) {
-        waitingContainer.innerHTML = UI.sectionHeader("Preparando a Central", "Primeiro validamos a sessão, as capacidades e as políticas disponíveis.") + (bootstrap && bootstrap.status === "error" ? UI.state({ type: bootstrap.error && bootstrap.error.code === "offline" ? "offline" : "unavailable", message: bootstrap.error && bootstrap.error.message }) : UI.state({ type: "loading", retry: false }));
+        waitingContainer.innerHTML = UI.sectionHeader(legendaCentral("legenda_ic_central_preparando"), legendaCentral("legenda_ic_central_validando_disponibilidade")) + (bootstrap && bootstrap.status === "error" ? UI.state({ type: bootstrap.error && bootstrap.error.code === "offline" ? "offline" : "unavailable", message: bootstrap.error && bootstrap.error.message }) : UI.state({ type: "loading", retry: false }));
       }
       return;
     }
     if (store.getState().bootstrap && store.getState().bootstrap.status === "ready" && !sectionEnabled(section)) {
       var disabledContainer = document.querySelector('[data-panel="' + section + '"]');
-      if (disabledContainer) disabledContainer.innerHTML = UI.sectionHeader("Recurso indisponível", "Esta área está desativada pela política operacional atual.") + UI.state({ type: "unavailable", title: "Área temporariamente desativada", message: "Os demais controles e o histórico permanecem preservados.", retry: false });
+      if (disabledContainer) disabledContainer.innerHTML = UI.sectionHeader(legendaCentral("legenda_ic_central_recurso_indisponivel"), legendaCentral("legenda_ic_central_area_desativada_politica")) + UI.state({ type: "unavailable", title: legendaCentral("legenda_ic_central_area_desativada"), message: legendaCentral("legenda_ic_central_demais_controles_preservados"), retry: false });
       return;
     }
     var screen = getScreen(section);
     if (screen) { screen.container = document.querySelector('[data-panel="' + section + '"]'); screen.container.innerHTML = screen.render(); screen.load(false); }
-    UI.announce("Aba " + section.replace(/-/g, " ") + " aberta.");
+    UI.announce(legendaCentral("legenda_ic_central_aba_aberta", { secao: section.replace(/-/g, " ") }));
   }
 
   function navigate(target, replace) {
@@ -150,15 +186,15 @@
     data = data || {};
     var capture = data.capture || data.captura || {};
     var captureNode = document.getElementById("icCaptureStatus");
-    if (captureNode) captureNode.innerHTML = '<span class="ic-status-dot ic-status-dot--' + Core.statusTone(capture.status || capture.estado || "neutral") + '"></span><span>' + Core.escapeHtml(capture.label || capture.rotulo || "Captura não informada") + '</span>';
+    if (captureNode) captureNode.innerHTML = '<span class="ic-status-dot ic-status-dot--' + Core.statusTone(capture.status || capture.estado || "neutral") + '"></span><span>' + Core.escapeHtml(capture.label || capture.rotulo || legendaCentral("legenda_ic_central_captura_nao_informada")) + '</span>';
     var globalSession = data.global_session || data.sessao_global || {};
     var sessionActive = globalSession.active === true || globalSession.ativa === true;
     if (captureNode) captureNode.hidden = !(globalSession.active || globalSession.ativa);
     var sessionDot = document.getElementById("icHeaderSessionDot");
     if (sessionDot) {
       sessionDot.classList.toggle("is-active", sessionActive);
-      sessionDot.setAttribute("aria-label", sessionActive ? "Sessão ativa" : "Nenhuma sessão ativa");
-      sessionDot.title = sessionActive ? "Sessão ativa" : "Nenhuma sessão ativa";
+      sessionDot.setAttribute("aria-label", sessionActive ? legendaCentral("legenda_ic_central_sessao_ativa") : legendaCentral("legenda_ic_central_sem_sessao"));
+      sessionDot.title = sessionActive ? legendaCentral("legenda_ic_central_sessao_ativa") : legendaCentral("legenda_ic_central_sem_sessao");
     }
     var statusStrip = document.getElementById("icStatusStrip");
     if (statusStrip) statusStrip.hidden = !sessionActive;
@@ -166,7 +202,7 @@
     if (header) header.classList.toggle("has-active-session", sessionActive);
     var updated = document.getElementById("icLastUpdated");
     var updatedAt = data.updated_at || data.atualizado_em || data.generated_at;
-    if (updated) updated.textContent = updatedAt ? "Atualizado " + Core.formatDateTime(updatedAt, { hour: "2-digit", minute: "2-digit" }) : "";
+    if (updated) updated.textContent = updatedAt ? legendaCentral("legenda_ic_central_atualizado") + Core.formatDateTime(updatedAt, { hour: "2-digit", minute: "2-digit" }) : "";
     var notifications = data.notifications || data.notificacoes || {};
     var dot = document.getElementById("icNotificationDot");
     if (dot) dot.hidden = !(Number(notifications.unread || notifications.nao_lidas || 0) > 0);
@@ -230,7 +266,7 @@
       pullRefreshActive = true;
       setPullRefreshState(1, true);
       Promise.resolve(refreshCurrent(true)).catch(function (error) {
-        UI.toast(error && error.message || "Não foi possível atualizar as informações.", true);
+        UI.toast(error && error.message || legendaCentral("legenda_ic_central_falha_atualizacao"), true);
       }).finally(function () {
         root.setTimeout(function () {
           pullRefreshActive = false;
@@ -251,11 +287,11 @@
     var html = items.length ? '<div class="ic-list">' + items.map(function (item) {
       var effectiveSource = item.effective_source || item.fonte_efetiva;
       var isHistoricalPattern = !!(item.id_assinatura_estatistica || item.statistical_subscription_id || item.codigo_hipotese || item.hypothesis_code);
-      var sourceLabel = effectiveSource === "pessoal" ? "Origem efetiva: seu histórico" : effectiveSource === "comunidade" ? "Origem efetiva: comunidade elegível" : effectiveSource === "ambos" ? "Origem efetiva: seu histórico e comunidade elegível" : isHistoricalPattern ? "Origem efetiva indisponível" : "";
+      var sourceLabel = effectiveSource === "pessoal" ? legendaCentral("legenda_ic_central_origem_historico") : effectiveSource === "comunidade" ? legendaCentral("legenda_ic_central_origem_comunidade") : effectiveSource === "ambos" ? legendaCentral("legenda_ic_central_origem_ambos") : isHistoricalPattern ? legendaCentral("legenda_ic_central_origem_indisponivel") : "";
       var detail = [item.message || item.mensagem || "", sourceLabel].filter(Boolean).join(" · ");
-      return UI.listRow(item.title || item.titulo || "Notificação", detail, item.created_at || item.criado_em ? Core.formatDateTime(item.created_at || item.criado_em) : "");
-    }).join("") + '</div>' : UI.state({ type: "empty", title: "Nenhuma notificação", message: "Lembretes, alertas de controle e atualizações aparecerão aqui.", retry: false });
-    UI.openSheet({ eyebrow: "Central de controle", title: "Notificações", html: html });
+      return UI.listRow(item.title || item.titulo || legendaCentral("legenda_ic_central_notificacao"), detail, item.created_at || item.criado_em ? Core.formatDateTime(item.created_at || item.criado_em) : "");
+    }).join("") + '</div>' : UI.state({ type: "empty", title: legendaCentral("legenda_ic_central_sem_notificacoes"), message: legendaCentral("legenda_ic_central_notificacoes_descricao"), retry: false });
+    UI.openSheet({ eyebrow: legendaCentral("legenda_ic_central_central_controle"), title: legendaCentral("legenda_ic_central_notificacoes"), html: html });
   }
 
   function activeScreen() { return screens[route.section] || getScreen(route.section); }
@@ -271,7 +307,7 @@
         event.preventDefault();
         if (globalAction.dataset.globalAction === "close") Bridge.close(route.loadGeneration);
         if (globalAction.dataset.globalAction === "notifications") notificationSheet();
-        if (globalAction.dataset.globalAction === "sections") UI.openSheet({ title: "Explorar a Central", html: '<div class="ic-quick-actions">' + [["historico", "Meu histórico", "history"], ["jogos", "Jogos e passaportes", "game"], ["comunidade", "Comunidade", "community"], ["regras-pausas", "Regras e pausas", "shield"], ["coach", "Tiger Coach", "coach"], ["configuracoes", "Meus alertas e configurações", "bell"]].filter(function (item) { return sectionEnabled(item[0]); }).map(function (item) { return UI.button(item[1], { route: item[0], icon: item[2] }); }).join("") + '</div>' });
+        if (globalAction.dataset.globalAction === "sections") UI.openSheet({ title: legendaCentral("legenda_ic_central_explorar_central"), html: '<div class="ic-quick-actions">' + [["historico", legendaCentral("legenda_ic_central_meu_historico"), "history"], ["jogos", legendaCentral("legenda_ic_central_jogos_passaportes"), "game"], ["comunidade", legendaCentral("legenda_ic_central_comunidade"), "community"], ["regras-pausas", legendaCentral("legenda_ic_central_regras_pausas"), "shield"], ["coach", "Tiger Coach", "coach"], ["configuracoes", legendaCentral("legenda_ic_central_alertas_configuracoes"), "bell"]].filter(function (item) { return sectionEnabled(item[0]); }).map(function (item) { return UI.button(item[1], { route: item[0], icon: item[2] }); }).join("") + '</div>' });
         return;
       }
       var actionNode = event.target.closest("[data-screen-action]");
@@ -301,6 +337,15 @@
       tabs[index].focus();
     });
 
+    root.addEventListener("turbotiger:idioma", function () {
+      if (!root.TurboTigerLegendas || !hasAuthorizedSession()) return;
+      Object.keys(screens).forEach(function (section) {
+        var container = document.querySelector('[data-panel="' + section + '"]');
+        if (container) root.TurboTigerLegendas.atualizarApresentacao(container, screens[section].render());
+      });
+      var bootstrap = store.getState().bootstrap;
+      if (bootstrap) renderHeader(bootstrap.data || {});
+    });
     root.addEventListener("popstate", function () { route = router.parse(root.location.search); activateSection(route.section, false); });
     root.addEventListener("online", function () { store.set({ online: true }); refreshCurrent(true); });
     root.addEventListener("offline", function () { store.set({ online: false }); rerender(route.section); });

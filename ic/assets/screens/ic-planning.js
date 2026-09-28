@@ -3,6 +3,124 @@
   var IC = root.TurboTigerIC;
   IC.Screens = IC.Screens || {};
 
+  var fontesLegendasPlanejamento = {
+    "legenda_ic_planejamento_15_minutos": "15 minutos",
+    "legenda_ic_planejamento_30_minutos": "30 minutos",
+    "legenda_ic_planejamento_45_minutos": "45 minutos",
+    "legenda_ic_planejamento_60_minutos": "60 minutos",
+    "legenda_ic_planejamento_90_minutos": "90 minutos",
+    "legenda_ic_planejamento_reagendando_sessao_planejada": "Reagendando Sessão Planejada",
+    "legenda_ic_planejamento_confirme_novamente_data_duracao_limite_e_lembrete_a_alteracao_cria_nova_revisao_auditavel": "Confirme novamente data, duração, limite e lembrete. A alteração cria nova revisão auditável.",
+    "legenda_ic_planejamento_contexto_historico_carregado": "Contexto histórico carregado",
+    "legenda_ic_planejamento_a_faixa_e_o_contexto_foram_preenchidos_data_duracao_limite_e_lembrete_continuam_exigindo_sua_co": "A faixa e o contexto foram preenchidos. Data, duração, limite e lembrete continuam exigindo sua confirmação.",
+    "legenda_ic_planejamento_salvando": "Salvando…",
+    "legenda_ic_planejamento_salvar_reagendamento": "Salvar reagendamento",
+    "legenda_ic_planejamento_criar_sessao_planejada": "Criar Sessão Planejada",
+    "legenda_ic_planejamento_cancelar_edicao": "Cancelar edição",
+    "legenda_ic_planejamento_defina_seu_compromisso": "Defina seu compromisso",
+    "legenda_ic_planejamento_data": "Data *",
+    "legenda_ic_planejamento_horario": "Horário *",
+    "legenda_ic_planejamento_duracao_maxima": "Duração máxima *",
+    "legenda_ic_planejamento_selecione": "Selecione",
+    "legenda_ic_planejamento_limite_maximo_de_perda": "Limite máximo de perda *",
+    "legenda_ic_planejamento_valor_na_moeda_selecionada": "Valor na moeda selecionada",
+    "legenda_ic_planejamento_moeda": "Moeda *",
+    "legenda_ic_planejamento_selecione_a_moeda": "Selecione a moeda",
+    "legenda_ic_planejamento_revise_os_campos_obrigatorios_destacados_antes_de_continuar": "Revise os campos obrigatórios destacados antes de continuar.",
+    "legenda_ic_planejamento_abrir_o_lembrete_nao_inicia_a_sessao_somente_o_botao_iniciar_sessao_ativa_o_controle": "Abrir o lembrete não inicia a sessão. Somente o botão “Iniciar sessão” ativa o controle.",
+    "legenda_ic_planejamento_no_horario": "No horário",
+    "legenda_ic_planejamento_5_min_antes": "5 min antes",
+    "legenda_ic_planejamento_10_min_antes": "10 min antes",
+    "legenda_ic_planejamento_15_min_antes": "15 min antes",
+    "legenda_ic_planejamento_30_min_antes": "30 min antes",
+    "legenda_ic_planejamento_momento_do_lembrete": "Momento do lembrete *",
+    "legenda_ic_planejamento_toda_sessao_planejada_possui_lembrete_automatico_o_canal_pode_ser_local_remoto_ou_hibrido": "Toda Sessão Planejada possui lembrete automático. O canal pode ser local, remoto ou híbrido.",
+    "legenda_ic_planejamento_segunda": "Segunda",
+    "legenda_ic_planejamento_terca": "Terça",
+    "legenda_ic_planejamento_quarta": "Quarta",
+    "legenda_ic_planejamento_quinta": "Quinta",
+    "legenda_ic_planejamento_sexta": "Sexta",
+    "legenda_ic_planejamento_sabado": "Sábado",
+    "legenda_ic_planejamento_domingo": "Domingo",
+    "legenda_ic_planejamento_contexto_e_recorrencia": "Contexto e recorrência",
+    "legenda_ic_planejamento_bet": "Bet",
+    "legenda_ic_planejamento_conta": "Conta",
+    "legenda_ic_planejamento_jogo": "Jogo",
+    "legenda_ic_planejamento_modo": "Modo",
+    "legenda_ic_planejamento_orientativo": "Orientativo",
+    "legenda_ic_planejamento_firme": "Firme",
+    "legenda_ic_planejamento_recorrencia": "Recorrência",
+    "legenda_ic_planejamento_uma_ocorrencia": "Uma ocorrência",
+    "legenda_ic_planejamento_semanal": "Semanal",
+    "legenda_ic_planejamento_ordinal_mensal": "Ordinal mensal",
+    "legenda_ic_planejamento_personalizada": "Personalizada",
+    "legenda_ic_planejamento_fuso_do_compromisso": "Fuso do compromisso",
+    "legenda_ic_planejamento_dia_da_semana_semanal_mensal": "Dia da semana (semanal/mensal)",
+    "legenda_ic_planejamento_ocorrencia_no_mes": "Ocorrência no mês",
+    "legenda_ic_planejamento_primeira": "Primeira",
+    "legenda_ic_planejamento_terceira": "Terceira",
+    "legenda_ic_planejamento_ultima": "Última",
+    "legenda_ic_planejamento_personalizada_a_cada_quantas_semanas": "Personalizada: a cada quantas semanas",
+    "legenda_ic_planejamento_personalizada_dias_da_semana": "Personalizada: dias da semana",
+    "legenda_ic_planejamento_encerrar_recorrencia_em_opcional": "Encerrar recorrência em (opcional)",
+    "legenda_ic_planejamento_revisao_periodica": "Revisão periódica",
+    "legenda_ic_planejamento_nao_definida": "Não definida",
+    "legenda_ic_planejamento_mensal": "Mensal",
+    "legenda_ic_planejamento_trimestral": "Trimestral",
+    "legenda_ic_planejamento_mensagem_pessoal": "Mensagem pessoal",
+    "legenda_ic_planejamento_nenhuma_sessao_planejada": "Nenhuma sessão planejada",
+    "legenda_ic_planejamento_seus_proximos_compromissos_e_planos_concluidos_aparecerao_aqui": "Seus próximos compromissos e planos concluídos aparecerão aqui.",
+    "legenda_ic_planejamento_abrir": "Abrir",
+    "legenda_ic_planejamento_no_horario_2": "no horário",
+    "legenda_ic_planejamento_obrigatorio": "obrigatório",
+    "legenda_ic_planejamento_min_antes": " min antes",
+    "legenda_ic_planejamento_compromissos_recorrentes": "Compromissos recorrentes",
+    "legenda_ic_planejamento_sessao_recorrente": "Sessão recorrente",
+    "legenda_ic_planejamento_proxima": " · próxima: ",
+    "legenda_ic_planejamento_editar_serie": "Editar série",
+    "legenda_ic_planejamento_retomar_serie": "Retomar série",
+    "legenda_ic_planejamento_pausar_serie": "Pausar série",
+    "legenda_ic_planejamento_cancelar_proximas": "Cancelar próximas",
+    "legenda_ic_planejamento_planejar": "Planejar",
+    "legenda_ic_planejamento_defina_antes_quanto_tempo_e_quanto_esta_disposto_a_perder_o_aplicativo_informa_voce_decide": "Defina antes quanto tempo e quanto está disposto a perder. O aplicativo informa; você decide.",
+    "legenda_ic_planejamento_seus_planos": "Seus planos",
+    "legenda_ic_planejamento_proximos_concluidos_cancelados_e_expirados": "Próximos, concluídos, cancelados e expirados.",
+    "legenda_ic_planejamento_revise_os_dias_e_a_frequencia_da_recorrencia": "Revise os dias e a frequência da recorrência.",
+    "legenda_ic_planejamento_a_moeda_precisa_estar_disponivel_no_catalogo_validado": "A moeda precisa estar disponível no catálogo validado.",
+    "legenda_ic_planejamento_revise_os_campos_obrigatorios_antes_de_continuar": "Revise os campos obrigatórios antes de continuar.",
+    "legenda_ic_planejamento_revise_os_campos_obrigatorios_da_sessao_planejada": "Revise os campos obrigatórios da Sessão Planejada.",
+    "legenda_ic_planejamento_nao_foi_possivel_validar_a_revisao_atual_deste_planejamento": "Não foi possível validar a revisão atual deste planejamento.",
+    "legenda_ic_planejamento_nao_foi_possivel_gerar_uma_identificacao_segura_para_o_planejamento": "Não foi possível gerar uma identificação segura para o planejamento.",
+    "legenda_ic_planejamento_sessao_planejada_reagendada_com_novo_lembrete_automatico": "Sessão Planejada reagendada com novo lembrete automático.",
+    "legenda_ic_planejamento_sessao_planejada_criada_com_lembrete_automatico": "Sessão Planejada criada com lembrete automático.",
+    "legenda_ic_planejamento_nao_foi_possivel_salvar_a_sessao_planejada": "Não foi possível salvar a Sessão Planejada.",
+    "legenda_ic_planejamento_compromisso_recorrente": "Compromisso recorrente",
+    "legenda_ic_planejamento_cancelar_proximas_ocorrencias": "Cancelar próximas ocorrências?",
+    "legenda_ic_planejamento_pausar_recorrencia": "Pausar recorrência?",
+    "legenda_ic_planejamento_retomar_recorrencia": "Retomar recorrência?",
+    "legenda_ic_planejamento_os_fatos_ja_registrados_serao_preservados": "Os fatos já registrados serão preservados",
+    "legenda_ic_planejamento_a_alteracao_afeta_somente_os_proximos_compromissos_e_seus_lembretes": "A alteração afeta somente os próximos compromissos e seus lembretes.",
+    "legenda_ic_planejamento_confirmar": "Confirmar",
+    "legenda_ic_planejamento_nao_foi_possivel_alterar_a_recorrencia": "Não foi possível alterar a recorrência.",
+    "legenda_ic_planejamento_abrir_nao_inicia_a_sessao": "Abrir não inicia a sessão",
+    "legenda_ic_planejamento_revise_o_compromisso_e_toque_em_iniciar_sessao_somente_quando_decidir_comecar": "Revise o compromisso e toque em Iniciar sessão somente quando decidir começar.",
+    "legenda_ic_planejamento_inicio": "Início",
+    "legenda_ic_planejamento_duracao": "Duração",
+    "legenda_ic_planejamento_min": " min",
+    "legenda_ic_planejamento_limite": "Limite",
+    "legenda_ic_planejamento_iniciar_sessao": "Iniciar sessão",
+    "legenda_ic_planejamento_reagendar": "Reagendar",
+    "legenda_ic_planejamento_cancelar": "Cancelar",
+    "legenda_ic_planejamento_sessao_planejada": "Sessão Planejada",
+    "legenda_ic_planejamento_detalhes_do_plano": "Detalhes do plano",
+    "legenda_ic_planejamento_o_servidor_nao_confirmou_uma_sessao_ativa_atualize_o_planejamento": "O servidor não confirmou uma sessão ativa. Atualize o planejamento.",
+    "legenda_ic_planejamento_sessao_de_controle_iniciada": "Sessão de controle iniciada.",
+    "legenda_ic_planejamento_sessao_planejada_cancelada": "Sessão Planejada cancelada.",
+    "legenda_ic_planejamento_a_operacao_nao_foi_concluida": "A operação não foi concluída."
+  };
+  if (root.TurboTigerLegendas) root.TurboTigerLegendas.registrar(fontesLegendasPlanejamento);
+  function legendaPlanejamento(chave) { return root.TurboTigerLegendas ? root.TurboTigerLegendas.texto(chave) : fontesLegendasPlanejamento[chave]; }
+
   IC.Screens.planejar = function (deps) {
     var Core = IC.Core, UI = IC.UI;
     var state = { status: "idle", data: null, series: [], error: null, saving: false, errors: {}, editingPlan: null, editingSeries: null, pendingCreate: null };
@@ -50,34 +168,34 @@
       var offset = draft.reminder_offset_minutes;
       if (offset === null || typeof offset === "undefined") offset = draft.lembrete_antecedencia_minutos;
       if (offset === null || typeof offset === "undefined") offset = 10;
-      var durations = [[15, "15 minutos"], [30, "30 minutos"], [45, "45 minutos"], [60, "60 minutos"], [90, "90 minutos"]];
-      var contextBanner = editing ? UI.banner("Reagendando Sessão Planejada", "Confirme novamente data, duração, limite e lembrete. A alteração cria nova revisão auditável.", "attention") : Object.keys(historicalDraft).length ? UI.banner("Contexto histórico carregado", "A faixa e o contexto foram preenchidos. Data, duração, limite e lembrete continuam exigindo sua confirmação.", "neutral") : "";
-      var actions = UI.button(state.saving ? "Salvando…" : editing ? "Salvar reagendamento" : "Criar Sessão Planejada", { type: "submit", kind: "primary", block: true, disabled: state.saving });
-      if (editing) actions += UI.button("Cancelar edição", { action: "cancel-reschedule", kind: "quiet", disabled: state.saving });
-      return '<form class="ic-form" id="icPlanningForm" novalidate>' + contextBanner + '<div class="ic-form-section"><h3>Defina seu compromisso</h3><div class="ic-form-grid"><div class="ic-field"><label for="ic-plan-date">Data *</label><input id="ic-plan-date" name="date" type="date" min="' + today + '" value="' + Core.escapeHtml(draftDate) + '" required></div><div class="ic-field"><label for="ic-plan-time">Horário *</label><input id="ic-plan-time" name="time" type="time" value="' + Core.escapeHtml(draftTime) + '" required></div><div class="ic-field"><label for="ic-plan-duration">Duração máxima *</label><select id="ic-plan-duration" name="duration_minutes" required><option value="">Selecione</option>' + durations.map(function (item) { return '<option value="' + item[0] + '"' + selected(duration, item[0]) + '>' + item[1] + '</option>'; }).join("") + '</select></div><div class="ic-field"><label for="ic-plan-limit">Limite máximo de perda *</label><input id="ic-plan-limit" name="loss_limit" inputmode="decimal" placeholder="Valor na moeda selecionada" value="' + Core.escapeHtml(loss) + '" required></div><div class="ic-field"><label for="ic-plan-currency">Moeda *</label><select id="ic-plan-currency" name="currency" required>' + Core.currencyOptions(currencyContext(), draft.currency || draft.moeda || "", "Selecione a moeda") + '</select></div></div></div>' + reminderHtml(offset) + optionalHtml(draft) + (Object.keys(state.errors).length ? '<p class="ic-form-error" role="alert">Revise os campos obrigatórios destacados antes de continuar.</p>' : '') + '<div class="ic-page-stack">' + actions + '</div><p class="ic-required-note">Abrir o lembrete não inicia a sessão. Somente o botão “Iniciar sessão” ativa o controle.</p></form>';
+      var durations = [[15, legendaPlanejamento("legenda_ic_planejamento_15_minutos")], [30, legendaPlanejamento("legenda_ic_planejamento_30_minutos")], [45, legendaPlanejamento("legenda_ic_planejamento_45_minutos")], [60, legendaPlanejamento("legenda_ic_planejamento_60_minutos")], [90, legendaPlanejamento("legenda_ic_planejamento_90_minutos")]];
+      var contextBanner = editing ? UI.banner(legendaPlanejamento("legenda_ic_planejamento_reagendando_sessao_planejada"), legendaPlanejamento("legenda_ic_planejamento_confirme_novamente_data_duracao_limite_e_lembrete_a_alteracao_cria_nova_revisao_auditavel"), "attention") : Object.keys(historicalDraft).length ? UI.banner(legendaPlanejamento("legenda_ic_planejamento_contexto_historico_carregado"), legendaPlanejamento("legenda_ic_planejamento_a_faixa_e_o_contexto_foram_preenchidos_data_duracao_limite_e_lembrete_continuam_exigindo_sua_co"), "neutral") : "";
+      var actions = UI.button(state.saving ? legendaPlanejamento("legenda_ic_planejamento_salvando") : editing ? legendaPlanejamento("legenda_ic_planejamento_salvar_reagendamento") : legendaPlanejamento("legenda_ic_planejamento_criar_sessao_planejada"), { type: "submit", kind: "primary", block: true, disabled: state.saving });
+      if (editing) actions += UI.button(legendaPlanejamento("legenda_ic_planejamento_cancelar_edicao"), { action: "cancel-reschedule", kind: "quiet", disabled: state.saving });
+      return '<form class="ic-form" id="icPlanningForm" novalidate>' + contextBanner + ('<div class="ic-form-section"><h3>' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_defina_seu_compromisso")) + '</h3><div class="ic-form-grid"><div class="ic-field"><label for="ic-plan-date">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_data")) + '</label><input id="ic-plan-date" name="date" type="date" min="') + today + '" value="' + Core.escapeHtml(draftDate) + ('" required></div><div class="ic-field"><label for="ic-plan-time">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_horario")) + '</label><input id="ic-plan-time" name="time" type="time" value="') + Core.escapeHtml(draftTime) + ('" required></div><div class="ic-field"><label for="ic-plan-duration">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_duracao_maxima")) + '</label><select id="ic-plan-duration" name="duration_minutes" required><option value="">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_selecione")) + '</option>') + durations.map(function (item) { return '<option value="' + item[0] + '"' + selected(duration, item[0]) + '>' + Core.escapeHtml(item[1]) + '</option>'; }).join("") + ('</select></div><div class="ic-field"><label for="ic-plan-limit">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_limite_maximo_de_perda")) + '</label><input id="ic-plan-limit" name="loss_limit" inputmode="decimal" placeholder="' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_valor_na_moeda_selecionada")) + "\" value=\"") + Core.escapeHtml(loss) + ('" required></div><div class="ic-field"><label for="ic-plan-currency">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_moeda")) + '</label><select id="ic-plan-currency" name="currency" required>') + Core.currencyOptions(currencyContext(), draft.currency || draft.moeda || "", legendaPlanejamento("legenda_ic_planejamento_selecione_a_moeda")) + '</select></div></div></div>' + reminderHtml(offset) + optionalHtml(draft) + (Object.keys(state.errors).length ? ('<p class="ic-form-error" role="alert">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_revise_os_campos_obrigatorios_destacados_antes_de_continuar")) + '</p>') : '') + '<div class="ic-page-stack">' + actions + ('</div><p class="ic-required-note">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_abrir_o_lembrete_nao_inicia_a_sessao_somente_o_botao_iniciar_sessao_ativa_o_controle")) + '</p></form>');
     }
 
     function reminderHtml(selectedOffset) {
-      var offsets = [{ v: 0, l: "No horário" }, { v: 5, l: "5 min antes" }, { v: 10, l: "10 min antes" }, { v: 15, l: "15 min antes" }, { v: 30, l: "30 min antes" }];
-      return '<div class="ic-form-section"><fieldset class="ic-fieldset"><legend>Momento do lembrete *</legend><div class="ic-choice-grid">' + offsets.map(function (item) { return '<div class="ic-choice"><input type="radio" id="ic-reminder-' + item.v + '" name="reminder_offset_minutes" value="' + item.v + '"' + (Number(selectedOffset) === item.v ? " checked" : "") + ' required><label for="ic-reminder-' + item.v + '">' + item.l + '</label></div>'; }).join("") + '</div><p class="ic-required-note">Toda Sessão Planejada possui lembrete automático. O canal pode ser local, remoto ou híbrido.</p></fieldset></div>';
+      var offsets = [{ v: 0, l: legendaPlanejamento("legenda_ic_planejamento_no_horario") }, { v: 5, l: legendaPlanejamento("legenda_ic_planejamento_5_min_antes") }, { v: 10, l: legendaPlanejamento("legenda_ic_planejamento_10_min_antes") }, { v: 15, l: legendaPlanejamento("legenda_ic_planejamento_15_min_antes") }, { v: 30, l: legendaPlanejamento("legenda_ic_planejamento_30_min_antes") }];
+      return ('<div class="ic-form-section"><fieldset class="ic-fieldset"><legend>' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_momento_do_lembrete")) + '</legend><div class="ic-choice-grid">') + offsets.map(function (item) { return '<div class="ic-choice"><input type="radio" id="ic-reminder-' + item.v + '" name="reminder_offset_minutes" value="' + item.v + '"' + (Number(selectedOffset) === item.v ? " checked" : "") + ' required><label for="ic-reminder-' + item.v + '">' + Core.escapeHtml(item.l) + '</label></div>'; }).join("") + ('</div><p class="ic-required-note">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_toda_sessao_planejada_possui_lembrete_automatico_o_canal_pode_ser_local_remoto_ou_hibrido")) + '</p></fieldset></div>');
     }
 
     function optionalHtml(draft) {
       draft = draft || {};
-      var days = [[1, "Segunda"], [2, "Terça"], [3, "Quarta"], [4, "Quinta"], [5, "Sexta"], [6, "Sábado"], [7, "Domingo"]];
-      return '<details class="ic-form-section"' + (Object.keys(draft).length ? " open" : "") + '><summary>Contexto e recorrência</summary><div class="ic-form-grid">' + ["bet", "account", "game"].map(function (name, index) { return '<div class="ic-field"><label for="ic-plan-' + name + '">' + ["Bet", "Conta", "Jogo"][index] + '</label><input id="ic-plan-' + name + '" name="' + name + '" maxlength="100" value="' + Core.escapeHtml(draft[name] || draft[name + "_reference"] || "") + '"></div>'; }).join("") +
-        '<div class="ic-field"><label for="ic-plan-mode">Modo</label><select id="ic-plan-mode" name="mode"><option value="orientativo">Orientativo</option><option value="firme">Firme</option></select></div><div class="ic-field"><label for="ic-plan-recurrence">Recorrência</label><select id="ic-plan-recurrence" name="recurrence"><option value="none">Uma ocorrência</option><option value="weekly">Semanal</option><option value="monthly_ordinal">Ordinal mensal</option><option value="custom">Personalizada</option></select></div><div class="ic-field"><label for="ic-plan-timezone">Fuso do compromisso</label><input id="ic-plan-timezone" name="timezone" value="' + Core.escapeHtml(draft.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone) + '" required></div>' +
-        '<div class="ic-field"><label for="ic-plan-weekday">Dia da semana (semanal/mensal)</label><select id="ic-plan-weekday" name="recurrence_weekday"><option value="">Selecione</option>' + days.map(function (day) { return '<option value="' + day[0] + '">' + day[1] + '</option>'; }).join("") + '</select></div><div class="ic-field"><label for="ic-plan-ordinal">Ocorrência no mês</label><select id="ic-plan-ordinal" name="recurrence_ordinal"><option value="">Selecione</option><option value="1">Primeira</option><option value="2">Segunda</option><option value="3">Terceira</option><option value="4">Quarta</option><option value="5">Quinta</option><option value="-1">Última</option></select></div><div class="ic-field"><label for="ic-plan-interval">Personalizada: a cada quantas semanas</label><input id="ic-plan-interval" name="interval_weeks" type="number" min="1" max="52" value="1"></div><fieldset class="ic-fieldset"><legend>Personalizada: dias da semana</legend>' + days.map(function (day) { return '<label><input type="checkbox" name="weekdays" value="' + day[0] + '"> ' + day[1] + '</label>'; }).join("") + '</fieldset><div class="ic-field"><label for="ic-plan-until">Encerrar recorrência em (opcional)</label><input id="ic-plan-until" name="until" type="date"></div><div class="ic-field"><label for="ic-plan-review">Revisão periódica</label><select id="ic-plan-review" name="review"><option value="none">Não definida</option><option value="monthly">Mensal</option><option value="quarterly">Trimestral</option></select></div></div><div class="ic-field"><label for="ic-plan-message">Mensagem pessoal</label><textarea id="ic-plan-message" name="personal_message" maxlength="500"></textarea></div></details>';
+      var days = [[1, legendaPlanejamento("legenda_ic_planejamento_segunda")], [2, legendaPlanejamento("legenda_ic_planejamento_terca")], [3, legendaPlanejamento("legenda_ic_planejamento_quarta")], [4, legendaPlanejamento("legenda_ic_planejamento_quinta")], [5, legendaPlanejamento("legenda_ic_planejamento_sexta")], [6, legendaPlanejamento("legenda_ic_planejamento_sabado")], [7, legendaPlanejamento("legenda_ic_planejamento_domingo")]];
+      return '<details class="ic-form-section"' + (Object.keys(draft).length ? " open" : "") + ('><summary>' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_contexto_e_recorrencia")) + '</summary><div class="ic-form-grid">') + ["bet", "account", "game"].map(function (name, index) { return '<div class="ic-field"><label for="ic-plan-' + name + '">' + Core.escapeHtml([legendaPlanejamento("legenda_ic_planejamento_bet"), legendaPlanejamento("legenda_ic_planejamento_conta"), legendaPlanejamento("legenda_ic_planejamento_jogo")][index]) + '</label><input id="ic-plan-' + name + '" name="' + name + '" maxlength="100" value="' + Core.escapeHtml(draft[name] || draft[name + "_reference"] || "") + '"></div>'; }).join("") +
+        ('<div class="ic-field"><label for="ic-plan-mode">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_modo")) + '</label><select id="ic-plan-mode" name="mode"><option value="orientativo">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_orientativo")) + '</option><option value="firme">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_firme")) + '</option></select></div><div class="ic-field"><label for="ic-plan-recurrence">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_recorrencia")) + '</label><select id="ic-plan-recurrence" name="recurrence"><option value="none">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_uma_ocorrencia")) + '</option><option value="weekly">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_semanal")) + '</option><option value="monthly_ordinal">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_ordinal_mensal")) + '</option><option value="custom">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_personalizada")) + '</option></select></div><div class="ic-field"><label for="ic-plan-timezone">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_fuso_do_compromisso")) + '</label><input id="ic-plan-timezone" name="timezone" value="') + Core.escapeHtml(draft.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone) + '" required></div>' +
+        ('<div class="ic-field"><label for="ic-plan-weekday">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_dia_da_semana_semanal_mensal")) + '</label><select id="ic-plan-weekday" name="recurrence_weekday"><option value="">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_selecione")) + '</option>') + days.map(function (day) { return '<option value="' + day[0] + '">' + Core.escapeHtml(day[1]) + '</option>'; }).join("") + ('</select></div><div class="ic-field"><label for="ic-plan-ordinal">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_ocorrencia_no_mes")) + '</label><select id="ic-plan-ordinal" name="recurrence_ordinal"><option value="">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_selecione")) + '</option><option value="1">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_primeira")) + '</option><option value="2">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_segunda")) + '</option><option value="3">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_terceira")) + '</option><option value="4">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_quarta")) + '</option><option value="5">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_quinta")) + '</option><option value="-1">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_ultima")) + '</option></select></div><div class="ic-field"><label for="ic-plan-interval">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_personalizada_a_cada_quantas_semanas")) + '</label><input id="ic-plan-interval" name="interval_weeks" type="number" min="1" max="52" value="1"></div><fieldset class="ic-fieldset"><legend>' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_personalizada_dias_da_semana")) + '</legend>') + days.map(function (day) { return '<label><input type="checkbox" name="weekdays" value="' + day[0] + '"> ' + Core.escapeHtml(day[1]) + '</label>'; }).join("") + ('</fieldset><div class="ic-field"><label for="ic-plan-until">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_encerrar_recorrencia_em_opcional")) + '</label><input id="ic-plan-until" name="until" type="date"></div><div class="ic-field"><label for="ic-plan-review">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_revisao_periodica")) + '</label><select id="ic-plan-review" name="review"><option value="none">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_nao_definida")) + '</option><option value="monthly">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_mensal")) + '</option><option value="quarterly">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_trimestral")) + '</option></select></div></div><div class="ic-field"><label for="ic-plan-message">' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_mensagem_pessoal")) + '</label><textarea id="ic-plan-message" name="personal_message" maxlength="500"></textarea></div></details>');
     }
 
     function plansHtml() {
       var data = state.data || {};
       var plans = Core.normalizeArray(data.items || data.itens || data.plans || data.planos);
-      if (!plans.length) return UI.state({ type: "empty", title: "Nenhuma sessão planejada", message: "Seus próximos compromissos e planos concluídos aparecerão aqui.", retry: false });
+      if (!plans.length) return UI.state({ type: "empty", title: legendaPlanejamento("legenda_ic_planejamento_nenhuma_sessao_planejada"), message: legendaPlanejamento("legenda_ic_planejamento_seus_proximos_compromissos_e_planos_concluidos_aparecerao_aqui"), retry: false });
       return '<div class="ic-list">' + plans.map(function (plan) {
         var when = Core.formatDateTime(plan.starts_at || plan.inicio_em);
         var limit = Core.formatMoney(Core.unitsFrom(plan, ["loss_limit_units_text", "limite_perda_unidades_texto", "loss_limit_units", "limite_perda_unidades"], null), plan.currency || plan.moeda || "", Core.decimalPlacesOf(plan, null));
-        var actions = UI.button("Abrir", { action: "open-plan", value: planIdentifier(plan), kind: "quiet" });
+        var actions = UI.button(legendaPlanejamento("legenda_ic_planejamento_abrir"), { action: "open-plan", value: planIdentifier(plan), kind: "quiet" });
         var reminderOffset = plan.reminder_offset_minutes;
         if (reminderOffset === null || typeof reminderOffset === "undefined") reminderOffset = plan.lembrete_antecedencia_minutos;
         return UI.listRow(plan.title || plan.titulo || when, (plan.status || "agendada") + " · " + (plan.duration_minutes || plan.duracao_minutos || "—") + " min · lembrete " + reminderLabel(reminderOffset), limit, actions);
@@ -85,20 +203,20 @@
     }
 
     function planIdentifier(plan) { return plan && (plan.id || plan.plan_id || plan.id_planejamento || plan.cod_sessao_planejada); }
-    function reminderLabel(offset) { var value = Core.validReminderOffset(offset); return value === 0 ? "no horário" : value === null ? "obrigatório" : value + " min antes"; }
+    function reminderLabel(offset) { var value = Core.validReminderOffset(offset); return value === 0 ? legendaPlanejamento("legenda_ic_planejamento_no_horario_2") : value === null ? legendaPlanejamento("legenda_ic_planejamento_obrigatorio") : value + legendaPlanejamento("legenda_ic_planejamento_min_antes"); }
     function seriesHtml() {
       if (!state.series.length) return "";
-      return '<section class="ic-page-stack"><h3>Compromissos recorrentes</h3>' + state.series.map(function (series) {
+      return ('<section class="ic-page-stack"><h3>' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_compromissos_recorrentes")) + '</h3>') + state.series.map(function (series) {
         var paused = series.status === "pausada", cancelled = series.status === "cancelada";
-        return '<article class="ic-card"><h4>' + Core.escapeHtml(series.title || "Sessão recorrente") + '</h4><p>' + Core.escapeHtml(series.status) + ' · próxima: ' + Core.escapeHtml(Core.formatDateTime(series.next_occurrence_at)) + '</p><div class="ic-card__footer">' + (cancelled ? "" : UI.button("Editar série", { action: "edit-series", value: series.series_id }) + UI.button(paused ? "Retomar série" : "Pausar série", { action: paused ? "resume-series" : "pause-series", value: series.series_id }) + UI.button("Cancelar próximas", { action: "cancel-series", value: series.series_id, kind: "danger" })) + '</div></article>';
+        return '<article class="ic-card"><h4>' + Core.escapeHtml(series.title || legendaPlanejamento("legenda_ic_planejamento_sessao_recorrente")) + '</h4><p>' + Core.escapeHtml(series.status) + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_proxima")) + Core.escapeHtml(Core.formatDateTime(series.next_occurrence_at)) + '</p><div class="ic-card__footer">' + (cancelled ? "" : UI.button(legendaPlanejamento("legenda_ic_planejamento_editar_serie"), { action: "edit-series", value: series.series_id }) + UI.button(paused ? legendaPlanejamento("legenda_ic_planejamento_retomar_serie") : legendaPlanejamento("legenda_ic_planejamento_pausar_serie"), { action: paused ? "resume-series" : "pause-series", value: series.series_id }) + UI.button(legendaPlanejamento("legenda_ic_planejamento_cancelar_proximas"), { action: "cancel-series", value: series.series_id, kind: "danger" })) + '</div></article>';
       }).join("") + '</section>';
     }
 
     function render() {
-      var html = UI.sectionHeader("Planejar", "Defina antes quanto tempo e quanto está disposto a perder. O aplicativo informa; você decide.");
+      var html = UI.sectionHeader(legendaPlanejamento("legenda_ic_planejamento_planejar"), legendaPlanejamento("legenda_ic_planejamento_defina_antes_quanto_tempo_e_quanto_esta_disposto_a_perder_o_aplicativo_informa_voce_decide"));
       if (state.status === "idle" || state.status === "loading") return html + UI.state({ type: "loading", retry: false });
       if (state.status === "error") return html + UI.state({ type: state.error && state.error.code === "offline" ? "offline" : state.error && /^http_40[346]$/.test(state.error.code || "") ? "unavailable" : "error", message: state.error && state.error.message });
-      return html + '<div class="ic-planning-layout"><section class="ic-card ic-card--raised">' + formHtml() + '</section><section><div class="ic-card__header"><div><h3>Seus planos</h3><p>Próximos, concluídos, cancelados e expirados.</p></div></div>' + plansHtml() + seriesHtml() + '</section></div>';
+      return html + '<div class="ic-planning-layout"><section class="ic-card ic-card--raised">' + formHtml() + ('</section><section><div class="ic-card__header"><div><h3>' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_seus_planos")) + '</h3><p>' + Core.escapeHtml(legendaPlanejamento("legenda_ic_planejamento_proximos_concluidos_cancelados_e_expirados")) + '</p></div></div>') + plansHtml() + seriesHtml() + '</section></div>';
     }
 
     function renderInto() {
@@ -155,31 +273,31 @@
       var validation = Core.validatePlannedSession(payload);
       if ((payload.recurrence.weekday != null && !(payload.recurrence.weekday >= 1 && payload.recurrence.weekday <= 7)) ||
           (payload.recurrence.type === "monthly_ordinal" && [1, 2, 3, 4, 5, -1].indexOf(payload.recurrence.ordinal) < 0) ||
-          (payload.recurrence.type === "custom" && (!payload.recurrence.weekdays.length || !Number.isInteger(payload.recurrence.interval_weeks) || payload.recurrence.interval_weeks < 1 || payload.recurrence.interval_weeks > 52))) { validation.valid = false; validation.errors.recurrence = "Revise os dias e a frequência da recorrência."; }
-      if (!definition) { validation.valid = false; validation.errors.currency = "A moeda precisa estar disponível no catálogo validado."; }
+          (payload.recurrence.type === "custom" && (!payload.recurrence.weekdays.length || !Number.isInteger(payload.recurrence.interval_weeks) || payload.recurrence.interval_weeks < 1 || payload.recurrence.interval_weeks > 52))) { validation.valid = false; validation.errors.recurrence = legendaPlanejamento("legenda_ic_planejamento_revise_os_dias_e_a_frequencia_da_recorrencia"); }
+      if (!definition) { validation.valid = false; validation.errors.currency = legendaPlanejamento("legenda_ic_planejamento_a_moeda_precisa_estar_disponivel_no_catalogo_validado"); }
       state.errors = validation.errors;
       if (!validation.valid) {
         var fieldMap = { starts_at: "date", duration_minutes: "duration_minutes", loss_limit_units: "loss_limit", currency: "currency", reminder_offset_minutes: "reminder_offset_minutes" };
         Object.keys(validation.errors).forEach(function (key) { var field = form.elements.namedItem(fieldMap[key]); if (field) { if (field.length && !field.tagName) field = field[0]; field.setAttribute("aria-invalid", "true"); } });
         var existingError = form.querySelector(".ic-form-error");
         if (!existingError) { existingError = document.createElement("p"); existingError.className = "ic-form-error"; existingError.setAttribute("role", "alert"); form.appendChild(existingError); }
-        existingError.textContent = "Revise os campos obrigatórios antes de continuar.";
+        existingError.textContent = legendaPlanejamento("legenda_ic_planejamento_revise_os_campos_obrigatorios_antes_de_continuar");
         var firstInvalid = form.querySelector('[aria-invalid="true"]'); if (firstInvalid) firstInvalid.focus();
-        UI.announce("Revise os campos obrigatórios da Sessão Planejada."); return;
+        UI.announce(legendaPlanejamento("legenda_ic_planejamento_revise_os_campos_obrigatorios_da_sessao_planejada")); return;
       }
       state.saving = true;
       var submitButton = form.querySelector('button[type="submit"]');
-      if (submitButton) { submitButton.disabled = true; submitButton.textContent = "Salvando…"; }
+      if (submitButton) { submitButton.disabled = true; submitButton.textContent = legendaPlanejamento("legenda_ic_planejamento_salvando"); }
       try {
         var editing = state.editingPlan;
         var series = state.editingSeries;
         var planId = editing && Core.finiteInteger(editing.id || editing.plan_id || editing.id_planejamento || editing.cod_sessao_planejada, 0);
         var revision = editing && Core.finiteInteger(editing.revision || editing.revisao || editing.revisao_atual, 0);
-        if (editing && (planId <= 0 || revision <= 0)) throw new Error("Não foi possível validar a revisão atual deste planejamento.");
+        if (editing && (planId <= 0 || revision <= 0)) throw new Error(legendaPlanejamento("legenda_ic_planejamento_nao_foi_possivel_validar_a_revisao_atual_deste_planejamento"));
         if (!editing && !series) {
           var fingerprint = JSON.stringify(payload);
           if (!state.pendingCreate || state.pendingCreate.fingerprint !== fingerprint) {
-            if (!root.crypto || typeof root.crypto.randomUUID !== "function") throw new Error("Não foi possível gerar uma identificação segura para o planejamento.");
+            if (!root.crypto || typeof root.crypto.randomUUID !== "function") throw new Error(legendaPlanejamento("legenda_ic_planejamento_nao_foi_possivel_gerar_uma_identificacao_segura_para_o_planejamento"));
             state.pendingCreate = { fingerprint: fingerprint, id: root.crypto.randomUUID() };
           }
           payload.client_request_id = state.pendingCreate.id;
@@ -189,10 +307,10 @@
         var created = await deps.api.rpc(rpc, parameters, { key: "planning:save" });
         syncLocalReminder(created.data, "schedule");
         state.pendingCreate = null;
-        UI.toast(editing ? "Sessão Planejada reagendada com novo lembrete automático." : "Sessão Planejada criada com lembrete automático.");
+        UI.toast(editing ? legendaPlanejamento("legenda_ic_planejamento_sessao_planejada_reagendada_com_novo_lembrete_automatico") : legendaPlanejamento("legenda_ic_planejamento_sessao_planejada_criada_com_lembrete_automatico"));
         deps.store.set({ planningDraft: null });
         state.editingPlan = null; state.editingSeries = null; state.status = "idle"; state.saving = false; await load(true);
-      } catch (error) { state.saving = false; if (submitButton) { submitButton.disabled = false; submitButton.textContent = state.editingPlan ? "Salvar reagendamento" : "Criar Sessão Planejada"; } UI.toast(error.message || "Não foi possível salvar a Sessão Planejada."); }
+      } catch (error) { state.saving = false; if (submitButton) { submitButton.disabled = false; submitButton.textContent = state.editingPlan ? legendaPlanejamento("legenda_ic_planejamento_salvar_reagendamento") : legendaPlanejamento("legenda_ic_planejamento_criar_sessao_planejada"); } UI.toast(error.message || legendaPlanejamento("legenda_ic_planejamento_nao_foi_possivel_salvar_a_sessao_planejada")); }
     }
 
     async function handleAction(action, value) {
@@ -201,26 +319,26 @@
         var series = state.series.find(function (item) { return item.series_id === value; });
         if (!series) return;
         if (action === "edit-series") { state.editingSeries = series; state.editingPlan = null; renderInto(); return; }
-        UI.openSheet({ eyebrow: "Compromisso recorrente", title: action === "cancel-series" ? "Cancelar próximas ocorrências?" : action === "pause-series" ? "Pausar recorrência?" : "Retomar recorrência?", html: UI.banner("Os fatos já registrados serão preservados", "A alteração afeta somente os próximos compromissos e seus lembretes.", "attention") + UI.button("Confirmar", { action: "confirm-" + action, value: value }) });
+        UI.openSheet({ eyebrow: legendaPlanejamento("legenda_ic_planejamento_compromisso_recorrente"), title: action === "cancel-series" ? legendaPlanejamento("legenda_ic_planejamento_cancelar_proximas_ocorrencias") : action === "pause-series" ? legendaPlanejamento("legenda_ic_planejamento_pausar_recorrencia") : legendaPlanejamento("legenda_ic_planejamento_retomar_recorrencia"), html: UI.banner(legendaPlanejamento("legenda_ic_planejamento_os_fatos_ja_registrados_serao_preservados"), legendaPlanejamento("legenda_ic_planejamento_a_alteracao_afeta_somente_os_proximos_compromissos_e_seus_lembretes"), "attention") + UI.button(legendaPlanejamento("legenda_ic_planejamento_confirmar"), { action: "confirm-" + action, value: value }) });
       }
       if (["confirm-pause-series", "confirm-resume-series", "confirm-cancel-series"].indexOf(action) >= 0) {
         var selectedSeries = state.series.find(function (item) { return item.series_id === value; });
         if (!selectedSeries) return;
         var seriesRpc = action === "confirm-pause-series" ? "ic_serie_planejada_pausar_rpc" : action === "confirm-resume-series" ? "ic_serie_planejada_retomar_rpc" : "ic_serie_planejada_cancelar_rpc";
         try { await deps.api.rpc(seriesRpc, { p_id_serie: selectedSeries.series_id, p_revisao_esperada: selectedSeries.revision }, { key: "planning:series:mutation" }); UI.closeSheet(); state.status = "idle"; await load(true); }
-        catch (error) { UI.toast(error.message || "Não foi possível alterar a recorrência."); }
+        catch (error) { UI.toast(error.message || legendaPlanejamento("legenda_ic_planejamento_nao_foi_possivel_alterar_a_recorrencia")); }
       }
       if (action === "open-plan") {
         var plans = Core.normalizeArray((state.data || {}).items || (state.data || {}).itens || (state.data || {}).plans || (state.data || {}).planos);
         var plan = plans.find(function (item) { return String(planIdentifier(item)) === String(value); });
         if (!plan) return;
-        var html = UI.banner("Abrir não inicia a sessão", "Revise o compromisso e toque em Iniciar sessão somente quando decidir começar.", "neutral") + '<div class="ic-grid ic-grid--metrics">' + UI.metric("Início", Core.formatDateTime(plan.starts_at || plan.inicio_em)) + UI.metric("Duração", Core.safeText(plan.duration_minutes || plan.duracao_minutos) + " min") + UI.metric("Limite", Core.formatMoney(Core.unitsFrom(plan, ["loss_limit_units_text", "limite_perda_unidades_texto", "loss_limit_units", "limite_perda_unidades"], null), plan.currency || plan.moeda || "", Core.decimalPlacesOf(plan, null))) + '</div><div class="ic-card__footer">' + UI.button("Iniciar sessão", { action: "start-plan", value: value, kind: "primary" }) + UI.button("Reagendar", { action: "reschedule-plan", value: value }) + UI.button("Cancelar", { action: "cancel-plan", value: value, kind: "danger" }) + '</div>';
-        UI.openSheet({ eyebrow: plan.status || "Sessão Planejada", title: plan.title || "Detalhes do plano", html: html });
+        var html = UI.banner(legendaPlanejamento("legenda_ic_planejamento_abrir_nao_inicia_a_sessao"), legendaPlanejamento("legenda_ic_planejamento_revise_o_compromisso_e_toque_em_iniciar_sessao_somente_quando_decidir_comecar"), "neutral") + '<div class="ic-grid ic-grid--metrics">' + UI.metric(legendaPlanejamento("legenda_ic_planejamento_inicio"), Core.formatDateTime(plan.starts_at || plan.inicio_em)) + UI.metric(legendaPlanejamento("legenda_ic_planejamento_duracao"), Core.safeText(plan.duration_minutes || plan.duracao_minutos) + legendaPlanejamento("legenda_ic_planejamento_min")) + UI.metric(legendaPlanejamento("legenda_ic_planejamento_limite"), Core.formatMoney(Core.unitsFrom(plan, ["loss_limit_units_text", "limite_perda_unidades_texto", "loss_limit_units", "limite_perda_unidades"], null), plan.currency || plan.moeda || "", Core.decimalPlacesOf(plan, null))) + '</div><div class="ic-card__footer">' + UI.button(legendaPlanejamento("legenda_ic_planejamento_iniciar_sessao"), { action: "start-plan", value: value, kind: "primary" }) + UI.button(legendaPlanejamento("legenda_ic_planejamento_reagendar"), { action: "reschedule-plan", value: value }) + UI.button(legendaPlanejamento("legenda_ic_planejamento_cancelar"), { action: "cancel-plan", value: value, kind: "danger" }) + '</div>';
+        UI.openSheet({ eyebrow: plan.status || legendaPlanejamento("legenda_ic_planejamento_sessao_planejada"), title: plan.title || legendaPlanejamento("legenda_ic_planejamento_detalhes_do_plano"), html: html });
       }
       if (["start-plan", "cancel-plan"].indexOf(action) >= 0) {
         var rpc = action === "start-plan" ? "ic_sessao_iniciar_rpc" : "ic_sessao_cancelar_rpc";
-        try { var changed = await deps.api.rpc(rpc, { p_id_planejamento: value }, { key: "planning:mutation" }); if (action === "start-plan" && (!changed.data || changed.data.started === false || ["ativa", "pausada"].indexOf(changed.data.status) < 0 || Core.finiteInteger(changed.data.session_id || changed.data.id_sessao, 0) <= 0 || Core.finiteInteger(changed.data.revision || changed.data.revisao, 0) <= 0)) throw new Error("O servidor não confirmou uma sessão ativa. Atualize o planejamento."); if (action === "cancel-plan") syncLocalReminder(changed.data || { id_planejamento: value }, "cancel"); else IC.Bridge.post("session_control_action", { action: "start", session_id: changed.data && (changed.data.session_id || changed.data.id_sessao), revision: changed.data && (changed.data.revision || changed.data.revisao), carga: deps.route().loadGeneration || null }); UI.closeSheet(); UI.toast(action === "start-plan" ? "Sessão de controle iniciada." : "Sessão Planejada cancelada."); state.status = "idle"; await load(true); if (action === "start-plan") deps.navigate({ section: "ao-vivo", sessionId: null }); }
-        catch (error) { UI.toast(error.message || "A operação não foi concluída."); }
+        try { var changed = await deps.api.rpc(rpc, { p_id_planejamento: value }, { key: "planning:mutation" }); if (action === "start-plan" && (!changed.data || changed.data.started === false || ["ativa", "pausada"].indexOf(changed.data.status) < 0 || Core.finiteInteger(changed.data.session_id || changed.data.id_sessao, 0) <= 0 || Core.finiteInteger(changed.data.revision || changed.data.revisao, 0) <= 0)) throw new Error(legendaPlanejamento("legenda_ic_planejamento_o_servidor_nao_confirmou_uma_sessao_ativa_atualize_o_planejamento")); if (action === "cancel-plan") syncLocalReminder(changed.data || { id_planejamento: value }, "cancel"); else IC.Bridge.post("session_control_action", { action: "start", session_id: changed.data && (changed.data.session_id || changed.data.id_sessao), revision: changed.data && (changed.data.revision || changed.data.revisao), carga: deps.route().loadGeneration || null }); UI.closeSheet(); UI.toast(action === "start-plan" ? legendaPlanejamento("legenda_ic_planejamento_sessao_de_controle_iniciada") : legendaPlanejamento("legenda_ic_planejamento_sessao_planejada_cancelada")); state.status = "idle"; await load(true); if (action === "start-plan") deps.navigate({ section: "ao-vivo", sessionId: null }); }
+        catch (error) { UI.toast(error.message || legendaPlanejamento("legenda_ic_planejamento_a_operacao_nao_foi_concluida")); }
       }
       if (action === "reschedule-plan") {
         var scheduledPlans = Core.normalizeArray((state.data || {}).items || (state.data || {}).itens || (state.data || {}).plans || (state.data || {}).planos);

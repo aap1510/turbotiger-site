@@ -1,10 +1,40 @@
 (function (root, factory) {
-  var api = factory();
+  var api = factory(root);
   root.TurboTigerIC = root.TurboTigerIC || {};
   root.TurboTigerIC.Core = api;
   if (typeof module === "object" && module.exports) module.exports = api;
-}(typeof window !== "undefined" ? window : globalThis, function () {
+}(typeof window !== "undefined" ? window : globalThis, function (root) {
   "use strict";
+
+
+  var fontesLegendasBase = {
+    "legenda_ic_base_ultimos_trinta_dias": "Últimos 30 dias",
+    "legenda_ic_base_historico_reconstruido_saldo_nao_confirmado": "Histórico reconstruído; saldo não confirmado",
+    "legenda_ic_base_saldo_nao_confirmado": "Saldo não confirmado",
+    "legenda_ic_base_exploratorio": "Exploratório",
+    "legenda_ic_base_descritivo": "Descritivo",
+    "legenda_ic_base_poucos_dados": "Poucos dados",
+    "legenda_ic_base_sem_historico": "Sem histórico neste recorte",
+    "legenda_ic_base_atualizacao_pendente": "Atualização pendente",
+    "legenda_ic_base_em_validacao": "Em validação",
+    "legenda_ic_base_historico_reconstruido": "Histórico reconstruído",
+    "legenda_ic_base_inconclusivo": "Inconclusivo",
+    "legenda_ic_base_validado_outro_periodo": "Validado em outro período",
+    "legenda_ic_base_replicado": "Replicado",
+    "legenda_ic_base_selecione_moeda": "Selecione a moeda",
+    "legenda_ic_base_resposta_fora_contrato": "A resposta segura desta área está fora do contrato.",
+    "legenda_ic_base_data_horario_futuros": "Escolha uma data e um horário futuros.",
+    "legenda_ic_base_duracao_maxima_valida": "Informe uma duração máxima válida.",
+    "legenda_ic_base_limite_perda_valido": "Informe um limite máximo de perda válido.",
+    "legenda_ic_base_moeda_obrigatoria": "Selecione a moeda.",
+    "legenda_ic_base_momento_lembrete_obrigatorio": "Selecione o momento do lembrete.",
+    "legenda_ic_base_periodo_de_ate": "{inicio} a {fim}"
+  };
+  if (root.TurboTigerLegendas) root.TurboTigerLegendas.registrar(fontesLegendasBase);
+  function legendaBase(chave, valores) {
+    if (root.TurboTigerLegendas) return root.TurboTigerLegendas.texto(chave, valores);
+    return fontesLegendasBase[chave].replace(/\{([a-z][a-z0-9_]*)\}/g, function (token, nome) { return valores && Object.prototype.hasOwnProperty.call(valores, nome) ? String(valores[nome]) : token; });
+  }
 
   var SECTIONS = [
     "visao-geral", "planejar", "ao-vivo", "historico", "estatisticas",
@@ -44,15 +74,15 @@
   function evidencePeriod(value) {
     if (value && typeof value === "object") {
       var start = value.start || value.inicio || value.from, end = value.end || value.fim || value.to;
-      return start && end ? formatDateTime(start, { dateStyle: "short" }) + " a " + formatDateTime(end, { dateStyle: "short" }) : "";
+      return start && end ? legendaBase("legenda_ic_base_periodo_de_ate", { inicio: formatDateTime(start, { dateStyle: "short" }), fim: formatDateTime(end, { dateStyle: "short" }) }) : "";
     }
-    return value === "30_days" ? "Últimos 30 dias" : safeText(value, "");
+    return value === "30_days" ? legendaBase("legenda_ic_base_ultimos_trinta_dias") : safeText(value, "");
   }
 
   function statusLabel(value) {
-    if (value === "reconstruida_modelada") return "Histórico reconstruído; saldo não confirmado";
-    if (value === "sem_saldo") return "Saldo não confirmado";
-    var labels = { exploratorio: "Exploratório", descritivo: "Descritivo", amostra_insuficiente: "Poucos dados", sem_dados: "Sem histórico neste recorte", atualizacao_pendente: "Atualização pendente", model_update_pending: "Atualização pendente", validacao_futura: "Em validação", historica_reconstruida: "Histórico reconstruído", inconclusivo: "Inconclusivo", validado_fora_da_amostra: "Validado em outro período", replicado: "Replicado" };
+    if (value === "reconstruida_modelada") return legendaBase("legenda_ic_base_historico_reconstruido_saldo_nao_confirmado");
+    if (value === "sem_saldo") return legendaBase("legenda_ic_base_saldo_nao_confirmado");
+    var labels = { exploratorio: legendaBase("legenda_ic_base_exploratorio"), descritivo: legendaBase("legenda_ic_base_descritivo"), amostra_insuficiente: legendaBase("legenda_ic_base_poucos_dados"), sem_dados: legendaBase("legenda_ic_base_sem_historico"), atualizacao_pendente: legendaBase("legenda_ic_base_atualizacao_pendente"), model_update_pending: legendaBase("legenda_ic_base_atualizacao_pendente"), validacao_futura: legendaBase("legenda_ic_base_em_validacao"), historica_reconstruida: legendaBase("legenda_ic_base_historico_reconstruido"), inconclusivo: legendaBase("legenda_ic_base_inconclusivo"), validado_fora_da_amostra: legendaBase("legenda_ic_base_validado_outro_periodo"), replicado: legendaBase("legenda_ic_base_replicado") };
     return labels[String(value || "").toLowerCase()] || safeText(value);
   }
 
@@ -212,7 +242,7 @@
   }
 
   function currencyOptions(context, selectedCode, emptyLabel) {
-    return '<option value="">' + escapeHtml(emptyLabel || "Selecione a moeda") + '</option>' + currencyCatalog(context).map(function (currency) {
+    return '<option value="">' + escapeHtml(emptyLabel || legendaBase("legenda_ic_base_selecione_moeda")) + '</option>' + currencyCatalog(context).map(function (currency) {
       return '<option value="' + currency.code + '"' + (currency.code === selectedCode ? " selected" : "") + '>' + escapeHtml(currency.label) + '</option>';
     }).join("");
   }
@@ -280,7 +310,7 @@
   function normalizeEnvelope(payload) {
     var value = Array.isArray(payload) && payload.length === 1 ? payload[0] : payload;
     if (!isPlainObject(value) || !Object.prototype.hasOwnProperty.call(value, "ok")) {
-      return { ok: false, version: "ic_api_v1", data: null, meta: {}, error: { public_message: "A resposta segura desta área está fora do contrato." } };
+      return { ok: false, version: "ic_api_v1", data: null, meta: {}, error: { public_message: legendaBase("legenda_ic_base_resposta_fora_contrato") } };
     }
     if (Object.prototype.hasOwnProperty.call(value, "ok")) {
       return {
@@ -317,11 +347,11 @@
     var value = isPlainObject(input) ? input : {};
     var start = new Date(safeText(value.starts_at, ""));
     var reference = now instanceof Date ? now : new Date();
-    if (Number.isNaN(start.getTime()) || start.getTime() <= reference.getTime()) errors.starts_at = "Escolha uma data e um horário futuros.";
-    if (finiteInteger(value.duration_minutes, 0) <= 0) errors.duration_minutes = "Informe uma duração máxima válida.";
-    if (unitsSign(value.loss_limit_units) <= 0) errors.loss_limit_units = "Informe um limite máximo de perda válido.";
-    if (!/^[A-Z]{3}$/.test(safeText(value.currency, ""))) errors.currency = "Selecione a moeda.";
-    if (validReminderOffset(value.reminder_offset_minutes) === null) errors.reminder_offset_minutes = "Selecione o momento do lembrete.";
+    if (Number.isNaN(start.getTime()) || start.getTime() <= reference.getTime()) errors.starts_at = legendaBase("legenda_ic_base_data_horario_futuros");
+    if (finiteInteger(value.duration_minutes, 0) <= 0) errors.duration_minutes = legendaBase("legenda_ic_base_duracao_maxima_valida");
+    if (unitsSign(value.loss_limit_units) <= 0) errors.loss_limit_units = legendaBase("legenda_ic_base_limite_perda_valido");
+    if (!/^[A-Z]{3}$/.test(safeText(value.currency, ""))) errors.currency = legendaBase("legenda_ic_base_moeda_obrigatoria");
+    if (validReminderOffset(value.reminder_offset_minutes) === null) errors.reminder_offset_minutes = legendaBase("legenda_ic_base_momento_lembrete_obrigatorio");
     return { valid: Object.keys(errors).length === 0, errors: errors };
   }
 

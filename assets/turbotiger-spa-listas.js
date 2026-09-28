@@ -6,6 +6,27 @@
   var API_PAGE_SIZE = 100;
   var PAGE_COUNT = 5;
   var MIN_PAGE_SIZE = 20;
+  var legendas = window.TurboTigerLegendas;
+  var textos = {
+    legenda_bets_consultar_lista: "Consultar lista",
+    legenda_bets_fechar_consulta: "Fechar consulta",
+    legenda_bets_consultando_base: "Consultando a base informativa...",
+    legenda_bets_dominio_encontrado: "{quantidade} domínio encontrado",
+    legenda_bets_dominios_encontrados: "{quantidade} domínios encontrados",
+    legenda_bets_falha_consultar: "Não foi possível consultar a lista neste momento. Tente novamente em instantes.",
+    legenda_bets_consulta_indisponivel: "Consulta temporariamente indisponível.",
+    legenda_bets_ir_para_pagina: "Ir para a página {pagina}",
+    legenda_bets_marca_nao_informada: "Marca não informada",
+    legenda_bets_dominio_informativo: "Domínio informativo: {dominio}",
+    legenda_bets_determinacao_judicial: "Determinação judicial",
+    legenda_bets_autorizada_spa: "Autorizada pela SPA/MF",
+    legenda_bets_busca_sem_resultado: "Nenhum resultado encontrado para esta busca."
+  };
+  if (legendas) legendas.registrar(textos);
+  function legenda(chave, valores) {
+    if (legendas) return legendas.texto(chave, valores);
+    return textos[chave].replace(/\{([a-z_]+)\}/g, function (token, nome) { return valores && Object.prototype.hasOwnProperty.call(valores, nome) ? String(valores[nome]) : token; });
+  }
 
   document.querySelectorAll("[data-spa-reference]").forEach(initialize);
 
@@ -19,6 +40,14 @@
     var tabs = Array.prototype.slice.call(section.querySelectorAll("[data-spa-origin]"));
     var state = { loaded: false, loading: false, origin: "", query: "", page: 1, items: [] };
     var debounceTimer = 0;
+    var legendaStatus = "";
+    var parametrosStatus;
+    var legendaVazio = "";
+
+    function mostrarStatus(chave, valores) {
+      legendaStatus = chave; parametrosStatus = valores;
+      status.textContent = legenda(chave, valores);
+    }
 
     ["copy", "cut", "dragstart", "contextmenu"].forEach(function (eventName) {
       section.addEventListener(eventName, function (event) {
@@ -30,7 +59,7 @@
     toggle.addEventListener("click", function () {
       var expanded = toggle.getAttribute("aria-expanded") === "true";
       toggle.setAttribute("aria-expanded", String(!expanded));
-      toggle.textContent = expanded ? "Consultar lista" : "Fechar consulta";
+      toggle.textContent = legenda(expanded ? "legenda_bets_consultar_lista" : "legenda_bets_fechar_consulta");
       panel.hidden = expanded;
       if (!expanded && !state.loaded) load();
     });
@@ -80,7 +109,7 @@
       if (state.loading) return;
       state.loading = true;
       state.page = 1;
-      status.textContent = "Consultando a base informativa...";
+      mostrarStatus("legenda_bets_consultando_base");
       pagination.replaceChildren();
 
       try {
@@ -94,13 +123,13 @@
 
         state.items = items.sort(compareItems);
         state.loaded = true;
-        status.textContent = total + (total === 1 ? " dom\u00ednio encontrado" : " dom\u00ednios encontrados");
+        mostrarStatus(total === 1 ? "legenda_bets_dominio_encontrado" : "legenda_bets_dominios_encontrados", { quantidade: total });
         showPage();
       } catch (_) {
         state.items = [];
         list.replaceChildren();
-        showEmpty("N\u00e3o foi poss\u00edvel consultar a lista neste momento. Tente novamente em instantes.");
-        status.textContent = "Consulta temporariamente indispon\u00edvel.";
+        showEmpty("legenda_bets_falha_consultar");
+        mostrarStatus("legenda_bets_consulta_indisponivel");
       } finally {
         state.loading = false;
       }
@@ -113,6 +142,7 @@
     }
 
     function showPage() {
+      legendaVazio = "";
       list.replaceChildren();
       pagination.replaceChildren();
       if (!state.items.length) {
@@ -131,7 +161,7 @@
         button.type = "button";
         button.className = "spa-reference-page";
         button.textContent = String(page);
-        button.setAttribute("aria-label", "Ir para a p\u00e1gina " + page);
+        button.setAttribute("aria-label", legenda("legenda_bets_ir_para_pagina", { pagina: page }));
         button.setAttribute("aria-current", page === state.page ? "page" : "false");
         button.addEventListener("click", selectPage.bind(null, page));
         pagination.appendChild(button);
@@ -152,7 +182,7 @@
 
         var brand = document.createElement("div");
         brand.className = "spa-reference-brand";
-        brand.textContent = item.marca || "Marca n\u00e3o informada";
+        brand.textContent = item.marca || legenda("legenda_bets_marca_nao_informada");
 
         var company = document.createElement("div");
         company.className = "spa-reference-company";
@@ -164,12 +194,12 @@
         var domain = document.createElement("span");
         domain.className = "spa-reference-domain";
         domain.textContent = item.dominio || "";
-        domain.setAttribute("aria-label", "Dom\u00ednio informativo: " + (item.dominio || ""));
+        domain.setAttribute("aria-label", legenda("legenda_bets_dominio_informativo", { dominio: item.dominio || "" }));
 
         var kind = document.createElement("div");
         kind.className = "spa-reference-kind";
         kind.setAttribute("data-kind", item.origem || "");
-        kind.textContent = item.origem === "judicial" ? "Determina\u00e7\u00e3o judicial" : "Autorizada pela SPA/MF";
+        kind.textContent = legenda(item.origem === "judicial" ? "legenda_bets_determinacao_judicial" : "legenda_bets_autorizada_spa");
 
         row.appendChild(brand);
         row.appendChild(company);
@@ -180,11 +210,21 @@
       list.appendChild(fragment);
     }
 
-    function showEmpty(message) {
+    function showEmpty(chave) {
+      legendaVazio = chave || "legenda_bets_busca_sem_resultado";
       var empty = document.createElement("p");
       empty.className = "spa-reference-empty";
-      empty.textContent = message || "Nenhum resultado encontrado para esta busca.";
+      empty.textContent = legenda(legendaVazio);
       list.appendChild(empty);
     }
+
+    window.addEventListener("turbotiger:idioma", function () {
+      toggle.textContent = legenda(toggle.getAttribute("aria-expanded") === "true" ? "legenda_bets_fechar_consulta" : "legenda_bets_consultar_lista");
+      if (legendaStatus) status.textContent = legenda(legendaStatus, parametrosStatus);
+      if (legendaVazio) {
+        var chaveVazio = legendaVazio;
+        list.replaceChildren(); showEmpty(chaveVazio);
+      } else if (state.loaded) showPage();
+    });
   }
 })();

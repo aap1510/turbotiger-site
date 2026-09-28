@@ -1,6 +1,105 @@
 (function () {
   "use strict";
 
+  var fontesLegendasHistoria = {
+    "legenda_historia_tentar_novamente": "Tentar novamente",
+    "legenda_historia_confrontos": "Confrontos",
+    "legenda_historia_no_local": "No local",
+    "legenda_historia_tv_outro_meio": "TV/outro meio",
+    "legenda_historia_contribuicoes": "Contribuições",
+    "legenda_historia_titulos_acompanhados": "Títulos acompanhados",
+    "legenda_historia_confrontos_de_titulo": "Confrontos de título",
+    "legenda_historia_decisoes_completas": "Decisões completas",
+    "legenda_historia_confirmacoes_vistas": "Confirmações vistas",
+    "legenda_historia_principais_no_local": "Principais no local",
+    "legenda_historia_clubes_campeoes": "Clubes campeões",
+    "legenda_historia_competicoes": "Competições",
+    "legenda_historia_competicao": "Competição",
+    "legenda_historia_campeoes": "Campeões: ",
+    "legenda_historia_campeao": "Campeão: ",
+    "legenda_historia_vices": "Vices: ",
+    "legenda_historia_vice": "Vice: ",
+    "legenda_historia_decisao_completa": "Decisão completa",
+    "legenda_historia_decisao_incompleta": "Decisão incompleta",
+    "legenda_historia_titulo_compartilhado": "Título compartilhado",
+    "legenda_historia_principal_no_local": "Principal no local",
+    "legenda_historia_final": "Final",
+    "legenda_historia_final_ida": "Final · ida",
+    "legenda_historia_final_volta": "Final · volta",
+    "legenda_historia_desempate": "Desempate",
+    "legenda_historia_titulo_confirmado": "Título confirmado",
+    "legenda_historia_rodada_decisiva": "Rodada decisiva",
+    "legenda_historia_entrega_da_taca": "Entrega da taça",
+    "legenda_historia_final_da_fase": "Final da fase",
+    "legenda_historia_relacionado_ao_titulo": "Relacionado ao título",
+    "legenda_historia_confronto_de_titulo": "Confronto de título",
+    "legenda_historia_principal": "Principal",
+    "legenda_historia_no_local_do_evento": "No local do evento",
+    "legenda_historia_assistiu_com": "Assistiu com ",
+    "legenda_historia_confronto": "Confronto",
+    "legenda_historia_w_o": "W.O.",
+    "legenda_historia_carregando": "Carregando…",
+    "legenda_historia_ver_mais": "Ver mais",
+    "legenda_historia_nao_foi_possivel_carregar_a_linha_do_tempo": "Não foi possível carregar a linha do tempo.",
+    "legenda_historia_nao_foi_possivel_carregar_as_colaboracoes": "Não foi possível carregar as colaborações.",
+    "legenda_historia_carregando_linha_do_tempo": "Carregando linha do tempo…",
+    "legenda_historia_este_membro_ainda_nao_publicou_confrontos_em_sua_linha_do_tempo": "Este membro ainda não publicou confrontos em sua linha do tempo.",
+    "legenda_historia_confronto_revisado": "Confronto revisado",
+    "legenda_historia_confronto_incluido": "Confronto incluído",
+    "legenda_historia_informacao_corrigida": "Informação corrigida",
+    "legenda_historia_carregando_colaboracoes": "Carregando colaborações…",
+    "legenda_historia_membro_turbo_tiger": "Membro Turbo Tiger",
+    "legenda_historia_perfil_privado": "Perfil privado",
+    "legenda_historia_este_membro_nao_disponibilizou_sua_historia_esportiva_publicamente": "Este membro não disponibilizou sua história esportiva publicamente.",
+    "legenda_historia_esporte": "Esporte",
+    "legenda_historia_codigo_invalido": "Código inválido",
+    "legenda_historia_verifique_o_link_recebido_e_tente_novamente": "Verifique o link recebido e tente novamente.",
+    "legenda_historia_historia_indisponivel": "História indisponível",
+    "legenda_historia_o_codigo_pode_ter_expirado_sido_renovado_ou_a_pagina_pode_ter_sido_desativada": "O código pode ter expirado, sido renovado ou a página pode ter sido desativada.",
+    "legenda_historia_um_membro_da_comunidade_turbo_tiger": "Um membro da comunidade Turbo Tiger",
+    "legenda_historia_confronto_esportivo": "Confronto esportivo",
+    "legenda_historia_lembranca_confirmada": "Lembrança confirmada",
+    "legenda_historia_voce_confirmou_que_assistiram_juntos_a_historia_compartilhada_continua_disponivel_abaixo": "Você confirmou que assistiram juntos. A história compartilhada continua disponível abaixo.",
+    "legenda_historia_disse_que_assistiu_com_voce": " disse que assistiu com você",
+    "legenda_historia_confirme_apenas_se_reconhecer_esta_lembranca_o_turbo_tiger_nao_considera_a_informacao_comprovada_ate": "Confirme apenas se reconhecer esta lembrança. O Turbo Tiger não considera a informação comprovada até sua resposta.",
+    "legenda_historia_se_eu_confirmar_autorizo_que_o_nome_informado_no_convite_apareca_nesta_lembranca_publica": "Se eu confirmar, autorizo que o nome informado no convite apareça nesta lembrança pública.",
+    "legenda_historia_sim_assistimos_juntos": "Sim, assistimos juntos",
+    "legenda_historia_nao_reconheco": "Não reconheço",
+    "legenda_historia_prefiro_nao_responder": "Prefiro não responder",
+    "legenda_historia_nao_quero_receber_novos_convites": "Não quero receber novos convites",
+    "legenda_historia_convite_indisponivel": "Convite indisponível",
+    "legenda_historia_este_convite_pode_ter_expirado_sido_revogado_ou_ja_ter_sido_respondido_voce_ainda_pode_impedir_novos": "Este convite pode ter expirado, sido revogado ou já ter sido respondido. Você ainda pode impedir novos convites para este endereço.",
+    "legenda_historia_preferencia_registrada_voce_nao_recebera_novos_convites_neste_endereco": "Preferência registrada. Você não receberá novos convites neste endereço.",
+    "legenda_historia_preferencia_registrada": "Preferência registrada",
+    "legenda_historia_nao_foi_possivel_registrar_sua_preferencia_agora": "Não foi possível registrar sua preferência agora.",
+    "legenda_historia_obrigado_por_confirmar_esta_lembranca": "Obrigado por confirmar esta lembrança.",
+    "legenda_historia_contestacao_registrada_para_analise": "Contestação registrada para análise.",
+    "legenda_historia_resposta_registrada": "Resposta registrada.",
+    "legenda_historia_resposta_registrada_2": "Resposta registrada",
+    "legenda_historia_nao_foi_possivel_registrar_sua_resposta_agora": "Não foi possível registrar sua resposta agora.",
+    "legenda_historia_historia_esportiva_no_turbo_tiger": "História esportiva no Turbo Tiger",
+    "legenda_historia_veja_esta_historia_esportiva_compartilhada_pela_comunidade_turbo_tiger": "Veja esta história esportiva compartilhada pela comunidade Turbo Tiger.",
+    "legenda_historia_link_copiado": "Link copiado.",
+    "legenda_historia_nao_foi_possivel_compartilhar_agora": "Não foi possível compartilhar agora.",
+    "legenda_historia_link_de_preferencia_indisponivel": "Link de preferência indisponível",
+    "legenda_historia_codigo_obrigatorio": "Código obrigatório",
+    "legenda_historia_abra_esta_pagina_pelo_link_seguro_compartilhado_por_um_membro_turbo_tiger": "Abra esta página pelo link seguro compartilhado por um membro Turbo Tiger.",
+    "legenda_historia_preferencias_de_convites": "Preferências de convites",
+    "legenda_historia_confirme_abaixo_se_nao_quiser_receber_novos_convites_do_turbo_tiger_neste_endereco": "Confirme abaixo se não quiser receber novos convites do Turbo Tiger neste endereço.",
+    "legenda_historia_o_link_informado_nao_e_valido": "O link informado não é válido.",
+    "legenda_historia_nomes_lista": "{anteriores} e {ultimo}",
+    "legenda_historia_resumo_pontuacao": "{pontos} pontos · {locais} no local · {remotos} por TV/outro meio",
+    "legenda_historia_decisao_assistida": "{assistidos} de {total} confronto da decisão acompanhado",
+    "legenda_historia_decisoes_assistidas": "{assistidos} de {total} confrontos da decisão acompanhados",
+    "legenda_historia_titulo_assistido": "{quantidade} confronto de título acompanhado",
+    "legenda_historia_titulos_assistidos": "{quantidade} confrontos de título acompanhados"
+  };
+  if (window.TurboTigerLegendas) window.TurboTigerLegendas.registrar(fontesLegendasHistoria);
+  function legendaHistoria(chave, parametros) {
+    if (window.TurboTigerLegendas) return window.TurboTigerLegendas.texto(chave, parametros);
+    return String(fontesLegendasHistoria[chave] || chave).replace(/\{([a-z][a-z0-9_]*)\}/g, function (marca, nome) { return parametros && Object.prototype.hasOwnProperty.call(parametros, nome) ? String(parametros[nome]) : marca; });
+  }
+
   var CONFIG = {
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU"
@@ -26,6 +125,45 @@
       colaboracoes: { items: [], nextCursor: null, hasMore: false, loading: false, initialized: false, failed: false }
     }
   };
+
+  // Reapresentacao usa o DOM existente; nao recarrega dados nem consentimentos.
+  var reapresentandoIdioma = false;
+  var conviteApresentado = null;
+  var estadoApresentado = null;
+  var optoutApresentado = null;
+  var avisoApresentado = null;
+  function apresentarHTML(elemento, html) {
+    if (reapresentandoIdioma) {
+      var motor = window.TurboTigerLegendas;
+      if (motor && typeof motor.atualizarApresentacao === "function") motor.atualizarApresentacao(elemento, html);
+      return;
+    }
+    elemento.innerHTML = html;
+  }
+  function atualizarIdiomaHistoria() {
+    if (!window.TurboTigerLegendas || typeof window.TurboTigerLegendas.atualizarApresentacao !== "function") return;
+    reapresentandoIdioma = true;
+    try {
+      if (state.data && !byId("storyPage").hidden) {
+        var perfil = state.data.perfil || {};
+        if (!perfil.nome_exibicao && !perfil.codinome) byId("profileName").textContent = legendaHistoria("legenda_historia_membro_turbo_tiger");
+        if (!perfil.esporte && !state.data.esporte_nome) byId("profileSport").textContent = legendaHistoria("legenda_historia_esporte");
+        renderMetrics(state.data.resumo || {});
+        renderRanking(state.data);
+        renderTitles();
+        renderTimeline(state.data);
+        renderContributions(state.data);
+      }
+      if (conviteApresentado && !byId("invitePanel").hidden) renderInvitation(conviteApresentado);
+      else if (optoutApresentado && !byId("invitePanel").hidden) renderOptoutPanel(optoutApresentado.titulo, optoutApresentado.mensagem);
+      if (estadoApresentado && !byId("statePanel").hidden) showState(estadoApresentado.tipo, estadoApresentado.titulo, estadoApresentado.mensagem);
+      var toast = byId('toast');
+      if (avisoApresentado && !toast.hidden && toast.textContent === avisoApresentado.ultimo) {
+        avisoApresentado.ultimo = legendaHistoria(avisoApresentado.chave);
+        toast.textContent = avisoApresentado.ultimo;
+      }
+    } finally { reapresentandoIdioma = false; }
+  }
 
   function byId(id) { return document.getElementById(id); }
   function arrayOf(value) { return Array.isArray(value) ? value : value && Array.isArray(value.itens) ? value.itens : []; }
@@ -60,8 +198,8 @@
       summaryUnavailable: false,
       contextsUnavailable: false
     };
-    byId("titleMetrics").innerHTML = "";
-    byId("titlesList").innerHTML = "";
+    apresentarHTML(byId("titleMetrics"), "");
+    apresentarHTML(byId("titlesList"), "");
     byId("titlesSection").hidden = true;
   }
 
@@ -84,7 +222,9 @@
     return result;
   }
 
-  function showToast(message, isError) {
+  function showToast(chaveMensagem, isError) {
+    var message = legendaHistoria(chaveMensagem);
+    avisoApresentado = {chave:chaveMensagem, ultimo:message};
     var toast = byId("toast");
     window.clearTimeout(state.toastTimer);
     toast.textContent = message;
@@ -95,14 +235,17 @@
     state.toastTimer = window.setTimeout(function () { toast.hidden = true; }, 3800);
   }
 
-  function showState(type, title, message) {
+  function showState(type, chaveTitulo, chaveMensagem) {
+    if (!reapresentandoIdioma) estadoApresentado = {tipo:type, titulo:chaveTitulo, mensagem:chaveMensagem};
+    var title = legendaHistoria(chaveTitulo);
+    var message = legendaHistoria(chaveMensagem);
     var symbols = { invalid: "close", private: "lock", empty: "clock", success: "trophy" };
     byId("storyPage").hidden = true;
     var panel = byId("statePanel");
-    panel.innerHTML = icon(symbols[type] || "clock") + "<h1>" + escapeHtml(title) + "</h1><p>" + escapeHtml(message) + "</p>" + (type === "invalid" ? "<button type=\"button\" data-retry>Tentar novamente</button>" : "");
+    apresentarHTML(panel, icon(symbols[type] || "clock") + "<h1>" + escapeHtml(title) + "</h1><p>" + escapeHtml(message) + "</p>" + (type === "invalid" ? ("<button type=\"button\" data-retry>" + escapeHtml(legendaHistoria("legenda_historia_tentar_novamente")) + "</button>") : ""));
     panel.hidden = false;
     panel.tabIndex = -1;
-    try { panel.focus(); } catch (error) {}
+    if (!reapresentandoIdioma) { try { panel.focus(); } catch (error) {} }
   }
 
   function storyCodeFromUrl() {
@@ -143,12 +286,12 @@
 
   function renderMetrics(summary) {
     var metrics = [
-      { icon:"clock", label:"Confrontos", value:numberOf(summary.total) },
-      { icon:"stadium", label:"No local", value:numberOf(summary.total_local || summary.presenciais) },
-      { icon:"tv", label:"TV/outro meio", value:numberOf(summary.total_remoto || summary.remotos) },
-      { icon:"group", label:"Contribuições", value:numberOf(summary.contribuicoes) }
+      { icon:"clock", label:legendaHistoria("legenda_historia_confrontos"), value:numberOf(summary.total) },
+      { icon:"stadium", label:legendaHistoria("legenda_historia_no_local"), value:numberOf(summary.total_local || summary.presenciais) },
+      { icon:"tv", label:legendaHistoria("legenda_historia_tv_outro_meio"), value:numberOf(summary.total_remoto || summary.remotos) },
+      { icon:"group", label:legendaHistoria("legenda_historia_contribuicoes"), value:numberOf(summary.contribuicoes) }
     ];
-    byId("storyMetrics").innerHTML = metrics.map(function (metric) { return "<div><dt>" + icon(metric.icon) + "<span>" + escapeHtml(metric.label) + "</span></dt><dd>" + escapeHtml(metric.value) + "</dd></div>"; }).join("");
+    apresentarHTML(byId("storyMetrics"), metrics.map(function (metric) { return "<div><dt>" + icon(metric.icon) + "<span>" + escapeHtml(metric.label) + "</span></dt><dd>" + escapeHtml(metric.value) + "</dd></div>"; }).join(""));
   }
 
   function firstMetric(summary, names) {
@@ -174,8 +317,8 @@
 
   function joinTitleNames(names) {
     if (names.length < 2) return names[0] || "";
-    if (names.length === 2) return names[0] + " e " + names[1];
-    return names.slice(0,-1).join(", ") + " e " + names[names.length - 1];
+    if (names.length === 2) return legendaHistoria("legenda_historia_nomes_lista", { anteriores: names[0], ultimo: names[1] });
+    return legendaHistoria("legenda_historia_nomes_lista", { anteriores: names.slice(0, -1).join(", "), ultimo: names[names.length - 1] });
   }
 
   function titleDecisionStatus(item, required) {
@@ -191,28 +334,28 @@
     var summary = payload.resumo || payload.summary || {};
     var titles = arrayOf(payload.titulos || payload.titles || payload.items);
     var metrics = [
-      { label:"Títulos acompanhados", value:firstMetric(summary,["titulos_acompanhados","total_titulos"]) },
-      { label:"Confrontos de título", value:firstMetric(summary,["confrontos_titulo_assistidos","confrontos_assistidos"]) },
-      { label:"Decisões completas", value:firstMetric(summary,["decisoes_completas","finais_completas"]) },
-      { label:"Confirmações vistas", value:firstMetric(summary,["confirmacoes_titulo_assistidas","confirmacoes_assistidas"]) },
-      { label:"Principais no local", value:firstMetric(summary,["confrontos_principais_local","principais_local"]) },
-      { label:"Clubes campeões", value:firstMetric(summary,["clubes_campeoes","total_clubes_campeoes"]) },
-      { label:"Competições", value:firstMetric(summary,["competicoes","total_competicoes"]) }
+      { label:legendaHistoria("legenda_historia_titulos_acompanhados"), value:firstMetric(summary,["titulos_acompanhados","total_titulos"]) },
+      { label:legendaHistoria("legenda_historia_confrontos_de_titulo"), value:firstMetric(summary,["confrontos_titulo_assistidos","confrontos_assistidos"]) },
+      { label:legendaHistoria("legenda_historia_decisoes_completas"), value:firstMetric(summary,["decisoes_completas","finais_completas"]) },
+      { label:legendaHistoria("legenda_historia_confirmacoes_vistas"), value:firstMetric(summary,["confirmacoes_titulo_assistidas","confirmacoes_assistidas"]) },
+      { label:legendaHistoria("legenda_historia_principais_no_local"), value:firstMetric(summary,["confrontos_principais_local","principais_local"]) },
+      { label:legendaHistoria("legenda_historia_clubes_campeoes"), value:firstMetric(summary,["clubes_campeoes","total_clubes_campeoes"]) },
+      { label:legendaHistoria("legenda_historia_competicoes"), value:firstMetric(summary,["competicoes","total_competicoes"]) }
     ];
     var hasData = titles.length > 0 || metrics.some(function (metric) { return metric.value > 0; });
     var section = byId("titlesSection");
     if (!hasData) {
-      byId("titleMetrics").innerHTML = "";
-      byId("titlesList").innerHTML = "";
+      apresentarHTML(byId("titleMetrics"), "");
+      apresentarHTML(byId("titlesList"), "");
       section.hidden = true;
       return;
     }
-    byId("titleMetrics").innerHTML = metrics.map(function (metric) {
+    apresentarHTML(byId("titleMetrics"), metrics.map(function (metric) {
       return "<div><dt>" + escapeHtml(metric.label) + "</dt><dd>" + escapeHtml(metric.value) + "</dd></div>";
-    }).join("");
-    byId("titlesList").innerHTML = titles.map(function (item) {
+    }).join(""));
+    apresentarHTML(byId("titlesList"), titles.map(function (item) {
       item = item || {};
-      var competition = item.competicao || item.competition || "Competição";
+      var competition = item.competicao || item.competition || legendaHistoria("legenda_historia_competicao");
       var season = item.temporada || item.season || "";
       var championFallback = item.campeao || item.campeao_nome || item.champion || "";
       var runnerUpFallback = item.vice || item.vice_campeao || item.vice_nome || item.runner_up || "";
@@ -225,47 +368,47 @@
       var decisionStatus = titleDecisionStatus(item, required);
       var decisionApplies = decisionStatus !== "nao_aplicavel" && required > 0;
       var result = [];
-      if (champions.length) result.push((champions.length > 1 ? "Campeões: " : "Campeão: ") + joinTitleNames(champions));
-      if (runnersUp.length) result.push((runnersUp.length > 1 ? "Vices: " : "Vice: ") + joinTitleNames(runnersUp));
+      if (champions.length) result.push((champions.length > 1 ? legendaHistoria("legenda_historia_campeoes") : legendaHistoria("legenda_historia_campeao")) + joinTitleNames(champions));
+      if (runnersUp.length) result.push((runnersUp.length > 1 ? legendaHistoria("legenda_historia_vices") : legendaHistoria("legenda_historia_vice")) + joinTitleNames(runnersUp));
       var count = decisionApplies
-        ? decisionWatched + " de " + required + (required === 1 ? " confronto da decisão acompanhado" : " confrontos da decisão acompanhados")
-        : watched > 0 ? watched + (watched === 1 ? " confronto de título acompanhado" : " confrontos de título acompanhados") : "";
+        ? legendaHistoria(required === 1 ? "legenda_historia_decisao_assistida" : "legenda_historia_decisoes_assistidas", { assistidos: decisionWatched, total: required })
+        : watched > 0 ? legendaHistoria(watched === 1 ? "legenda_historia_titulo_assistido" : "legenda_historia_titulos_assistidos", { quantidade: watched }) : "";
       var flags = [];
-      if (decisionStatus === "completa") flags.push("Decisão completa");
-      else if (decisionStatus === "incompleta") flags.push("Decisão incompleta");
-      if (shared) flags.push("Título compartilhado");
-      if (item.confronto_principal_local === true || item.assistiu_principal_local === true) flags.push("Principal no local");
+      if (decisionStatus === "completa") flags.push(legendaHistoria("legenda_historia_decisao_completa"));
+      else if (decisionStatus === "incompleta") flags.push(legendaHistoria("legenda_historia_decisao_incompleta"));
+      if (shared) flags.push(legendaHistoria("legenda_historia_titulo_compartilhado"));
+      if (item.confronto_principal_local === true || item.assistiu_principal_local === true) flags.push(legendaHistoria("legenda_historia_principal_no_local"));
       return "<article class=\"hs-title-item\"><div><strong>" + escapeHtml(competition) + "</strong>" + (season ? "<span>" + escapeHtml(season) + "</span>" : "") + "</div>" + (result.length ? "<p>" + escapeHtml(result.join(" · ")) + "</p>" : "") + (count ? "<small>" + escapeHtml(count) + "</small>" : "") + (flags.length ? "<div class=\"hs-title-flags\">" + flags.map(function (flag) { return "<span>" + escapeHtml(flag) + "</span>"; }).join("") + "</div>" : "") + "</article>";
-    }).join("");
+    }).join(""));
     section.hidden = false;
   }
 
   function titleRoleLabel(item) {
     var roles = {
-      final_unica:"Final",
-      final_ida:"Final · ida",
-      final_volta:"Final · volta",
-      desempate:"Desempate",
-      confirmacao_titulo:"Título confirmado",
-      rodada_decisiva:"Rodada decisiva",
-      entrega_taca:"Entrega da taça",
-      final_fase:"Final da fase",
-      relacionado:"Relacionado ao título"
+      final_unica:legendaHistoria("legenda_historia_final"),
+      final_ida:legendaHistoria("legenda_historia_final_ida"),
+      final_volta:legendaHistoria("legenda_historia_final_volta"),
+      desempate:legendaHistoria("legenda_historia_desempate"),
+      confirmacao_titulo:legendaHistoria("legenda_historia_titulo_confirmado"),
+      rodada_decisiva:legendaHistoria("legenda_historia_rodada_decisiva"),
+      entrega_taca:legendaHistoria("legenda_historia_entrega_da_taca"),
+      final_fase:legendaHistoria("legenda_historia_final_da_fase"),
+      relacionado:legendaHistoria("legenda_historia_relacionado_ao_titulo")
     };
     var role = String(item && (item.papel_confronto || item.papel || item.tipo_vinculo || item.role) || "").toLowerCase();
-    return roles[role] || "Confronto de título";
+    return roles[role] || legendaHistoria("legenda_historia_confronto_de_titulo");
   }
 
   function titleRoleLabels(item) {
     var labels = [titleRoleLabel(item)];
-    if (item && item.confronto_principal === true) labels.push("Principal");
+    if (item && item.confronto_principal === true) labels.push(legendaHistoria("legenda_historia_principal"));
     return labels;
   }
 
   function namesInPortuguese(names) {
     names = arrayOf(names).filter(Boolean);
     if (names.length < 2) return names[0] || "";
-    return names.slice(0, -1).join(", ") + " e " + names[names.length - 1];
+    return legendaHistoria("legenda_historia_nomes_lista", { anteriores: names.slice(0, -1).join(", "), ultimo: names[names.length - 1] });
   }
 
   function titleBadges(item) {
@@ -288,7 +431,7 @@
     var away = item.time_fora || item.participante_fora || "";
     var hasScore = item.placar_casa != null && item.placar_fora != null;
     var title = home && away ? [home, hasScore ? item.placar_casa : "", "×", hasScore ? item.placar_fora : "", away].filter(function (value) { return value !== ""; }).join(" ") : item.titulo;
-    var detail = form === "local" ? [item.local, item.cidade].filter(Boolean).join(" · ") || "No local do evento" : "TV/outro meio";
+    var detail = form === "local" ? [item.local, item.cidade].filter(Boolean).join(" · ") || legendaHistoria("legenda_historia_no_local_do_evento") : legendaHistoria("legenda_historia_tv_outro_meio");
     var rawDate = item.data_partida || item.data || item.inicio_em;
     var formatted = formatDate(rawDate);
     var parts = formatted.split(" ");
@@ -296,13 +439,13 @@
     var competition = item.competicao || "";
     if (item.temporada && competition.toLowerCase().indexOf(String(item.temporada).toLowerCase()) < 0) competition += " " + item.temporada;
     var subline = [competition, detail].filter(Boolean).join(" · ");
-    var companionsLine = companions.length ? "<small class=\"hs-timeline-companions\">Assistiu com " + escapeHtml(namesInPortuguese(companions)) + "</small>" : "";
+    var companionsLine = companions.length ? ("<small class=\"hs-timeline-companions\">" + escapeHtml(legendaHistoria("legenda_historia_assistiu_com"))) + escapeHtml(namesInPortuguese(companions)) + "</small>" : "";
     var wo = item.wo_time_casa === true || item.wo_time_fora === true;
     var titleHtml = home && away ?
       "<span class=\"hs-timeline-team-name" + (item.wo_time_casa === true ? " is-wo" : "") + "\">" + escapeHtml(home) + "</span> " +
       (hasScore ? "<span class=\"hs-timeline-score\">" + escapeHtml(item.placar_casa) + " × " + escapeHtml(item.placar_fora) + "</span>" : "×") + " " +
-      "<span class=\"hs-timeline-team-name" + (item.wo_time_fora === true ? " is-wo" : "") + "\">" + escapeHtml(away) + "</span>" : escapeHtml(title || "Confronto");
-    return "<article class=\"hs-timeline-item\"><time datetime=\"" + escapeHtml(String(rawDate || "").slice(0,10)) + "\"><strong>" + escapeHtml(parts[0] || "") + "</strong><span>" + escapeHtml(parts.slice(1).join(" ")) + "</span>" + (wo ? "<em class=\"hs-wo\">W.O.</em>" : "") + "</time><span class=\"hs-timeline-node\"></span><div class=\"hs-timeline-copy\"><strong class=\"hs-timeline-match\" aria-label=\"" + escapeHtml(title || "Confronto") + "\">" + titleHtml + "</strong><span class=\"hs-timeline-meta\">" + escapeHtml(subline) + "</span>" + companionsLine + titleBadges(item) + "</div>" + icon(form === "local" ? "stadium" : "tv") + "</article>";
+      "<span class=\"hs-timeline-team-name" + (item.wo_time_fora === true ? " is-wo" : "") + "\">" + escapeHtml(away) + "</span>" : escapeHtml(title || legendaHistoria("legenda_historia_confronto"));
+    return "<article class=\"hs-timeline-item\"><time datetime=\"" + escapeHtml(String(rawDate || "").slice(0,10)) + "\"><strong>" + escapeHtml(parts[0] || "") + "</strong><span>" + escapeHtml(parts.slice(1).join(" ")) + "</span>" + (wo ? ("<em class=\"hs-wo\">" + escapeHtml(legendaHistoria("legenda_historia_w_o")) + "</em>") : "") + "</time><span class=\"hs-timeline-node\"></span><div class=\"hs-timeline-copy\"><strong class=\"hs-timeline-match\" aria-label=\"" + escapeHtml(title || legendaHistoria("legenda_historia_confronto")) + "\">" + titleHtml + "</strong><span class=\"hs-timeline-meta\">" + escapeHtml(subline) + "</span>" + companionsLine + titleBadges(item) + "</div>" + icon(form === "local" ? "stadium" : "tv") + "</article>";
   }
 
   async function loadTitleContexts(items) {
@@ -382,7 +525,7 @@
     var button = byId(section === "experiencias" ? "loadMoreButton" : "loadMoreContributionsButton");
     button.disabled = page.loading;
     button.setAttribute("aria-busy", page.loading ? "true" : "false");
-    button.textContent = page.loading ? "Carregando…" : page.failed ? "Tentar novamente" : "Ver mais";
+    button.textContent = page.loading ? legendaHistoria("legenda_historia_carregando") : page.failed ? legendaHistoria("legenda_historia_tentar_novamente") : legendaHistoria("legenda_historia_ver_mais");
     button.hidden = !page.loading && !page.failed && (!page.initialized || !page.hasMore);
   }
 
@@ -412,7 +555,7 @@
     } catch (error) {
       if (state.code === requestCode) {
         page.failed = true;
-        showToast(section === "experiencias" ? "Não foi possível carregar a linha do tempo." : "Não foi possível carregar as colaborações.", true);
+        showToast((section === "experiencias" ? "legenda_historia_nao_foi_possivel_carregar_a_linha_do_tempo" : "legenda_historia_nao_foi_possivel_carregar_as_colaboracoes"), true);
       }
     } finally {
       page.loading = false;
@@ -432,7 +575,7 @@
       return;
     }
     byId("timelineSection").hidden = false;
-    byId("timeline").innerHTML = rows.length ? rows.map(timelineItem).join("") : "<div class=\"hs-empty\">" + (page.loading ? "Carregando linha do tempo…" : page.failed ? "Não foi possível carregar a linha do tempo." : "Este membro ainda não publicou confrontos em sua linha do tempo.") + "</div>";
+    apresentarHTML(byId("timeline"), rows.length ? rows.map(timelineItem).join("") : "<div class=\"hs-empty\">" + (page.loading ? escapeHtml(legendaHistoria("legenda_historia_carregando_linha_do_tempo")) : page.failed ? escapeHtml(legendaHistoria("legenda_historia_nao_foi_possivel_carregar_a_linha_do_tempo")) : escapeHtml(legendaHistoria("legenda_historia_este_membro_ainda_nao_publicou_confrontos_em_sua_linha_do_tempo"))) + "</div>");
     updatePageButton("experiencias");
   }
 
@@ -442,12 +585,12 @@
     var rows = page.items;
     var section = byId("contributionsSection");
     if (profile.exibir_colaboracoes === false || (!rows.length && !page.loading && !page.failed)) { section.hidden = true; return; }
-    byId("contributions").innerHTML = rows.length ? rows.map(function (item) {
-      var match = [item.time_casa, item.time_fora].filter(Boolean).join(" × ") || "Confronto revisado";
-      var detail = [item.competicao, item.tipo === "inclusao" ? "Confronto incluído" : "Informação corrigida"].filter(Boolean).join(" · ");
+    apresentarHTML(byId("contributions"), rows.length ? rows.map(function (item) {
+      var match = [item.time_casa, item.time_fora].filter(Boolean).join(" × ") || legendaHistoria("legenda_historia_confronto_revisado");
+      var detail = [item.competicao, item.tipo === "inclusao" ? legendaHistoria("legenda_historia_confronto_incluido") : legendaHistoria("legenda_historia_informacao_corrigida")].filter(Boolean).join(" · ");
       var rawDate = item.aprovada_em || item.data;
       return "<article class=\"hs-contribution\"><time datetime=\"" + escapeHtml(String(rawDate || "").slice(0,10)) + "\">" + escapeHtml(formatDate(rawDate)) + "</time><span><strong>" + escapeHtml(match) + "</strong><small>" + escapeHtml(detail) + "</small></span></article>";
-    }).join("") : "<div class=\"hs-empty\">" + (page.loading ? "Carregando colaborações…" : "Não foi possível carregar as colaborações.") + "</div>";
+    }).join("") : "<div class=\"hs-empty\">" + (page.loading ? escapeHtml(legendaHistoria("legenda_historia_carregando_colaboracoes")) : escapeHtml(legendaHistoria("legenda_historia_nao_foi_possivel_carregar_as_colaboracoes"))) + "</div>");
     section.hidden = false;
     updatePageButton("colaboracoes");
   }
@@ -458,14 +601,14 @@
     var rows = payload ? arrayOf(payload) : [];
     var section = byId("rankingSection");
     if (profile.exibir_ranking === false || !payload || !rows.length) {
-      byId("ranking").innerHTML = "";
+      apresentarHTML(byId("ranking"), "");
       section.hidden = true;
       return;
     }
-    byId("ranking").innerHTML = rows.map(function (item) {
-      var detail = numberOf(item.pontos) + " pontos · " + numberOf(item.total_local) + " no local · " + numberOf(item.total_remoto) + " por TV/outro meio";
-      return "<li><span class=\"hs-ranking-position\">#" + escapeHtml(numberOf(item.posicao)) + "</span><span><strong>" + escapeHtml(item.codinome || "Membro Turbo Tiger") + "</strong><small>" + escapeHtml(detail) + "</small></span></li>";
-    }).join("");
+    apresentarHTML(byId("ranking"), rows.map(function (item) {
+      var detail = legendaHistoria("legenda_historia_resumo_pontuacao", { pontos: numberOf(item.pontos), locais: numberOf(item.total_local), remotos: numberOf(item.total_remoto) });
+      return "<li><span class=\"hs-ranking-position\">#" + escapeHtml(numberOf(item.posicao)) + "</span><span><strong>" + escapeHtml(item.codinome || legendaHistoria("legenda_historia_membro_turbo_tiger")) + "</strong><small>" + escapeHtml(detail) + "</small></span></li>";
+    }).join(""));
     section.hidden = false;
   }
 
@@ -474,19 +617,19 @@
     var profile = data.perfil || {};
     var summary = data.resumo || {};
     if (profile.ativo === false || data.status === "privada") {
-      showState("private", "Perfil privado", "Este membro não disponibilizou sua história esportiva publicamente.");
+      showState("private", "legenda_historia_perfil_privado", "legenda_historia_este_membro_nao_disponibilizou_sua_historia_esportiva_publicamente");
       return false;
     }
     state.data = data;
     state.code = String(profile.codigo_publico || data.codigo_publico || data.codigo || state.code);
     resetTitleData();
     resetPagination(data);
-    var name = profile.nome_exibicao || profile.codinome || "Membro Turbo Tiger";
+    var name = profile.nome_exibicao || profile.codinome || legendaHistoria("legenda_historia_membro_turbo_tiger");
     byId("profileName").textContent = name;
     var codename = profile.exibir_codinome === false || !profile.codinome || profile.codinome === name ? "" : profile.codinome;
     byId("profileCodename").textContent = codename;
     byId("profileCodename").hidden = !codename;
-    byId("profileSport").textContent = profile.esporte || data.esporte_nome || "Esporte";
+    byId("profileSport").textContent = profile.esporte || data.esporte_nome || legendaHistoria("legenda_historia_esporte");
     byId("profileAvatar").textContent = initials(name);
     if (summary.contribuicoes == null) summary.contribuicoes = arrayOf(data.colaboracoes).length;
     renderMetrics(summary);
@@ -501,7 +644,7 @@
   }
 
   async function loadStory(code) {
-    if (!CODE_RE.test(code || "")) { showState("invalid", "Código inválido", "Verifique o link recebido e tente novamente."); return; }
+    if (!CODE_RE.test(code || "")) { showState("invalid", "legenda_historia_codigo_invalido", "legenda_historia_verifique_o_link_recebido_e_tente_novamente"); return; }
     try {
       var data = await rpc("ie_experiencia_historia_bootstrap_rpc", { p_codigo_publico: code, p_id_esporte: null });
       if (!renderStory(data || {})) return;
@@ -511,37 +654,42 @@
       if (profile.exibir_colaboracoes !== false) loads.push(loadHistorySection("colaboracoes", true));
       await Promise.all(loads);
     } catch (error) {
-      showState("invalid", "História indisponível", "O código pode ter expirado, sido renovado ou a página pode ter sido desativada.");
+      showState("invalid", "legenda_historia_historia_indisponivel", "legenda_historia_o_codigo_pode_ter_expirado_sido_renovado_ou_a_pagina_pode_ter_sido_desativada");
     }
   }
 
   function renderInvitation(invitation) {
+    if (!reapresentandoIdioma) { conviteApresentado = invitation; optoutApresentado = null; }
     var match = invitation.confronto || {};
-    var member = invitation.convidador_codinome || "Um membro da comunidade Turbo Tiger";
+    var member = invitation.convidador_codinome || legendaHistoria("legenda_historia_um_membro_da_comunidade_turbo_tiger");
     var addressee = invitation.destinatario_nome ? invitation.destinatario_nome + ", " : "";
-    var title = match.titulo || "Confronto esportivo";
+    var title = match.titulo || legendaHistoria("legenda_historia_confronto_esportivo");
     var detail = [formatDate(match.data), match.hora ? String(match.hora).slice(0,5) : "", match.competicao, match.local, match.cidade].filter(Boolean).join(" · ");
     var panel = byId("invitePanel");
     var heading = byId("storyPage").hidden ? "h1" : "h2";
     if (invitation.status === "confirmado" || invitation.respondido === true) {
-      panel.innerHTML = "<" + heading + ">Lembrança confirmada</" + heading + "><p>Você confirmou que assistiram juntos. A história compartilhada continua disponível abaixo.</p>";
+      apresentarHTML(panel, "<" + heading + (">" + escapeHtml(legendaHistoria("legenda_historia_lembranca_confirmada")) + "</") + heading + ("><p>" + escapeHtml(legendaHistoria("legenda_historia_voce_confirmou_que_assistiram_juntos_a_historia_compartilhada_continua_disponivel_abaixo")) + "</p>"));
       if (byId("storyPage").hidden) byId("statePanel").hidden = true;
       panel.hidden = false;
       return;
     }
-    panel.innerHTML = "<" + heading + ">" + escapeHtml(addressee + member) + " disse que assistiu com você</" + heading + "><p>Confirme apenas se reconhecer esta lembrança. O Turbo Tiger não considera a informação comprovada até sua resposta.</p><div class=\"hs-invite-match\"><strong>" + escapeHtml(title) + "</strong><span>" + escapeHtml(detail) + "</span></div><label class=\"hs-invite-consent\"><input id=\"inviteNameConsent\" type=\"checkbox\"><span>Se eu confirmar, autorizo que o nome informado no convite apareça nesta lembrança pública.</span></label><div class=\"hs-invite-actions\"><button type=\"button\" data-invite-response=\"confirmar\">Sim, assistimos juntos</button><button type=\"button\" data-invite-response=\"contestar\">Não reconheço</button><button type=\"button\" data-invite-response=\"recusar\">Prefiro não responder</button></div><button type=\"button\" class=\"hs-invite-optout\" data-invite-response=\"optout\">Não quero receber novos convites</button>";
+    apresentarHTML(panel, "<" + heading + ">" + escapeHtml(addressee + member) + (escapeHtml(legendaHistoria("legenda_historia_disse_que_assistiu_com_voce")) + "</") + heading + ("><p>" + escapeHtml(legendaHistoria("legenda_historia_confirme_apenas_se_reconhecer_esta_lembranca_o_turbo_tiger_nao_considera_a_informacao_comprovada_ate")) + "</p><div class=\"hs-invite-match\"><strong>") + escapeHtml(title) + "</strong><span>" + escapeHtml(detail) + ("</span></div><label class=\"hs-invite-consent\"><input id=\"inviteNameConsent\" type=\"checkbox\"><span>" + escapeHtml(legendaHistoria("legenda_historia_se_eu_confirmar_autorizo_que_o_nome_informado_no_convite_apareca_nesta_lembranca_publica")) + "</span></label><div class=\"hs-invite-actions\"><button type=\"button\" data-invite-response=\"confirmar\">" + escapeHtml(legendaHistoria("legenda_historia_sim_assistimos_juntos")) + "</button><button type=\"button\" data-invite-response=\"contestar\">" + escapeHtml(legendaHistoria("legenda_historia_nao_reconheco")) + "</button><button type=\"button\" data-invite-response=\"recusar\">" + escapeHtml(legendaHistoria("legenda_historia_prefiro_nao_responder")) + "</button></div><button type=\"button\" class=\"hs-invite-optout\" data-invite-response=\"optout\">" + escapeHtml(legendaHistoria("legenda_historia_nao_quero_receber_novos_convites")) + "</button>"));
     if (byId("storyPage").hidden) byId("statePanel").hidden = true;
     panel.hidden = false;
-    try { panel.focus(); } catch (error) {}
+    if (!reapresentandoIdioma) { try { panel.focus(); } catch (error) {} }
   }
 
-  function renderOptoutPanel(title, message) {
+  function renderOptoutPanel(chaveTitulo, chaveMensagem) {
+    if (!reapresentandoIdioma) optoutApresentado = {titulo:chaveTitulo, mensagem:chaveMensagem};
+    var title = legendaHistoria(chaveTitulo);
+    var message = legendaHistoria(chaveMensagem);
+    conviteApresentado = null;
     var panel = byId("invitePanel");
     var heading = byId("storyPage").hidden ? "h1" : "h2";
-    panel.innerHTML = "<" + heading + ">" + escapeHtml(title) + "</" + heading + "><p>" + escapeHtml(message) + "</p><div class=\"hs-invite-actions hs-invite-actions-single\"><button type=\"button\" data-invite-response=\"optout\">Não quero receber novos convites</button></div>";
+    apresentarHTML(panel, "<" + heading + ">" + escapeHtml(title) + "</" + heading + "><p>" + escapeHtml(message) + ("</p><div class=\"hs-invite-actions hs-invite-actions-single\"><button type=\"button\" data-invite-response=\"optout\">" + escapeHtml(legendaHistoria("legenda_historia_nao_quero_receber_novos_convites")) + "</button></div>"));
     if (byId("storyPage").hidden) byId("statePanel").hidden = true;
     panel.hidden = false;
-    try { panel.focus(); } catch (error) {}
+    if (!reapresentandoIdioma) { try { panel.focus(); } catch (error) {} }
   }
 
   async function loadInvitation(token) {
@@ -557,7 +705,7 @@
       }
       renderInvitation(invitation || {});
     } catch (error) {
-      renderOptoutPanel("Convite indisponível", "Este convite pode ter expirado, sido revogado ou já ter sido respondido. Você ainda pode impedir novos convites para este endereço.");
+      renderOptoutPanel("legenda_historia_convite_indisponivel", "legenda_historia_este_convite_pode_ter_expirado_sido_revogado_ou_ja_ter_sido_respondido_voce_ainda_pode_impedir_novos");
     }
   }
 
@@ -567,11 +715,11 @@
     try {
       await rpc("ie_experiencia_email_optout_rpc", { p_token: state.invitation });
       byId("invitePanel").hidden = true;
-      var message = "Preferência registrada. Você não receberá novos convites neste endereço.";
+      var message = "legenda_historia_preferencia_registrada_voce_nao_recebera_novos_convites_neste_endereco";
       if (!byId("storyPage").hidden && state.data) showToast(message, false);
-      else showState("success", "Preferência registrada", message);
+      else showState("success", "legenda_historia_preferencia_registrada", message);
     } catch (error) {
-      showToast("Não foi possível registrar sua preferência agora.", true);
+      showToast("legenda_historia_nao_foi_possivel_registrar_sua_preferencia_agora", true);
       buttons.forEach(function (button) { button.disabled = false; });
     }
   }
@@ -584,15 +732,15 @@
       var consent = response === "confirmar" && !!(byId("inviteNameConsent") && byId("inviteNameConsent").checked);
       await rpc("ie_experiencia_convite_responder_rpc", { p_token: state.invitation, p_resposta: response, p_autoriza_exibicao_nome: consent });
       byId("invitePanel").hidden = true;
-      var message = response === "confirmar" ? "Obrigado por confirmar esta lembrança." : response === "contestar" ? "Contestação registrada para análise." : "Resposta registrada.";
+      var message = (response === "confirmar" ? "legenda_historia_obrigado_por_confirmar_esta_lembranca" : (response === "contestar" ? "legenda_historia_contestacao_registrada_para_analise" : "legenda_historia_resposta_registrada"));
       if (CODE_RE.test(state.code)) {
         showToast(message, false);
         await loadStory(state.code);
       } else {
-        showState("success", "Resposta registrada", message);
+        showState("success", "legenda_historia_resposta_registrada_2", message);
       }
     } catch (error) {
-      showToast("Não foi possível registrar sua resposta agora.", true);
+      showToast("legenda_historia_nao_foi_possivel_registrar_sua_resposta_agora", true);
       buttons.forEach(function (button) { button.disabled = false; });
     }
   }
@@ -602,13 +750,13 @@
     shareUrl.search = "";
     if (CODE_RE.test(state.code)) shareUrl.searchParams.set("codigo", state.code);
     var url = shareUrl.href.split("#")[0];
-    var payload = { title:"História esportiva no Turbo Tiger", text:"Veja esta história esportiva compartilhada pela comunidade Turbo Tiger.", url:url };
+    var payload = { title:legendaHistoria("legenda_historia_historia_esportiva_no_turbo_tiger"), text:legendaHistoria("legenda_historia_veja_esta_historia_esportiva_compartilhada_pela_comunidade_turbo_tiger"), url:url };
     try {
       if (navigator.share) await navigator.share(payload);
-      else if (navigator.clipboard) { await navigator.clipboard.writeText(url); showToast("Link copiado.", false); }
+      else if (navigator.clipboard) { await navigator.clipboard.writeText(url); showToast("legenda_historia_link_copiado", false); }
       else throw new Error("indisponivel");
     } catch (error) {
-      if (String(error && error.name) !== "AbortError") showToast("Não foi possível compartilhar agora.", true);
+      if (String(error && error.name) !== "AbortError") showToast("legenda_historia_nao_foi_possivel_compartilhar_agora", true);
     }
   }
 
@@ -632,15 +780,16 @@
     state.invitationMode = optoutToken ? "optout" : invitationToken ? "convite" : "";
     if (hadInvitationParameter || hadOptoutParameter) removeSensitiveParametersFromAddressBar();
     if ((hadInvitationParameter || hadOptoutParameter) && !state.invitation && !state.code) {
-      showState("invalid", hadOptoutParameter ? "Link de preferência indisponível" : "Convite indisponível", "Verifique o link recebido e tente novamente.");
+      showState("invalid", (hadOptoutParameter ? "legenda_historia_link_de_preferencia_indisponivel" : "legenda_historia_convite_indisponivel"), "legenda_historia_verifique_o_link_recebido_e_tente_novamente");
       return;
     }
-    if (!state.code && !state.invitation) { showState("invalid", "Código obrigatório", "Abra esta página pelo link seguro compartilhado por um membro Turbo Tiger."); return; }
+    if (!state.code && !state.invitation) { showState("invalid", "legenda_historia_codigo_obrigatorio", "legenda_historia_abra_esta_pagina_pelo_link_seguro_compartilhado_por_um_membro_turbo_tiger"); return; }
     if (state.code) await loadStory(state.code);
-    if (state.invitationMode === "optout") renderOptoutPanel("Preferências de convites", "Confirme abaixo se não quiser receber novos convites do Turbo Tiger neste endereço.");
+    if (state.invitationMode === "optout") renderOptoutPanel("legenda_historia_preferencias_de_convites", "legenda_historia_confirme_abaixo_se_nao_quiser_receber_novos_convites_do_turbo_tiger_neste_endereco");
     else if (state.invitation) await loadInvitation(state.invitation);
-    else if (hadInvitationParameter || hadOptoutParameter) showToast("O link informado não é válido.", true);
+    else if (hadInvitationParameter || hadOptoutParameter) showToast("legenda_historia_o_link_informado_nao_e_valido", true);
   }
 
+  if (typeof window.addEventListener === "function") window.addEventListener("turbotiger:idioma", atualizarIdiomaHistoria);
   init();
 }());

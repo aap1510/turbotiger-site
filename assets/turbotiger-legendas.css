@@ -1,0 +1,24 @@
+/* Apenas o seletor das duas paginas iniciais. */
+[data-tt-seletor-idioma] { display: inline-flex; flex: 0 0 auto; }
+.tt-idioma-botao { display: inline-flex; gap: 6px; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 6px 9px; border: 1px solid rgba(255,255,255,.35); border-radius: 999px; background: rgba(0,0,0,.34); color: #fff; font: inherit; font-size: 12px; cursor: pointer; }
+.brand .tt-idioma-botao img { width: 24px; height: 18px; border-radius: 2px; box-shadow: none; object-fit: cover; }
+.tt-idioma-botao:focus-visible,.tt-idioma-dialogo button:focus-visible { outline: 2px solid #f4b400; outline-offset: 3px; }
+.tt-idioma-dialogo { position: fixed; inset: 0; width: min(440px,calc(100vw - 32px)); max-height: calc(100dvh - 40px); padding: 22px; overflow: auto; border: 1px solid #5c5131; border-radius: 18px; background: #17191e; color: #fff; box-shadow: 0 18px 70px #0009; }
+.tt-idioma-dialogo::backdrop { background: #000b; }
+.tt-idioma-cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.tt-idioma-cabecalho h2 { margin: 0; font-size: 20px; color: #fff; }
+.tt-idioma-cabecalho button { min-width: 44px; min-height: 44px; border: 0; border-radius: 8px; background: transparent; color: #fff; font-size: 28px; cursor: pointer; }
+.tt-idioma-opcoes { display: grid; gap: 8px; }
+.tt-idioma-opcoes button { display: grid; grid-template-columns: 28px 70px 1fr; align-items: center; gap: 12px; min-height: 48px; padding: 10px 12px; border: 1px solid #ffffff38; border-radius: 10px; background: transparent; color: #fff; font: inherit; text-align: left; cursor: pointer; }
+.tt-idioma-opcoes button[aria-pressed=true] { border-color: #f4b400; background: #f4b40018; }
+.tt-idioma-opcoes img { width: 28px; height: 21px; object-fit: cover; border-radius: 2px; }
+.tt-idioma-opcoes small { color: #d4d6dc; font-size: 12px; }
+.tt-idioma-status { margin: 12px 0 0; font-size: 14px; }
+.tt-idioma-status:empty { display: none; }
+@media(max-width:640px) {
+  [data-tt-seletor-idioma] { position: absolute; top: -5px; right: 39px; }
+  .tt-idioma-botao { padding: 6px; border-color: transparent; background: transparent; }
+  .tt-idioma-codigo { display: none; }
+  .tt-idioma-home .brand-copy { max-width: calc(100vw - 180px); }
+  .tt-idioma-home .brand-copy strong { white-space: normal; }
+}

@@ -1,5 +1,12 @@
 (function () {
   "use strict";
+  var fontesLegendasSelecao = {
+    legenda_ie_comparacao_selecionar_confronto: "Comparar {confronto}. Toque para marcar ou desmarcar; mantenha pressionado para abrir com dois confrontos. No teclado, Shift mais Enter."
+  };
+  if (window.TurboTigerLegendas) window.TurboTigerLegendas.registrar(fontesLegendasSelecao);
+  function legendaSelecao(confronto) {
+    return window.TurboTigerLegendas ? window.TurboTigerLegendas.texto("legenda_ie_comparacao_selecionar_confronto", { confronto: confronto }) : fontesLegendasSelecao.legenda_ie_comparacao_selecionar_confronto.replace("{confronto}", function () { return String(confronto); });
+  }
   window.TurboTigerCompareSelection = function (api) {
     var root = api.root, selected = [], press = null, swallowed = null;
     var selector = '[data-compare-select]';
@@ -74,7 +81,7 @@
       reset: function () { cancel(true); selected = []; swallowed = null; sync(); },
       button: function (id, name, start) {
         var marked = selected.some(function (item) { return item.id === Number(id); });
-        return '<button type="button" class="ie-compare-select" data-compare-select="' + Number(id) + '" data-compare-start="' + Number(start) + '" aria-pressed="' + marked + '" aria-label="Comparar ' + escape(name) + '. Toque para marcar ou desmarcar; mantenha pressionado para abrir com dois confrontos. No teclado, Shift mais Enter."><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="7" height="16" rx="1.5"/><rect x="15" y="4" width="7" height="16" rx="1.5"/><path d="M7 9h10m-2-2 2 2-2 2M17 15H7m2-2-2 2 2 2"/></svg></button>';
+        return '<button type="button" class="ie-compare-select" data-compare-select="' + Number(id) + '" data-compare-start="' + Number(start) + '" aria-pressed="' + marked + '" aria-label="' + escape(legendaSelecao(name)) + '"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="7" height="16" rx="1.5"/><rect x="15" y="4" width="7" height="16" rx="1.5"/><path d="M7 9h10m-2-2 2 2-2 2M17 15H7m2-2-2 2 2 2"/></svg></button>';
       }
     };
   };

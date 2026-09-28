@@ -8,8 +8,8 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#050607">
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <title>Inteligência Esportiva — Turbo Tiger</title>
-  <meta name="description" content="Central personalizada de acompanhamento esportivo do Turbo Tiger.">
+  <title data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_inteligencia_esportiva_turbo_tiger&quot;}">Inteligência Esportiva — Turbo Tiger</title>
+  <meta name="description" content="Central personalizada de acompanhamento esportivo do Turbo Tiger." data-legenda-atributos="{&quot;content&quot;:&quot;legenda_site_central_personalizada_de_acompanhamento_esportivo_do_turbo_tiger&quot;}">
   <link rel="icon" href="../assets/icone-turbotiger-raio.ico">
   <link rel="stylesheet" href="assets/ie.css?v=20260917-02">
   <link rel="stylesheet" href="assets/ie-personal.css?v=20260903-06">
@@ -17,6 +17,9 @@
   <link rel="stylesheet" href="assets/ie-simulator-manual.css?v=20260903-03">
   <link rel="stylesheet" href="assets/ie-compare.css?v=20260903-03">
   <link rel="stylesheet" href="assets/ie-bets.css?v=20260917-04">
+<link rel="stylesheet" href="../assets/turbotiger-legendas.css?v=20260926-01">
+<script src="../assets/turbotiger-legendas.js?v=20260926-i18n-01"></script>
+<script src="../assets/legendas/pt-BR.js?v=20260926-i18n-01"></script>
 </head>
 <body>
   <svg class="ie-symbols" aria-hidden="true">
@@ -48,15 +51,15 @@
 
   <div id="loadingPanel" class="ie-gate" aria-live="polite">
     <span class="ie-spinner" aria-hidden="true"></span>
-    <strong>Carregando sua Central<br>de Inteligência Esportiva</strong>
-    <span id="loadingStatus" class="sr-only">Validando a sessão do aplicativo...</span>
+    <strong data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_carregando_sua_central&quot;,&quot;2&quot;:&quot;legenda_site_de_inteligencia_esportiva&quot;}">Carregando sua Central<br>de Inteligência Esportiva</strong>
+    <span id="loadingStatus" class="sr-only" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_validando_a_sessao_do_aplicativo&quot;}">Validando a sessão do aplicativo...</span>
   </div>
 
   <div id="accessPanel" class="ie-gate" hidden>
     <img src="../assets/icone-turbotiger-raio.webp" alt="" width="54" height="54">
-    <strong>Acesso pelo aplicativo</strong>
-    <span>Esta central usa sua sessão segura do Turbo Tiger e não pode ser aberta diretamente.</span>
-    <button id="retryButton" class="ie-button ie-button-primary" type="button">Tentar novamente</button>
+    <strong data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_acesso_pelo_aplicativo&quot;}">Acesso pelo aplicativo</strong>
+    <span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_esta_central_usa_sua_sessao_segura_do_turbo_tiger_e&quot;}">Esta central usa sua sessão segura do Turbo Tiger e não pode ser aberta diretamente.</span>
+    <button id="retryButton" class="ie-button ie-button-primary" type="button" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_tentar_novamente&quot;}">Tentar novamente</button>
   </div>
 
   <div id="ieApp" class="ie-app" hidden>
@@ -68,27 +71,27 @@
       <div class="ie-header-brand">
         <svg class="ie-header-sport-icon" aria-hidden="true"><use href="#ie-ico-football"/></svg>
         <div class="ie-header-title">
-          <h1>Inteligência Esportiva</h1>
-          <span id="headerFreshness">Atualizando...</span>
+          <h1 data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_inteligencia_esportiva&quot;}">Inteligência Esportiva</h1>
+          <span id="headerFreshness" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_atualizando&quot;}">Atualizando...</span>
         </div>
       </div>
-      <button id="settingsButton" class="ie-header-settings" type="button" aria-label="Configurações" aria-pressed="false">
-        <svg><use href="#ie-ico-settings"/></svg><span>Configurações</span>
+      <button id="settingsButton" class="ie-header-settings" type="button" aria-label="Configurações" aria-pressed="false" data-legenda-atributos="{&quot;aria-label&quot;:&quot;legenda_site_configuracoes&quot;}">
+        <svg><use href="#ie-ico-settings"/></svg><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_configuracoes&quot;}">Configurações</span>
       </button>
-      <button id="closeButton" class="ie-icon-button ie-close-button" type="button" aria-label="Fechar a Central de Inteligência Esportiva">
+      <button id="closeButton" class="ie-icon-button ie-close-button" type="button" aria-label="Fechar a Central de Inteligência Esportiva" data-legenda-atributos="{&quot;aria-label&quot;:&quot;legenda_site_fechar_a_central_de_inteligencia_esportiva&quot;}">
         <svg><use href="#ie-ico-close"/></svg>
       </button>
     </header>
 
-    <nav class="ie-tabs" role="tablist" aria-label="Áreas da central">
-      <button id="tab-home" class="is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-home" tabindex="0" data-tab="home"><svg><use href="#ie-ico-home"/></svg><span>Para você</span></button>
-      <button id="tab-games" type="button" role="tab" aria-selected="false" aria-controls="panel-games" tabindex="-1" data-tab="games"><svg><use href="#ie-ico-games"/></svg><span>Confrontos</span></button>
-      <button id="tab-competitions" type="button" role="tab" aria-selected="false" aria-controls="panel-competitions" tabindex="-1" data-tab="competitions"><svg><use href="#ie-ico-trophy"/></svg><span>Competições</span></button>
-      <button id="tab-teams" type="button" role="tab" aria-selected="false" aria-controls="panel-teams" tabindex="-1" data-tab="teams"><svg><use href="#ie-ico-team"/></svg><span>Times</span></button>
-      <button id="tab-news" type="button" role="tab" aria-selected="false" aria-controls="panel-news" tabindex="-1" data-tab="news"><svg><use href="#ie-ico-news"/></svg><span>Notícias</span></button>
+    <nav class="ie-tabs" role="tablist" aria-label="Áreas da central" data-legenda-atributos="{&quot;aria-label&quot;:&quot;legenda_site_areas_da_central&quot;}">
+      <button id="tab-home" class="is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-home" tabindex="0" data-tab="home"><svg><use href="#ie-ico-home"/></svg><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_para_voce&quot;}">Para você</span></button>
+      <button id="tab-games" type="button" role="tab" aria-selected="false" aria-controls="panel-games" tabindex="-1" data-tab="games"><svg><use href="#ie-ico-games"/></svg><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_confrontos&quot;}">Confrontos</span></button>
+      <button id="tab-competitions" type="button" role="tab" aria-selected="false" aria-controls="panel-competitions" tabindex="-1" data-tab="competitions"><svg><use href="#ie-ico-trophy"/></svg><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_competicoes&quot;}">Competições</span></button>
+      <button id="tab-teams" type="button" role="tab" aria-selected="false" aria-controls="panel-teams" tabindex="-1" data-tab="teams"><svg><use href="#ie-ico-team"/></svg><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_times&quot;}">Times</span></button>
+      <button id="tab-news" type="button" role="tab" aria-selected="false" aria-controls="panel-news" tabindex="-1" data-tab="news"><svg><use href="#ie-ico-news"/></svg><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_noticias&quot;}">Notícias</span></button>
     </nav>
 
-    <nav id="sportsNav" class="ie-sports-nav" aria-label="Esportes disponíveis"></nav>
+    <nav id="sportsNav" class="ie-sports-nav" aria-label="Esportes disponíveis" data-legenda-atributos="{&quot;aria-label&quot;:&quot;legenda_site_esportes_disponiveis&quot;}"></nav>
 
     <main class="ie-main">
       <section id="panel-home" class="ie-panel is-active" role="tabpanel" aria-labelledby="tab-home" data-panel="home">
@@ -98,15 +101,15 @@
       <section id="panel-games" class="ie-panel" role="tabpanel" aria-labelledby="tab-games" data-panel="games" hidden>
         <div class="ie-panel-toolbar ie-filter-toolbar ie-games-filter-toolbar">
           <label class="ie-games-competition-filter" for="gamesCompetitionFilter">
-            <span>Competição</span>
+            <span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_competicao&quot;}">Competição</span>
             <select id="gamesCompetitionFilter">
-              <option value="">Todas as favoritas</option>
+              <option value="" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_todas_as_favoritas&quot;}">Todas as favoritas</option>
             </select>
           </label>
-          <div class="ie-segmented" role="tablist" aria-label="Filtro de jogos">
-            <button id="game-filter-live" class="is-active" type="button" role="tab" aria-selected="true" aria-controls="gamesContent" tabindex="0" data-game-filter="live">Ao vivo</button>
-            <button id="game-filter-upcoming" type="button" role="tab" aria-selected="false" aria-controls="gamesContent" tabindex="-1" data-game-filter="upcoming">Próximos</button>
-            <button id="game-filter-results" type="button" role="tab" aria-selected="false" aria-controls="gamesContent" tabindex="-1" data-game-filter="results">Resultados</button>
+          <div class="ie-segmented" role="tablist" aria-label="Filtro de jogos" data-legenda-atributos="{&quot;aria-label&quot;:&quot;legenda_site_filtro_de_jogos&quot;}">
+            <button id="game-filter-live" class="is-active" type="button" role="tab" aria-selected="true" aria-controls="gamesContent" tabindex="0" data-game-filter="live" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_ao_vivo&quot;}">Ao vivo</button>
+            <button id="game-filter-upcoming" type="button" role="tab" aria-selected="false" aria-controls="gamesContent" tabindex="-1" data-game-filter="upcoming" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_proximos&quot;}">Próximos</button>
+            <button id="game-filter-results" type="button" role="tab" aria-selected="false" aria-controls="gamesContent" tabindex="-1" data-game-filter="results" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_resultados&quot;}">Resultados</button>
           </div>
         </div>
         <div id="gamesContent" class="ie-feed" role="tabpanel" aria-labelledby="game-filter-live"></div>
@@ -121,54 +124,54 @@
       </section>
 
       <section id="panel-news" class="ie-panel" role="tabpanel" aria-labelledby="tab-news" data-panel="news" hidden>
-        <div class="ie-news-filters" aria-label="Filtros das notícias">
-          <label><span>Times</span><select id="newsTeamFilter"><option value="">Todos</option></select></label>
-          <label><span>Competição</span><select id="newsCompetitionFilter"><option value="">Todas</option></select></label>
+        <div class="ie-news-filters" aria-label="Filtros das notícias" data-legenda-atributos="{&quot;aria-label&quot;:&quot;legenda_site_filtros_das_noticias&quot;}">
+          <label><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_times&quot;}">Times</span><select id="newsTeamFilter"><option value="" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_todos&quot;}">Todos</option></select></label>
+          <label><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_competicao&quot;}">Competição</span><select id="newsCompetitionFilter"><option value="" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_todas&quot;}">Todas</option></select></label>
         </div>
         <div id="newsContent" class="ie-feed"></div>
       </section>
 
-      <section class="ie-panel" data-panel="settings" aria-label="Configurações" hidden>
+      <section class="ie-panel" data-panel="settings" aria-label="Configurações" hidden data-legenda-atributos="{&quot;aria-label&quot;:&quot;legenda_site_configuracoes&quot;}">
         <form id="settingsForm" class="ie-settings-form">
           <section id="settingsFavoriteSport" class="ie-form-section" data-settings-section="favorite">
-            <h3>Esportes favoritos</h3>
-            <p class="ie-field-help">Escolha quantos desejar e defina a ordem. O primeiro é exibido inicialmente na central e no card do aplicativo. As modalidades marcadas “Em breve!” já podem ser organizadas.</p>
+            <h3 data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_esportes_favoritos&quot;}">Esportes favoritos</h3>
+            <p class="ie-field-help" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_escolha_quantos_desejar_e_defina_a_ordem_o_primeiro_e&quot;}">Escolha quantos desejar e defina a ordem. O primeiro é exibido inicialmente na central e no card do aplicativo. As modalidades marcadas “Em breve!” já podem ser organizadas.</p>
             <div id="sportFavoriteList" class="ie-sport-favorite-list"></div>
           </section>
 
           <section id="settingsFilters" class="ie-form-section" data-settings-section="filters">
-            <h3>Filtros</h3>
+            <h3 data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_filtros&quot;}">Filtros</h3>
             <div class="ie-filter-stack">
-              <label class="ie-filter-row"><span>Continente</span><select id="continentSelect"><option value="">Todos</option></select></label>
-              <label class="ie-filter-row"><span>País</span><select id="countrySelect"><option value="">Todos</option></select></label>
-              <label class="ie-filter-row"><span>Esporte</span><select id="sportSelect"><option value="">Todos</option></select></label>
+              <label class="ie-filter-row"><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_continente&quot;}">Continente</span><select id="continentSelect"><option value="" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_todos&quot;}">Todos</option></select></label>
+              <label class="ie-filter-row"><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_pais&quot;}">País</span><select id="countrySelect"><option value="" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_todos&quot;}">Todos</option></select></label>
+              <label class="ie-filter-row"><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_esporte&quot;}">Esporte</span><select id="sportSelect"><option value="" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_todos&quot;}">Todos</option></select></label>
             </div>
           </section>
 
           <section class="ie-selection-columns">
             <div id="settingsParticipants" class="ie-form-section" data-settings-section="participants">
-              <div class="ie-list-title"><h3>Times e participantes</h3><span id="teamSelectionCount">0 selecionados</span></div>
-              <label class="ie-search"><svg><use href="#ie-ico-search"/></svg><input id="teamSearch" type="search" placeholder="Buscar time ou participante" autocomplete="off"></label>
+              <div class="ie-list-title"><h3 data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_times_e_participantes&quot;}">Times e participantes</h3><span id="teamSelectionCount" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_0_selecionados&quot;}">0 selecionados</span></div>
+              <label class="ie-search"><svg><use href="#ie-ico-search"/></svg><input id="teamSearch" type="search" placeholder="Buscar time ou participante" autocomplete="off" data-legenda-atributos="{&quot;placeholder&quot;:&quot;legenda_site_buscar_time_ou_participante&quot;}"></label>
               <div id="teamSelectionList" class="ie-selection-list"></div>
             </div>
             <div id="settingsCompetitions" class="ie-form-section" data-settings-section="competitions">
-              <div class="ie-list-title"><h3>Competição</h3><span id="competitionSelectionCount">0 selecionados</span></div>
-              <label class="ie-search"><svg><use href="#ie-ico-search"/></svg><input id="competitionSearch" type="search" placeholder="Buscar competição" autocomplete="off"></label>
+              <div class="ie-list-title"><h3 data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_competicao&quot;}">Competição</h3><span id="competitionSelectionCount" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_0_selecionados&quot;}">0 selecionados</span></div>
+              <label class="ie-search"><svg><use href="#ie-ico-search"/></svg><input id="competitionSearch" type="search" placeholder="Buscar competição" autocomplete="off" data-legenda-atributos="{&quot;placeholder&quot;:&quot;legenda_site_buscar_competicao&quot;}"></label>
               <div id="competitionSelectionList" class="ie-selection-list"></div>
             </div>
           </section>
 
           <section id="settingsNotifications" class="ie-form-section" data-settings-section="notifications">
             <div class="ie-switch-row">
-              <div><h3>Notificar</h3><span>Somente os times e participantes com sino ativo.</span></div>
+              <div><h3 data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_notificar&quot;}">Notificar</h3><span data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_somente_os_times_e_participantes_com_sino_ativo&quot;}">Somente os times e participantes com sino ativo.</span></div>
               <label class="ie-switch"><input id="notificationsEnabled" type="checkbox"><span aria-hidden="true"></span></label>
             </div>
             <fieldset class="ie-time-fieldset">
-              <legend>Antecedência</legend>
+              <legend data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_antecedencia&quot;}">Antecedência</legend>
               <div id="alertTimes" class="ie-time-options"></div>
             </fieldset>
             <fieldset class="ie-time-fieldset">
-              <legend>Tipos de alerta</legend>
+              <legend data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_tipos_de_alerta&quot;}">Tipos de alerta</legend>
               <div id="alertEvents" class="ie-event-options"></div>
             </fieldset>
           </section>
@@ -183,7 +186,7 @@
   <div id="detailModal" class="ie-modal" hidden>
     <div class="ie-modal-backdrop" data-close-detail></div>
     <section class="ie-modal-sheet" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-describedby="detailSubtitle" tabindex="-1">
-      <header><div><h2 id="detailTitle">Detalhes</h2><span id="detailSubtitle"></span></div><button class="ie-icon-button ie-detail-close" type="button" data-close-detail aria-label="Fechar"><svg><use href="#ie-ico-close"/></svg></button></header>
+      <header><div><h2 id="detailTitle" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_detalhes&quot;}">Detalhes</h2><span id="detailSubtitle"></span></div><button class="ie-icon-button ie-detail-close" type="button" data-close-detail aria-label="Fechar" data-legenda-atributos="{&quot;aria-label&quot;:&quot;legenda_site_fechar&quot;}"><svg><use href="#ie-ico-close"/></svg></button></header>
       <div id="detailContent" class="ie-detail-content"></div>
     </section>
   </div>
@@ -192,11 +195,11 @@
 
   <script src="assets/ie-live-channel.js?v=20260903-01"></script>
   <script src="assets/ie-autosave.js?v=20260903-06"></script>
-  <script src="assets/ie-compare-engine.js?v=20260903-01"></script>
-  <script src="assets/ie-compare.js?v=20260903-02"></script>
-  <script src="assets/ie-compare-selection.js?v=20260903-01"></script>
-  <script src="assets/ie-bets.js?v=20260917-05"></script>
-  <script src="assets/ie.js?v=20260917-07"></script>
+  <script src="assets/ie-compare-engine.js?v=20260926-i18n-01"></script>
+  <script src="assets/ie-compare.js?v=20260926-i18n-01"></script>
+  <script src="assets/ie-compare-selection.js?v=20260926-i18n-01"></script>
+  <script src="assets/ie-bets.js?v=20260926-i18n-01"></script>
+  <script src="assets/ie.js?v=20260926-i18n-01"></script>
   <script src="assets/ie-simulator-split.js?v=20260903-04"></script>
 </body>
 </html>

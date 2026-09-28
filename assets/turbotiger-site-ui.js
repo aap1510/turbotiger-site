@@ -6,6 +6,16 @@
   var DEFAULT_INSTAGRAM = "https://www.instagram.com/turbotiger.com.br";
   var DEFAULT_FACEBOOK = "https://www.facebook.com/turbotiger.com.br";
   var WHATSAPP_MESSAGE = "Ol\u00e1, suporte Turbo Tiger. Estou chamando o atendimento pelo site. Preciso de ajuda.";
+  var ultimoTelefoneWhatsapp = "";
+  var legendas = window.TurboTigerLegendas;
+  if (legendas) legendas.registrar({
+    legenda_site_atendimento_mensagem_whatsapp: WHATSAPP_MESSAGE,
+    legenda_site_idade_acesso_exclusivo: "Acesso exclusivo",
+    legenda_site_idade_maiores_de_idade: "para maiores de idade",
+    legenda_site_idade_verificacao_cpf: "No cadastro com país Brasil, a idade é verificada pelos dados consultados a partir do CPF. Para outros países, são exigidos nome completo e data de nascimento digitados pelo usuário, com bloqueio de cadastro para menores de 18 anos.",
+    legenda_site_idade_minima: "O acesso ao aplicativo é permitido exclusivamente a pessoas com 18 (dezoito) anos ou mais.",
+    legenda_site_idade_entendi: "Entendi"
+  });
   var LOCAL_IMAGE_FILES = {
     instagramIcon: "icone-instagram-96x96.webp",
     facebookIcon: "icone-facebook-96x96.webp",
@@ -99,7 +109,7 @@
   function whatsappUrl(phone) {
     var number = digitsOnly(phone);
     if (!number) return "";
-    return "https://wa.me/" + number + "?text=" + encodeURIComponent(WHATSAPP_MESSAGE);
+    return "https://wa.me/" + number + "?text=" + encodeURIComponent(legendas ? legendas.texto("legenda_site_atendimento_mensagem_whatsapp") : WHATSAPP_MESSAGE);
   }
 
   function cacheBustUrl(url) {
@@ -366,13 +376,22 @@
       '<h2 id="ttAgeModalTitle">Acesso exclusivo<br>para maiores de idade</h2>',
       '</div>',
       '<div class="tt-age-modal-copy">',
-      '<p>O Turbo Tiger verifica a idade por meio do CPF, utilizando dados oficiais da Receita Federal disponibilizados pelo Serpro, empresa pública do Governo Federal, em serviço acessado por meio da plataforma Gov.br.</p>',
+      '<p>No cadastro com país Brasil, a idade é verificada pelos dados consultados a partir do CPF. Para outros países, são exigidos nome completo e data de nascimento digitados pelo usuário, com bloqueio de cadastro para menores de 18 anos.</p>',
       '<p>O acesso ao aplicativo é permitido exclusivamente a pessoas com 18 (dezoito) anos ou mais.</p>',
       '</div>',
       '<button class="tt-age-modal-close" type="button">Entendi</button>',
       '</div>'
     ].join("");
     document.body.appendChild(modal);
+
+    if (legendas) {
+      modal.querySelector("h2").setAttribute("data-legenda-nos", JSON.stringify({ 0: "legenda_site_idade_acesso_exclusivo", 2: "legenda_site_idade_maiores_de_idade" }));
+      modal.querySelectorAll(".tt-age-modal-copy p").forEach(function (paragrafo, indice) {
+        paragrafo.setAttribute("data-legenda-nos", JSON.stringify({ 0: indice === 0 ? "legenda_site_idade_verificacao_cpf" : "legenda_site_idade_minima" }));
+      });
+      modal.querySelector(".tt-age-modal-close").setAttribute("data-legenda-nos", JSON.stringify({ 0: "legenda_site_idade_entendi" }));
+      legendas.aplicar(modal);
+    }
 
     var closeButton = modal.querySelector(".tt-age-modal-close");
 
@@ -432,6 +451,7 @@
       ["whatsapp", "suporte"]
     ]);
     var whatsapp = insideApp ? "" : whatsappUrl(whatsappPhone);
+    ultimoTelefoneWhatsapp = insideApp ? "" : whatsappPhone;
 
     updateSocial("[data-tt-contact='instagram']", instagram, instagramIcon);
     updateSocial("[data-tt-contact='facebook']", facebook, facebookIcon);
@@ -439,6 +459,13 @@
     updateSocial("[data-tt-contact='telegram']", telegram, telegramIcon);
     updateSocial("[data-tt-contact='whatsapp']", whatsapp, whatsappIcon);
   }
+
+  window.addEventListener("turbotiger:idioma", function () {
+    if (!ultimoTelefoneWhatsapp) return;
+    document.querySelectorAll("[data-tt-contact='whatsapp']").forEach(function (link) {
+      link.href = whatsappUrl(ultimoTelefoneWhatsapp);
+    });
+  });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
