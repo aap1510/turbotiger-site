@@ -1,5 +1,10 @@
 (function (root) {
   "use strict";
+  var LEGENDAS_VALIDACAO={
+  "legenda_ic_validacao_resposta_do_coach_fora_do_contrato": "Resposta do Coach fora do contrato."
+};
+  if(root.TurboTigerLegendas)root.TurboTigerLegendas.registrar(LEGENDAS_VALIDACAO);
+  function legendaValidacao(chave){return root.TurboTigerLegendas?root.TurboTigerLegendas.texto(chave):LEGENDAS_VALIDACAO[chave];}
   var IC = root.TurboTigerIC;
   IC.Screens = IC.Screens || {};
   var fontesLegendasCoach = {
@@ -186,7 +191,7 @@
       try {
         var result = await deps.api.edge("ic-coach", { request_type: suggestion.request_type, reference_id: suggestion.reference_id }, { key: "coach:explain" });
         var explanation = result.explanation || {};
-        if (!Core.isPlainObject(explanation) || !Core.safeText(explanation.title, "") || !Core.safeText(explanation.message, "") || !Array.isArray(explanation.fact_refs) || !Array.isArray(explanation.actions)) throw new Error("Resposta do Coach fora do contrato.");
+        if (!Core.isPlainObject(explanation) || !Core.safeText(explanation.title, "") || !Core.safeText(explanation.message, "") || !Array.isArray(explanation.fact_refs) || !Array.isArray(explanation.actions)) throw new Error(legendaValidacao("legenda_ic_validacao_resposta_do_coach_fora_do_contrato"));
         state.explanations.push({ explanation: explanation, evidence: result.evidence || {}, status: result.status, contextHash: result.context_hash || null });
       } catch (_error) {
         state.explanations.push({ explanation: { title: legendaCoach("legenda_ic_coach_explicacao_indisponivel"), message: legendaCoach("legenda_ic_coach_explicacao_validada_indisponivel_controles_ativos"), fact_refs: [], actions: [] }, status: "client_fallback" });

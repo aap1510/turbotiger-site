@@ -1,5 +1,12 @@
 (function () {
   "use strict";
+  var fontesDivisao = {
+  "legenda_fechamento_simulador_ocultar": "Ocultar navegador das bets",
+  "legenda_fechamento_simulador_mostrar": "Mostrar navegador das bets em tela dividida"
+};
+  if(window.TurboTigerLegendas)window.TurboTigerLegendas.registrar(fontesDivisao);
+  function legendaDivisao(chave){return window.TurboTigerLegendas?window.TurboTigerLegendas.texto(chave):fontesDivisao[chave];}
+
   // Apenas visibilidade das abas existentes. Nenhum link, odd ou valor e enviado.
   var content = document.getElementById("detailContent");
   var modal = document.getElementById("detailModal");
@@ -25,8 +32,9 @@
     button.hidden = !supportsSplitView();
     button.disabled = pending;
     button.setAttribute("aria-pressed", String(active));
-    button.setAttribute("aria-label", active ? "Ocultar navegador das bets" : "Mostrar navegador das bets em tela dividida");
+    button.setAttribute("aria-label", active ? legendaDivisao("legenda_fechamento_simulador_ocultar") : legendaDivisao("legenda_fechamento_simulador_mostrar"));
   }
+  window.addEventListener("turbotiger:idioma", function(){button.setAttribute("aria-label",active ? legendaDivisao("legenda_fechamento_simulador_ocultar") : legendaDivisao("legenda_fechamento_simulador_mostrar"));});
   function request(visible) {
     pending = true;
     clearTimeout(timeout);

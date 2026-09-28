@@ -69,8 +69,9 @@
     @media print{body{background:#fff}.shell{width:100%;margin:0}.topbar{display:none}.document{box-shadow:none;border-radius:0}.hero,.content{padding-left:26px;padding-right:26px}.state{display:none}}
   </style>
 <link rel="stylesheet" href="assets/turbotiger-legendas.css?v=20260926-01">
-<script src="assets/turbotiger-legendas.js?v=20260926-i18n-01"></script>
-<script src="assets/legendas/pt-BR.js?v=20260926-i18n-01"></script>
+<script src="assets/turbotiger-legendas.js?v=20260928-i18n-03"></script>
+<script src="assets/legendas/pt-BR.js?v=20260928-i18n-03"></script>
+<script src="assets/turbotiger-documentos.js?v=20260928-01"></script>
 </head>
 <body>
   <div class="shell">
@@ -142,6 +143,66 @@
   <script>
   (function(){
     "use strict";
+    var LEGENDAS_REGULAMENTO={
+  "legenda_regulamento_painel_nao_foi_possivel_conectar_ao_servidor_verifique_a_internet_e_tente_novamente": "Não foi possível conectar ao servidor. Verifique a internet e tente novamente.",
+  "legenda_regulamento_painel_a_versao_solicitada_nao_esta_publicada_ou_nao_existe": "A versão solicitada não está publicada ou não existe.",
+  "legenda_regulamento_painel_nenhuma_versao_vigente_do_regulamento_esta_publicada": "Nenhuma versão vigente do regulamento está publicada.",
+  "legenda_regulamento_painel_nao_foi_possivel_carregar_o_regulamento": "Não foi possível carregar o regulamento.",
+  "legenda_regulamento_painel_nenhuma_versao_publicada_esta_disponivel": "Nenhuma versão publicada está disponível.",
+  "legenda_regulamento_painel_regulamento_do_programa_de_indicacoes_e_beneficios_turbo_tiger": "Regulamento do Programa de Indicações e Benefícios Turbo Tiger",
+  "legenda_regulamento_painel_o_texto_oficial_desta_versao_nao_foi_disponibilizado_pelo_servidor": "O texto oficial desta versão não foi disponibilizado pelo servidor.",
+  "legenda_regulamento_painel_nivel_is": " nível(is)",
+  "legenda_regulamento_painel_vaga_s_por_no": " vaga(s) por nó",
+  "legenda_regulamento_painel_este_regulamento_disciplina_a_participacao_voluntaria_no": "Este Regulamento disciplina a participação voluntária no ",
+  "legenda_regulamento_painel_programa_de_indicacoes_e_beneficios_turbo_tiger": "Programa de Indicações e Benefícios Turbo Tiger",
+  "legenda_regulamento_painel_no_territorio": ", no território ",
+  "legenda_regulamento_painel_em": ", em ",
+  "legenda_regulamento_painel_a_assinatura_premium_precisa_estar_ativa_na_data_da_receita_e_no_fechamento_salvo_grupo_isento_publicado": "A assinatura Premium precisa estar ativa na data da receita e no fechamento, salvo grupo isento publicado.",
+  "legenda_regulamento_painel_a_versao_publicada_nao_exige_assinatura_premium_propria_sem_afastar_os_demais_requisitos_de_elegibilidade": "A versão publicada não exige assinatura Premium própria, sem afastar os demais requisitos de elegibilidade.",
+  "legenda_regulamento_painel_nenhum_grupo_isento_publicado": "Nenhum grupo isento publicado.",
+  "legenda_regulamento_painel_dia_s": " dia(s)",
+  "legenda_regulamento_painel_a_largura_de_posicionamento_e_ilimitada_nesta_versao_novas_indicacoes_permanecem_diretamente_vinculadas_ao_pat": "A largura de posicionamento é ilimitada nesta versão; novas indicações permanecem diretamente vinculadas ao patrocinador na estrutura vigente.",
+  "legenda_regulamento_painel_cada_participante_pode_ocupar_ate": "Cada participante pode ocupar até ",
+  "legenda_regulamento_painel_vaga_s_imediatamente_abaixo_do_mesmo_pai_de_posicionamento_a_indicacao_seguinte_entra_por_spillover_automatico": " vaga(s) imediatamente abaixo do mesmo pai de posicionamento. A indicação seguinte entra por spillover automático, sem alterar o patrocinador pessoal.",
+  "legenda_regulamento_painel_esta_versao_remunera_somente_o_nivel_1_reservado_a_comissao_direta_nao_ha_nivel_residual_ativo": "Esta versão remunera somente o nível 1, reservado à comissão direta; não há nível residual ativo.",
+  "legenda_regulamento_painel_as_comissoes_residuais_seguem_a_arvore_de_posicionamento_do_nivel_2_ao_nivel": "As comissões residuais seguem a árvore de posicionamento do nível 2 ao nível ",
+  "legenda_regulamento_painel_conforme_percentuais_e_qualificacoes_publicados": ", conforme percentuais e qualificações publicados.",
+  "legenda_regulamento_painel_nenhum_nivel_foi_publicado_para_esta_versao": "Nenhum nível foi publicado para esta versão.",
+  "legenda_regulamento_painel_profundidade_publicada": "Profundidade publicada: ",
+  "legenda_regulamento_painel_nivel_is_linhas_acima_dessa_profundidade_permanecem_preservadas_no_historico_administrativo_mas_nao_geram_comi": " nível(is). Linhas acima dessa profundidade permanecem preservadas no histórico administrativo, mas não geram comissão nesta versão.",
+  "legenda_regulamento_painel_nenhum_rank_foi_publicado_para_esta_versao": "Nenhum rank foi publicado para esta versão.",
+  "legenda_regulamento_painel_o_dia_de_fechamento_nao_foi_informado_neste_snapshot_prevalece_o_calendario_operacional_comunicado_no_painel": "O dia de fechamento não foi informado neste snapshot; prevalece o calendário operacional comunicado no painel.",
+  "legenda_regulamento_painel_competencia_mensal_com_fechamento_previsto_para_o_dia": "Competência mensal com fechamento previsto para o dia ",
+  "legenda_regulamento_painel_sujeito_ao_calendario_operacional_e_as_aprovacoes_configuradas": ", sujeito ao calendário operacional e às aprovações configuradas.",
+  "legenda_regulamento_painel_o_dia_de_pagamento_nao_foi_informado_neste_snapshot": "O dia de pagamento não foi informado neste snapshot",
+  "legenda_regulamento_painel_pagamento_previsto_para_o_dia": "Pagamento previsto para o dia ",
+  "legenda_regulamento_painel_no_modo": ", no modo ",
+  "legenda_regulamento_painel_pelo_provedor_configurado": ", pelo provedor configurado ",
+  "legenda_regulamento_painel_saldo_minimo_de": "Saldo mínimo de ",
+  "legenda_regulamento_painel_valores_inferiores_permanecem_acumulados_para_competencia_futura_sujeitos_as_regras_vigentes": ". Valores inferiores permanecem acumulados para competência futura, sujeitos às regras vigentes.",
+  "legenda_regulamento_painel_prazo_informado_no_painel": "prazo informado no painel",
+  "legenda_regulamento_painel_pagamentos_reais_estao_bloqueados_nesta_versao_ate_a_homologacao_fiscal_e_a_liberacao_administrativa": "Pagamentos reais estão bloqueados nesta versão até a homologação fiscal e a liberação administrativa.",
+  "legenda_regulamento_painel_pagamentos_reais_estao_administrativamente_habilitados_sem_afastar_validacoes_quorum_e_controles_do_provedor": "Pagamentos reais estão administrativamente habilitados, sem afastar validações, quórum e controles do provedor.",
+  "legenda_regulamento_painel_regra_geral": "Regra geral",
+  "legenda_regulamento_painel_somente_parametrizada": "Somente parametrizada",
+  "legenda_regulamento_painel_nenhuma_retencao_publicada_a_homologacao_contabil_continua_obrigatoria_antes_do_primeiro_pagamento_real": "Nenhuma retenção publicada; a homologação contábil continua obrigatória antes do primeiro pagamento real.",
+  "legenda_regulamento_painel_prazo_nao_informado_neste_snapshot": "Prazo não informado neste snapshot.",
+  "legenda_regulamento_painel_prazo_publicado_no_painel": "prazo publicado no painel",
+  "legenda_regulamento_painel_dia_s_util_eis": " dia(s) útil(eis)",
+  "legenda_regulamento_painel_falha_http": "Falha HTTP ",
+  "legenda_regulamento_painel_versao_nao_disponivel": "Versão não disponível",
+  "legenda_regulamento_painel_regulamento_indisponivel": "Regulamento indisponível",
+  "legenda_regulamento_painel_ilimitada": "Ilimitada",
+  "legenda_regulamento_painel_ativo": "Ativo",
+  "legenda_regulamento_painel_inativo": "Inativo",
+  "legenda_regulamento_painel_reter": "Reter",
+  "legenda_regulamento_painel_manual": "manual",
+  "legenda_regulamento_painel_versao": "Versão ",
+  "legenda_regulamento_painel_exibida": " · exibida",
+  "legenda_regulamento_painel_o_historico_ainda_nao_foi_disponibilizado_pelo_servidor": "O histórico ainda não foi disponibilizado pelo servidor."
+};
+    if(window.TurboTigerLegendas)window.TurboTigerLegendas.registrar(LEGENDAS_REGULAMENTO);
+    function legendaRegulamento(chave){return window.TurboTigerLegendas?window.TurboTigerLegendas.texto(chave):LEGENDAS_REGULAMENTO[chave];}
     var SUPABASE_URL="https://jzqgudmvquokizvgehow.supabase.co";
     var API_KEY="sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU";
     var RPC="mmn_regulamento_publico_rpc";
@@ -163,7 +224,7 @@
     function moneyCents(value){return value==null||value===""?"—":(number(value)/100).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
     function count(value){return value==null||value===""?"—":number(value).toLocaleString("pt-BR",{maximumFractionDigits:0})}
     function date(value,withTime){if(!value)return"—";var parsed=new Date(value);if(Number.isNaN(parsed.getTime()))return String(value);return parsed.toLocaleString("pt-BR",withTime?{dateStyle:"short",timeStyle:"short"}:{dateStyle:"short"})}
-    function errorMessage(error){var message=error&&error.message?error.message:String(error||"");if(/Failed to fetch|NetworkError/i.test(message))return"Não foi possível conectar ao servidor. Verifique a internet e tente novamente.";if(message==="regulamento_publicado_nao_encontrado")return requestedVersion?"A versão solicitada não está publicada ou não existe.":"Nenhuma versão vigente do regulamento está publicada.";return message||"Não foi possível carregar o regulamento."}
+    function errorMessage(error){var message=error&&error.message?error.message:String(error||"");if(/Failed to fetch|NetworkError/i.test(message))returnlegendaRegulamento("legenda_regulamento_painel_nao_foi_possivel_conectar_ao_servidor_verifique_a_internet_e_tente_novamente");if(message==="regulamento_publicado_nao_encontrado")return requestedVersion?legendaRegulamento("legenda_regulamento_painel_a_versao_solicitada_nao_esta_publicada_ou_nao_existe"):legendaRegulamento("legenda_regulamento_painel_nenhuma_versao_vigente_do_regulamento_esta_publicada");return message||legendaRegulamento("legenda_regulamento_painel_nao_foi_possivel_carregar_o_regulamento")}
 
     async function loadConfiguredLogo(){
       var image=document.querySelector(".topbar img");
@@ -199,46 +260,49 @@
 
     function renderTableBody(id,rows,emptyMessage,columnCount){var body=byId(id);body.innerHTML=rows.length?rows.join(""):"<tr><td colspan=\""+escapeHtml(columnCount||7)+"\">"+escapeHtml(emptyMessage)+"</td></tr>"}
 
+    var documentoCarregado = null;
+    window.addEventListener("turbotiger:idioma",function(){if(documentoCarregado)render(documentoCarregado);});
     function render(data){
       var normalized=normalize(data);
       var doc=normalized.document;
-      if(!Object.keys(doc).length||data&&data.ok===false)throw new Error(first([data&&data.mensagem,data&&data.erro,data&&data.error],requestedVersion?"A versão solicitada não está publicada ou não existe.":"Nenhuma versão publicada está disponível."));
+      if(!Object.keys(doc).length||data&&data.ok===false)throw new Error(first([data&&data.mensagem,data&&data.erro,data&&data.error],requestedVersion?legendaRegulamento("legenda_regulamento_painel_a_versao_solicitada_nao_esta_publicada_ou_nao_existe"):legendaRegulamento("legenda_regulamento_painel_nenhuma_versao_publicada_esta_disponivel")));
       var p=normalized.params;
       var version=first([doc.versao,doc.documento_versao,p.versao],requestedVersion||"");
-      var titleValue=first([doc.titulo,p.programa_nome],"Regulamento do Programa de Indicações e Benefícios Turbo Tiger");
+      var titleValue=first([doc.titulo,p.programa_nome],legendaRegulamento("legenda_regulamento_painel_regulamento_do_programa_de_indicacoes_e_beneficios_turbo_tiger"));
       var canonicalContent=first([doc.conteudo,doc.conteudo_publicado],"");
-      if(typeof canonicalContent!=="string"||!canonicalContent.trim())throw new Error("O texto oficial desta versão não foi disponibilizado pelo servidor.");
+      if(typeof canonicalContent!=="string"||!canonicalContent.trim())throw new Error(legendaRegulamento("legenda_regulamento_painel_o_texto_oficial_desta_versao_nao_foi_disponibilizado_pelo_servidor"));
       var depth=Math.max(1,Math.min(10,integer(first([p.quantidade_niveis],6),6)));
       var width=Math.max(0,integer(first([p.largura_maxima_posicionamento],0),0));
       var payout=first([p.payout_teto_percentual,p.teto_payout_percentual],33);
       var minimum=first([p.pagamento_minimo_centavos],5000);
       document.title=titleValue+" — Turbo Tiger";
       text("documentTitle",titleValue);text("documentVersion",version||"—");text("documentUpdated",date(first([doc.atualizado_em,doc.criado_em]),true));text("documentPublished",date(doc.publicado_em,true));text("documentEffective",date(first([doc.vigencia_inicio,doc.vigente_desde,p.vigencia_inicio]),false));
-      byId("canonicalContent").textContent=canonicalContent;
-      text("summaryLevels",depth+" nível(is)");text("summaryWidth",width===0?"Ilimitada":width+" vaga(s) por nó");text("summaryPayout",percent(payout));text("summaryMinimum",moneyCents(minimum));
-      text("programIdentity","Este Regulamento disciplina a participação voluntária no "+(p.programa_nome||"Programa de Indicações e Benefícios Turbo Tiger")+", no território "+(p.territorio||"BR")+", em "+(p.moeda||"BRL")+".");
-      text("premiumRule",bool(first([p.premium_obrigatorio],true),true)?"A assinatura Premium precisa estar ativa na data da receita e no fechamento, salvo grupo isento publicado.":"A versão publicada não exige assinatura Premium própria, sem afastar os demais requisitos de elegibilidade.");
-      var activeGroups=normalized.groups.filter(function(row){return bool(first([row.ativo],true),true)}).map(function(row){return row.nome||row.grupo_chave||row.chave}).filter(Boolean);text("exemptGroups",activeGroups.length?activeGroups.join(", "):"Nenhum grupo isento publicado.");
-      text("holdDays",count(first([p.carencia_estorno_dias,p.prazo_seguranca_dias],15))+" dia(s)");
-      text("placementRule",width===0?"A largura de posicionamento é ilimitada nesta versão; novas indicações permanecem diretamente vinculadas ao patrocinador na estrutura vigente.":"Cada participante pode ocupar até "+width+" vaga(s) imediatamente abaixo do mesmo pai de posicionamento. A indicação seguinte entra por spillover automático, sem alterar o patrocinador pessoal.");
-      text("residualRule",depth===1?"Esta versão remunera somente o nível 1, reservado à comissão direta; não há nível residual ativo.":"As comissões residuais seguem a árvore de posicionamento do nível 2 ao nível "+depth+", conforme percentuais e qualificações publicados.");
+      byId("canonicalContent").textContent=window.TurboTigerDocumentos ? window.TurboTigerDocumentos.textoMmn(doc) || canonicalContent : canonicalContent;
+      text("summaryLevels",depth+legendaRegulamento("legenda_regulamento_painel_nivel_is"));text("summaryWidth",width===0?legendaRegulamento("legenda_regulamento_painel_ilimitada"):width+legendaRegulamento("legenda_regulamento_painel_vaga_s_por_no"));text("summaryPayout",percent(payout));text("summaryMinimum",moneyCents(minimum));
+      text("programIdentity",legendaRegulamento("legenda_regulamento_painel_este_regulamento_disciplina_a_participacao_voluntaria_no")+(p.programa_nome||legendaRegulamento("legenda_regulamento_painel_programa_de_indicacoes_e_beneficios_turbo_tiger"))+legendaRegulamento("legenda_regulamento_painel_no_territorio")+(p.territorio||"BR")+legendaRegulamento("legenda_regulamento_painel_em")+(p.moeda||"BRL")+".");
+      text("premiumRule",bool(first([p.premium_obrigatorio],true),true)?legendaRegulamento("legenda_regulamento_painel_a_assinatura_premium_precisa_estar_ativa_na_data_da_receita_e_no_fechamento_salvo_grupo_isento_publicado"):legendaRegulamento("legenda_regulamento_painel_a_versao_publicada_nao_exige_assinatura_premium_propria_sem_afastar_os_demais_requisitos_de_elegibilidade"));
+      var activeGroups=normalized.groups.filter(function(row){return bool(first([row.ativo],true),true)}).map(function(row){return row.nome||row.grupo_chave||row.chave}).filter(Boolean);text("exemptGroups",activeGroups.length?activeGroups.join(", "):legendaRegulamento("legenda_regulamento_painel_nenhum_grupo_isento_publicado"));
+      text("holdDays",count(first([p.carencia_estorno_dias,p.prazo_seguranca_dias],15))+legendaRegulamento("legenda_regulamento_painel_dia_s"));
+      text("placementRule",width===0?legendaRegulamento("legenda_regulamento_painel_a_largura_de_posicionamento_e_ilimitada_nesta_versao_novas_indicacoes_permanecem_diretamente_vinculadas_ao_pat"):legendaRegulamento("legenda_regulamento_painel_cada_participante_pode_ocupar_ate")+width+legendaRegulamento("legenda_regulamento_painel_vaga_s_imediatamente_abaixo_do_mesmo_pai_de_posicionamento_a_indicacao_seguinte_entra_por_spillover_automatico"));
+      text("residualRule",depth===1?legendaRegulamento("legenda_regulamento_painel_esta_versao_remunera_somente_o_nivel_1_reservado_a_comissao_direta_nao_ha_nivel_residual_ativo"):legendaRegulamento("legenda_regulamento_painel_as_comissoes_residuais_seguem_a_arvore_de_posicionamento_do_nivel_2_ao_nivel")+depth+legendaRegulamento("legenda_regulamento_painel_conforme_percentuais_e_qualificacoes_publicados"));
       var levels=normalized.levels.filter(function(row){var level=integer(row.nivel);return level>=1&&level<=depth}).sort(function(a,b){return integer(a.nivel)-integer(b.nivel)});
-      renderTableBody("levelsBody",levels.map(function(row){return"<tr><td>"+escapeHtml(row.nivel)+"</td><td>"+escapeHtml(percent(row.percentual))+"</td><td>"+escapeHtml(count(row.min_diretos_ativos))+"</td><td>"+escapeHtml(count(row.min_pernas_qualificadas))+"</td><td>"+escapeHtml(count(row.min_ativos_por_perna))+"</td><td>"+escapeHtml(bool(first([row.ativo],true),true)?"Ativo":"Inativo")+"</td></tr>"}),"Nenhum nível foi publicado para esta versão.",6);
-      text("levelsNote","Profundidade publicada: "+depth+" nível(is). Linhas acima dessa profundidade permanecem preservadas no histórico administrativo, mas não geram comissão nesta versão.");
+      renderTableBody("levelsBody",levels.map(function(row){return"<tr><td>"+escapeHtml(row.nivel)+"</td><td>"+escapeHtml(percent(row.percentual))+"</td><td>"+escapeHtml(count(row.min_diretos_ativos))+"</td><td>"+escapeHtml(count(row.min_pernas_qualificadas))+"</td><td>"+escapeHtml(count(row.min_ativos_por_perna))+"</td><td>"+escapeHtml(bool(first([row.ativo],true),true)?legendaRegulamento("legenda_regulamento_painel_ativo"):legendaRegulamento("legenda_regulamento_painel_inativo"))+"</td></tr>"}),legendaRegulamento("legenda_regulamento_painel_nenhum_nivel_foi_publicado_para_esta_versao"),6);
+      text("levelsNote",legendaRegulamento("legenda_regulamento_painel_profundidade_publicada")+depth+legendaRegulamento("legenda_regulamento_painel_nivel_is_linhas_acima_dessa_profundidade_permanecem_preservadas_no_historico_administrativo_mas_nao_geram_comi"));
       var ranks=normalized.ranks.slice().sort(function(a,b){return integer(a.ordem)-integer(b.ordem)});
-      renderTableBody("ranksBody",ranks.map(function(row){return"<tr><td>"+escapeHtml(row.nome||row.chave||"—")+"</td><td>"+escapeHtml(count(row.min_rede_ativa))+"</td><td>"+escapeHtml(count(row.min_diretos_ativos))+"</td><td>"+escapeHtml(percent(row.max_percentual_maior_perna))+"</td><td>"+escapeHtml(percent(row.bonus_percentual))+"</td><td>"+escapeHtml(count(row.pool_coeficiente))+"</td><td>"+escapeHtml(bool(first([row.ativo],true),true)?"Ativo":"Inativo")+"</td></tr>"}),"Nenhum rank foi publicado para esta versão.");
+      renderTableBody("ranksBody",ranks.map(function(row){return"<tr><td>"+escapeHtml(row.nome||row.chave||"—")+"</td><td>"+escapeHtml(count(row.min_rede_ativa))+"</td><td>"+escapeHtml(count(row.min_diretos_ativos))+"</td><td>"+escapeHtml(percent(row.max_percentual_maior_perna))+"</td><td>"+escapeHtml(percent(row.bonus_percentual))+"</td><td>"+escapeHtml(count(row.pool_coeficiente))+"</td><td>"+escapeHtml(bool(first([row.ativo],true),true)?legendaRegulamento("legenda_regulamento_painel_ativo"):legendaRegulamento("legenda_regulamento_painel_inativo"))+"</td></tr>"}),legendaRegulamento("legenda_regulamento_painel_nenhum_rank_foi_publicado_para_esta_versao"));
       text("poolPercent",percent(first([p.pool_global_percentual],0)));text("payoutCapText",percent(payout));
       var closingDay=first([p.fechamento_dia],null);var paymentDay=first([p.pagamento_dia],null);
-      text("closingRule",closingDay==null?"O dia de fechamento não foi informado neste snapshot; prevalece o calendário operacional comunicado no painel.":"Competência mensal com fechamento previsto para o dia "+count(closingDay)+", sujeito ao calendário operacional e às aprovações configuradas.");
-      text("paymentRule",(paymentDay==null?"O dia de pagamento não foi informado neste snapshot":"Pagamento previsto para o dia "+count(paymentDay))+", no modo "+(p.pagamento_modo||p.modo_inicial||"manual")+(p.pagamento_provedor?", pelo provedor configurado "+p.pagamento_provedor:"")+".");
-      text("minimumRule","Saldo mínimo de "+moneyCents(minimum)+". Valores inferiores permanecem acumulados para competência futura, sujeitos às regras vigentes.");var pixHold=first([p.alteracao_pix_carencia_dias],null);text("pixHoldDays",pixHold==null?"prazo informado no painel":count(pixHold)+" dia(s)");
-      text("paymentAvailability",bool(first([p.pagamento_real_bloqueado,p.pagamento_real_bloqueado_ate_homologacao_fiscal],true),true)?"Pagamentos reais estão bloqueados nesta versão até a homologação fiscal e a liberação administrativa.":"Pagamentos reais estão administrativamente habilitados, sem afastar validações, quórum e controles do provedor.");
-      renderTableBody("taxesBody",normalized.taxes.map(function(row){var locality=[row.municipio,row.estado].filter(Boolean).join("/")||"Regra geral";return"<tr><td>"+escapeHtml(row.nome||row.chave||"—")+"</td><td>"+escapeHtml(row.tipo||"—")+"</td><td>"+escapeHtml(percent(row.aliquota))+"</td><td>"+escapeHtml(bool(row.reter,false)?"Reter":"Somente parametrizada")+"</td><td>"+escapeHtml(locality)+"</td></tr>"}),"Nenhuma retenção publicada; a homologação contábil continua obrigatória antes do primeiro pagamento real.",5);
-      var waitlist=first([p.prazo_conversao_dias,p.prazo_conversao_espera_dias,p.lista_espera_prazo_dias],null);var dispute=first([p.contestacao_dias_uteis],null);text("waitlistDays",waitlist==null?"Prazo não informado neste snapshot.":count(waitlist)+" dia(s)");text("disputeDays",dispute==null?"prazo publicado no painel":count(dispute)+" dia(s) útil(eis)");
+      text("closingRule",closingDay==null?legendaRegulamento("legenda_regulamento_painel_o_dia_de_fechamento_nao_foi_informado_neste_snapshot_prevalece_o_calendario_operacional_comunicado_no_painel"):legendaRegulamento("legenda_regulamento_painel_competencia_mensal_com_fechamento_previsto_para_o_dia")+count(closingDay)+legendaRegulamento("legenda_regulamento_painel_sujeito_ao_calendario_operacional_e_as_aprovacoes_configuradas"));
+      text("paymentRule",(paymentDay==null?legendaRegulamento("legenda_regulamento_painel_o_dia_de_pagamento_nao_foi_informado_neste_snapshot"):legendaRegulamento("legenda_regulamento_painel_pagamento_previsto_para_o_dia")+count(paymentDay))+legendaRegulamento("legenda_regulamento_painel_no_modo")+(p.pagamento_modo||p.modo_inicial||legendaRegulamento("legenda_regulamento_painel_manual"))+(p.pagamento_provedor?legendaRegulamento("legenda_regulamento_painel_pelo_provedor_configurado")+p.pagamento_provedor:"")+".");
+      text("minimumRule",legendaRegulamento("legenda_regulamento_painel_saldo_minimo_de")+moneyCents(minimum)+legendaRegulamento("legenda_regulamento_painel_valores_inferiores_permanecem_acumulados_para_competencia_futura_sujeitos_as_regras_vigentes"));var pixHold=first([p.alteracao_pix_carencia_dias],null);text("pixHoldDays",pixHold==null?legendaRegulamento("legenda_regulamento_painel_prazo_informado_no_painel"):count(pixHold)+legendaRegulamento("legenda_regulamento_painel_dia_s"));
+      text("paymentAvailability",bool(first([p.pagamento_real_bloqueado,p.pagamento_real_bloqueado_ate_homologacao_fiscal],true),true)?legendaRegulamento("legenda_regulamento_painel_pagamentos_reais_estao_bloqueados_nesta_versao_ate_a_homologacao_fiscal_e_a_liberacao_administrativa"):legendaRegulamento("legenda_regulamento_painel_pagamentos_reais_estao_administrativamente_habilitados_sem_afastar_validacoes_quorum_e_controles_do_provedor"));
+      renderTableBody("taxesBody",normalized.taxes.map(function(row){var locality=[row.municipio,row.estado].filter(Boolean).join("/")||legendaRegulamento("legenda_regulamento_painel_regra_geral");return"<tr><td>"+escapeHtml(row.nome||row.chave||"—")+"</td><td>"+escapeHtml(row.tipo||"—")+"</td><td>"+escapeHtml(percent(row.aliquota))+"</td><td>"+escapeHtml(bool(row.reter,false)?legendaRegulamento("legenda_regulamento_painel_reter"):legendaRegulamento("legenda_regulamento_painel_somente_parametrizada"))+"</td><td>"+escapeHtml(locality)+"</td></tr>"}),legendaRegulamento("legenda_regulamento_painel_nenhuma_retencao_publicada_a_homologacao_contabil_continua_obrigatoria_antes_do_primeiro_pagamento_real"),5);
+      var waitlist=first([p.prazo_conversao_dias,p.prazo_conversao_espera_dias,p.lista_espera_prazo_dias],null);var dispute=first([p.contestacao_dias_uteis],null);text("waitlistDays",waitlist==null?legendaRegulamento("legenda_regulamento_painel_prazo_nao_informado_neste_snapshot"):count(waitlist)+legendaRegulamento("legenda_regulamento_painel_dia_s"));text("disputeDays",dispute==null?legendaRegulamento("legenda_regulamento_painel_prazo_publicado_no_painel"):count(dispute)+legendaRegulamento("legenda_regulamento_painel_dia_s_util_eis"));
       var company=object(p,["dados_empresa"]);var email=company.email_privacidade||"comunidade@turbotiger.com.br";text("privacyEmail",email);byId("privacyEmail").href="mailto:"+email;
       var history=normalized.history.filter(function(row){return row.versao||row.documento_versao});
       if(!history.length&&version)history=[doc];
-      byId("historyLinks").innerHTML=history.length?history.map(function(row){var itemVersion=row.versao||row.documento_versao;var current=String(itemVersion)===String(version);return"<a href=\"regulamento-mmn.html?versao="+encodeURIComponent(itemVersion)+(embeddedMode?"&amp;embedded=1":"")+"\""+(current?" aria-current=\"page\"":"")+">Versão "+escapeHtml(itemVersion)+(current?" · exibida":"")+"</a>"}).join(""):"<span class=\"small\">O histórico ainda não foi disponibilizado pelo servidor.</span>";
+      byId("historyLinks").innerHTML=history.length?history.map(function(row){var itemVersion=row.versao||row.documento_versao;var current=String(itemVersion)===String(version);return"<a href=\"regulamento-mmn.html?versao="+encodeURIComponent(itemVersion)+(embeddedMode?"&amp;embedded=1":"")+"\""+(current?" aria-current=\"page\"":"")+">"+escapeHtml(legendaRegulamento("legenda_regulamento_painel_versao"))+escapeHtml(itemVersion)+(current?legendaRegulamento("legenda_regulamento_painel_exibida"):"")+"</a>"}).join(""):"<span class=\"small\">"+escapeHtml(legendaRegulamento("legenda_regulamento_painel_o_historico_ainda_nao_foi_disponibilizado_pelo_servidor"))+"</span>";
+      documentoCarregado=data;
       byId("loadingState").hidden=true;byId("errorState").hidden=true;byId("regulationContent").hidden=false;
     }
 
@@ -247,8 +311,8 @@
       try{
         var controller=typeof AbortController==="function"?new AbortController():null;var timer=controller?setTimeout(function(){controller.abort()},15000):null;
         var response=await fetch(SUPABASE_URL+"/rest/v1/rpc/"+RPC,{method:"POST",headers:{apikey:API_KEY,Authorization:"Bearer "+API_KEY,"Content-Type":"application/json; charset=utf-8",Accept:"application/json"},body:JSON.stringify({p_versao:requestedVersion||null}),signal:controller?controller.signal:undefined});
-        if(timer)clearTimeout(timer);var payload=await response.json().catch(function(){return null});if(!response.ok)throw new Error(first([payload&&payload.message,payload&&payload.error],"Falha HTTP "+response.status+"."));render(payload||{});
-      }catch(error){byId("loadingState").hidden=true;byId("regulationContent").hidden=true;byId("errorState").hidden=false;text("errorTitle",requestedVersion?"Versão não disponível":"Regulamento indisponível");text("errorMessage",errorMessage(error));}
+        if(timer)clearTimeout(timer);var payload=await response.json().catch(function(){return null});if(!response.ok)throw new Error(first([payload&&payload.message,payload&&payload.error],legendaRegulamento("legenda_regulamento_painel_falha_http")+response.status+"."));render(payload||{});
+      }catch(error){byId("loadingState").hidden=true;byId("regulationContent").hidden=true;byId("errorState").hidden=false;text("errorTitle",requestedVersion?legendaRegulamento("legenda_regulamento_painel_versao_nao_disponivel"):legendaRegulamento("legenda_regulamento_painel_regulamento_indisponivel"));text("errorMessage",errorMessage(error));}
     }
     function returnToMmn(event){if(event)event.preventDefault();if(embeddedMode&&window.parent!==window){window.parent.postMessage({type:"TURBO_MMN_REGULATION_CLOSE"},"*");return}window.location.href="adm/mmn/index.html"}
     byId("regulationBack").addEventListener("click",returnToMmn);

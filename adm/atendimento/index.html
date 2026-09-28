@@ -9,8 +9,8 @@
   <link rel="stylesheet" href="../assets/admin.css?v=20260823-atd-01">
   <link rel="stylesheet" href="atendimento.css?v=20260825-live-01">
 <link rel="stylesheet" href="../../assets/turbotiger-legendas.css?v=20260926-01">
-<script src="../../assets/turbotiger-legendas.js?v=20260926-i18n-01"></script>
-<script src="../../assets/legendas/pt-BR.js?v=20260926-i18n-01"></script>
+<script src="../../assets/turbotiger-legendas.js?v=20260928-i18n-03"></script>
+<script src="../../assets/legendas/pt-BR.js?v=20260928-i18n-03"></script>
 </head>
 <body data-admin-page="atendimento">
   <div class="pull-refresh" id="pullRefresh" aria-live="polite" hidden data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_puxe_para_atualizar&quot;}">Puxe para atualizar</div>
@@ -71,7 +71,7 @@
             <div class="message-stream" id="messageStream" role="log" aria-live="polite" aria-relevant="additions text"></div>
             <form class="composer" id="messageForm">
               <div class="composer-tabs"><button class="is-active" type="button" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_responder&quot;}">Responder</button><button type="button" id="internalNoteTab" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_nota_interna&quot;}">Nota interna</button></div>
-              <textarea id="messageInput" placeholder="Digite sua mensagem..." aria-label="Mensagem"></textarea>
+              <textarea id="messageInput" placeholder="Digite sua mensagem..." aria-label="Mensagem" data-legenda-atributos="{&quot;placeholder&quot;:&quot;legenda_site_digite_sua_mensagem&quot;,&quot;aria-label&quot;:&quot;legenda_site_mensagem&quot;}"></textarea>
               <div class="composer-actions"><span id="composerHint" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_assuma_uma_conversa_para_responder&quot;}">Assuma uma conversa para responder</span><button class="btn btn-ghost" id="chooseTemplateButton" type="button" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_templates&quot;}">Templates</button><button class="btn btn-primary" id="sendButton" type="submit" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_enviar&quot;}">Enviar</button></div>
             </form>
           </div>
@@ -83,7 +83,7 @@
           <div id="customerContent" hidden>
             <section class="customer-identity"><div class="avatar" id="customerAvatar" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_tt&quot;}">TT</div><div><strong id="customerName" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_contato&quot;}">Contato</strong><span id="customerPhone"></span></div></section>
             <section class="detail-section"><h2 data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_conversa_atual&quot;}">Conversa atual</h2><dl><div><dt data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_canal&quot;}">Canal</dt><dd id="detailChannel">—</dd></div><div><dt data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_setor&quot;}">Setor</dt><dd id="detailSector">—</dd></div><div><dt data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_atribuicao&quot;}">Atribuição</dt><dd id="detailAssignment">—</dd></div><div><dt data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_janela_whatsapp&quot;}">Janela WhatsApp</dt><dd id="detailWindow">—</dd></div></dl></section>
-            <section class="detail-section"><h2 data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_notas_internas&quot;}">Notas internas</h2><div id="notesList" class="notes-list"></div><form id="noteForm"><textarea id="noteInput" placeholder="Adicionar nota interna..."></textarea><button class="btn btn-ghost btn-small" type="submit" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_salvar_nota&quot;}">Salvar nota</button></form></section>
+            <section class="detail-section"><h2 data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_notas_internas&quot;}">Notas internas</h2><div id="notesList" class="notes-list"></div><form id="noteForm"><textarea id="noteInput" placeholder="Adicionar nota interna..." data-legenda-atributos="{&quot;placeholder&quot;:&quot;legenda_site_adicionar_nota_interna&quot;}"></textarea><button class="btn btn-ghost btn-small" type="submit" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_salvar_nota&quot;}">Salvar nota</button></form></section>
             <section class="detail-section"><h2 data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_auditoria&quot;}">Auditoria</h2><div id="auditList" class="audit-list"></div></section>
           </div>
         </aside>
@@ -106,7 +106,7 @@
           <small id="schedulerAudienceHint"></small>
           <div class="scheduler-contacts" id="schedulerContacts" hidden></div>
         </fieldset>
-        <label data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_orientacao_para_a_ia&quot;}">Orientação para a IA<textarea id="schedulerInstruction" maxlength="4000" required placeholder="Ex.: Dê bom dia, retome o assunto da conversa com naturalidade e diga que estamos à disposição quando for conveniente."></textarea><small data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_a_ia_produzira_uma_mensagem_diferente_e_coerente_para_cada&quot;}">A IA produzirá uma mensagem diferente e coerente para cada histórico.</small></label>
+        <label data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_orientacao_para_a_ia&quot;}">Orientação para a IA<textarea id="schedulerInstruction" maxlength="4000" required placeholder="Ex.: Dê bom dia, retome o assunto da conversa com naturalidade e diga que estamos à disposição quando for conveniente." data-legenda-atributos="{&quot;placeholder&quot;:&quot;legenda_site_ex_de_bom_dia_retome_o_assunto_da_conversa_com&quot;}"></textarea><small data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_a_ia_produzira_uma_mensagem_diferente_e_coerente_para_cada&quot;}">A IA produzirá uma mensagem diferente e coerente para cada histórico.</small></label>
         <fieldset><legend data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_se_a_janela_de_24_horas_estiver_fechada&quot;}">Se a janela de 24 horas estiver fechada</legend>
           <label class="choice-card"><input type="radio" name="schedulerOutsideWindow" value="nao_enviar" checked><span><strong data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_nao_enviar_nada&quot;}">Não enviar nada</strong><small data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_o_contato_sera_ignorado_com_seguranca&quot;}">O contato será ignorado com segurança.</small></span></label>
           <label class="choice-card"><input type="radio" name="schedulerOutsideWindow" value="template"><span><strong data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_usar_template_aprovado&quot;}">Usar template aprovado</strong><small data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_envia_somente_um_modelo_aprovado_pela_meta&quot;}">Envia somente um modelo aprovado pela Meta.</small></span></label>
@@ -118,6 +118,6 @@
       <section class="scheduler-history" aria-labelledby="schedulerHistoryTitle"><div class="scheduler-history-heading"><h3 id="schedulerHistoryTitle" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_programacoes&quot;}">Programações</h3><button class="btn btn-ghost btn-small" id="schedulerReload" type="button" data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_atualizar&quot;}">Atualizar</button></div><div id="schedulerCampaigns" class="scheduler-campaigns"><p data-legenda-nos="{&quot;0&quot;:&quot;legenda_site_nenhuma_programacao_carregada&quot;}">Nenhuma programação carregada.</p></div></section>
     </div>
   </dialog>
-  <script src="atendimento.js?v=20260926-i18n-01"></script>
+  <script src="atendimento.js?v=20260928-i18n-03"></script>
 </body>
 </html>

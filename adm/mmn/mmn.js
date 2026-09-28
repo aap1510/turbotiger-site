@@ -1,6 +1,603 @@
 (function () {
   "use strict";
+  var LEGENDAS_MMN = {
+"legenda_fechamento_extra_emitido":"emitido",
+"legenda_fechamento_extra_rascunho":"rascunho",
+"legenda_fechamento_extra_confirmada":"confirmada",
+"legenda_fechamento_extra_motor":"Motor ",
+  "legenda_fechamento_mmn_escolher_endereco": "Selecione um dos ",
+  "legenda_fechamento_mmn_enderecos_encontrados": " endereços encontrados",
+  "legenda_fechamento_mmn_nivel": "Nível ",
+  "legenda_fechamento_mmn_ativos_de": "ativos de ",
+  "legenda_fechamento_mmn_participantes": " participantes",
+  "legenda_fechamento_mmn_competencia": "Competência ",
+  "legenda_fechamento_mmn_liquido": "Líquido: ",
+  "legenda_fechamento_mmn_transferencia": "Transferência ",
+  "legenda_fechamento_mmn_diretos_ativos": " diretos ativos",
+  "legenda_fechamento_mmn_simulacao": "Simulação #",
+  "legenda_fechamento_mmn_profundidade": "Profundidade remunerada: ",
+  "legenda_fechamento_mmn_niveis_sufixo": " nível(is).",
+  "legenda_fechamento_mmn_sem_limite": "Não há limite estrutural horizontal. A profundidade remunerada permanece em ",
+  "legenda_fechamento_mmn_rede_ate": "Rede até o nível ",
+  "legenda_fechamento_mmn_posicoes": " posições",
+  "legenda_fechamento_mmn_capacidade_perna": "Capacidade por perna: ",
+  "legenda_fechamento_mmn_versao": "Versão ",
+  "legenda_fechamento_mmn_modelo_juridico": " · modelo jurídico Regulamento MMN v1.",
+  "legenda_fechamento_mmn_comparacao_base": "Comparação com baseline #",
+  "legenda_fechamento_mmn_ativos": " ativos",
+  "legenda_fechamento_mmn_de": "de ",
 
+"legenda_mmn_estado_ativo": "ativo",
+"legenda_mmn_estado_elegivel": "elegivel",
+"legenda_mmn_estado_confirmado": "confirmado",
+"legenda_mmn_estado_pago": "pago",
+"legenda_mmn_estado_concluido": "concluido",
+"legenda_mmn_estado_ok": "ok",
+"legenda_mmn_estado_convertido": "convertido",
+"legenda_mmn_estado_homologado": "homologado",
+"legenda_mmn_estado_pendente": "pendente",
+"legenda_mmn_estado_apurando": "apurando",
+"legenda_mmn_estado_retido": "retido",
+"legenda_mmn_estado_revisao": "revisao",
+"legenda_mmn_estado_aguardando": "aguardando",
+"legenda_mmn_estado_fila": "fila",
+"legenda_mmn_estado_enviado": "enviado",
+"legenda_mmn_estado_aberto": "aberto",
+"legenda_mmn_estado_aberta": "aberta",
+"legenda_mmn_estado_em_atendimento": "em_atendimento",
+"legenda_mmn_estado_bloqueado": "bloqueado",
+"legenda_mmn_estado_cancelado": "cancelado",
+"legenda_mmn_estado_falhou": "falhou",
+"legenda_mmn_estado_revertido": "revertido",
+"legenda_mmn_estado_permanente": "permanente",
+"legenda_mmn_estado_inelegivel": "inelegivel",
+"legenda_mmn_complemento_acompanhe_sua_jornada": ". Acompanhe sua jornada.",
+"legenda_mmn_complemento_ativos": " ativos",
+"legenda_mmn_complemento_de": " de ",
+"legenda_mmn_complemento_diretos": " diretos",
+"legenda_mmn_complemento_vagas_por_participante": " vagas por participante",
+"legenda_mmn_complemento_indicado": " indicado",
+"legenda_mmn_complemento_indicados": " indicados",
+"legenda_mmn_complemento_pool": " · pool ",
+"legenda_mmn_complemento_participante_qualificado": " participante qualificado",
+"legenda_mmn_complemento_participantes_qualificados": " participantes qualificados",
+"legenda_mmn_complemento_meses": " meses.",
+"legenda_mmn_complemento_pessoas_ativas_na_rede": " pessoas ativas na rede · ",
+"legenda_mmn_complemento_spillover": " · spillover",
+"legenda_mmn_complemento_para_largura": " para largura ",
+"legenda_mmn_complemento_pre_visualizacao_do_regulamento": "Pré-visualização do regulamento",
+"legenda_mmn_complemento_no_hash_atual": " no hash atual",
+"legenda_mmn_complemento_sem_nome": "sem nome",
+"legenda_mmn_complemento_a_genealogia_sera_preservada_sem_reservar_ou_alterar_o_cod_usuario_normal": "A genealogia será preservada sem reservar ou alterar o cod_usuario normal.",
+"legenda_mmn_complemento_recalculado": " · recalculado ",
+"legenda_mmn_complemento_payout": " · payout ",
+"legenda_mmn_complemento_config": " · Config. #",
+"legenda_mmn_complemento_margem": " · margem ",
+"legenda_mmn_rotulo_aguarde": "Aguarde...",
+"legenda_mmn_rotulo_celular": "Celular",
+"legenda_mmn_rotulo_verificando": "Verificando...",
+"legenda_mmn_rotulo_confirmando": "Confirmando...",
+"legenda_mmn_rotulo_nenhum_estado_encontrado": "Nenhum estado encontrado.",
+"legenda_mmn_rotulo_selecione": "Selecione",
+"legenda_mmn_rotulo_rank": "Rank ",
+"legenda_mmn_rotulo_base": "Base",
+"legenda_mmn_rotulo_marcar_como_lida": "Marcar como lida",
+"legenda_mmn_rotulo_raiz": "Raiz",
+"legenda_mmn_rotulo_ilimitada": "Ilimitada",
+"legenda_mmn_rotulo_indicado": "Indicado",
+"legenda_mmn_rotulo_ativo": "Ativo",
+"legenda_mmn_rotulo_inativo": "Inativo",
+"legenda_mmn_rotulo_a_consulta_atingiu_o_limite_de_registros_este_diagrama_esta_incompleto_e_nao": "A consulta atingiu o limite de registros. Este diagrama está incompleto e não representa toda a sua rede.",
+"legenda_mmn_rotulo_sua_rede_de_posicionamento": "Sua rede de posicionamento",
+"legenda_mmn_rotulo_nao_foi_possivel_atualizar_o_diagrama_completo_agora_a_visualizacao_usa_os_dados": "Não foi possível atualizar o diagrama completo agora. A visualização usa os dados já carregados.",
+"legenda_mmn_rotulo_qualificado": "Qualificado",
+"legenda_mmn_rotulo_contestar": "Contestar",
+"legenda_mmn_rotulo_ver_participantes_qualificados": "Ver participantes qualificados",
+"legenda_mmn_rotulo_coeficiente": "Coeficiente",
+"legenda_mmn_rotulo_pago": "Pago",
+"legenda_mmn_rotulo_abrir_documento_rpa": "Abrir documento RPA",
+"legenda_mmn_rotulo_apurado": "Apurado",
+"legenda_mmn_rotulo_aprovado": "Aprovado",
+"legenda_mmn_rotulo_resultado": "Resultado",
+"legenda_mmn_rotulo_base_real_usada": "Base real usada",
+"legenda_mmn_rotulo_a_projecao_parte_dos_seus_dados_atuais_e_das_regras_vigentes": "A projeção parte dos seus dados atuais e das regras vigentes.",
+"legenda_mmn_rotulo_mes": "Mês",
+"legenda_mmn_rotulo_ativos": "Ativos",
+"legenda_mmn_rotulo_receita": "Receita",
+"legenda_mmn_rotulo_recalculado": "Recalculado",
+"legenda_mmn_rotulo_payout": "Payout",
+"legenda_mmn_rotulo_avisos_da_simulacao": "Avisos da simulação",
+"legenda_mmn_rotulo_simulacao_estimativa_sem_promessa_ou_garantia_de_renda_pagamento_ou_resultado": "Simulação estimativa, sem promessa ou garantia de renda, pagamento ou resultado.",
+"legenda_mmn_rotulo_sim": "Sim",
+"legenda_mmn_rotulo_apurar": "Apurar",
+"legenda_mmn_rotulo_fechar": "Fechar",
+"legenda_mmn_rotulo_reabrir": "Reabrir",
+"legenda_mmn_rotulo_indicacao_direta": "Indicação direta",
+"legenda_mmn_rotulo_spillover": "Spillover",
+"legenda_mmn_rotulo_permanente": "Permanente",
+"legenda_mmn_rotulo_gerenciar": "Gerenciar",
+"legenda_mmn_rotulo_aprovar": "Aprovar",
+"legenda_mmn_rotulo_cancelar": "Cancelar",
+"legenda_mmn_rotulo_revisar": "Revisar",
+"legenda_mmn_rotulo_patrocinio": "Patrocínio",
+"legenda_mmn_rotulo_origem_da_comissao_direta": "Origem da comissão direta.",
+"legenda_mmn_rotulo_pai_de_posicionamento": "Pai de posicionamento",
+"legenda_mmn_rotulo_origem_dos_niveis_residuais": "Origem dos níveis residuais.",
+"legenda_mmn_rotulo_vaga": "Vaga",
+"legenda_mmn_rotulo_slot_estrutural_registrado": "Slot estrutural registrado.",
+"legenda_mmn_rotulo_regra": "Regra",
+"legenda_mmn_rotulo_duas_genealogias_independentes": "Duas genealogias independentes",
+"legenda_mmn_rotulo_patrocinio_preserva_quem_convidou_posicionamento_organiza_as_vagas_e_o_spillover_a_comissao": "Patrocínio preserva quem convidou. Posicionamento organiza as vagas e o spillover. A comissão direta prevalece e o mesmo beneficiário não recebe duas vezes sobre a mesma assinatura.",
+"legenda_mmn_rotulo_patrocinio_indicados_diretos": "Patrocínio · indicados diretos",
+"legenda_mmn_rotulo_vinculo_permanente_de_indicacao": "Vínculo permanente de indicação",
+"legenda_mmn_rotulo_posicionamento_vagas_abaixo": "Posicionamento · vagas abaixo",
+"legenda_mmn_rotulo_aguardando": "Aguardando",
+"legenda_mmn_rotulo_gera": "Gera",
+"legenda_mmn_rotulo_largura_ilimitada": "Largura ilimitada",
+"legenda_mmn_rotulo_capacidade_teorica_da_matriz": "Capacidade teórica da matriz",
+"legenda_mmn_rotulo_por_nivel_w": "Por nível (W",
+"legenda_mmn_rotulo_configuracao_invalida": "Configuração inválida",
+"legenda_mmn_rotulo_use_0_para_ilimitada_ou_um_inteiro_a_partir_de_2": "Use 0 para ilimitada ou um inteiro a partir de 2.",
+"legenda_mmn_rotulo_percentual": "Percentual (%)",
+"legenda_mmn_rotulo_diretos_ativos_minimos": "Diretos ativos mínimos",
+"legenda_mmn_rotulo_pernas_qualificadas_minimas": "Pernas qualificadas mínimas",
+"legenda_mmn_rotulo_ativos_minimos_por_perna": "Ativos mínimos por perna",
+"legenda_mmn_rotulo_nao": "Não",
+"legenda_mmn_rotulo_fechamento": "Fechamento",
+"legenda_mmn_rotulo_pagamento": "Pagamento",
+"legenda_mmn_rotulo_reabertura": "Reabertura",
+"legenda_mmn_rotulo_uid": "UID ",
+"legenda_mmn_rotulo_perfil": "Perfil ",
+"legenda_mmn_rotulo_chave": "Chave",
+"legenda_mmn_rotulo_nome": "Nome",
+"legenda_mmn_rotulo_rede_ativa_minima": "Rede ativa mínima",
+"legenda_mmn_rotulo_maximo_da_maior_perna": "Máximo da maior perna (%)",
+"legenda_mmn_rotulo_bonus_de_lideranca": "Bônus de liderança (%)",
+"legenda_mmn_rotulo_coeficiente_pool": "Coeficiente pool",
+"legenda_mmn_rotulo_remover": "Remover",
+"legenda_mmn_rotulo_grupo": "Grupo",
+"legenda_mmn_rotulo_dispensa_premium": "Dispensa Premium",
+"legenda_mmn_rotulo_tipo": "Tipo",
+"legenda_mmn_rotulo_percentual_mensagem": "Percentual",
+"legenda_mmn_rotulo_valor_fixo": "Valor fixo",
+"legenda_mmn_rotulo_faixas": "Faixas",
+"legenda_mmn_rotulo_reter": "Reter",
+"legenda_mmn_rotulo_aliquota": "Alíquota (%)",
+"legenda_mmn_rotulo_base_minima_r": "Base mínima (R$)",
+"legenda_mmn_rotulo_teto_r": "Teto (R$)",
+"legenda_mmn_rotulo_municipio": "Município",
+"legenda_mmn_rotulo_estado": "Estado",
+"legenda_mmn_rotulo_parametros_por_faixa_json": "Parâmetros por faixa (JSON)",
+"legenda_mmn_rotulo_use_json_valido_para_faixas_limites_e_regras_adicionais": "Use JSON válido para faixas, limites e regras adicionais.",
+"legenda_mmn_rotulo_versao": "Versão",
+"legenda_mmn_rotulo_status": "Status",
+"legenda_mmn_rotulo_atualizacao": "Atualização",
+"legenda_mmn_rotulo_publicacao": "Publicação",
+"legenda_mmn_rotulo_vigencia": "Vigência",
+"legenda_mmn_rotulo_abrir_versao_historico": "Abrir versão/histórico",
+"legenda_mmn_rotulo_niveis": " níveis",
+"legenda_mmn_rotulo_largura": " largura",
+"legenda_mmn_rotulo_teto": " teto",
+"legenda_mmn_rotulo_minimo": " mínimo",
+"legenda_mmn_rotulo_nivel": "Nível",
+"legenda_mmn_rotulo_diretos": "Diretos",
+"legenda_mmn_rotulo_pernas": "Pernas",
+"legenda_mmn_rotulo_ativos_perna": "Ativos/perna",
+"legenda_mmn_rotulo_ranks": "Ranks:",
+"legenda_mmn_rotulo_nenhum": "Nenhum",
+"legenda_mmn_rotulo_todas": "Todas",
+"legenda_mmn_rotulo_aprovacoes_registradas": "Aprovações registradas",
+"legenda_mmn_rotulo_administrador": "Administrador",
+"legenda_mmn_rotulo_rascunhos": "Rascunhos",
+"legenda_mmn_rotulo_emitidos": "Emitidos",
+"legenda_mmn_rotulo_pagos": "Pagos",
+"legenda_mmn_rotulo_detalhes": "Detalhes",
+"legenda_mmn_rotulo_titular": "Titular",
+"legenda_mmn_rotulo_valores": "Valores",
+"legenda_mmn_rotulo_bruto": "Bruto ",
+"legenda_mmn_rotulo_comprovante": "Comprovante",
+"legenda_mmn_rotulo_analisar": "Analisar",
+"legenda_mmn_rotulo_sistema": "Sistema",
+"legenda_mmn_rotulo_carregando": "Carregando...",
+"legenda_mmn_rotulo_entrando": "Entrando...",
+"legenda_mmn_rotulo_salvando": "Salvando...",
+"legenda_mmn_rotulo_simulando": "Simulando...",
+"legenda_mmn_rotulo_saindo": "Saindo...",
+"legenda_mmn_rotulo_gerenciar_prefixo": "Gerenciar ",
+"legenda_mmn_rotulo_abrindo": "Abrindo...",
+"legenda_mmn_rotulo_registrando": "Registrando...",
+"legenda_mmn_rotulo_emitindo": "Emitindo...",
+"legenda_mmn_rotulo_criando": "Criando...",
+"legenda_mmn_rotulo_gerando": "Gerando...",
+"legenda_mmn_rotulo_real": "Real ",
+"legenda_mmn_rotulo_receita_prefixo": "Receita ",
+"legenda_mmn_rotulo_apta": "Apta",
+"legenda_mmn_rotulo_ver_detalhes": "Ver detalhes",
+"legenda_mmn_rotulo_mensal": "Mensal",
+"legenda_mmn_rotulo_niveis_mensagem": "Níveis",
+"legenda_mmn_rotulo_ranks_mensagem": "Ranks",
+"legenda_mmn_rotulo_resumo": "Resumo",
+"legenda_mmn_rotulo_completo": "Completo",
+"legenda_mmn_rotulo_exportar_json": "Exportar JSON",
+"legenda_mmn_rotulo_2_a_4_execucoes_registradas_sem_alterar_dados_reais": "2 a 4 execuções registradas, sem alterar dados reais.",
+"legenda_mmn_rotulo_executando": "Executando...",
+"legenda_mmn_rotulo_comparando": "Comparando...",
+  "legenda_mmn_confirme_seu_e_mail_antes_de_entrar": "Confirme seu e-mail antes de entrar.",
+  "legenda_mmn_falha_de_conexao_verifique_sua_internet_e_tente_novamente": "Falha de conexão. Verifique sua internet e tente novamente.",
+  "legenda_mmn_e_mail_ou_senha_invalidos": "E-mail ou senha inválidos.",
+  "legenda_mmn_o_app_demorou_para_validar_sua_sessao_toque_em_atualizar": "O app demorou para validar sua sessão. Toque em Atualizar.",
+  "legenda_mmn_nao_foi_possivel_validar_sua_sessao_pelo_app": "Não foi possível validar sua sessão pelo app.",
+  "legenda_mmn_preencha_os_campos_obrigatorios": "Preencha os campos obrigatórios.",
+  "legenda_mmn_sessao_expirada_entre_novamente": "Sessão expirada. Entre novamente.",
+  "legenda_mmn_entre_para_continuar": "Entre para continuar.",
+  "legenda_mmn_sem_permissao_administrativa": "Sem permissão administrativa.",
+  "legenda_mmn_sem_permissao_para_acessar_o_mmn": "Sem permissão para acessar o MMN.",
+  "legenda_mmn_usuario_nao_encontrado": "Usuário não encontrado.",
+  "legenda_mmn_usuario_do_app_nao_encontrado": "Usuário do app não encontrado.",
+  "legenda_mmn_confirme_a_reentrada_no_programa": "Confirme a reentrada no programa.",
+  "legenda_mmn_aceite_novamente_o_regulamento_vigente_antes_de_reentrar": "Aceite novamente o regulamento vigente antes de reentrar.",
+  "legenda_mmn_nao_ha_uma_saida_voluntaria_pendente_de_reentrada": "Não há uma saída voluntária pendente de reentrada.",
+  "legenda_mmn_sua_situacao_cadastral_nao_permite_a_reentrada_neste_momento": "Sua situação cadastral não permite a reentrada neste momento.",
+  "legenda_mmn_a_chave_pix_deve_pertencer_ao_mesmo_cpf_do_cadastro": "A chave PIX deve pertencer ao mesmo CPF do cadastro.",
+  "legenda_mmn_informe_um_e_mail_valido_para_a_chave_pix": "Informe um e-mail válido para a chave Pix.",
+  "legenda_mmn_informe_um_celular_com_ddd_e_11_numeros": "Informe um celular com DDD e 11 números.",
+  "legenda_mmn_informe_uma_chave_aleatoria_pix_valida": "Informe uma chave aleatória Pix válida.",
+  "legenda_mmn_informe_um_cpf_valido_com_11_numeros": "Informe um CPF válido com 11 números.",
+  "legenda_mmn_e_necessario_aceitar_o_regulamento_vigente": "É necessário aceitar o regulamento vigente.",
+  "legenda_mmn_os_pagamentos_reais_permanecem_bloqueados_ate_a_homologacao_fiscal": "Os pagamentos reais permanecem bloqueados até a homologação fiscal.",
+  "legenda_mmn_a_quantidade_de_niveis_deve_ser_um_inteiro_de_1_a_10": "A quantidade de níveis deve ser um inteiro de 1 a 10.",
+  "legenda_mmn_a_largura_deve_ser_0_para_ilimitada_ou_um_inteiro_a_partir_de": "A largura deve ser 0 para ilimitada ou um inteiro a partir de 2.",
+  "legenda_mmn_as_dez_faixas_de_nivel_precisam_permanecer_preservadas_na_configuracao": "As dez faixas de nível precisam permanecer preservadas na configuração.",
+  "legenda_mmn_gere_primeiro_o_rascunho_do_regulamento_para_esta_configuracao": "Gere primeiro o rascunho do regulamento para esta configuração.",
+  "legenda_mmn_o_regulamento_so_pode_ser_gerado_para_uma_configuracao_em_rascunho": "O regulamento só pode ser gerado para uma configuração em rascunho.",
+  "legenda_mmn_o_modelo_juridico_solicitado_nao_e_permitido": "O modelo jurídico solicitado não é permitido.",
+  "legenda_mmn_essa_versao_do_regulamento_ja_existe": "Essa versão do regulamento já existe.",
+  "legenda_mmn_as_regras_mudaram_gere_novamente_o_regulamento_e_refaca_a_simulacao_antes_de": "As regras mudaram. Gere novamente o regulamento e refaça a simulação antes de publicar.",
+  "legenda_mmn_nao_foi_possivel_concluir_a_operacao": "Não foi possível concluir a operação.",
+  "legenda_mmn_indicacoes_e_beneficios_turbo_tiger": "Indicações e Benefícios - Turbo Tiger",
+  "legenda_mmn_indicacoes_e_beneficios": "Indicações e Benefícios",
+  "legenda_mmn_mmn_turbo_tiger_admin": "MMN - Turbo Tiger Admin",
+  "legenda_mmn_admin_mmn": "Admin MMN",
+  "legenda_mmn_painel_mmn": "Painel MMN",
+  "legenda_mmn_falha_http": "Falha HTTP ",
+  "legenda_mmn_a_consulta_demorou_alem_do_esperado": "A consulta demorou além do esperado.",
+  "legenda_mmn_chave_aleatoria": "Chave aleatória",
+  "legenda_mmn_selecione_o_tipo_da_chave_pix": "Selecione o tipo da chave Pix.",
+  "legenda_mmn_informe_a_chave_pix": "Informe a chave Pix.",
+  "legenda_mmn_muitas_tentativas_em_pouco_tempo_aguarde_um_momento_e_tente_novamente": "Muitas tentativas em pouco tempo. Aguarde um momento e tente novamente.",
+  "legenda_mmn_ela_sera_mantida_enquanto_voce_nao_informar_uma_nova_chave": "Ela será mantida enquanto você não informar uma nova chave.",
+  "legenda_mmn_chave_pix_confirmada": "Chave Pix confirmada.",
+  "legenda_mmn_a_chave_atual_ainda_nao_esta_confirmada_informe_a_novamente_para_verificar": "A chave atual ainda não está confirmada. Informe-a novamente para verificar.",
+  "legenda_mmn_informe_novamente_a_chave_pix_atual_para_concluir_a_confirmacao": "Informe novamente a chave Pix atual para concluir a confirmação.",
+  "legenda_mmn_informe_a_nova_chave_pix_para_verificar_a_alteracao": "Informe a nova chave Pix para verificar a alteração.",
+  "legenda_mmn_informe_a_nova_chave_pix": "Informe a nova chave Pix.",
+  "legenda_mmn_informe_o_tipo_e_a_chave_depois_toque_em_verificar": "Informe o tipo e a chave, depois toque em verificar.",
+  "legenda_mmn_a_verificacao_expirou_verifique_a_chave_pix_novamente": "A verificação expirou. Verifique a chave Pix novamente.",
+  "legenda_mmn_por_seguranca_sua_chave_pix_podera_ser_alterada_novamente_em": "Por segurança, sua chave Pix poderá ser alterada novamente em ",
+  "legenda_mmn_por_seguranca_ainda_nao_e_possivel_alterar_sua_chave_pix_aguarde_o_prazo": "Por segurança, ainda não é possível alterar sua chave Pix. Aguarde o prazo informado pelo programa e tente novamente.",
+  "legenda_mmn_o_servico_de_consulta_pix_esta_temporariamente_indisponivel_tente_novamente_mais_tarde": "O serviço de consulta Pix está temporariamente indisponível. Tente novamente mais tarde.",
+  "legenda_mmn_sua_sessao_expirou_atualize_o_painel_e_tente_novamente": "Sua sessão expirou. Atualize o painel e tente novamente.",
+  "legenda_mmn_selecione_um_tipo_valido_de_chave_pix": "Selecione um tipo válido de chave Pix.",
+  "legenda_mmn_informe_uma_chave_pix_valida": "Informe uma chave Pix válida.",
+  "legenda_mmn_esta_chave_pix_nao_corresponde_ao_titular_do_cadastro_confira_os_dados_ou": "Esta chave Pix não corresponde ao titular do cadastro. Confira os dados ou use uma chave do mesmo CPF.",
+  "legenda_mmn_a_chave_pix_nao_foi_localizada_confira_o_tipo_e_a_chave_informados": "A chave Pix não foi localizada. Confira o tipo e a chave informados.",
+  "legenda_mmn_a_verificacao_desta_chave_pix_ja_esta_em_andamento_aguarde_alguns_segundos_e": "A verificação desta chave Pix já está em andamento. Aguarde alguns segundos e tente novamente.",
+  "legenda_mmn_a_instituicao_retornou_dados_que_nao_puderam_ser_confirmados_com_seguranca_confira_a": "A instituição retornou dados que não puderam ser confirmados com segurança. Confira a chave ou tente novamente mais tarde.",
+  "legenda_mmn_nao_foi_possivel_consultar_a_chave_pix_agora_tente_novamente_em_instantes": "Não foi possível consultar a chave Pix agora. Tente novamente em instantes.",
+  "legenda_mmn_nao_foi_possivel_confirmar_esta_chave_pix_verifique_novamente_e_repita_a_confirmacao": "Não foi possível confirmar esta chave Pix. Verifique novamente e repita a confirmação.",
+  "legenda_mmn_nao_foi_possivel_confirmar_que_esta_chave_pix_pertence_ao_titular_do_cadastro": "Não foi possível confirmar que esta chave Pix pertence ao titular do cadastro. Confira os dados ou use outra chave.",
+  "legenda_mmn_consultando_a_chave_pix_com_seguranca": "Consultando a chave Pix com segurança...",
+  "legenda_mmn_chave_localizada_confira_os_dados_abaixo_e_confirme_a_titularidade": "Chave localizada. Confira os dados abaixo e confirme a titularidade.",
+  "legenda_mmn_registrando_sua_confirmacao": "Registrando sua confirmação...",
+  "legenda_mmn_a_confirmacao_foi_registrada_se_alterar_o_tipo_ou_a_chave_sera_necessario": "A confirmação foi registrada. Se alterar o tipo ou a chave, será necessário verificar novamente.",
+  "legenda_mmn_informe_novamente_a_chave_pix_atual_para_verificar_e_confirmar": "Informe novamente a chave Pix atual para verificar e confirmar.",
+  "legenda_mmn_confira_os_dados_encontrados_e_toque_em_confirmar": "Confira os dados encontrados e toque em Confirmar.",
+  "legenda_mmn_endereco_alterado_complete_uf_cidade_e_logradouro_ou_digite_um_cep_valido": "Endereço alterado. Complete UF, cidade e logradouro ou digite um CEP válido.",
+  "legenda_mmn_endereco_alterado_conferindo_o_cep_correspondente": "Endereço alterado. Conferindo o CEP correspondente...",
+  "legenda_mmn_nao_foi_possivel_carregar_as_cidades_agora": "Não foi possível carregar as cidades agora.",
+  "legenda_mmn_digite_e_selecione_a_cidade": "Digite e selecione a cidade",
+  "legenda_mmn_cep_nao_encontrado": "CEP não encontrado.",
+  "legenda_mmn_falha_nas_consultas_de_cep": "Falha nas consultas de CEP.",
+  "legenda_mmn_nao_foi_possivel_localizar_esse_cep": "Não foi possível localizar esse CEP.",
+  "legenda_mmn_consultando_o_cep": "Consultando o CEP...",
+  "legenda_mmn_endereco_encontrado": "Endereço encontrado.",
+  "legenda_mmn_nao_foi_possivel_consultar_o_cep": "Não foi possível consultar o CEP.",
+  "legenda_mmn_selecione_uma_uf_valida": "Selecione uma UF válida.",
+  "legenda_mmn_informe_uma_cidade_com_pelo_menos_3_caracteres": "Informe uma cidade com pelo menos 3 caracteres.",
+  "legenda_mmn_informe_uma_rua_ou_avenida_com_pelo_menos_3_caracteres": "Informe uma rua ou avenida com pelo menos 3 caracteres.",
+  "legenda_mmn_procurando_o_cep_do_endereco": "Procurando o CEP do endereço...",
+  "legenda_mmn_corrija_o_endereco_ou_digite_um_cep_valido": "Corrija o endereço ou digite um CEP válido.",
+  "legenda_mmn_cep_encontrado": "CEP encontrado.",
+  "legenda_mmn_foram_encontrados_varios_ceps_selecione_o_endereco_correto_para_confirmar": "Foram encontrados vários CEPs. Selecione o endereço correto para confirmar.",
+  "legenda_mmn_selecione_o_estado_primeiro": "Selecione o estado primeiro",
+  "legenda_mmn_cep_selecionado_com_sucesso": "CEP selecionado com sucesso.",
+  "legenda_mmn_informe_um_cep_valido_com_8_digitos": "Informe um CEP válido com 8 dígitos.",
+  "legenda_mmn_complete_o_endereco_para_os_dados_do_rpa": "Complete o endereço para os dados do RPA.",
+  "legenda_mmn_selecione_a_uf_do_endereco": "Selecione a UF do endereço.",
+  "legenda_mmn_o_cep_e_o_endereco_ainda_nao_foram_confirmados_corrija_o_endereco_selecione": "O CEP e o endereço ainda não foram confirmados. Corrija o endereço, selecione um dos CEPs encontrados ou digite um CEP válido.",
+  "legenda_mmn_verifique_confira_e_confirme_a_chave_pix_antes_de_concluir_a_adesao": "Verifique, confira e confirme a chave Pix antes de concluir a adesão.",
+  "legenda_mmn_informe_a_rua_ou_avenida": "Informe a rua ou avenida.",
+  "legenda_mmn_informe_o_numero_do_endereco": "Informe o número do endereço.",
+  "legenda_mmn_informe_o_bairro": "Informe o bairro.",
+  "legenda_mmn_informe_e_selecione_a_cidade": "Informe e selecione a cidade.",
+  "legenda_mmn_confirme_o_cep_e_o_endereco_antes_de_concluir_a_adesao": "Confirme o CEP e o endereço antes de concluir a adesão.",
+  "legenda_mmn_leia_e_aceite_o_regulamento_vigente_para_concluir_a_adesao": "Leia e aceite o regulamento vigente para concluir a adesão.",
+  "legenda_mmn_a_comissao_considera_somente_assinaturas_efetivamente_pagas": "A comissão considera somente assinaturas efetivamente pagas.",
+  "legenda_mmn_e_necessario_estar_elegivel_na_data_da_receita_e_no_fechamento": "É necessário estar elegível na data da receita e no fechamento.",
+  "legenda_mmn_simulacoes_nao_representam_garantia_de_renda": "Simulações não representam garantia de renda.",
+  "legenda_mmn_chave_atual": "Chave atual: ",
+  "legenda_mmn_nenhuma_chave_cadastrada": "Nenhuma chave cadastrada.",
+  "legenda_mmn_ola": "Olá, ",
+  "legenda_mmn_indicacoes_qualificacoes_e_valores": "Indicações, qualificações e valores.",
+  "legenda_mmn_elegivel_nesta_competencia": "Elegível nesta competência",
+  "legenda_mmn_inelegivel_nesta_competencia": "Inelegível nesta competência",
+  "legenda_mmn_maior_rank_alcancado": "Maior rank alcançado",
+  "legenda_mmn_os_criterios_sao_avaliados_a_cada_competencia": "Os critérios são avaliados a cada competência.",
+  "legenda_mmn_necessarios": " necessários",
+  "legenda_mmn_objetivo_alcancado": "Objetivo alcançado",
+  "legenda_mmn_rede_ativa": "Rede ativa: ",
+  "legenda_mmn_diretos_ativos": "Diretos ativos: ",
+  "legenda_mmn_maior_perna": "Maior perna: ",
+  "legenda_mmn_maximo": " (máximo ",
+  "legenda_mmn_criterio": "Critério",
+  "legenda_mmn_os_criterios_da_competencia_ainda_nao_foram_publicados": "Os critérios da competência ainda não foram publicados.",
+  "legenda_mmn_ainda_nao_ha_competencias_reconhecidas_para_exibir": "Ainda não há competências reconhecidas para exibir.",
+  "legenda_mmn_carregando_a_evolucao_real_da_sua_rede": "Carregando a evolução real da sua rede...",
+  "legenda_mmn_ainda_nao_ha_competencias_com_totais_da_rede_suficientes_para_montar_o_grafico": "Ainda não há competências com totais da rede suficientes para montar o gráfico de evolução.",
+  "legenda_mmn_o_grafico_usa_somente_os_totais_reais_de_rede_retornados_em_cada_competencia": "O gráfico usa somente os totais reais de rede retornados em cada competência.",
+  "legenda_mmn_nao_foi_possivel_atualizar_a_evolucao_da_rede_agora": "Não foi possível atualizar a evolução da rede agora.",
+  "legenda_mmn_atualizacao": "Atualização",
+  "legenda_mmn_nenhuma_notificacao_disponivel": "Nenhuma notificação disponível.",
+  "legenda_mmn_bonus_de_lideranca": "Bônus de liderança",
+  "legenda_mmn_pool_global": "Pool Global",
+  "legenda_mmn_usuario": "Usuário",
+  "legenda_mmn_raiz_estrutural": "Raiz estrutural",
+  "legenda_mmn_sem_vaga_atribuida": "Sem vaga atribuída",
+  "legenda_mmn_sem_limite_horizontal_de_posicionamento": "Sem limite horizontal de posicionamento.",
+  "legenda_mmn_posicionado_por_spillover_seu_patrocinador_permanece_o_mesmo": "Posicionado por spillover; seu patrocinador permanece o mesmo.",
+  "legenda_mmn_posicionamento_direto_sem_spillover_nesta_entrada": "Posicionamento direto, sem spillover nesta entrada.",
+  "legenda_mmn_com_a_largura_limitada_indicacoes_alem_das_vagas_diretas_entram_por_spillover_a": "Com a largura limitada, indicações além das vagas diretas entram por spillover. A comissão direta permanece com quem convidou; as residuais seguem os níveis reais, sem pagar duas vezes o mesmo beneficiário pela mesma assinatura.",
+  "legenda_mmn_data_de_cadastro_no_app_nao_informada": "Data de cadastro no app não informada",
+  "legenda_mmn_vinculo_da_indicacao_em": "Vínculo da indicação em ",
+  "legenda_mmn_cadastro_no_app_em": "Cadastro no app em ",
+  "legenda_mmn_indicacao_direta": "Indicação direta ",
+  "legenda_mmn_indicacao_direta_posicao_ainda_nao_informada": "Indicação direta · posição ainda não informada",
+  "legenda_mmn_posicao": "Posição ",
+  "legenda_mmn_posicao_da_indicacao_nao_informada": "Posição da indicação não informada",
+  "legenda_mmn_ver_ramificacao": "Ver ramificação",
+  "legenda_mmn_sem_indicados": "Sem indicados",
+  "legenda_mmn_indicados_de": "Indicados de ",
+  "legenda_mmn_carregando_indicados": "Carregando indicados...",
+  "legenda_mmn_este_indicado_ainda_nao_possui_indicacoes_registradas": "Este indicado ainda não possui indicações registradas.",
+  "legenda_mmn_nao_foi_possivel_carregar_esta_ramificacao_agora_tente_novamente": "Não foi possível carregar esta ramificação agora. Tente novamente.",
+  "legenda_mmn_vaga_da_indicacao_nao_informada": "Vaga da indicação não informada",
+  "legenda_mmn_vaga": "Vaga #",
+  "legenda_mmn_voce": "Você",
+  "legenda_mmn_voce_ainda_nao_possui_indicados_para_exibir_no_diagrama": "Você ainda não possui indicados para exibir no diagrama.",
+  "legenda_mmn_carregando_o_diagrama_completo_da_rede": "Carregando o diagrama completo da rede...",
+  "legenda_mmn_nao_foi_possivel_carregar_o_diagrama_da_rede_agora_tente_novamente": "Não foi possível carregar o diagrama da rede agora. Tente novamente.",
+  "legenda_mmn_nao_qualificado": "Não qualificado",
+  "legenda_mmn_a_distribuicao_por_nivel_ainda_nao_esta_disponivel": "A distribuição por nível ainda não está disponível.",
+  "legenda_mmn_voce_ainda_nao_possui_indicados_diretos": "Você ainda não possui indicados diretos.",
+  "legenda_mmn_resumo_da_competencia": "Resumo da competência",
+  "legenda_mmn_lancamento": "Lançamento",
+  "legenda_mmn_nivel": "Nível ",
+  "legenda_mmn_inclui_bonus": "Inclui bônus",
+  "legenda_mmn_nenhum_lancamento_encontrado_para_o_periodo": "Nenhum lançamento encontrado para o período.",
+  "legenda_mmn_rank_atual": "Rank atual",
+  "legenda_mmn_qualificacao": "Qualificação",
+  "legenda_mmn_ativos_na_rede_bonus": " ativos na rede · bônus ",
+  "legenda_mmn_os_ranks_vigentes_ainda_nao_foram_carregados": "Os ranks vigentes ainda não foram carregados.",
+  "legenda_mmn_base_pessoal": "Base pessoal",
+  "legenda_mmn_seus_pontos": "Seus pontos",
+  "legenda_mmn_pontos_totais": "Pontos totais",
+  "legenda_mmn_pool_disponivel": "Pool disponível",
+  "legenda_mmn_competencia": "Competência ",
+  "legenda_mmn_beneficio": "Benefício",
+  "legenda_mmn_nenhuma_bonificacao_registrada_nesta_competencia": "Nenhuma bonificação registrada nesta competência.",
+  "legenda_mmn_participantes_qualificados_neste_rank": "Participantes qualificados neste rank",
+  "legenda_mmn_carregando_participantes_qualificados": "Carregando participantes qualificados...",
+  "legenda_mmn_nenhum_participante_qualificado_foi_encontrado_neste_rank": "Nenhum participante qualificado foi encontrado neste rank.",
+  "legenda_mmn_nao_foi_possivel_carregar_os_qualificados_agora_tente_novamente": "Não foi possível carregar os qualificados agora. Tente novamente.",
+  "legenda_mmn_minimo_vigente": "Mínimo vigente",
+  "legenda_mmn_em_processamento": "Em processamento",
+  "legenda_mmn_documento_ainda_nao_emitido": "Documento ainda não emitido",
+  "legenda_mmn_retencoes": " · Retenções: ",
+  "legenda_mmn_rpa_ainda_sem_numero": "RPA ainda sem número",
+  "legenda_mmn_nenhum_pagamento_processado": "Nenhum pagamento processado.",
+  "legenda_mmn_total_projetado_para": "Total projetado para ",
+  "legenda_mmn_mes": " mês.",
+  "legenda_mmn_media_mensal_estimada": "Média mensal estimada",
+  "legenda_mmn_bruto_medio_mensal": "Bruto médio mensal: ",
+  "legenda_mmn_valor_mensal_no_ultimo_mes": "Valor mensal no último mês",
+  "legenda_mmn_bruto_no_ultimo_mes": "Bruto no último mês: ",
+  "legenda_mmn_apta_para_publicacao": "Apta para publicação",
+  "legenda_mmn_somente_analise": "Somente análise",
+  "legenda_mmn_bruto_pessoal": "Bruto pessoal",
+  "legenda_mmn_payout_real": "Payout real",
+  "legenda_mmn_comissoes": "Comissões",
+  "legenda_mmn_liquido_estimado": "Líquido estimado",
+  "legenda_mmn_bonus_e_pool": "Bônus e pool",
+  "legenda_mmn_projecao_futura_calculada_por_coortes_estatisticas": "Projeção futura calculada por coortes estatísticas.",
+  "legenda_mmn_pool_global_indisponivel_nesta_estimativa_por_falta_de_base_historica": "Pool global indisponível nesta estimativa por falta de base histórica.",
+  "legenda_mmn_a_projecao_aplica_a_estrutura_vigente_e_prioriza_a_comissao_direta_sem_duplicidade": "A projeção aplica a estrutura vigente e prioriza a comissão direta sem duplicidade.",
+  "legenda_mmn_indicacao_pessoal_e_posicionamento_sao_calculados_separadamente": "Indicação pessoal e posicionamento são calculados separadamente.",
+  "legenda_mmn_o_spillover_futuro_e_estimado_conforme_a_capacidade_da_estrutura": "O spillover futuro é estimado conforme a capacidade da estrutura.",
+  "legenda_mmn_a_deduplicacao_futura_e_apresentada_como_intervalo_estimado": "A deduplicação futura é apresentada como intervalo estimado.",
+  "legenda_mmn_o_servidor_nao_retornou_resultados_para_esta_simulacao": "O servidor não retornou resultados para esta simulação.",
+  "legenda_mmn_a_versao_vigente_ainda_nao_retornou_os_niveis": "A versão vigente ainda não retornou os níveis.",
+  "legenda_mmn_nao": "Não",
+  "legenda_mmn_verificacao": "Verificação",
+  "legenda_mmn_nenhuma_pendencia_operacional_informada": "Nenhuma pendência operacional informada.",
+  "legenda_mmn_nenhuma_competencia_encontrada": "Nenhuma competência encontrada.",
+  "legenda_mmn_posicao_direta": "Posição direta",
+  "legenda_mmn_em_dia": "Em dia",
+  "legenda_mmn_elegivel": "Elegível",
+  "legenda_mmn_nenhum_participante_encontrado": "Nenhum participante encontrado.",
+  "legenda_mmn_reativar_prazo": "Reativar prazo",
+  "legenda_mmn_aguardando_cadastro": "Aguardando cadastro",
+  "legenda_mmn_nenhum_cadastro_na_lista_de_espera": "Nenhum cadastro na lista de espera.",
+  "legenda_mmn_largura_ilimitada": "Largura ilimitada",
+  "legenda_mmn_vagas_por_no": " vagas por nó",
+  "legenda_mmn_posicao_direta_mensagem": " · posição direta",
+  "legenda_mmn_nenhuma_genealogia_encontrada_para_esse_usuario": "Nenhuma genealogia encontrada para esse usuário.",
+  "legenda_mmn_nao_gera": "Não gera",
+  "legenda_mmn_nenhum_lancamento_encontrado": "Nenhum lançamento encontrado.",
+  "legenda_mmn_acima_do_limite_numerico_de_exibicao": "Acima do limite numérico de exibição",
+  "legenda_mmn_a_largura_deve_ser_0_para_ilimitada_ou_um_inteiro_de_2_a": "A largura deve ser 0 para ilimitada ou um inteiro de 2 a 2.147.483.647.",
+  "legenda_mmn_no_nivel": "No nível ",
+  "legenda_mmn_diretos_ativos_minimos_nao_pode_superar_a_largura_atual_de": ", diretos ativos mínimos não pode superar a largura atual de ",
+  "legenda_mmn_pernas_qualificadas_nao_pode_superar_a_largura_atual_de": ", pernas qualificadas não pode superar a largura atual de ",
+  "legenda_mmn_ativos_minimos_por_perna_supera_a_capacidade_teorica_de": ", ativos mínimos por perna supera a capacidade teórica de ",
+  "legenda_mmn_a_combinacao_de_pernas_e_ativos_por_perna_supera_a_capacidade_total_de": ", a combinação de pernas e ativos por perna supera a capacidade total de ",
+  "legenda_mmn_no_rank": "No rank ",
+  "legenda_mmn_a_rede_ativa_minima_supera_a_capacidade_teorica_de": ", a rede ativa mínima supera a capacidade teórica de ",
+  "legenda_mmn_a_maior_perna_nao_pode_ter_limite_inferior_ao_minimo_teorico_de": ", a maior perna não pode ter limite inferior ao mínimo teórico de ",
+  "legenda_mmn_nenhum_rank_configurado": "Nenhum rank configurado.",
+  "legenda_mmn_nenhum_grupo_isento_configurado": "Nenhum grupo isento configurado.",
+  "legenda_mmn_nenhuma_retencao_configurada": "Nenhuma retenção configurada.",
+  "legenda_mmn_publicacao": "Publicação",
+  "legenda_mmn_nenhum_aprovador_adicional_configurado": "Nenhum aprovador adicional configurado.",
+  "legenda_mmn_nenhum_regulamento_foi_gerado_para_esta_versao": "Nenhum regulamento foi gerado para esta versão.",
+  "legenda_mmn_regulamento_de_indicacoes_e_beneficios": "Regulamento de Indicações e Benefícios",
+  "legenda_mmn_use_pre_visualizar_para_conferir_o_snapshot_desta_versao": "Use Pré-visualizar para conferir o snapshot desta versão.",
+  "legenda_mmn_gere_o_regulamento_depois_de_salvar_as_regras": "Gere o regulamento depois de salvar as regras.",
+  "legenda_mmn_versao": "Versão ",
+  "legenda_mmn_nenhuma_versao_de_configuracao": "Nenhuma versão de configuração.",
+  "legenda_mmn_salve_o_rascunho_para_consultar_o_progresso": "Salve o rascunho para consultar o progresso.",
+  "legenda_mmn_rascunho_salvo": "Rascunho salvo",
+  "legenda_mmn_configuracao": "Configuração #",
+  "legenda_mmn_regulamento_gerado": "Regulamento gerado",
+  "legenda_mmn_snapshot": "Snapshot #",
+  "legenda_mmn_gere_o_snapshot_no_servidor": "Gere o snapshot no servidor",
+  "legenda_mmn_simulacao_v2_valida": "Simulação V2 válida",
+  "legenda_mmn_simulacao": "Simulação #",
+  "legenda_mmn_execute_novamente_apos_qualquer_alteracao": "Execute novamente após qualquer alteração",
+  "legenda_mmn_quorum_de_publicacao": "Quórum de publicação",
+  "legenda_mmn_registrar_pago": "Registrar pago",
+  "legenda_mmn_nenhum_pagamento_encontrado": "Nenhum pagamento encontrado.",
+  "legenda_mmn_beneficiarios": "Beneficiários",
+  "legenda_mmn_aguardando_rpa": "Aguardando RPA",
+  "legenda_mmn_retencoes_prefixo": " · retenções ",
+  "legenda_mmn_sem_numero": "Sem número",
+  "legenda_mmn_nenhum_beneficiario_encontrado_na_fila_fiscal": "Nenhum beneficiário encontrado na fila fiscal.",
+  "legenda_mmn_beneficiario": "Beneficiário",
+  "legenda_mmn_liquido": " · líquido ",
+  "legenda_mmn_ainda_nao_registrado": "Ainda não registrado",
+  "legenda_mmn_transferencia": "Transferência",
+  "legenda_mmn_ainda_nao_confirmado": "Ainda não confirmado",
+  "legenda_mmn_ocorrencia": "Ocorrência",
+  "legenda_mmn_nenhuma_ocorrencia_encontrada": "Nenhuma ocorrência encontrada.",
+  "legenda_mmn_alteracao": "Alteração",
+  "legenda_mmn_nenhum_evento_de_auditoria_encontrado": "Nenhum evento de auditoria encontrado.",
+  "legenda_mmn_json_invalido_na_retencao": "JSON inválido na retenção ",
+  "legenda_mmn_entre_com_uma_conta_autorizada": "Entre com uma conta autorizada",
+  "legenda_mmn_online_acesso_conforme_suas_permissoes": "Online · acesso conforme suas permissões",
+  "legenda_mmn_validando_acesso": "Validando acesso...",
+  "legenda_mmn_sessao_encerrada": "Sessão encerrada",
+  "legenda_mmn_convite_turbo_tiger": "Convite Turbo Tiger",
+  "legenda_mmn_o_link_de_convite_ainda_nao_esta_disponivel": "O link de convite ainda não está disponível.",
+  "legenda_mmn_nao_foi_possivel_copiar_o_link_neste_dispositivo": "Não foi possível copiar o link neste dispositivo.",
+  "legenda_mmn_salvando_adesao": "Salvando adesão...",
+  "legenda_mmn_reentrada_concluida_com_seguranca": "Reentrada concluída com segurança.",
+  "legenda_mmn_adesao_concluida_com_seguranca": "Adesão concluída com segurança.",
+  "legenda_mmn_verifique_confira_e_confirme_a_chave_pix_antes_de_salvar": "Verifique, confira e confirme a chave Pix antes de salvar.",
+  "legenda_mmn_a_confirmacao_da_nova_chave_pix_nao_foi_preservada_verifique_novamente": "A confirmação da nova chave Pix não foi preservada. Verifique novamente.",
+  "legenda_mmn_dados_atualizados": "Dados atualizados.",
+  "legenda_mmn_assunto_da_contestacao": "Assunto da contestação:",
+  "legenda_mmn_revisao_de_lancamento": "Revisão de lançamento",
+  "legenda_mmn_descreva_o_motivo_da_contestacao": "Descreva o motivo da contestação:",
+  "legenda_mmn_informe_o_assunto_e_a_descricao_da_contestacao": "Informe o assunto e a descrição da contestação.",
+  "legenda_mmn_contestacao_registrada_para_analise": "Contestação registrada para análise.",
+  "legenda_mmn_preparando_o_diagrama_para_gerar_o_pdf": "Preparando o diagrama para gerar o PDF...",
+  "legenda_mmn_nao_foi_possivel_abrir_a_geracao_do_pdf_no_aplicativo": "Não foi possível abrir a geração do PDF no aplicativo.",
+  "legenda_mmn_escolha_salvar_como_pdf_na_tela_aberta_pelo_dispositivo": "Escolha Salvar como PDF na tela aberta pelo dispositivo.",
+  "legenda_mmn_nao_foi_possivel_gerar_o_pdf": "Não foi possível gerar o PDF.",
+  "legenda_mmn_processando_sua_solicitacao": "Processando sua solicitação...",
+  "legenda_mmn_saida_concluida_atualizando_seu_painel": "Saída concluída. Atualizando seu painel...",
+  "legenda_mmn_voce_saiu_do_programa_de_indicacoes": "Você saiu do programa de indicações.",
+  "legenda_mmn_sua_saida_foi_concluida_para_participar_novamente_faca_uma_nova_adesao_ao_regulamento": "Sua saída foi concluída. Para participar novamente, faça uma nova adesão ao regulamento vigente.",
+  "legenda_mmn_confirmar_acao_na_competencia": "Confirmar ação na competência",
+  "legenda_mmn_a_acao_respeitara_a_versao_vinculada_e_mantera_a_trilha_de_auditoria": "A ação respeitará a versão vinculada e manterá a trilha de auditoria.",
+  "legenda_mmn_selecione_um_participante": "Selecione um participante.",
+  "legenda_mmn_validar_pix": "Validar PIX",
+  "legenda_mmn_rejeitar_pix": "Rejeitar PIX",
+  "legenda_mmn_confirme_que_a_chave_pertence_ao_mesmo_titular_cadastrado_no_app": "Confirme que a chave pertence ao mesmo titular cadastrado no app.",
+  "legenda_mmn_o_pix_ficara_pendente_ate_uma_nova_validacao_administrativa": "O PIX ficará pendente até uma nova validação administrativa.",
+  "legenda_mmn_pix_validado": "PIX validado.",
+  "legenda_mmn_pix_rejeitado": "PIX rejeitado.",
+  "legenda_mmn_alteracao_registrada_e_auditada": "Alteração registrada e auditada.",
+  "legenda_mmn_informe_o_id_do_usuario_patrocinador_deixe_vazio_para_raiz": "Informe o ID do usuário patrocinador (deixe vazio para raiz):",
+  "legenda_mmn_informe_um_usuario_patrocinador_valido": "Informe um usuário patrocinador válido.",
+  "legenda_mmn_decidir_vinculo_da_lista_de_espera": "Decidir vínculo da lista de espera",
+  "legenda_mmn_informe_a_referencia_do_comprovante_de_pagamento": "Informe a referência do comprovante de pagamento:",
+  "legenda_mmn_informe_a_referencia_do_comprovante": "Informe a referência do comprovante.",
+  "legenda_mmn_confirmar_acao_financeira": "Confirmar ação financeira",
+  "legenda_mmn_a_acao_sera_validada_pelas_aprovacoes_bloqueios_fiscais_e_estado_atual_do_lote": "A ação será validada pelas aprovações, bloqueios fiscais e estado atual do lote.",
+  "legenda_mmn_beneficiario_do_lote_invalido": "Beneficiário do lote inválido.",
+  "legenda_mmn_selecione_um_beneficiario": "Selecione um beneficiário.",
+  "legenda_mmn_informe_o_motivo_do_registro": "Informe o motivo do registro.",
+  "legenda_mmn_registrar_rascunho_do_rpa": "Registrar rascunho do RPA",
+  "legenda_mmn_os_dados_fiscais_e_os_valores_do_beneficiario_serao_validados_pelo_servidor": "Os dados fiscais e os valores do beneficiário serão validados pelo servidor.",
+  "legenda_mmn_rascunho_do_rpa_registrado": "Rascunho do RPA registrado.",
+  "legenda_mmn_informe_a_referencia_do_documento_fiscal": "Informe a referência do documento fiscal.",
+  "legenda_mmn_informe_um_hash_sha_256_valido_com_64_caracteres_hexadecimais": "Informe um hash SHA-256 válido com 64 caracteres hexadecimais.",
+  "legenda_mmn_informe_o_motivo_da_emissao": "Informe o motivo da emissão.",
+  "legenda_mmn_emitir_rpa": "Emitir RPA",
+  "legenda_mmn_a_emissao_sera_auditada_e_podera_liberar_a_proxima_etapa_do_pagamento": "A emissão será auditada e poderá liberar a próxima etapa do pagamento.",
+  "legenda_mmn_rpa_emitido_com_sucesso": "RPA emitido com sucesso.",
+  "legenda_mmn_atualizar_ocorrencia": "Atualizar ocorrência",
+  "legenda_mmn_registre_a_orientacao_inicial_depois_o_status_podera_ser_atualizado_conforme_a_decisao": "Registre a orientação inicial. Depois, o status poderá ser atualizado conforme a decisão administrativa.",
+  "legenda_mmn_selecione_uma_versao_base_para_duplicar": "Selecione uma versão base para duplicar.",
+  "legenda_mmn_nome_da_nova_versao_em_rascunho": "Nome da nova versão em rascunho:",
+  "legenda_mmn_informe_o_nome_da_nova_versao": "Informe o nome da nova versão.",
+  "legenda_mmn_nova_versao_criada_como_rascunho_auditavel": "Nova versão criada como rascunho auditável.",
+  "legenda_mmn_selecione_uma_versao_de_configuracao": "Selecione uma versão de configuração.",
+  "legenda_mmn_informe_somente_o_uid_do_administrador_ou_somente_o_perfil": "Informe somente o UID do administrador ou somente o perfil.",
+  "legenda_mmn_informe_o_motivo_da_alteracao": "Informe o motivo da alteração.",
+  "legenda_mmn_aprovador_salvo_e_auditado": "Aprovador salvo e auditado.",
+  "legenda_mmn_somente_o_superadmin_pode_gerar_o_regulamento": "Somente o superadmin pode gerar o regulamento.",
+  "legenda_mmn_salve_primeiro_a_versao_em_rascunho": "Salve primeiro a versão em rascunho.",
+  "legenda_mmn_informe_versao_titulo_e_motivo_da_geracao": "Informe versão, título e motivo da geração.",
+  "legenda_mmn_snapshot_do_regulamento_gerado_e_vinculado_a_configuracao_atual": "Snapshot do regulamento gerado e vinculado à configuração atual.",
+  "legenda_mmn_pre_visualizacao_carregada_a_partir_do_snapshot_do_servidor": "Pré-visualização carregada a partir do snapshot do servidor.",
+  "legenda_mmn_rascunho_salvo_gere_novamente_o_regulamento_e_valide_a_simulacao_para_estas_regras": "Rascunho salvo. Gere novamente o regulamento e valide a simulação para estas regras.",
+  "legenda_mmn_gere_o_regulamento_no_servidor_e_execute_uma_simulacao_v2_valida_para_as": "Gere o regulamento no servidor e execute uma simulação V2 válida para as regras atuais antes de publicar.",
+  "legenda_mmn_aprovar_publicacao": "Aprovar publicação",
+  "legenda_mmn_sua_aprovacao_sera_registrada_no_quorum_desta_versao_ao_completar_o_quorum_ela": "Sua aprovação será registrada no quórum desta versão. Ao completar o quórum, ela será agendada para a vigência informada sem recalcular competências fechadas.",
+  "legenda_mmn_aprovacao_registrada_aguardando_o_restante_do_quorum": "Aprovação registrada; aguardando o restante do quórum.",
+  "legenda_mmn_versao_publicada_e_agendada": "Versão publicada e agendada.",
+  "legenda_mmn_salve_a_versao_antes_da_homologacao_fiscal": "Salve a versão antes da homologação fiscal.",
+  "legenda_mmn_confirmar_que_os_parametros_fiscais_desta_versao_foram_homologados_com_a_contabilidade": "Confirmar que os parâmetros fiscais desta versão foram homologados com a contabilidade?",
+  "legenda_mmn_homologacao_fiscal": "Homologação fiscal",
+  "legenda_mmn_a_versao_sera_marcada_como_homologada_defina_se_os_pagamentos_permanecem_bloqueados_no": "A versão será marcada como homologada. Defina se os pagamentos permanecem bloqueados no campo da configuração.",
+  "legenda_mmn_a_homologacao_sera_removida_e_os_pagamentos_permanecerao_bloqueados": "A homologação será removida e os pagamentos permanecerão bloqueados.",
+  "legenda_mmn_configuracao_fiscal_homologada": "Configuração fiscal homologada.",
+  "legenda_mmn_homologacao_fiscal_removida": "Homologação fiscal removida.",
+  "legenda_mmn_as_participacoes_do_mix_de_planos_devem_somar_exatamente_100": "As participações do mix de planos devem somar exatamente 100%.",
+  "legenda_mmn_liquido_estimado_prefixo": "Líquido estimado ",
+  "legenda_mmn_replay_historico": "Replay histórico",
+  "legenda_mmn_simulacao_prefixo": "Simulação ",
+  "legenda_mmn_nenhuma_simulacao_registrada_com_esses_filtros": "Nenhuma simulação registrada com esses filtros.",
+  "legenda_mmn_selecione_de_2_a_4_simulacoes_distintas": "Selecione de 2 a 4 simulações distintas.",
+  "legenda_mmn_criar_lote_manual": "Criar lote manual",
+  "legenda_mmn_sera_criado_um_lote_real_para_a_competencia_selecionada_bloqueios_fiscais_e_valor": "Será criado um lote real para a competência selecionada. Bloqueios fiscais e valor mínimo serão validados pelo servidor."
+};
+  if(window.TurboTigerLegendas)window.TurboTigerLegendas.registrar(LEGENDAS_MMN);
+  function legendaMmn(chave){return window.TurboTigerLegendas?window.TurboTigerLegendas.texto(chave):LEGENDAS_MMN[chave]||chave;}
+
+
+
+  var vinculosApresentacaoMmn=new Map();
+  function apresentarMmn(elemento,propriedade,obter){var texto=obter();elemento[propriedade]=texto;vinculosApresentacaoMmn.set(elemento,{propriedade:propriedade,obter:obter,ultimo:propriedade==='innerHTML'?elemento.textContent:elemento[propriedade]});return texto;}
+  function acrescentarHtmlMmn(elemento, html, obter) {
+    var anterior=vinculosApresentacaoMmn.get(elemento), fixo=elemento.innerHTML;
+    var reutilizar=anterior&&anterior.propriedade==="innerHTML"&&elemento.textContent===anterior.ultimo;
+    elemento.insertAdjacentHTML("beforeend",html);
+    vinculosApresentacaoMmn.set(elemento,{propriedade:"innerHTML",ultimo:elemento.textContent,obter:function(){return (reutilizar?anterior.obter():fixo)+obter();}});
+  }
+  function atualizarApresentacaoMmn(){vinculosApresentacaoMmn.forEach(function(v,e){if(!e.isConnected||(v.propriedade==='innerHTML'?e.textContent:e[v.propriedade])!==v.ultimo){vinculosApresentacaoMmn.delete(e);return;}var texto=v.obter();if(v.propriedade==='innerHTML'){if(!window.TurboTigerLegendas||!window.TurboTigerLegendas.atualizarApresentacao(e,texto)){vinculosApresentacaoMmn.delete(e);return;}}else e[v.propriedade]=texto;v.ultimo=v.propriedade==='innerHTML'?e.textContent:e[v.propriedade];});}
+  window.addEventListener('turbotiger:idioma',atualizarApresentacaoMmn);
   var CONFIG = {
     supabaseUrl: "https://jzqgudmvquokizvgehow.supabase.co",
     apiKey: "sb_publishable_eAPW_Kg8SLYpL43JVe104Q__qvEbyDU",
@@ -109,42 +706,42 @@
   };
 
   var FRIENDLY_MESSAGES = {
-    "Email not confirmed": "Confirme seu e-mail antes de entrar.",
-    "Failed to fetch": "Falha de conexão. Verifique sua internet e tente novamente.",
-    "Invalid login credentials": "E-mail ou senha inválidos.",
-    app_session_timeout: "O app demorou para validar sua sessão. Toque em Atualizar.",
-    app_session_unavailable: "Não foi possível validar sua sessão pelo app.",
-    dados_obrigatorios: "Preencha os campos obrigatórios.",
-    invalid_credentials: "E-mail ou senha inválidos.",
-    invalid_grant: "E-mail ou senha inválidos.",
-    missing_authorization: "Sessão expirada. Entre novamente.",
-    nao_autenticado: "Entre para continuar.",
-    sem_permissao_admin: "Sem permissão administrativa.",
-    sem_permissao_mmn: "Sem permissão para acessar o MMN.",
-    sessao_expirada: "Sessão expirada. Entre novamente.",
-    usuario_nao_encontrado: "Usuário não encontrado.",
-    usuario_nao_encontrado_no_app: "Usuário do app não encontrado.",
-    confirmacao_reentrada_mmn_obrigatoria: "Confirme a reentrada no programa.",
-    novo_aceite_regulamento_vigente_obrigatorio: "Aceite novamente o regulamento vigente antes de reentrar.",
-    saida_voluntaria_nao_encontrada: "Não há uma saída voluntária pendente de reentrada.",
-    situacao_cadastral_nao_permite_reentrada: "Sua situação cadastral não permite a reentrada neste momento.",
-    pix_titular_invalido: "A chave PIX deve pertencer ao mesmo CPF do cadastro.",
-    pix_email_invalido: "Informe um e-mail válido para a chave Pix.",
-    pix_celular_invalido: "Informe um celular com DDD e 11 números.",
-    pix_phone_invalido: "Informe um celular com DDD e 11 números.",
-    pix_evp_invalido: "Informe uma chave aleatória Pix válida.",
-    pix_chave_aleatoria_invalida: "Informe uma chave aleatória Pix válida.",
-    pix_cpf_invalido: "Informe um CPF válido com 11 números.",
-    regulamento_nao_aceito: "É necessário aceitar o regulamento vigente.",
-    configuracao_fiscal_nao_homologada: "Os pagamentos reais permanecem bloqueados até a homologação fiscal.",
-    quantidade_niveis_deve_ser_inteiro_de_1_a_10: "A quantidade de níveis deve ser um inteiro de 1 a 10.",
-    largura_deve_ser_zero_ou_inteiro_maior_ou_igual_a_2: "A largura deve ser 0 para ilimitada ou um inteiro a partir de 2.",
-    dez_faixas_de_nivel_devem_ser_preservadas_na_configuracao: "As dez faixas de nível precisam permanecer preservadas na configuração.",
-    regulamento_rascunho_nao_encontrado: "Gere primeiro o rascunho do regulamento para esta configuração.",
-    regulamento_somente_para_configuracao_rascunho: "O regulamento só pode ser gerado para uma configuração em rascunho.",
-    modelo_de_regulamento_nao_permitido: "O modelo jurídico solicitado não é permitido.",
-    versao_de_regulamento_ja_existe: "Essa versão do regulamento já existe.",
-    regulamento_desatualizado_salvar_novamente_e_refazer_simulacao: "As regras mudaram. Gere novamente o regulamento e refaça a simulação antes de publicar."
+    get "Email not confirmed"(){return legendaMmn("legenda_mmn_confirme_seu_e_mail_antes_de_entrar");},
+    get "Failed to fetch"(){return legendaMmn("legenda_mmn_falha_de_conexao_verifique_sua_internet_e_tente_novamente");},
+    get "Invalid login credentials"(){return legendaMmn("legenda_mmn_e_mail_ou_senha_invalidos");},
+    get app_session_timeout(){return legendaMmn("legenda_mmn_o_app_demorou_para_validar_sua_sessao_toque_em_atualizar");},
+    get app_session_unavailable(){return legendaMmn("legenda_mmn_nao_foi_possivel_validar_sua_sessao_pelo_app");},
+    get dados_obrigatorios(){return legendaMmn("legenda_mmn_preencha_os_campos_obrigatorios");},
+    get invalid_credentials(){return legendaMmn("legenda_mmn_e_mail_ou_senha_invalidos");},
+    get invalid_grant(){return legendaMmn("legenda_mmn_e_mail_ou_senha_invalidos");},
+    get missing_authorization(){return legendaMmn("legenda_mmn_sessao_expirada_entre_novamente");},
+    get nao_autenticado(){return legendaMmn("legenda_mmn_entre_para_continuar");},
+    get sem_permissao_admin(){return legendaMmn("legenda_mmn_sem_permissao_administrativa");},
+    get sem_permissao_mmn(){return legendaMmn("legenda_mmn_sem_permissao_para_acessar_o_mmn");},
+    get sessao_expirada(){return legendaMmn("legenda_mmn_sessao_expirada_entre_novamente");},
+    get usuario_nao_encontrado(){return legendaMmn("legenda_mmn_usuario_nao_encontrado");},
+    get usuario_nao_encontrado_no_app(){return legendaMmn("legenda_mmn_usuario_do_app_nao_encontrado");},
+    get confirmacao_reentrada_mmn_obrigatoria(){return legendaMmn("legenda_mmn_confirme_a_reentrada_no_programa");},
+    get novo_aceite_regulamento_vigente_obrigatorio(){return legendaMmn("legenda_mmn_aceite_novamente_o_regulamento_vigente_antes_de_reentrar");},
+    get saida_voluntaria_nao_encontrada(){return legendaMmn("legenda_mmn_nao_ha_uma_saida_voluntaria_pendente_de_reentrada");},
+    get situacao_cadastral_nao_permite_reentrada(){return legendaMmn("legenda_mmn_sua_situacao_cadastral_nao_permite_a_reentrada_neste_momento");},
+    get pix_titular_invalido(){return legendaMmn("legenda_mmn_a_chave_pix_deve_pertencer_ao_mesmo_cpf_do_cadastro");},
+    get pix_email_invalido(){return legendaMmn("legenda_mmn_informe_um_e_mail_valido_para_a_chave_pix");},
+    get pix_celular_invalido(){return legendaMmn("legenda_mmn_informe_um_celular_com_ddd_e_11_numeros");},
+    get pix_phone_invalido(){return legendaMmn("legenda_mmn_informe_um_celular_com_ddd_e_11_numeros");},
+    get pix_evp_invalido(){return legendaMmn("legenda_mmn_informe_uma_chave_aleatoria_pix_valida");},
+    get pix_chave_aleatoria_invalida(){return legendaMmn("legenda_mmn_informe_uma_chave_aleatoria_pix_valida");},
+    get pix_cpf_invalido(){return legendaMmn("legenda_mmn_informe_um_cpf_valido_com_11_numeros");},
+    get regulamento_nao_aceito(){return legendaMmn("legenda_mmn_e_necessario_aceitar_o_regulamento_vigente");},
+    get configuracao_fiscal_nao_homologada(){return legendaMmn("legenda_mmn_os_pagamentos_reais_permanecem_bloqueados_ate_a_homologacao_fiscal");},
+    get quantidade_niveis_deve_ser_inteiro_de_1_a_10(){return legendaMmn("legenda_mmn_a_quantidade_de_niveis_deve_ser_um_inteiro_de_1_a_10");},
+    get largura_deve_ser_zero_ou_inteiro_maior_ou_igual_a_2(){return legendaMmn("legenda_mmn_a_largura_deve_ser_0_para_ilimitada_ou_um_inteiro_a_partir_de");},
+    get dez_faixas_de_nivel_devem_ser_preservadas_na_configuracao(){return legendaMmn("legenda_mmn_as_dez_faixas_de_nivel_precisam_permanecer_preservadas_na_configuracao");},
+    get regulamento_rascunho_nao_encontrado(){return legendaMmn("legenda_mmn_gere_primeiro_o_rascunho_do_regulamento_para_esta_configuracao");},
+    get regulamento_somente_para_configuracao_rascunho(){return legendaMmn("legenda_mmn_o_regulamento_so_pode_ser_gerado_para_uma_configuracao_em_rascunho");},
+    get modelo_de_regulamento_nao_permitido(){return legendaMmn("legenda_mmn_o_modelo_juridico_solicitado_nao_e_permitido");},
+    get versao_de_regulamento_ja_existe(){return legendaMmn("legenda_mmn_essa_versao_do_regulamento_ja_existe");},
+    get regulamento_desatualizado_salvar_novamente_e_refazer_simulacao(){return legendaMmn("legenda_mmn_as_regras_mudaram_gere_novamente_o_regulamento_e_refaca_a_simulacao_antes_de");}
   };
 
   function qs(id) {
@@ -265,18 +862,32 @@
 
   function friendlyMessage(value) {
     var raw = String(value == null ? "" : value).trim();
-    if (!raw) return "Não foi possível concluir a operação.";
+    if (!raw) return legendaMmn("legenda_mmn_nao_foi_possivel_concluir_a_operacao");
     return FRIENDLY_MESSAGES[raw] || FRIENDLY_MESSAGES[raw.toLowerCase()] || raw;
+  }
+
+  function apresentarTextoMmn(id, obter) {
+    var element = qs(id);
+    if (element) apresentarMmn(element, "textContent", function(){var value=obter();return value == null ? "" : String(value);});
+  }
+
+  function apresentarStatusMmn(id, obter, kind) {
+    var element = typeof id === "string" ? qs(id) : id;
+    if (!element) return;
+    setStatus(id, obter(), kind);
+    apresentarMmn(element, "textContent", function(){var value=obter();return value ? friendlyMessage(value) : "";});
   }
 
   function setText(id, value) {
     var element = qs(id);
+    if (element) vinculosApresentacaoMmn.delete(element);
     if (element) element.textContent = value == null ? "" : String(value);
   }
 
   function setStatus(id, text, kind) {
     var element = typeof id === "string" ? qs(id) : id;
     if (!element) return;
+    vinculosApresentacaoMmn.delete(element);
     element.textContent = text ? friendlyMessage(text) : "";
     element.classList.remove("is-error", "is-ok", "is-warn");
     if (kind) element.classList.add("is-" + kind);
@@ -288,7 +899,7 @@
     if (busy) {
       if (!button.dataset.label) button.dataset.label = button.textContent;
       button.dataset.busy = "true";
-      button.textContent = busyText || "Aguarde...";
+      apresentarMmn(button,"textContent",function(){return busyText || legendaMmn("legenda_mmn_rotulo_aguarde");});
       button.disabled = true;
     } else {
       if (button.dataset.label) button.textContent = button.dataset.label;
@@ -305,12 +916,45 @@
     return "<tr><td colspan=\"" + columns + "\"><div class=\"mmn-empty\">" + escapeHtml(message) + "</div></td></tr>";
   }
 
+  var LEGENDAS_ESTADOS_MMN = {
+  "ativo": "legenda_mmn_estado_ativo",
+  "elegivel": "legenda_mmn_estado_elegivel",
+  "confirmado": "legenda_mmn_estado_confirmado",
+  "pago": "legenda_mmn_estado_pago",
+  "concluido": "legenda_mmn_estado_concluido",
+  "ok": "legenda_mmn_estado_ok",
+  "convertido": "legenda_mmn_estado_convertido",
+  "homologado": "legenda_mmn_estado_homologado",
+  "pendente": "legenda_mmn_estado_pendente",
+  "apurando": "legenda_mmn_estado_apurando",
+  "retido": "legenda_mmn_estado_retido",
+  "revisao": "legenda_mmn_estado_revisao",
+  "aguardando": "legenda_mmn_estado_aguardando",
+  "fila": "legenda_mmn_estado_fila",
+  "enviado": "legenda_mmn_estado_enviado",
+  "aberto": "legenda_mmn_estado_aberto",
+  "aberta": "legenda_mmn_estado_aberta",
+  "em_atendimento": "legenda_mmn_estado_em_atendimento",
+  "bloqueado": "legenda_mmn_estado_bloqueado",
+  "cancelado": "legenda_mmn_estado_cancelado",
+  "falhou": "legenda_mmn_estado_falhou",
+  "revertido": "legenda_mmn_estado_revertido",
+  "permanente": "legenda_mmn_estado_permanente",
+  "inelegivel": "legenda_mmn_estado_inelegivel"
+};
+  function textoEstadoMmn(status) {
+    var motor = window.TurboTigerLegendas;
+    if (!motor || !motor.idioma || motor.idioma() === "pt-BR") return status;
+    var codigo = String(status || "").toLowerCase();
+    return Object.prototype.hasOwnProperty.call(LEGENDAS_ESTADOS_MMN, codigo) ? legendaMmn(LEGENDAS_ESTADOS_MMN[codigo]) : status;
+  }
+
   function pillHtml(status, label) {
     var normalized = String(status || "").toLowerCase();
     var kind = ["ativo", "elegivel", "confirmado", "pago", "concluido", "ok", "convertido", "homologado"].indexOf(normalized) >= 0 ? "is-ok" :
       (["pendente", "apurando", "retido", "revisao", "aguardando", "fila", "enviado", "aberto", "aberta", "em_atendimento"].indexOf(normalized) >= 0 ? "is-warn" :
       (["bloqueado", "cancelado", "falhou", "revertido", "permanente", "inelegivel"].indexOf(normalized) >= 0 ? "is-bad" : ""));
-    return "<span class=\"mmn-pill " + kind + "\">" + escapeHtml(label || status || "—") + "</span>";
+    return "<span class=\"mmn-pill " + kind + "\">" + escapeHtml(label || textoEstadoMmn(status) || "—") + "</span>";
   }
 
   function setGlobalError(error) {
@@ -379,13 +1023,13 @@
     state.mode = hasNativeBridge() ? "user" : "admin";
     document.documentElement.classList.toggle("mmn-app-webview", state.mode === "user");
     if (state.mode === "user") {
-      document.title = "Indicações e Benefícios - Turbo Tiger";
-      setText("brandTitle", "Indicações e Benefícios");
+      apresentarMmn(document,"title",function(){return legendaMmn("legenda_mmn_indicacoes_e_beneficios_turbo_tiger");});
+      apresentarTextoMmn("brandTitle",function(){return legendaMmn("legenda_mmn_indicacoes_e_beneficios");});
       setText("pageTitle", "");
     } else {
-      document.title = "MMN - Turbo Tiger Admin";
-      setText("brandTitle", "Admin MMN");
-      setText("pageTitle", "Painel MMN");
+      apresentarMmn(document,"title",function(){return legendaMmn("legenda_mmn_mmn_turbo_tiger_admin");});
+      apresentarTextoMmn("brandTitle",function(){return legendaMmn("legenda_mmn_admin_mmn");});
+      apresentarTextoMmn("pageTitle",function(){return legendaMmn("legenda_mmn_painel_mmn");});
     }
   }
 
@@ -541,9 +1185,9 @@
       try { data = JSON.parse(text); } catch (error) { data = { raw: text }; }
     }
     if (!response.ok) {
-      throw new Error((data && (data.error_description || data.message || data.error || data.erro || data.details)) || "Falha HTTP " + response.status + ".");
+      throw new Error((data && (data.error_description || data.message || data.error || data.erro || data.details)) || legendaMmn("legenda_mmn_falha_http") + response.status + ".");
     }
-    if (data && data.ok === false) throw new Error(data.error || data.erro || data.message || "Não foi possível concluir a operação.");
+    if (data && data.ok === false) throw new Error(data.error || data.erro || data.message || legendaMmn("legenda_mmn_nao_foi_possivel_concluir_a_operacao"));
     return data == null ? {} : data;
   }
 
@@ -555,7 +1199,7 @@
     try {
       return await parseResponse(await fetch(url, requestOptions));
     } catch (error) {
-      if (error && error.name === "AbortError") throw new Error("A consulta demorou além do esperado.");
+      if (error && error.name === "AbortError") throw new Error(legendaMmn("legenda_mmn_a_consulta_demorou_alem_do_esperado"));
       throw error;
     } finally {
       if (timer) window.clearTimeout(timer);
@@ -716,8 +1360,8 @@
   var PIX_TYPE_LABELS = {
     cpf: "CPF",
     email: "E-mail",
-    celular: "Celular",
-    aleatoria: "Chave aleatória"
+    get celular(){return legendaMmn("legenda_mmn_rotulo_celular");},
+    get aleatoria(){return legendaMmn("legenda_mmn_chave_aleatoria");}
   };
 
   var PIX_TYPE_ALIASES = {
@@ -788,18 +1432,18 @@
     var normalizedType = normalizePixType(type);
     var rawKey = cleanText(key);
     if (!normalizedType) {
-      return { valid: false, message: "Selecione o tipo da chave Pix." };
+      return { valid: false, message: legendaMmn("legenda_mmn_selecione_o_tipo_da_chave_pix") };
     }
     if (!rawKey) {
-      return { valid: false, message: "Informe a chave Pix." };
+      return { valid: false, message: legendaMmn("legenda_mmn_informe_a_chave_pix") };
     }
     if (normalizedType === "cpf") {
       if (!/^[0-9.\s-]+$/.test(rawKey) || digitsOnly(rawKey).length !== 11) {
-        return { valid: false, message: "Informe um CPF válido com 11 números." };
+        return { valid: false, message: legendaMmn("legenda_mmn_informe_um_cpf_valido_com_11_numeros") };
       }
     } else if (normalizedType === "email") {
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(rawKey)) {
-        return { valid: false, message: "Informe um e-mail válido para a chave Pix." };
+        return { valid: false, message: legendaMmn("legenda_mmn_informe_um_e_mail_valido_para_a_chave_pix") };
       }
     } else if (normalizedType === "celular") {
       var phoneDigits = digitsOnly(rawKey);
@@ -807,10 +1451,10 @@
       var validNationalPhone = /^[1-9]\d{10}$/.test(phoneDigits);
       var validInternationalPhone = /^55[1-9]\d{10}$/.test(phoneDigits);
       if (!validPhoneCharacters || (!validNationalPhone && !validInternationalPhone)) {
-        return { valid: false, message: "Informe um celular com DDD e 11 números." };
+        return { valid: false, message: legendaMmn("legenda_mmn_informe_um_celular_com_ddd_e_11_numeros") };
       }
     } else if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(rawKey)) {
-      return { valid: false, message: "Informe uma chave aleatória Pix válida." };
+      return { valid: false, message: legendaMmn("legenda_mmn_informe_uma_chave_aleatoria_pix_valida") };
     }
     return { valid: true, message: "" };
   }
@@ -919,24 +1563,24 @@
     clearPixResult(prefix);
     if (flow.rateLimitedUntil > Date.now()) {
       setPixConfirmedPanel(prefix, false);
-      setPixWorkflowStatus(prefix, "Muitas tentativas em pouco tempo. Aguarde um momento e tente novamente.", "error");
+      setPixWorkflowStatus(prefix, legendaMmn("legenda_mmn_muitas_tentativas_em_pouco_tempo_aguarde_um_momento_e_tente_novamente"), "error");
       return;
     }
     if (prefix === "profile" && !profilePixChangeRequested() && flow.storedConfirmed) {
-      setPixConfirmedPanel(prefix, true, "Ela será mantida enquanto você não informar uma nova chave.");
+      setPixConfirmedPanel(prefix, true, legendaMmn("legenda_mmn_ela_sera_mantida_enquanto_voce_nao_informar_uma_nova_chave"));
       setStatus(prefix + "PixStatus", "", null);
-      setPixFieldStatus(prefix, "Chave Pix confirmada.", "ok");
+      setPixFieldStatus(prefix, legendaMmn("legenda_mmn_chave_pix_confirmada"), "ok");
       return;
     }
     setPixConfirmedPanel(prefix, false);
     if (prefix === "profile" && !profilePixChangeRequested() && flow.hasStoredKey) {
-      setStatus(prefix + "PixStatus", "A chave atual ainda não está confirmada. Informe-a novamente para verificar.", "warn");
-      setPixFieldStatus(prefix, "Informe novamente a chave Pix atual para concluir a confirmação.", "warn");
+      apresentarStatusMmn(prefix + "PixStatus",function(){return legendaMmn("legenda_mmn_a_chave_atual_ainda_nao_esta_confirmada_informe_a_novamente_para_verificar");},"warn");
+      setPixFieldStatus(prefix, legendaMmn("legenda_mmn_informe_novamente_a_chave_pix_atual_para_concluir_a_confirmacao"), "warn");
     } else if (prefix === "profile" && flow.hasStoredKey && !currentPixSnapshot(prefix).key) {
-      setStatus(prefix + "PixStatus", "Informe a nova chave Pix para verificar a alteração.", "warn");
-      setPixFieldStatus(prefix, "Informe a nova chave Pix.", "warn");
+      apresentarStatusMmn(prefix + "PixStatus",function(){return legendaMmn("legenda_mmn_informe_a_nova_chave_pix_para_verificar_a_alteracao");},"warn");
+      setPixFieldStatus(prefix, legendaMmn("legenda_mmn_informe_a_nova_chave_pix"), "warn");
     } else {
-      setStatus(prefix + "PixStatus", "Informe o tipo e a chave, depois toque em verificar.", null);
+      apresentarStatusMmn(prefix + "PixStatus",function(){return legendaMmn("legenda_mmn_informe_o_tipo_e_a_chave_depois_toque_em_verificar");},null);
       setPixFieldStatus(prefix, "", null);
     }
   }
@@ -1028,7 +1672,7 @@
     flow.verified = false;
     clearPixExpiry(flow);
     clearPixResult(prefix);
-    setPixWorkflowStatus(prefix, "A verificação expirou. Verifique a chave Pix novamente.", "warn");
+    setPixWorkflowStatus(prefix, legendaMmn("legenda_mmn_a_verificacao_expirou_verifique_a_chave_pix_novamente"), "warn");
     updatePixActions(prefix);
   }
 
@@ -1145,70 +1789,70 @@
       var blockedValue = blockedMatch[1].replace(/^(\d{4}-\d{2}-\d{2})(\d{2}:)/, "$1T$2");
       var blockedDate = new Date(blockedValue);
       if (!Number.isNaN(blockedDate.getTime())) {
-        return "Por segurança, sua chave Pix poderá ser alterada novamente em " +
+        return legendaMmn("legenda_mmn_por_seguranca_sua_chave_pix_podera_ser_alterada_novamente_em") +
           new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(blockedDate) + ".";
       }
-      return "Por segurança, ainda não é possível alterar sua chave Pix. Aguarde o prazo informado pelo programa e tente novamente.";
+      return legendaMmn("legenda_mmn_por_seguranca_ainda_nao_e_possivel_alterar_sua_chave_pix_aguarde_o_prazo");
     }
     if (status === 429 || code.indexOf("RATE_LIMIT") >= 0 || code.indexOf("TOO_MANY") >= 0) {
-      return "Muitas tentativas em pouco tempo. Aguarde um momento e tente novamente.";
+      return legendaMmn("legenda_mmn_muitas_tentativas_em_pouco_tempo_aguarde_um_momento_e_tente_novamente");
     }
     if (status === 401 || status === 403 || code.indexOf("AUTH") >= 0 ||
         code.indexOf("SESSION") >= 0 || code.indexOf("SESSAO") >= 0) {
       if (code.indexOf("ASAAS") >= 0 || code.indexOf("PROVIDER") >= 0) {
-        return "O serviço de consulta Pix está temporariamente indisponível. Tente novamente mais tarde.";
+        return legendaMmn("legenda_mmn_o_servico_de_consulta_pix_esta_temporariamente_indisponivel_tente_novamente_mais_tarde");
       }
-      return "Sua sessão expirou. Atualize o painel e tente novamente.";
+      return legendaMmn("legenda_mmn_sua_sessao_expirou_atualize_o_painel_e_tente_novamente");
     }
     if (status === 410 || code.indexOf("EXPIRED") >= 0 || code.indexOf("EXPIRAD") >= 0) {
-      return "A verificação expirou. Verifique a chave Pix novamente.";
+      return legendaMmn("legenda_mmn_a_verificacao_expirou_verifique_a_chave_pix_novamente");
     }
     if (code.indexOf("INVALID_PIX_TYPE") >= 0 || code.indexOf("PIX_TYPE_INVALID") >= 0) {
-      return "Selecione um tipo válido de chave Pix.";
+      return legendaMmn("legenda_mmn_selecione_um_tipo_valido_de_chave_pix");
     }
     if (code.indexOf("INVALID_PIX_CPF") >= 0 || code.indexOf("PIX_CPF_INVALID") >= 0 || code.indexOf("PIX_CPF_INVAL") >= 0) {
-      return "Informe um CPF válido com 11 números.";
+      return legendaMmn("legenda_mmn_informe_um_cpf_valido_com_11_numeros");
     }
     if (code.indexOf("INVALID_PIX_EMAIL") >= 0 || code.indexOf("PIX_EMAIL_INVALID") >= 0 || code.indexOf("PIX_EMAIL_INVAL") >= 0) {
-      return "Informe um e-mail válido para a chave Pix.";
+      return legendaMmn("legenda_mmn_informe_um_e_mail_valido_para_a_chave_pix");
     }
     if (code.indexOf("INVALID_PIX_PHONE") >= 0 || code.indexOf("INVALID_PIX_CELULAR") >= 0 ||
         code.indexOf("PIX_PHONE_INVALID") >= 0 || code.indexOf("PIX_CELULAR_INVAL") >= 0) {
-      return "Informe um celular com DDD e 11 números.";
+      return legendaMmn("legenda_mmn_informe_um_celular_com_ddd_e_11_numeros");
     }
     if (code.indexOf("INVALID_PIX_EVP") >= 0 || code.indexOf("PIX_EVP_INVALID") >= 0 ||
         code.indexOf("CHAVE_PIX_ALEATORIA_INVALIDA") >= 0 || code.indexOf("PIX_CHAVE_ALEATORIA_INVAL") >= 0) {
-      return "Informe uma chave aleatória Pix válida.";
+      return legendaMmn("legenda_mmn_informe_uma_chave_aleatoria_pix_valida");
     }
     if (code.indexOf("INVALID_PIX_KEY") >= 0) {
-      return "Informe uma chave Pix válida.";
+      return legendaMmn("legenda_mmn_informe_uma_chave_pix_valida");
     }
     if (code.indexOf("HOLDER_DATA_MISMATCH") >= 0 || code.indexOf("CPF_KEY_MUST_MATCH_USER") >= 0 ||
         code.indexOf("REJECTED_DIVERGENCE") >= 0 || code.indexOf("TITULAR") >= 0 ||
         code.indexOf("OWNERSHIP") >= 0 || code.indexOf("DIVERGEN") >= 0) {
-      return "Esta chave Pix não corresponde ao titular do cadastro. Confira os dados ou use uma chave do mesmo CPF.";
+      return legendaMmn("legenda_mmn_esta_chave_pix_nao_corresponde_ao_titular_do_cadastro_confira_os_dados_ou");
     }
     if (code.indexOf("PIX_KEY_NOT_VALIDATED") >= 0 || code.indexOf("KEY_NOT_FOUND") >= 0 ||
         code.indexOf("PIX_KEY_INVALID") >= 0 || code.indexOf("REJECTED_PROVIDER") >= 0) {
-      return "A chave Pix não foi localizada. Confira o tipo e a chave informados.";
+      return legendaMmn("legenda_mmn_a_chave_pix_nao_foi_localizada_confira_o_tipo_e_a_chave_informados");
     }
     if (code.indexOf("VALIDATION_IN_PROGRESS") >= 0) {
-      return "A verificação desta chave Pix já está em andamento. Aguarde alguns segundos e tente novamente.";
+      return legendaMmn("legenda_mmn_a_verificacao_desta_chave_pix_ja_esta_em_andamento_aguarde_alguns_segundos_e");
     }
     if (code.indexOf("PROVIDER_DATA_ANOMALOUS") >= 0 || code.indexOf("REVIEW_REQUIRED") >= 0 ||
         code.indexOf("CONSISTENCY") >= 0 || code === "INVALID_RESPONSE") {
-      return "A instituição retornou dados que não puderam ser confirmados com segurança. Confira a chave ou tente novamente mais tarde.";
+      return legendaMmn("legenda_mmn_a_instituicao_retornou_dados_que_nao_puderam_ser_confirmados_com_seguranca_confira_a");
     }
     if (code.indexOf("ASAAS") >= 0 || code.indexOf("PROVIDER_ERROR") >= 0 ||
         code.indexOf("BACKEND_UNAVAILABLE") >= 0 || code.indexOf("BACKEND_INVALID_RESPONSE") >= 0) {
-      return "O serviço de consulta Pix está temporariamente indisponível. Tente novamente mais tarde.";
+      return legendaMmn("legenda_mmn_o_servico_de_consulta_pix_esta_temporariamente_indisponivel_tente_novamente_mais_tarde");
     }
     if (status >= 500 || code === "REQUEST_TIMEOUT" || code.indexOf("FAILED TO FETCH") >= 0 ||
         code.indexOf("NETWORK") >= 0 || code.indexOf("LOAD FAILED") >= 0) {
-      return "Não foi possível consultar a chave Pix agora. Tente novamente em instantes.";
+      return legendaMmn("legenda_mmn_nao_foi_possivel_consultar_a_chave_pix_agora_tente_novamente_em_instantes");
     }
-    if (confirming) return "Não foi possível confirmar esta chave Pix. Verifique novamente e repita a confirmação.";
-    return "Não foi possível confirmar que esta chave Pix pertence ao titular do cadastro. Confira os dados ou use outra chave.";
+    if (confirming) return legendaMmn("legenda_mmn_nao_foi_possivel_confirmar_esta_chave_pix_verifique_novamente_e_repita_a_confirmacao");
+    return legendaMmn("legenda_mmn_nao_foi_possivel_confirmar_que_esta_chave_pix_pertence_ao_titular_do_cadastro");
   }
 
   function isPixRelatedError(error) {
@@ -1239,8 +1883,8 @@
     var flow = pixState(prefix);
     var requestSequence = ++flow.requestSequence;
     flow.validating = true;
-    setBusy(prefix + "PixVerify", true, "Verificando...");
-    setPixWorkflowStatus(prefix, "Consultando a chave Pix com segurança...", "warn");
+    setBusy(prefix + "PixVerify", true, legendaMmn("legenda_mmn_rotulo_verificando"));
+    setPixWorkflowStatus(prefix, legendaMmn("legenda_mmn_consultando_a_chave_pix_com_seguranca"), "warn");
     clearPixResult(prefix);
     setPixConfirmedPanel(prefix, false);
     updatePixActions(prefix);
@@ -1258,7 +1902,7 @@
       flow.expiresAt = details.expiresAt;
       flow.verified = true;
       renderPixValidationResult(prefix, details);
-      setPixWorkflowStatus(prefix, "Chave localizada. Confira os dados abaixo e confirme a titularidade.", "ok");
+      setPixWorkflowStatus(prefix, legendaMmn("legenda_mmn_chave_localizada_confira_os_dados_abaixo_e_confirme_a_titularidade"), "ok");
       schedulePixExpiration(prefix);
       return true;
     } catch (error) {
@@ -1300,8 +1944,8 @@
     flow.confirming = true;
     qs(prefix + "PixType").disabled = true;
     qs(prefix + "PixKey").disabled = true;
-    setBusy(prefix + "PixConfirm", true, "Confirmando...");
-    setPixWorkflowStatus(prefix, "Registrando sua confirmação...", "warn");
+    setBusy(prefix + "PixConfirm", true, legendaMmn("legenda_mmn_rotulo_confirmando"));
+    setPixWorkflowStatus(prefix, legendaMmn("legenda_mmn_registrando_sua_confirmacao"), "warn");
     updatePixActions(prefix);
     try {
       var response = await edgeFunction(CONFIG.edgeFunctions.confirmPixKey, {
@@ -1324,7 +1968,7 @@
       flow.expiresAt = 0;
       clearPixExpiry(flow);
       clearPixResult(prefix);
-      setPixConfirmedPanel(prefix, true, "A confirmação foi registrada. Se alterar o tipo ou a chave, será necessário verificar novamente.");
+      setPixConfirmedPanel(prefix, true, legendaMmn("legenda_mmn_a_confirmacao_foi_registrada_se_alterar_o_tipo_ou_a_chave_sera_necessario"));
       setPixWorkflowStatus(prefix, "", null);
       return true;
     } catch (error) {
@@ -1379,7 +2023,7 @@
     if (!minimumFormat.valid) {
       var missingStoredKey = prefix === "profile" && pixState(prefix).hasStoredKey && !current.key;
       var message = missingStoredKey ?
-        "Informe novamente a chave Pix atual para verificar e confirmar." : minimumFormat.message;
+        legendaMmn("legenda_mmn_informe_novamente_a_chave_pix_atual_para_verificar_e_confirmar") : minimumFormat.message;
       setPixWorkflowStatus(prefix, message, "error");
       var invalidKey = qs(prefix + "PixKey");
       if (invalidKey) invalidKey.focus();
@@ -1392,7 +2036,7 @@
       if (!verified) return false;
     }
     if (!currentPixIsPersisted(prefix)) {
-      setPixWorkflowStatus(prefix, "Confira os dados encontrados e toque em Confirmar.", "warn");
+      setPixWorkflowStatus(prefix, legendaMmn("legenda_mmn_confira_os_dados_encontrados_e_toque_em_confirmar"), "warn");
       updatePixActions(prefix);
       return false;
     }
@@ -1561,10 +2205,10 @@
     context.postalLookupRequest += 1;
     window.clearTimeout(context.reversePostalCodeTimer);
     if (!addressHasReverseLookupKey(prefix)) {
-      setAddressStatus(prefix, "Endereço alterado. Complete UF, cidade e logradouro ou digite um CEP válido.", "warn");
+      setAddressStatus(prefix, legendaMmn("legenda_mmn_endereco_alterado_complete_uf_cidade_e_logradouro_ou_digite_um_cep_valido"), "warn");
       return;
     }
-    setAddressStatus(prefix, "Endereço alterado. Conferindo o CEP correspondente...", "warn");
+    setAddressStatus(prefix, legendaMmn("legenda_mmn_endereco_alterado_conferindo_o_cep_correspondente"), "warn");
     if (scheduleLookup !== false) {
       context.reversePostalCodeTimer = window.setTimeout(function () {
         findPostalCodeByAddress(prefix, true);
@@ -1586,9 +2230,9 @@
   function renderStateOptions(prefix, rows) {
     var list = qs(prefix + "StateList");
     if (!list) return;
-    list.innerHTML = rows.length ? rows.map(function (row, index) {
+    apresentarMmn(list,"innerHTML",function(){return rows.length ? rows.map(function (row, index) {
       return addressOptionHtml(row.uf + " - " + row.nome, index);
-    }).join("") : "<div class=\"mmn-address-option\" role=\"option\">Nenhum estado encontrado.</div>";
+    }).join("") : ("<div class=\"mmn-address-option\" role=\"option\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_nenhum_estado_encontrado")) + "</div>");});
     list.hidden = false;
   }
 
@@ -1638,7 +2282,7 @@
       if (request !== context.cityRequest) return;
       context.cities = [];
       renderCityOptions(prefix, []);
-      setAddressStatus(prefix, "Não foi possível carregar as cidades agora.", "error");
+      setAddressStatus(prefix, legendaMmn("legenda_mmn_nao_foi_possivel_carregar_as_cidades_agora"), "error");
     }
   }
 
@@ -1651,7 +2295,7 @@
     hideAddressOptions(prefix, "state");
     var cityInput = qs(prefix + "City");
     cityInput.disabled = false;
-    cityInput.placeholder = "Digite e selecione a cidade";
+    cityInput.placeholder = legendaMmn("legenda_mmn_digite_e_selecione_a_cidade");
     if (!preserveCity) {
       context.selectedCity = null;
       cityInput.value = "";
@@ -1702,7 +2346,7 @@
         headers: { Accept: "application/json" },
         signal: controller ? controller.signal : undefined
       });
-      if (!response.ok) throw new Error("Falha HTTP " + response.status + ".");
+      if (!response.ok) throw new Error(legendaMmn("legenda_mmn_falha_http") + response.status + ".");
       return await response.json();
     } finally {
       if (timer) window.clearTimeout(timer);
@@ -1746,7 +2390,7 @@
         addressState.postalCodeCache[cep] = normalizedViaCep;
         return normalizedViaCep;
       }
-      viaCepError = new Error("CEP não encontrado.");
+      viaCepError = new Error(legendaMmn("legenda_mmn_cep_nao_encontrado"));
     } catch (error) {
       viaCepError = error;
     }
@@ -1756,8 +2400,8 @@
       addressState.postalCodeCache[cep] = normalizedBrasilApi;
       return normalizedBrasilApi;
     } catch (error) {
-      if (window.console && console.warn) console.warn("Falha nas consultas de CEP.", viaCepError, error);
-      throw new Error("Não foi possível localizar esse CEP.");
+      if (window.console && console.warn) console.warn(legendaMmn("legenda_mmn_falha_nas_consultas_de_cep"), viaCepError, error);
+      throw new Error(legendaMmn("legenda_mmn_nao_foi_possivel_localizar_esse_cep"));
     }
   }
 
@@ -1794,16 +2438,16 @@
     var cep = digitsOnly(postalCode);
     if (cep.length !== 8) return;
     var request = ++context.postalLookupRequest;
-    setAddressStatus(prefix, "Consultando o CEP...", null);
+    setAddressStatus(prefix, legendaMmn("legenda_mmn_consultando_o_cep"), null);
     var expectedCep = cep;
     try {
       var address = await findAddressByPostalCode(cep);
       if (request !== context.postalLookupRequest || digitsOnly(qs(prefix + "PostalCode").value) !== expectedCep) return;
       fillAddressFromLookup(prefix, address, focusNumber);
-      setAddressStatus(prefix, "Endereço encontrado.", "ok");
+      setAddressStatus(prefix, legendaMmn("legenda_mmn_endereco_encontrado"), "ok");
     } catch (error) {
       if (request !== context.postalLookupRequest || digitsOnly(qs(prefix + "PostalCode").value) !== expectedCep) return;
-      setAddressStatus(prefix, error.message || "Não foi possível consultar o CEP.", "error");
+      setAddressStatus(prefix, error.message || legendaMmn("legenda_mmn_nao_foi_possivel_consultar_o_cep"), "error");
     }
   }
 
@@ -1813,7 +2457,7 @@
     var container = qs(prefix + "PostalCodeResults");
     var select = qs(prefix + "PostalCodeSelect");
     container.hidden = true;
-    select.innerHTML = "<option value=\"\">Selecione</option>";
+    apresentarMmn(select,"innerHTML",function(){return "<option value=\"\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_selecione")) + "</option>";});
   }
 
   async function findPostalCodeByAddress(prefix, automatic) {
@@ -1825,21 +2469,21 @@
     var request = ++context.reverseRequest;
     resetReversePostalCodeResults(prefix);
     if (!/^[A-Z]{2}$/.test(uf)) {
-      setAddressStatus(prefix, "Selecione uma UF válida.", "error");
+      setAddressStatus(prefix, legendaMmn("legenda_mmn_selecione_uma_uf_valida"), "error");
       qs(prefix + "State").focus();
       return;
     }
     if (city.length < 3) {
-      setAddressStatus(prefix, "Informe uma cidade com pelo menos 3 caracteres.", "error");
+      setAddressStatus(prefix, legendaMmn("legenda_mmn_informe_uma_cidade_com_pelo_menos_3_caracteres"), "error");
       qs(prefix + "City").focus();
       return;
     }
     if (street.length < 3) {
-      setAddressStatus(prefix, "Informe uma rua ou avenida com pelo menos 3 caracteres.", "error");
+      setAddressStatus(prefix, legendaMmn("legenda_mmn_informe_uma_rua_ou_avenida_com_pelo_menos_3_caracteres"), "error");
       qs(prefix + "Address").focus();
       return;
     }
-    setAddressStatus(prefix, "Procurando o CEP do endereço...", null);
+    setAddressStatus(prefix, legendaMmn("legenda_mmn_procurando_o_cep_do_endereco"), null);
     var url = [
       "https://viacep.com.br/ws",
       encodeURIComponent(uf),
@@ -1861,28 +2505,28 @@
         var districtMatches = rows.filter(function (row) { return normalizeSearchText(row.bairro) === district; });
         if (districtMatches.length) rows = districtMatches;
       }
-      if (!rows.length) throw new Error("Corrija o endereço ou digite um CEP válido.");
+      if (!rows.length) throw new Error(legendaMmn("legenda_mmn_corrija_o_endereco_ou_digite_um_cep_valido"));
       if (rows.length === 1) {
         fillAddressFromLookup(prefix, rows[0], true);
-        setAddressStatus(prefix, "CEP encontrado.", "ok");
+        setAddressStatus(prefix, legendaMmn("legenda_mmn_cep_encontrado"), "ok");
         return;
       }
       context.reverseResults = rows;
       context.postalCodeConsistent = false;
       updatePostalCodeSearchButton(prefix);
       var select = qs(prefix + "PostalCodeSelect");
-      select.innerHTML = "<option value=\"\">Selecione um dos " + rows.length + " endereços encontrados</option>" + rows.map(function (row, index) {
+      select.innerHTML = ("<option value=\"\">" + escapeHtml(legendaMmn("legenda_fechamento_mmn_escolher_endereco"))) + rows.length + (escapeHtml(legendaMmn("legenda_fechamento_mmn_enderecos_encontrados")) + "</option>") + rows.map(function (row, index) {
         var label = [formatPostalCode(row.cep), row.logradouro, row.bairro, row.cidade + "/" + row.uf].filter(Boolean).join(" - ");
         return "<option value=\"" + index + "\">" + escapeHtml(label) + "</option>";
       }).join("");
       qs(prefix + "PostalCodeResults").hidden = false;
-      setAddressStatus(prefix, "Foram encontrados vários CEPs. Selecione o endereço correto para confirmar.", "warn");
+      setAddressStatus(prefix, legendaMmn("legenda_mmn_foram_encontrados_varios_ceps_selecione_o_endereco_correto_para_confirmar"), "warn");
     } catch (error) {
       if (request !== context.reverseRequest || currentAddressKey(prefix) !== expectedKey) return;
       context.postalCodeConsistent = false;
       updatePostalCodeSearchButton(prefix);
-      var message = error.message || "Corrija o endereço ou digite um CEP válido.";
-      if (automatic && /^Não foi possível/i.test(message)) message = "Corrija o endereço ou digite um CEP válido.";
+      var message = error.message || legendaMmn("legenda_mmn_corrija_o_endereco_ou_digite_um_cep_valido");
+      if (automatic && /^Não foi possível/i.test(message)) message = legendaMmn("legenda_mmn_corrija_o_endereco_ou_digite_um_cep_valido");
       setAddressStatus(prefix, message, "error");
     }
   }
@@ -1920,7 +2564,7 @@
       hideAddressOptions(prefix, "city");
       if (!selectTypedAddressState(prefix, true)) {
         cityInput.disabled = true;
-        cityInput.placeholder = "Selecione o estado primeiro";
+        cityInput.placeholder = legendaMmn("legenda_mmn_selecione_o_estado_primeiro");
         markAddressPending(prefix, false);
         return;
       }
@@ -1982,7 +2626,7 @@
       if (!selected) return;
       fillAddressFromLookup(prefix, selected, true);
       resetReversePostalCodeResults(prefix);
-      setAddressStatus(prefix, "CEP selecionado com sucesso.", "ok");
+      setAddressStatus(prefix, legendaMmn("legenda_mmn_cep_selecionado_com_sucesso"), "ok");
     });
     updatePostalCodeSearchButton(prefix);
   }
@@ -2000,12 +2644,12 @@
     var city = cleanText(qs(prefix + "City").value);
     var uf = cleanText(qs(prefix + "State").value).toUpperCase();
     var hasAddress = !!(cep || street || number || district || city || uf);
-    if ((required || cep) && cep.length !== 8) throw new Error("Informe um CEP válido com 8 dígitos.");
-    if ((required || uf) && !/^[A-Z]{2}$/.test(uf)) throw new Error("Selecione uma UF válida.");
-    if (required && (!street || !number || !district || !city)) throw new Error("Complete o endereço para os dados do RPA.");
-    if (!required && hasAddress && city && !uf) throw new Error("Selecione a UF do endereço.");
+    if ((required || cep) && cep.length !== 8) throw new Error(legendaMmn("legenda_mmn_informe_um_cep_valido_com_8_digitos"));
+    if ((required || uf) && !/^[A-Z]{2}$/.test(uf)) throw new Error(legendaMmn("legenda_mmn_selecione_uma_uf_valida"));
+    if (required && (!street || !number || !district || !city)) throw new Error(legendaMmn("legenda_mmn_complete_o_endereco_para_os_dados_do_rpa"));
+    if (!required && hasAddress && city && !uf) throw new Error(legendaMmn("legenda_mmn_selecione_a_uf_do_endereco"));
     if (hasAddress && (!context.postalCodeConsistent || context.resolvedPostalCode !== cep || context.resolvedAddressKey !== currentAddressKey(prefix))) {
-      throw new Error("O CEP e o endereço ainda não foram confirmados. Corrija o endereço, selecione um dos CEPs encontrados ou digite um CEP válido.");
+      throw new Error(legendaMmn("legenda_mmn_o_cep_e_o_endereco_ainda_nao_foram_confirmados_corrija_o_endereco_selecione"));
     }
     return true;
   }
@@ -2014,18 +2658,18 @@
     if (!currentPixIsPersisted("enrollment")) {
       return {
         scope: "pix",
-        message: "Verifique, confira e confirme a chave Pix antes de concluir a adesão.",
+        message: legendaMmn("legenda_mmn_verifique_confira_e_confirme_a_chave_pix_antes_de_concluir_a_adesao"),
         element: qs("enrollmentPixKey")
       };
     }
 
     var requiredFields = [
-      ["enrollmentPostalCode", "Informe um CEP válido com 8 dígitos."],
-      ["enrollmentAddress", "Informe a rua ou avenida."],
-      ["enrollmentAddressNumber", "Informe o número do endereço."],
-      ["enrollmentDistrict", "Informe o bairro."],
-      ["enrollmentState", "Selecione a UF do endereço."],
-      ["enrollmentCity", "Informe e selecione a cidade."]
+      ["enrollmentPostalCode", legendaMmn("legenda_mmn_informe_um_cep_valido_com_8_digitos")],
+      ["enrollmentAddress", legendaMmn("legenda_mmn_informe_a_rua_ou_avenida")],
+      ["enrollmentAddressNumber", legendaMmn("legenda_mmn_informe_o_numero_do_endereco")],
+      ["enrollmentDistrict", legendaMmn("legenda_mmn_informe_o_bairro")],
+      ["enrollmentState", legendaMmn("legenda_mmn_selecione_a_uf_do_endereco")],
+      ["enrollmentCity", legendaMmn("legenda_mmn_informe_e_selecione_a_cidade")]
     ];
     for (var index = 0; index < requiredFields.length; index += 1) {
       var field = qs(requiredFields[index][0]);
@@ -2034,7 +2678,7 @@
       }
     }
     if (digitsOnly(qs("enrollmentPostalCode").value).length !== 8) {
-      return { scope: "form", message: "Informe um CEP válido com 8 dígitos.", element: qs("enrollmentPostalCode") };
+      return { scope: "form", message: legendaMmn("legenda_mmn_informe_um_cep_valido_com_8_digitos"), element: qs("enrollmentPostalCode") };
     }
     var address = addressContext("enrollment");
     if (!address.postalCodeConsistent ||
@@ -2042,14 +2686,14 @@
         address.resolvedAddressKey !== currentAddressKey("enrollment")) {
       return {
         scope: "form",
-        message: "Confirme o CEP e o endereço antes de concluir a adesão.",
+        message: legendaMmn("legenda_mmn_confirme_o_cep_e_o_endereco_antes_de_concluir_a_adesao"),
         element: qs("enrollmentPostalCode")
       };
     }
     if (!qs("enrollmentTerms").checked) {
       return {
         scope: "form",
-        message: "Leia e aceite o regulamento vigente para concluir a adesão.",
+        message: legendaMmn("legenda_mmn_leia_e_aceite_o_regulamento_vigente_para_concluir_a_adesao"),
         element: qs("enrollmentTerms")
       };
     }
@@ -2193,9 +2837,9 @@
     if (!summaries.length && typeof regulation.resumo === "string" && regulation.resumo.trim()) summaries = [regulation.resumo];
     if (!summaries.length) {
       summaries = [
-        "A comissão considera somente assinaturas efetivamente pagas.",
-        "É necessário estar elegível na data da receita e no fechamento.",
-        "Simulações não representam garantia de renda."
+        legendaMmn("legenda_mmn_a_comissao_considera_somente_assinaturas_efetivamente_pagas"),
+        legendaMmn("legenda_mmn_e_necessario_estar_elegivel_na_data_da_receita_e_no_fechamento"),
+        legendaMmn("legenda_mmn_simulacoes_nao_representam_garantia_de_renda")
       ];
     }
     qs("enrollmentRuleSummary").innerHTML = summaries.map(function (item) {
@@ -2230,7 +2874,7 @@
       if (element) element.value = map[suffix] == null ? "" : map[suffix];
     });
     if (prefix === "profile") {
-      setText("profilePixMasked", profile.pix_mascarado ? "Chave atual: " + profile.pix_mascarado : "Nenhuma chave cadastrada.");
+      apresentarTextoMmn("profilePixMasked",function(){return profile.pix_mascarado ? legendaMmn("legenda_mmn_chave_atual") + profile.pix_mascarado : legendaMmn("legenda_mmn_nenhuma_chave_cadastrada");});
     }
     initializePixValidation(prefix, profile);
     var uf = cleanText(map.State).toUpperCase();
@@ -2250,7 +2894,7 @@
     var cityInput = qs(prefix + "City");
     if (cityInput) {
       cityInput.disabled = !context.selectedState;
-      cityInput.placeholder = context.selectedState ? "Digite e selecione a cidade" : "Selecione o estado primeiro";
+      cityInput.placeholder = context.selectedState ? legendaMmn("legenda_mmn_digite_e_selecione_a_cidade") : legendaMmn("legenda_mmn_selecione_o_estado_primeiro");
     }
     var expectedState = cleanText(map.State);
     var expectedCity = cleanText(map.City);
@@ -2283,16 +2927,16 @@
     var fullName = user.nomeuser || user.nome_exibicao || user.nome || user.codinome || user.loginuser || user.login || (state.session && state.session.user && (state.session.user.name || state.session.user.email)) || "participante";
     var firstName = cleanText(fullName).split(/\s+/)[0] || "participante";
     firstName = firstName.slice(0, 1).toLocaleUpperCase("pt-BR") + firstName.slice(1).toLocaleLowerCase("pt-BR");
-    setText("userGreeting", "Olá, " + firstName + ". Acompanhe sua jornada.");
-    setText("userHeroText", "Indicações, qualificações e valores.");
+    apresentarTextoMmn("userGreeting",function(){return legendaMmn("legenda_mmn_ola") + firstName + legendaMmn("legenda_mmn_complemento_acompanhe_sua_jornada");});
+    apresentarTextoMmn("userHeroText",function(){return legendaMmn("legenda_mmn_indicacoes_qualificacoes_e_valores");});
     var eligible = booleanValue(firstDefined([eligibility.elegivel_receber, eligibility.elegivel, data.elegivel], false), false);
     var status = qs("userEligibility");
     var reasons = listValue(eligibility.motivos);
-    status.textContent = eligible ? "Elegível nesta competência" : (reasons.length ? reasons.map(function (reason) {
+    apresentarMmn(status,"textContent",function(){return eligible ? legendaMmn("legenda_mmn_elegivel_nesta_competencia") : (reasons.length ? reasons.map(function (reason) {
       return String(reason).replace(/_/g, " ");
-    }).join("\n") : String(participation.status || "Inelegível nesta competência").replace(/_/g, " "));
+    }).join("\n") : String(participation.status || legendaMmn("legenda_mmn_inelegivel_nesta_competencia")).replace(/_/g, " "));});
     status.className = "mmn-status " + (eligible ? "is-ok" : "is-warn");
-    setText("userRank", "Rank " + (qualification.rank_financeiro || qualification.rank_atual_nome || qualification.rank_nome || user.rank || "Base"));
+    apresentarTextoMmn("userRank",function(){return legendaMmn("legenda_mmn_rotulo_rank") + (qualification.rank_financeiro || qualification.rank_atual_nome || qualification.rank_nome || user.rank || legendaMmn("legenda_mmn_rotulo_base"));});
     var invite = objectFrom(data, ["convite"]);
     state.user.inviteUrl = invite.url || data.convite_link || "";
   }
@@ -2310,19 +2954,19 @@
     var network = objectFrom(data, ["rede_resumo", "rede"]);
     var rules = objectFrom(data, ["regras", "configuracao_publica"]);
     var ranks = listFrom(rules, ["ranks"]);
-    var currentRank = qualification.rank_financeiro || qualification.rank_atual_nome || qualification.rank_nome || "Base";
+    var currentRank = qualification.rank_financeiro || qualification.rank_atual_nome || qualification.rank_nome || legendaMmn("legenda_mmn_rotulo_base");
     var current = firstDefined([qualification.rede_ativa, qualification.rede_ativos, network.rede_ativos], 0);
     var nextRankRow = ranks.filter(function (rank) { return numberValue(rank.min_rede_ativa || rank.min_ativos_rede) > numberValue(current); })
       .sort(function (a, b) { return numberValue(a.min_rede_ativa || a.min_ativos_rede) - numberValue(b.min_rede_ativa || b.min_ativos_rede); })[0] || null;
-    var nextRank = qualification.proximo_rank_nome || (nextRankRow && nextRankRow.nome) || "Maior rank alcançado";
+    var nextRank = qualification.proximo_rank_nome || (nextRankRow && nextRankRow.nome) || legendaMmn("legenda_mmn_maior_rank_alcancado");
     var target = firstDefined([qualification.proximo_rank_min_ativos, qualification.meta_ativos, nextRankRow && (nextRankRow.min_rede_ativa || nextRankRow.min_ativos_rede)], numberValue(current) > 0 ? current : 1000);
     var progress = firstDefined([qualification.progresso_percentual], target > 0 ? (numberValue(current) / numberValue(target) * 100) : 100);
     setText("userCurrentRank", currentRank);
-    setText("userRankCriteria", "Os critérios são avaliados a cada competência.");
+    apresentarTextoMmn("userRankCriteria",function(){return legendaMmn("legenda_mmn_os_criterios_sao_avaliados_a_cada_competencia");});
     setText("userNextRank", nextRank);
     qs("userRankProgressBar").style.width = Math.max(0, Math.min(100, numberValue(progress))) + "%";
-    setText("userRankProgressCurrent", formatInteger(current) + " ativos");
-    setText("userRankProgressTarget", target > current ? formatInteger(target) + " necessários" : "Objetivo alcançado");
+    apresentarTextoMmn("userRankProgressCurrent",function(){return formatInteger(current) + legendaMmn("legenda_mmn_complemento_ativos");});
+    apresentarTextoMmn("userRankProgressTarget",function(){return target > current ? formatInteger(target) + legendaMmn("legenda_mmn_necessarios") : legendaMmn("legenda_mmn_objetivo_alcancado");});
     var requirements = listFrom(qualification, ["requisitos", "criterios"]);
     if (!requirements.length) {
       var directActive = numberValue(firstDefined([qualification.diretos_ativos, network.diretos_ativos], 0));
@@ -2330,15 +2974,15 @@
       var largestLeg = numberValue(firstDefined([qualification.percentual_maior_perna, network.percentual_maior_perna], 0));
       var largestLegLimit = numberValue(firstDefined([nextRankRow && nextRankRow.max_percentual_maior_perna], 100));
       requirements = [
-        { nome: "Rede ativa: " + formatInteger(current) + " de " + formatInteger(target), ok: numberValue(current) >= numberValue(target) },
-        { nome: "Diretos ativos: " + formatInteger(directActive) + " de " + formatInteger(directTarget), ok: directActive >= directTarget },
-        { nome: "Maior perna: " + formatPercent(largestLeg) + " (máximo " + formatPercent(largestLegLimit) + ")", ok: largestLeg <= largestLegLimit }
+        { nome: legendaMmn("legenda_mmn_rede_ativa") + formatInteger(current) + legendaMmn("legenda_mmn_complemento_de") + formatInteger(target), ok: numberValue(current) >= numberValue(target) },
+        { nome: legendaMmn("legenda_mmn_diretos_ativos") + formatInteger(directActive) + legendaMmn("legenda_mmn_complemento_de") + formatInteger(directTarget), ok: directActive >= directTarget },
+        { nome: legendaMmn("legenda_mmn_maior_perna") + formatPercent(largestLeg) + legendaMmn("legenda_mmn_maximo") + formatPercent(largestLegLimit) + ")", ok: largestLeg <= largestLegLimit }
       ];
     }
-    qs("userQualificationChecklist").innerHTML = requirements.length ? requirements.map(function (item) {
+    apresentarMmn(qs("userQualificationChecklist"),"innerHTML",function(){return requirements.length ? requirements.map(function (item) {
       var ok = booleanValue(item.atendido || item.ok, false);
-      return "<div class=\"mmn-check-item " + (ok ? "is-ok" : "") + "\"><span>" + escapeHtml(item.nome || item.titulo || item.descricao || "Critério") + "</span></div>";
-    }).join("") : emptyHtml("Os critérios da competência ainda não foram publicados.");
+      return "<div class=\"mmn-check-item " + (ok ? "is-ok" : "") + "\"><span>" + escapeHtml(item.nome || item.titulo || item.descricao || legendaMmn("legenda_mmn_criterio")) + "</span></div>";
+    }).join("") : emptyHtml(legendaMmn("legenda_mmn_os_criterios_da_competencia_ainda_nao_foram_publicados"));});
     setText("userDirectActive", formatInteger(firstDefined([qualification.diretos_ativos, network.diretos_ativos], 0)));
     setText("userNetworkActive", formatInteger(firstDefined([qualification.rede_ativa, qualification.rede_ativos, network.rede_ativos], 0)));
     setText("userPeriod", qualification.competencia || data.competencia || data.periodo || "—");
@@ -2348,7 +2992,7 @@
     var rows = listFrom(data, ["historico_mensal", "evolucao_mensal", "evolucao"]);
     var container = qs("userMonthlyChart");
     if (!rows.length) {
-      container.innerHTML = emptyHtml("Ainda não há competências reconhecidas para exibir.");
+      apresentarMmn(container,"innerHTML",function(){return emptyHtml(legendaMmn("legenda_mmn_ainda_nao_ha_competencias_reconhecidas_para_exibir"));});
       return;
     }
     var max = Math.max.apply(null, rows.map(function (row) {
@@ -2393,21 +3037,21 @@
 
   function renderEvolutionChart() {
     if (state.user.evolution.loading) {
-      qs("evolutionChartContent").innerHTML = emptyHtml("Carregando a evolução real da sua rede...");
+      apresentarMmn(qs("evolutionChartContent"),"innerHTML",function(){return emptyHtml(legendaMmn("legenda_mmn_carregando_a_evolucao_real_da_sua_rede"));});
       return;
     }
     var rows = userEvolutionRows();
     if (!rows.length) {
-      qs("evolutionChartContent").innerHTML = emptyHtml(state.user.evolution.error || "Ainda não há competências com totais da rede suficientes para montar o gráfico de evolução.");
+      apresentarMmn(qs("evolutionChartContent"),"innerHTML",function(){return emptyHtml(state.user.evolution.error || legendaMmn("legenda_mmn_ainda_nao_ha_competencias_com_totais_da_rede_suficientes_para_montar_o_grafico"));});
       return;
     }
     var max = Math.max.apply(null, rows.map(function (row) { return numberValue(row.ativos); }).concat([1]));
-    qs("evolutionChartContent").innerHTML = "<div class=\"mmn-evolution-chart\">" + rows.map(function (row) {
+    apresentarMmn(qs("evolutionChartContent"),"innerHTML",function(){return "<div class=\"mmn-evolution-chart\">" + rows.map(function (row) {
       var value = Math.max(0, numberValue(row.ativos));
       var height = Math.max(3, value / max * 100);
-      var details = [row.rank, row.diretos !== null && row.diretos !== "" ? formatInteger(row.diretos) + " diretos" : ""].filter(Boolean).join(" · ");
+      var details = [row.rank, row.diretos !== null && row.diretos !== "" ? formatInteger(row.diretos) + legendaMmn("legenda_mmn_complemento_diretos") : ""].filter(Boolean).join(" · ");
       return "<article class=\"mmn-evolution-column\"><strong>" + escapeHtml(formatInteger(value)) + "</strong><div class=\"mmn-evolution-bar-wrap\"><span style=\"height:" + height + "%\"></span></div><small>" + escapeHtml(row.competencia.slice(0, 7)) + "</small>" + (details ? "<em title=\"" + escapeHtml(details) + "\">" + escapeHtml(details) + "</em>" : "") + "</article>";
-    }).join("") + "</div><p class=\"mmn-evolution-note" + (state.user.evolution.error ? " is-error" : "") + "\">" + escapeHtml(state.user.evolution.error || "O gráfico usa somente os totais reais de rede retornados em cada competência.") + "</p>";
+    }).join("") + "</div><p class=\"mmn-evolution-note" + (state.user.evolution.error ? " is-error" : "") + "\">" + escapeHtml(state.user.evolution.error || legendaMmn("legenda_mmn_o_grafico_usa_somente_os_totais_reais_de_rede_retornados_em_cada_competencia")) + "</p>";});
   }
 
   async function openEvolutionChart() {
@@ -2423,7 +3067,7 @@
         if (!Object.keys(payload).length) payload = response || {};
         state.user.evolution.rows = listFrom(payload, ["itens", "evolucao_rede", "evolucao"]);
       } catch (error) {
-        state.user.evolution.error = "Não foi possível atualizar a evolução da rede agora.";
+        state.user.evolution.error = legendaMmn("legenda_mmn_nao_foi_possivel_atualizar_a_evolucao_da_rede_agora");
       } finally {
         state.user.evolution.loading = false;
         state.user.evolution.loaded = true;
@@ -2440,10 +3084,10 @@
   function renderUserNotifications(data) {
     var events = listFrom(data, ["eventos"]);
     var container = qs("userNotificationList");
-    container.innerHTML = events.length ? events.map(function (event) {
-      var readAction = event.lido_em ? "" : "<button class=\"btn btn-ghost btn-small\" type=\"button\" data-user-event-read=\"" + escapeHtml(event.id || event.cod_mmn_evento) + "\">Marcar como lida</button>";
-      return "<article class=\"mmn-notification-item " + (event.lido_em ? "" : "is-unread") + "\"><div class=\"mmn-row-main\"><strong>" + escapeHtml(event.titulo || event.tipo || "Atualização") + "</strong><span>" + escapeHtml(event.mensagem || "") + "</span></div><div class=\"mmn-notification-meta\"><time datetime=\"" + escapeHtml(event.criado_em || "") + "\">" + escapeHtml(formatDate(event.criado_em, true)) + "</time>" + readAction + "</div></article>";
-    }).join("") : emptyHtml("Nenhuma notificação disponível.");
+    apresentarMmn(container,"innerHTML",function(){return events.length ? events.map(function (event) {
+      var readAction = event.lido_em ? "" : "<button class=\"btn btn-ghost btn-small\" type=\"button\" data-user-event-read=\"" + escapeHtml(event.id || event.cod_mmn_evento) + ("\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_marcar_como_lida")) + "</button>");
+      return "<article class=\"mmn-notification-item " + (event.lido_em ? "" : "is-unread") + "\"><div class=\"mmn-row-main\"><strong>" + escapeHtml(event.titulo || event.tipo || legendaMmn("legenda_mmn_atualizacao")) + "</strong><span>" + escapeHtml(event.mensagem || "") + "</span></div><div class=\"mmn-notification-meta\"><time datetime=\"" + escapeHtml(event.criado_em || "") + "\">" + escapeHtml(formatDate(event.criado_em, true)) + "</time>" + readAction + "</div></article>";
+    }).join("") : emptyHtml(legendaMmn("legenda_mmn_nenhuma_notificacao_disponivel"));});
   }
 
   function bonusesFromEvolution(data) {
@@ -2453,8 +3097,8 @@
       var competence = String(row.competencia || row.periodo || "").slice(0, 7);
       var rankValue = numberValue(row.bonus_rank_centavos);
       var poolValue = numberValue(row.pool_centavos);
-      if (rankValue > 0) result.push({ nome: "Bônus de liderança", tipo: "bonus_rank", competencia: competence, valor_centavos: rankValue, status: "confirmado" });
-      if (poolValue > 0) result.push({ nome: "Pool Global", tipo: "pool_global", competencia: competence, valor_centavos: poolValue, status: "confirmado" });
+      if (rankValue > 0) result.push({ nome: legendaMmn("legenda_mmn_bonus_de_lideranca"), tipo: "bonus_rank", competencia: competence, valor_centavos: rankValue, status: "confirmado" });
+      if (poolValue > 0) result.push({ nome: legendaMmn("legenda_mmn_pool_global"), tipo: "pool_global", competencia: competence, valor_centavos: poolValue, status: "confirmado" });
     });
     return result;
   }
@@ -2520,12 +3164,12 @@
   }
 
   function relationPersonLabel(person, fallback) {
-    if (person == null || person === "") return fallback || "Raiz";
-    if (typeof person !== "object") return "Usuário";
+    if (person == null || person === "") return fallback || legendaMmn("legenda_mmn_rotulo_raiz");
+    if (typeof person !== "object") return legendaMmn("legenda_mmn_usuario");
     return cleanText(firstDefined([
       person.loginuser, person.usuario_login, person.login_user, person.login,
       person.codinome, person.nome
-    ], "")) || fallback || "Usuário";
+    ], "")) || fallback || legendaMmn("legenda_mmn_usuario");
   }
 
   function renderUserGenealogy(data) {
@@ -2541,15 +3185,15 @@
     var spillover = booleanValue(firstDefined([placement.spillover, placement.foi_spillover, participant.foi_spillover, data.foi_spillover], sponsorId != null && parentId != null && String(sponsorId) !== String(parentId)), false);
     var sponsorLogin = cleanText(firstDefined([sponsor.loginuser, sponsorship.patrocinador_loginuser, placement.patrocinador_loginuser, participant.patrocinador_loginuser, data.patrocinador_loginuser], ""));
     var parentLogin = cleanText(firstDefined([parent.loginuser, placement.pai_posicionamento_loginuser, participant.pai_posicionamento_loginuser, data.pai_posicionamento_loginuser], ""));
-    setText("userSponsorRelation", sponsorLogin || (Object.keys(sponsor).length ? relationPersonLabel(sponsor, "Raiz") : relationPersonLabel(sponsorId, "Raiz")));
-    setText("userPlacementParent", parentLogin || (Object.keys(parent).length ? relationPersonLabel(parent, "Raiz estrutural") : relationPersonLabel(parentId, "Raiz estrutural")));
-    setText("userPlacementSlot", slot == null || slot === "" ? "Sem vaga atribuída" : "#" + slot);
-    setText("userPlacementWidth", width === 0 ? "Ilimitada" : formatInteger(width) + " vagas por participante");
-    setText("userPlacementSpillover", width === 0 ? "Sem limite horizontal de posicionamento." : (spillover ? "Posicionado por spillover; seu patrocinador permanece o mesmo." : "Posicionamento direto, sem spillover nesta entrada."));
+    apresentarTextoMmn("userSponsorRelation",function(){return sponsorLogin || (Object.keys(sponsor).length ? relationPersonLabel(sponsor, legendaMmn("legenda_mmn_rotulo_raiz")) : relationPersonLabel(sponsorId, legendaMmn("legenda_mmn_rotulo_raiz")));});
+    apresentarTextoMmn("userPlacementParent",function(){return parentLogin || (Object.keys(parent).length ? relationPersonLabel(parent, legendaMmn("legenda_mmn_raiz_estrutural")) : relationPersonLabel(parentId, legendaMmn("legenda_mmn_raiz_estrutural")));});
+    apresentarTextoMmn("userPlacementSlot",function(){return slot == null || slot === "" ? legendaMmn("legenda_mmn_sem_vaga_atribuida") : "#" + slot;});
+    apresentarTextoMmn("userPlacementWidth",function(){return width === 0 ? legendaMmn("legenda_mmn_rotulo_ilimitada") : formatInteger(width) + legendaMmn("legenda_mmn_complemento_vagas_por_participante");});
+    apresentarTextoMmn("userPlacementSpillover",function(){return width === 0 ? legendaMmn("legenda_mmn_sem_limite_horizontal_de_posicionamento") : (spillover ? legendaMmn("legenda_mmn_posicionado_por_spillover_seu_patrocinador_permanece_o_mesmo") : legendaMmn("legenda_mmn_posicionamento_direto_sem_spillover_nesta_entrada"));});
     var genealogyRule = qs("userGenealogyRule");
     if (genealogyRule) {
       genealogyRule.hidden = width === 0;
-      genealogyRule.textContent = "Com a largura limitada, indicações além das vagas diretas entram por spillover. A comissão direta permanece com quem convidou; as residuais seguem os níveis reais, sem pagar duas vezes o mesmo beneficiário pela mesma assinatura.";
+      apresentarMmn(genealogyRule,"textContent",function(){return legendaMmn("legenda_mmn_com_a_largura_limitada_indicacoes_alem_das_vagas_diretas_entram_por_spillover_a");});
     }
   }
 
@@ -2655,8 +3299,8 @@
   }
 
   function networkPersonDisplayName(person, directFromRoot) {
-    if (directFromRoot) return networkPersonFullName(person) || networkPersonLogin(person) || "Indicado";
-    return networkPersonLogin(person) || "Usuário";
+    if (directFromRoot) return networkPersonFullName(person) || networkPersonLogin(person) || legendaMmn("legenda_mmn_rotulo_indicado");
+    return networkPersonLogin(person) || legendaMmn("legenda_mmn_usuario");
   }
 
   function normalizeNetworkRows(data, directs) {
@@ -2795,10 +3439,10 @@
 
   function networkRegistrationLabel(person) {
     var registration = networkPersonRegistrationInfo(person);
-    if (!registration.value) return "Data de cadastro no app não informada";
+    if (!registration.value) return legendaMmn("legenda_mmn_data_de_cadastro_no_app_nao_informada");
     return registration.source === "vinculo" ?
-      "Vínculo da indicação em " + formatDate(registration.value, false) :
-      "Cadastro no app em " + formatDate(registration.value, false);
+      legendaMmn("legenda_mmn_vinculo_da_indicacao_em") + formatDate(registration.value, false) :
+      legendaMmn("legenda_mmn_cadastro_no_app_em") + formatDate(registration.value, false);
   }
 
   function networkPositionNumberLabel(person) {
@@ -2813,13 +3457,13 @@
     var name = networkPersonDisplayName(person, directFromRoot);
     var positionLabel = networkPositionNumberLabel(person);
     var secondary = directFromRoot ?
-      (positionLabel ? "Indicação direta " + positionLabel : "Indicação direta · posição ainda não informada") :
-      (positionLabel ? "Posição " + positionLabel : "Posição da indicação não informada");
+      (positionLabel ? legendaMmn("legenda_mmn_indicacao_direta") + positionLabel : legendaMmn("legenda_mmn_indicacao_direta_posicao_ainda_nao_informada")) :
+      (positionLabel ? legendaMmn("legenda_mmn_posicao") + positionLabel : legendaMmn("legenda_mmn_posicao_da_indicacao_nao_informada"));
     return "<button class=\"mmn-list-row mmn-network-person\" type=\"button\" data-network-person-id=\"" + escapeHtml(id) + "\">" +
       "<span class=\"mmn-row-main\"><strong>" + escapeHtml(name) + "</strong><small>" + escapeHtml(secondary) + "</small></span>" +
       "<span class=\"mmn-network-date\">" + escapeHtml(networkRegistrationLabel(person)) + "</span>" +
-      "<span class=\"mmn-network-children\">" + escapeHtml(children ? formatInteger(children) + (children === 1 ? " indicado" : " indicados") : (hasChildren || !explorer ? "Ver ramificação" : "Sem indicados")) + "</span>" +
-      pillHtml(networkPersonActive(person) ? "ativo" : "pendente", networkPersonActive(person) ? "Ativo" : "Inativo") +
+      "<span class=\"mmn-network-children\">" + escapeHtml(children ? formatInteger(children) + (children === 1 ? legendaMmn("legenda_mmn_complemento_indicado") : legendaMmn("legenda_mmn_complemento_indicados")) : (hasChildren || !explorer ? legendaMmn("legenda_mmn_ver_ramificacao") : legendaMmn("legenda_mmn_sem_indicados"))) + "</span>" +
+      pillHtml(networkPersonActive(person) ? "ativo" : "pendente", networkPersonActive(person) ? legendaMmn("legenda_mmn_rotulo_ativo") : legendaMmn("legenda_mmn_rotulo_inativo")) +
       "</button>";
   }
 
@@ -2834,12 +3478,12 @@
     var id = networkPersonId(person);
     var cache = state.user.network.nodeCache[id] || {};
     var children = Array.isArray(cache.rows) ? cache.rows : networkChildren(id);
-    setText("networkExplorerTitle", "Indicados de " + networkPersonDisplayName(person, state.user.network.stack.length === 1));
-    setText("networkExplorerSubtitle", networkRegistrationLabel(person) + " · " + (networkPersonActive(person) ? "Ativo" : "Inativo"));
+    apresentarTextoMmn("networkExplorerTitle",function(){return legendaMmn("legenda_mmn_indicados_de") + networkPersonDisplayName(person, state.user.network.stack.length === 1);});
+    apresentarTextoMmn("networkExplorerSubtitle",function(){return networkRegistrationLabel(person) + " · " + (networkPersonActive(person) ? legendaMmn("legenda_mmn_rotulo_ativo") : legendaMmn("legenda_mmn_rotulo_inativo"));});
     qs("networkExplorerBack").hidden = state.user.network.stack.length <= 1;
-    qs("networkExplorerContent").innerHTML = cache.loading ? emptyHtml("Carregando indicados...") : (children.length ? children.map(function (child) {
+    apresentarMmn(qs("networkExplorerContent"),"innerHTML",function(){return cache.loading ? emptyHtml(legendaMmn("legenda_mmn_carregando_indicados")) : (children.length ? children.map(function (child) {
       return networkPersonCardHtml(child, false, true);
-    }).join("") : emptyHtml(cache.error || "Este indicado ainda não possui indicações registradas."));
+    }).join("") : emptyHtml(cache.error || legendaMmn("legenda_mmn_este_indicado_ainda_nao_possui_indicacoes_registradas")));});
     qs("networkExplorerMore").hidden = cache.loading || !cache.hasMore;
   }
 
@@ -2876,7 +3520,7 @@
       previous.cursor = firstDefined([payload.next_cursor, payload.proximo_cursor, payload.cursor_proximo, response.next_cursor, response.proximo_cursor], null);
       previous.hasMore = booleanValue(firstDefined([payload.has_more, payload.tem_mais], !!previous.cursor), !!previous.cursor);
     } catch (error) {
-      previous.error = previous.rows.length ? "" : "Não foi possível carregar esta ramificação agora. Tente novamente.";
+      previous.error = previous.rows.length ? "" : legendaMmn("legenda_mmn_nao_foi_possivel_carregar_esta_ramificacao_agora_tente_novamente");
       previous.hasMore = false;
     } finally {
       previous.loading = false;
@@ -2912,7 +3556,7 @@
     var nested = children.map(function (child) {
       return diagramNodeHtml(child, visited);
     }).filter(Boolean).join("");
-    return "<li><article class=\"mmn-diagram-node\"><strong>" + escapeHtml(networkPersonDisplayName(person, directFromRoot)) + "</strong><small>" + escapeHtml(networkRegistrationLabel(person)) + "</small><span>" + escapeHtml((position == null ? "Vaga da indicação não informada" : "Vaga #" + formatInteger(position)) + " · " + (networkPersonActive(person) ? "Ativo" : "Inativo")) + "</span></article>" + (nested ? "<ul>" + nested + "</ul>" : "") + "</li>";
+    return "<li><article class=\"mmn-diagram-node\"><strong>" + escapeHtml(networkPersonDisplayName(person, directFromRoot)) + "</strong><small>" + escapeHtml(networkRegistrationLabel(person)) + "</small><span>" + escapeHtml((position == null ? legendaMmn("legenda_mmn_vaga_da_indicacao_nao_informada") : legendaMmn("legenda_mmn_vaga") + formatInteger(position)) + " · " + (networkPersonActive(person) ? legendaMmn("legenda_mmn_rotulo_ativo") : legendaMmn("legenda_mmn_rotulo_inativo"))) + "</span></article>" + (nested ? "<ul>" + nested + "</ul>" : "") + "</li>";
   }
 
   function renderNetworkDiagram() {
@@ -2920,19 +3564,19 @@
     var roots = networkDiagramChildren(state.user.network.rootId);
     if (!roots.length) roots = state.user.network.directs;
     var dashboardUser = objectFrom(state.user.dashboard || {}, ["usuario"]);
-    var rootLogin = networkPersonLogin(dashboardUser) || "Você";
+    var rootLogin = networkPersonLogin(dashboardUser) || legendaMmn("legenda_mmn_voce");
     var branches = roots.map(function (person) {
       return diagramNodeHtml(person, visited);
     }).filter(Boolean).join("");
-    var incomplete = state.user.network.hasMore ? "<p class=\"mmn-diagram-warning\">A consulta atingiu o limite de registros. Este diagrama está incompleto e não representa toda a sua rede.</p>" : "";
-    qs("networkDiagramContent").innerHTML = "<div class=\"mmn-diagram-root\"><strong>" + escapeHtml(rootLogin) + "</strong><span>Sua rede de posicionamento</span></div>" +
-      (branches ? "<div class=\"mmn-diagram-scroll\"><ul class=\"mmn-diagram-tree\">" + branches + "</ul></div>" : emptyHtml("Você ainda não possui indicados para exibir no diagrama.")) + incomplete;
+    var incomplete = state.user.network.hasMore ? ("<p class=\"mmn-diagram-warning\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_a_consulta_atingiu_o_limite_de_registros_este_diagrama_esta_incompleto_e_nao")) + "</p>") : "";
+    apresentarMmn(qs("networkDiagramContent"),"innerHTML",function(){return "<div class=\"mmn-diagram-root\"><strong>" + escapeHtml(rootLogin) + ("</strong><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_sua_rede_de_posicionamento")) + "</span></div>") +
+      (branches ? "<div class=\"mmn-diagram-scroll\"><ul class=\"mmn-diagram-tree\">" + branches + "</ul></div>" : emptyHtml(legendaMmn("legenda_mmn_voce_ainda_nao_possui_indicados_para_exibir_no_diagrama"))) + incomplete;});
   }
 
   async function openNetworkDiagram() {
     qs("networkDiagramOverlay").hidden = false;
     syncPageScrollLock();
-    qs("networkDiagramContent").innerHTML = emptyHtml("Carregando o diagrama completo da rede...");
+    apresentarMmn(qs("networkDiagramContent"),"innerHTML",function(){return emptyHtml(legendaMmn("legenda_mmn_carregando_o_diagrama_completo_da_rede"));});
     try {
       var response = await rpc(CONFIG.rpcs.userNetworkDiagram, { p_limite: 10000 });
       var payload = objectFrom(response, ["dados", "resultado", "diagrama"]);
@@ -2945,9 +3589,9 @@
     } catch (error) {
       if (state.user.network.rows.length) {
         renderNetworkDiagram();
-        qs("networkDiagramContent").insertAdjacentHTML("afterbegin", "<p class=\"mmn-diagram-warning\">Não foi possível atualizar o diagrama completo agora. A visualização usa os dados já carregados.</p>");
+        qs("networkDiagramContent").insertAdjacentHTML("afterbegin", ("<p class=\"mmn-diagram-warning\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_nao_foi_possivel_atualizar_o_diagrama_completo_agora_a_visualizacao_usa_os_dados")) + "</p>"));
       } else {
-        qs("networkDiagramContent").innerHTML = emptyHtml("Não foi possível carregar o diagrama da rede agora. Tente novamente.");
+        apresentarMmn(qs("networkDiagramContent"),"innerHTML",function(){return emptyHtml(legendaMmn("legenda_mmn_nao_foi_possivel_carregar_o_diagrama_da_rede_agora_tente_novamente"));});
       }
     }
   }
@@ -2967,17 +3611,21 @@
     storeUserNetwork(data, directs);
     if (!append) renderUserGenealogy(data);
     if (levels.length) {
-      qs("userLevelGrid").innerHTML = levels.map(function (level) {
+      apresentarMmn(qs("userLevelGrid"),"innerHTML",function(){return levels.map(function (level) {
         var unlocked = firstDefined([level.liberado, level.qualificado], true);
-        return "<article class=\"mmn-level-card " + (unlocked ? "" : "is-locked") + "\"><span>Nível " + escapeHtml(level.nivel) + " · " + escapeHtml(formatPercent(level.percentual)) + "</span><strong>" + escapeHtml(formatInteger(firstDefined([level.ativos, level.participantes_ativos], null))) + "</strong><span>ativos de " + escapeHtml(formatInteger(firstDefined([level.total, level.participantes], null))) + " participantes</span>" + pillHtml(unlocked ? "ativo" : "pendente", unlocked ? "Qualificado" : "Não qualificado") + "</article>";
-      }).join("");
+        return "<article class=\"mmn-level-card " + (unlocked ? "" : "is-locked") + ("\"><span>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_nivel"))) + escapeHtml(level.nivel) + " · " + escapeHtml(formatPercent(level.percentual)) + "</span><strong>" + escapeHtml(formatInteger(firstDefined([level.ativos, level.participantes_ativos], null))) + ("</strong><span>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_ativos_de"))) + escapeHtml(formatInteger(firstDefined([level.total, level.participantes], null))) + (escapeHtml(legendaMmn("legenda_fechamento_mmn_participantes")) + "</span>") + pillHtml(unlocked ? "ativo" : "pendente", unlocked ? legendaMmn("legenda_mmn_rotulo_qualificado") : legendaMmn("legenda_mmn_nao_qualificado")) + "</article>";
+      }).join("");});
     } else if (!append) {
-      qs("userLevelGrid").innerHTML = emptyHtml("A distribuição por nível ainda não está disponível.");
+      apresentarMmn(qs("userLevelGrid"),"innerHTML",function(){return emptyHtml(legendaMmn("legenda_mmn_a_distribuicao_por_nivel_ainda_nao_esta_disponivel"));});
     }
-    var html = state.user.network.directs.map(function (person) {
+    function construirHtmlLegendaMmn() {
+      var html = state.user.network.directs.map(function (person) {
       return networkPersonCardHtml(person, true, false);
     }).join("");
-    qs("userDirectList").innerHTML = html || emptyHtml("Você ainda não possui indicados diretos.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    apresentarMmn(qs("userDirectList"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyHtml(legendaMmn("legenda_mmn_voce_ainda_nao_possui_indicados_diretos"));});
     state.user.cursors.network = data.next_cursor || data.proximo_cursor || data.cursor_proximo || null;
     qs("userNetworkMore").hidden = !state.user.cursors.network;
   }
@@ -2988,17 +3636,21 @@
     var explicitlyAllowed = firstDefined([row.pode_contestar, row.contestavel], null);
     var withinDeadline = deadline ? new Date(deadline).getTime() >= Date.now() : false;
     if (!targetId || !(explicitlyAllowed === true || withinDeadline)) return "";
-    return "<button class=\"btn btn-ghost btn-small\" type=\"button\" data-user-dispute-type=\"" + escapeHtml(targetType) + "\" data-user-dispute-id=\"" + escapeHtml(targetId) + "\">Contestar</button>";
+    return "<button class=\"btn btn-ghost btn-small\" type=\"button\" data-user-dispute-type=\"" + escapeHtml(targetType) + "\" data-user-dispute-id=\"" + escapeHtml(targetId) + ("\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_contestar")) + "</button>");
   }
 
   function renderUserLedger(data, append) {
     var rows = listFrom(data, ["lancamentos", "extrato", "historico_mensal", "itens"]);
-    var html = rows.map(function (row) {
+    function construirHtmlLegendaMmn() {
+      var html = rows.map(function (row) {
       var value = row.creditos_centavos !== undefined ? numberValue(row.creditos_centavos) - numberValue(row.debitos_centavos) : centsFrom(row, ["valor_centavos"]);
-      return "<div class=\"mmn-ledger-row\"><div class=\"mmn-row-main\"><strong>" + escapeHtml(row.descricao || row.tipo_nome || row.tipo || (row.competencia ? "Resumo da competência" : "Lançamento")) + "</strong><small>" + escapeHtml(formatDate(row.criado_em || row.data || row.competencia, true)) + " · " + escapeHtml(row.competencia || "") + "</small></div><span>" + escapeHtml(row.nivel ? "Nível " + row.nivel : (row.origem || (row.bonus_rank_centavos ? "Inclui bônus" : "—"))) + "</span><strong>" + escapeHtml(formatMoneyCents(value)) + "</strong>" + pillHtml(row.status || "confirmado") + disputeButtonHtml(row, "lancamento", ["id", "cod_mmn_lancamento"]) + "</div>";
+      return "<div class=\"mmn-ledger-row\"><div class=\"mmn-row-main\"><strong>" + escapeHtml(row.descricao || row.tipo_nome || row.tipo || (row.competencia ? legendaMmn("legenda_mmn_resumo_da_competencia") : legendaMmn("legenda_mmn_lancamento"))) + "</strong><small>" + escapeHtml(formatDate(row.criado_em || row.data || row.competencia, true)) + " · " + escapeHtml(row.competencia || "") + "</small></div><span>" + escapeHtml(row.nivel ? legendaMmn("legenda_mmn_nivel") + row.nivel : (row.origem || (row.bonus_rank_centavos ? legendaMmn("legenda_mmn_inclui_bonus") : "—"))) + "</span><strong>" + escapeHtml(formatMoneyCents(value)) + "</strong>" + pillHtml(row.status || "confirmado") + disputeButtonHtml(row, "lancamento", ["id", "cod_mmn_lancamento"]) + "</div>";
     }).join("");
-    if (append) qs("userLedgerList").insertAdjacentHTML("beforeend", html);
-    else qs("userLedgerList").innerHTML = html || emptyHtml("Nenhum lançamento encontrado para o período.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    if (append) acrescentarHtmlMmn(qs("userLedgerList"), html, construirHtmlLegendaMmn);
+    else apresentarMmn(qs("userLedgerList"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyHtml(legendaMmn("legenda_mmn_nenhum_lancamento_encontrado_para_o_periodo"));});
     state.user.cursors.ledger = data.proximo_cursor || data.cursor_proximo || null;
     qs("userLedgerMore").hidden = !state.user.cursors.ledger;
   }
@@ -3010,11 +3662,11 @@
     var ledger = listFrom(data, ["extrato", "lancamentos"]);
     state.user.ranks = ranks;
     state.user.rankQualificationData = data;
-    qs("userRankLadder").innerHTML = ranks.length ? ranks.map(function (rank) {
+    apresentarMmn(qs("userRankLadder"),"innerHTML",function(){return ranks.length ? ranks.map(function (rank) {
       var status = String(rank.status || (String(rank.chave) === String(qualification.rank_chave) ? "atual" : "pendente"));
-      return "<button type=\"button\" class=\"mmn-rank-card " + (status === "atual" ? "is-current" : (status === "concluido" ? "is-complete" : "")) + "\" data-rank-qualified-index=\"" + escapeHtml(ranks.indexOf(rank)) + "\"><span>" + escapeHtml(status === "atual" ? "Rank atual" : "Qualificação") + "</span><strong>" + escapeHtml(rank.nome || rank.rank || "") + "</strong><span>" + escapeHtml(formatInteger(rank.min_rede_ativa || rank.min_ativos_rede || rank.ativos_necessarios)) + " ativos na rede · bônus " + escapeHtml(formatPercent(rank.bonus_percentual || rank.percentual_lideranca || rank.percentual)) + " · pool " + escapeHtml(numberValue(rank.pool_coeficiente)) + "</span>" + pillHtml(status || "pendente") + "<small class=\"mmn-rank-open-label\">Ver participantes qualificados</small></button>";
-    }).join("") : emptyHtml("Os ranks vigentes ainda não foram carregados.");
-    qs("userBonusGrid").innerHTML = bonuses.length ? bonuses.map(function (bonus) {
+      return "<button type=\"button\" class=\"mmn-rank-card " + (status === "atual" ? "is-current" : (status === "concluido" ? "is-complete" : "")) + "\" data-rank-qualified-index=\"" + escapeHtml(ranks.indexOf(rank)) + "\"><span>" + escapeHtml(status === "atual" ? legendaMmn("legenda_mmn_rank_atual") : legendaMmn("legenda_mmn_qualificacao")) + "</span><strong>" + escapeHtml(rank.nome || rank.rank || "") + "</strong><span>" + escapeHtml(formatInteger(rank.min_rede_ativa || rank.min_ativos_rede || rank.ativos_necessarios)) + legendaMmn("legenda_mmn_ativos_na_rede_bonus") + escapeHtml(formatPercent(rank.bonus_percentual || rank.percentual_lideranca || rank.percentual)) + legendaMmn("legenda_mmn_complemento_pool") + escapeHtml(numberValue(rank.pool_coeficiente)) + "</span>" + pillHtml(status || "pendente") + ("<small class=\"mmn-rank-open-label\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_ver_participantes_qualificados")) + "</small></button>");
+    }).join("") : emptyHtml(legendaMmn("legenda_mmn_os_ranks_vigentes_ainda_nao_foram_carregados"));});
+    apresentarMmn(qs("userBonusGrid"),"innerHTML",function(){return bonuses.length ? bonuses.map(function (bonus) {
       var competence = String(bonus.competencia || bonus.periodo || "").slice(0, 7);
       var type = bonus.tipo || bonus.chave || "";
       var source = ledger.find(function (row) {
@@ -3028,16 +3680,16 @@
       var totalPoints = firstDefined([source.pontos_totais, details.pontos_totais], null);
       var availablePool = firstDefined([source.pool_disponivel_centavos, details.pool_disponivel_centavos], null);
       if (type === "pool_global" || Object.keys(details).length) {
-        if (base != null) detailItems.push(["Base pessoal", formatMoneyCents(base)]);
-        if (coefficient != null) detailItems.push(["Coeficiente", numberValue(coefficient).toLocaleString("pt-BR", { maximumFractionDigits: 5 })]);
-        if (personalPoints != null) detailItems.push(["Seus pontos", numberValue(personalPoints).toLocaleString("pt-BR", { maximumFractionDigits: 3 })]);
-        if (totalPoints != null) detailItems.push(["Pontos totais", numberValue(totalPoints).toLocaleString("pt-BR", { maximumFractionDigits: 3 })]);
-        if (availablePool != null) detailItems.push(["Pool disponível", formatMoneyCents(availablePool)]);
+        if (base != null) detailItems.push([legendaMmn("legenda_mmn_base_pessoal"), formatMoneyCents(base)]);
+        if (coefficient != null) detailItems.push([legendaMmn("legenda_mmn_rotulo_coeficiente"), numberValue(coefficient).toLocaleString("pt-BR", { maximumFractionDigits: 5 })]);
+        if (personalPoints != null) detailItems.push([legendaMmn("legenda_mmn_seus_pontos"), numberValue(personalPoints).toLocaleString("pt-BR", { maximumFractionDigits: 3 })]);
+        if (totalPoints != null) detailItems.push([legendaMmn("legenda_mmn_pontos_totais"), numberValue(totalPoints).toLocaleString("pt-BR", { maximumFractionDigits: 3 })]);
+        if (availablePool != null) detailItems.push([legendaMmn("legenda_mmn_pool_disponivel"), formatMoneyCents(availablePool)]);
       }
       var detailHtml = detailItems.length ? "<dl class=\"mmn-bonus-details\">" + detailItems.map(function (item) { return "<div><dt>" + escapeHtml(item[0]) + "</dt><dd>" + escapeHtml(item[1]) + "</dd></div>"; }).join("") + "</dl>" : "";
-      var description = bonus.descricao || (competence ? "Competência " + competence : "");
-      return "<article class=\"mmn-bonus-card\"><span>" + escapeHtml(bonus.nome || bonus.tipo_nome || bonus.tipo || "Benefício") + "</span><strong>" + escapeHtml(formatMoneyCents(centsFrom(bonus, ["valor_centavos", "estimado_centavos"]))) + "</strong><span>" + escapeHtml(description) + "</span>" + detailHtml + pillHtml(bonus.status || source.status || "apurando") + "</article>";
-    }).join("") : emptyHtml("Nenhuma bonificação registrada nesta competência.");
+      var description = bonus.descricao || (competence ? legendaMmn("legenda_mmn_competencia") + competence : "");
+      return "<article class=\"mmn-bonus-card\"><span>" + escapeHtml(bonus.nome || bonus.tipo_nome || bonus.tipo || legendaMmn("legenda_mmn_beneficio")) + "</span><strong>" + escapeHtml(formatMoneyCents(centsFrom(bonus, ["valor_centavos", "estimado_centavos"]))) + "</strong><span>" + escapeHtml(description) + "</span>" + detailHtml + pillHtml(bonus.status || source.status || "apurando") + "</article>";
+    }).join("") : emptyHtml(legendaMmn("legenda_mmn_nenhuma_bonificacao_registrada_nesta_competencia"));});
   }
 
   function qualifiedRowsForRank(rank) {
@@ -3075,7 +3727,7 @@
   function renderRankQualified(loading, error) {
     var rank = state.user.rankQualified.rank;
     if (!rank) return;
-    var rankName = cleanText(rank.nome || rank.rank || rank.chave) || "Qualificação";
+    var rankName = cleanText(rank.nome || rank.rank || rank.chave) || legendaMmn("legenda_mmn_qualificacao");
     var rows = state.user.rankQualified.rows;
     var seen = {};
     var unique = rows.filter(function (row) {
@@ -3085,11 +3737,11 @@
       return true;
     });
     setText("rankQualifiedTitle", rankName);
-    setText("rankQualifiedSubtitle", unique.length ? formatInteger(unique.length) + (unique.length === 1 ? " participante qualificado" : " participantes qualificados") : "Participantes qualificados neste rank");
-    qs("rankQualifiedContent").innerHTML = loading ? emptyHtml("Carregando participantes qualificados...") : (unique.length ? "<div class=\"mmn-qualified-list\">" + unique.map(function (row) {
+    apresentarTextoMmn("rankQualifiedSubtitle",function(){return unique.length ? formatInteger(unique.length) + (unique.length === 1 ? legendaMmn("legenda_mmn_complemento_participante_qualificado") : legendaMmn("legenda_mmn_complemento_participantes_qualificados")) : legendaMmn("legenda_mmn_participantes_qualificados_neste_rank");});
+    apresentarMmn(qs("rankQualifiedContent"),"innerHTML",function(){return loading ? emptyHtml(legendaMmn("legenda_mmn_carregando_participantes_qualificados")) : (unique.length ? "<div class=\"mmn-qualified-list\">" + unique.map(function (row) {
       var active = typeof row === "object" ? networkPersonActive(row) : true;
-      return "<article class=\"mmn-qualified-person\"><strong>" + escapeHtml(qualifiedLogin(row)) + "</strong>" + pillHtml(active ? "ativo" : "pendente", active ? "Ativo" : "Inativo") + "</article>";
-    }).join("") + "</div>" : emptyHtml(error || "Nenhum participante qualificado foi encontrado neste rank."));
+      return "<article class=\"mmn-qualified-person\"><strong>" + escapeHtml(qualifiedLogin(row)) + "</strong>" + pillHtml(active ? "ativo" : "pendente", active ? legendaMmn("legenda_mmn_rotulo_ativo") : legendaMmn("legenda_mmn_rotulo_inativo")) + "</article>";
+    }).join("") + "</div>" : emptyHtml(error || legendaMmn("legenda_mmn_nenhum_participante_qualificado_foi_encontrado_neste_rank")));});
     qs("rankQualifiedMore").hidden = loading || !state.user.rankQualified.hasMore;
   }
 
@@ -3114,7 +3766,7 @@
     } catch (requestError) {
       if (!append && !state.user.rankQualified.rows.length) state.user.rankQualified.rows = qualifiedRowsForRank(rank);
       state.user.rankQualified.hasMore = false;
-      renderRankQualified(false, state.user.rankQualified.rows.length ? "" : "Não foi possível carregar os qualificados agora. Tente novamente.");
+      renderRankQualified(false, state.user.rankQualified.rows.length ? "" : legendaMmn("legenda_mmn_nao_foi_possivel_carregar_os_qualificados_agora_tente_novamente"));
     }
   }
 
@@ -3138,16 +3790,17 @@
     var summary = objectFrom(data, ["resumo", "saldo", "saldos"]);
     var rules = objectFrom(data, ["configuracao_publica", "regras"]);
     var parameters = objectFrom(rules, ["parametros"]);
-    qs("userPaymentSummary").innerHTML = [
-      ["Mínimo vigente", firstDefined([summary.minimo_pagamento_centavos, parameters.pagamento_minimo_centavos], null)],
-      ["Em processamento", centsFrom(summary, ["aguardando_centavos", "reservado_centavos", "pendente_centavos"])],
-      ["Pago", centsFrom(summary, ["total_pago_centavos", "pago_centavos"])]
+    apresentarMmn(qs("userPaymentSummary"),"innerHTML",function(){return [
+      [legendaMmn("legenda_mmn_minimo_vigente"), firstDefined([summary.minimo_pagamento_centavos, parameters.pagamento_minimo_centavos], null)],
+      [legendaMmn("legenda_mmn_em_processamento"), centsFrom(summary, ["aguardando_centavos", "reservado_centavos", "pendente_centavos"])],
+      [legendaMmn("legenda_mmn_rotulo_pago"), centsFrom(summary, ["total_pago_centavos", "pago_centavos"])]
     ].map(function (item) {
       return "<article class=\"mmn-payment-card\"><span>" + escapeHtml(item[0]) + "</span><strong>" + escapeHtml(formatMoneyCents(item[1])) + "</strong></article>";
-    }).join("");
+    }).join("");});
     var rows = listFrom(data, ["pagamentos", "itens"]);
     var rpas = listFrom(data, ["rpas"]);
-    var html = rows.map(function (row) {
+    function construirHtmlLegendaMmn() {
+      var html = rows.map(function (row) {
       var rpa = rpas.find(function (item) {
         return String(item.competencia || "").slice(0, 10) === String(row.competencia || "").slice(0, 10) &&
           numberValue(item.liquido_centavos) === numberValue(row.liquido_centavos);
@@ -3155,11 +3808,14 @@
       var rpaStatus = rpa.status || (row.rpa_documento ? "emitido" : (row.rpa_numero ? "rascunho" : "pendente"));
       var paid = row.status === "pago";
       var documentRef = rpa.documento_ref || row.rpa_documento || "";
-      var documentHtml = /^https?:\/\//i.test(documentRef) ? "<a href=\"" + escapeHtml(documentRef) + "\" target=\"_blank\" rel=\"noopener\">Abrir documento RPA</a>" : escapeHtml(documentRef || "Documento ainda não emitido");
-      return "<article class=\"mmn-payment-progress-card\"><div class=\"mmn-panel-title\"><div><h3>Competência " + escapeHtml(String(row.competencia || "").slice(0, 7)) + "</h3><p>Líquido: " + escapeHtml(formatMoneyCents(centsFrom(row, ["liquido_centavos"]))) + " · Retenções: " + escapeHtml(formatMoneyCents(centsFrom(row, ["retencoes_centavos"]))) + "</p></div>" + pillHtml(row.status) + "</div><div class=\"mmn-payment-steps\"><div class=\"is-complete\"><span>1</span><strong>Apurado</strong></div><div class=\"" + (["aprovado", "enfileirado", "processando", "pago"].indexOf(row.status) >= 0 ? "is-complete" : "is-current") + "\"><span>2</span><strong>Aprovado</strong></div><div class=\"" + (["emitido", "pago"].indexOf(rpaStatus) >= 0 ? "is-complete" : "is-current") + "\"><span>3</span><strong>RPA " + escapeHtml(rpaStatus) + "</strong></div><div class=\"" + (paid ? "is-complete" : (["enfileirado", "processando"].indexOf(row.status) >= 0 ? "is-current" : "")) + "\"><span>4</span><strong>Transferência " + escapeHtml(paid ? "confirmada" : "pendente") + "</strong></div></div><div class=\"mmn-payment-document\"><strong>" + escapeHtml(rpa.numero || row.rpa_numero || "RPA ainda sem número") + "</strong><span>" + documentHtml + "</span></div>" + disputeButtonHtml(row, "pagamento", ["id", "cod_mmn_lote_beneficiario"]) + "</article>";
+      var documentHtml = /^https?:\/\//i.test(documentRef) ? "<a href=\"" + escapeHtml(documentRef) + ("\" target=\"_blank\" rel=\"noopener\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_abrir_documento_rpa")) + "</a>") : escapeHtml(documentRef || legendaMmn("legenda_mmn_documento_ainda_nao_emitido"));
+      return ("<article class=\"mmn-payment-progress-card\"><div class=\"mmn-panel-title\"><div><h3>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_competencia"))) + escapeHtml(String(row.competencia || "").slice(0, 7)) + ("</h3><p>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_liquido"))) + escapeHtml(formatMoneyCents(centsFrom(row, ["liquido_centavos"]))) + legendaMmn("legenda_mmn_retencoes") + escapeHtml(formatMoneyCents(centsFrom(row, ["retencoes_centavos"]))) + "</p></div>" + pillHtml(row.status) + ("</div><div class=\"mmn-payment-steps\"><div class=\"is-complete\"><span>1</span><strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_apurado")) + "</strong></div><div class=\"") + (["aprovado", "enfileirado", "processando", "pago"].indexOf(row.status) >= 0 ? "is-complete" : "is-current") + ("\"><span>2</span><strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_aprovado")) + "</strong></div><div class=\"") + (["emitido", "pago"].indexOf(rpaStatus) >= 0 ? "is-complete" : "is-current") + "\"><span>3</span><strong>RPA " + escapeHtml(rpaStatus === "emitido" || rpaStatus === "rascunho" ? legendaMmn("legenda_fechamento_extra_" + rpaStatus) : textoEstadoMmn(rpaStatus)) + "</strong></div><div class=\"" + (paid ? "is-complete" : (["enfileirado", "processando"].indexOf(row.status) >= 0 ? "is-current" : "")) + ("\"><span>4</span><strong>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_transferencia"))) + escapeHtml(paid ? legendaMmn("legenda_fechamento_extra_confirmada") : legendaMmn("legenda_mmn_estado_pendente")) + "</strong></div></div><div class=\"mmn-payment-document\"><strong>" + escapeHtml(rpa.numero || row.rpa_numero || legendaMmn("legenda_mmn_rpa_ainda_sem_numero")) + "</strong><span>" + documentHtml + "</span></div>" + disputeButtonHtml(row, "pagamento", ["id", "cod_mmn_lote_beneficiario"]) + "</article>";
     }).join("");
-    if (append) qs("userPaymentList").insertAdjacentHTML("beforeend", html);
-    else qs("userPaymentList").innerHTML = html || emptyHtml("Nenhum pagamento processado.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    if (append) acrescentarHtmlMmn(qs("userPaymentList"), html, construirHtmlLegendaMmn);
+    else apresentarMmn(qs("userPaymentList"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyHtml(legendaMmn("legenda_mmn_nenhum_pagamento_processado"));});
     state.user.cursors.payments = data.proximo_cursor || data.cursor_proximo || null;
     qs("userPaymentsMore").hidden = !state.user.cursors.payments;
   }
@@ -3171,6 +3827,11 @@
       return;
     }
     var summary = objectFrom(data, ["resumo", "resultado"]);
+    var descricoesLegendaMmn = new WeakMap();
+    function descricaoMetricaLegenda(metric) {
+      var vinculo=descricoesLegendaMmn.get(metric);
+      return vinculo&&metric.descricao===vinculo.ultimo?vinculo.obter():(metric.descricao||"");
+    }
     var metrics = listFrom(data, ["metricas"]).slice();
     var monthly = listFrom(data, ["serie", "projecao_mensal", "meses"]);
     if (!metrics.length) {
@@ -3186,40 +3847,43 @@
       var projectedMonths = monthly.length;
       metrics.forEach(function (metric) {
         if (["bruto_total", "liquido_total"].indexOf(cleanText(metric.chave)) >= 0 && !metric.descricao) {
-          metric.descricao = "Total projetado para " + projectedMonths + (projectedMonths === 1 ? " mês." : " meses.");
+          var obterDescricao=function(){return legendaMmn("legenda_mmn_total_projetado_para") + projectedMonths + (projectedMonths === 1 ? legendaMmn("legenda_mmn_mes") : legendaMmn("legenda_mmn_complemento_meses"));};
+          metric.descricao=obterDescricao();
+          descricoesLegendaMmn.set(metric,{ultimo:metric.descricao,obter:obterDescricao});
         }
       });
       metrics.push({
         chave: "media_mensal_liquida",
-        nome: "Média mensal estimada",
+        get nome(){return legendaMmn("legenda_mmn_media_mensal_estimada");},
         valor_centavos: Math.round(netSum / projectedMonths),
-        descricao: "Bruto médio mensal: " + formatMoneyCents(Math.round(grossSum / projectedMonths)) + "."
+        get descricao(){return legendaMmn("legenda_mmn_bruto_medio_mensal") + formatMoneyCents(Math.round(grossSum / projectedMonths)) + ".";}
       });
       metrics.push({
         chave: "ultimo_mes_liquido",
-        nome: "Valor mensal no último mês",
+        get nome(){return legendaMmn("legenda_mmn_valor_mensal_no_ultimo_mes");},
         valor_centavos: numberValue(lastMonth.liquido_estimado_centavos),
-        descricao: "Bruto no último mês: " + formatMoneyCents(lastMonth.ganho_bruto_centavos) + "."
+        get descricao(){return legendaMmn("legenda_mmn_bruto_no_ultimo_mes") + formatMoneyCents(lastMonth.ganho_bruto_centavos) + ".";}
       });
     }
-    var html = metrics.map(function (metric) {
+    function construirHtmlLegendaMmn() {
+      var html = metrics.map(function (metric) {
       var value;
       if (metric.valor_centavos !== undefined) value = formatMoneyCents(metric.valor_centavos);
       else if (metric.tipo === "percentual") value = formatPercent(metric.valor);
       else value = firstDefined([metric.valor_formatado, metric.valor], "—");
-      return "<article class=\"mmn-result-card\"><span>" + escapeHtml(metric.nome || metric.titulo || metric.chave || "Resultado") + "</span><strong>" + escapeHtml(value) + "</strong><small>" + escapeHtml(metric.descricao || "") + "</small></article>";
+      return "<article class=\"mmn-result-card\"><span>" + escapeHtml(metric.nome || metric.titulo || metric.chave || legendaMmn("legenda_mmn_rotulo_resultado")) + "</span><strong>" + escapeHtml(value) + "</strong><small>" + escapeHtml(descricaoMetricaLegenda(metric)) + "</small></article>";
     }).join("");
     if (data.tipo === "usuario_pessoal") {
       var base = objectFrom(data, ["base_real"]);
-      html = "<article class=\"mmn-simulation-context\"><span>Base real usada</span><strong>" + escapeHtml(formatInteger(base.rede_ativa)) + " pessoas ativas na rede · " + escapeHtml(formatInteger(base.diretos_ativos)) + " diretos ativos</strong><small>A projeção parte dos seus dados atuais e das regras vigentes.</small></article>" + html;
+      html = ("<article class=\"mmn-simulation-context\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_base_real_usada")) + "</span><strong>") + escapeHtml(formatInteger(base.rede_ativa)) + legendaMmn("legenda_mmn_complemento_pessoas_ativas_na_rede") + escapeHtml(formatInteger(base.diretos_ativos)) + ((escapeHtml(legendaMmn("legenda_fechamento_mmn_diretos_ativos")) + "</strong><small>") + escapeHtml(legendaMmn("legenda_mmn_rotulo_a_projecao_parte_dos_seus_dados_atuais_e_das_regras_vigentes")) + "</small></article>") + html;
     }
     if (data.id_simulacao || data.simulacao_id) {
-      html += "<div class=\"mmn-simulation-meta\"><span>Simulação #" + escapeHtml(data.id_simulacao || data.simulacao_id) + "</span>" + pillHtml(data.apta_publicacao ? "ok" : "pendente", data.apta_publicacao ? "Apta para publicação" : "Somente análise") + "<span>Motor " + escapeHtml(data.motor_versao || "V2") + "</span></div>";
+      html += ("<div class=\"mmn-simulation-meta\"><span>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_simulacao"))) + escapeHtml(data.id_simulacao || data.simulacao_id) + "</span>" + pillHtml(data.apta_publicacao ? "ok" : "pendente", data.apta_publicacao ? legendaMmn("legenda_mmn_apta_para_publicacao") : legendaMmn("legenda_mmn_somente_analise")) + ("<span>" + escapeHtml(legendaMmn("legenda_fechamento_extra_motor"))) + escapeHtml(data.motor_versao || "V2") + "</span></div>";
     }
     if (monthly.length) {
       var personal = data.tipo === "usuario_pessoal";
       var replay = data.tipo === "admin_historica";
-      html += "<div class=\"mmn-simulation-table table-wrap\"><table><thead><tr><th>Mês</th><th>Ativos</th><th>Receita</th><th>" + (personal ? "Bruto pessoal" : (replay ? "Payout real" : "Comissões")) + "</th><th>" + (personal ? "Líquido estimado" : (replay ? "Recalculado" : "Bônus e pool")) + "</th><th>Payout</th></tr></thead><tbody>" + monthly.map(function (row) {
+      html += ("<div class=\"mmn-simulation-table table-wrap\"><table><thead><tr><th>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_mes")) + "</th><th>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_ativos")) + "</th><th>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_receita")) + "</th><th>") + (personal ? legendaMmn("legenda_mmn_bruto_pessoal") : (replay ? legendaMmn("legenda_mmn_payout_real") : legendaMmn("legenda_mmn_comissoes"))) + "</th><th>" + (personal ? legendaMmn("legenda_mmn_liquido_estimado") : (replay ? legendaMmn("legenda_mmn_rotulo_recalculado") : legendaMmn("legenda_mmn_bonus_e_pool"))) + ("</th><th>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_payout")) + "</th></tr></thead><tbody>") + monthly.map(function (row) {
         var real = objectFrom(row, ["real"]);
         var recalculated = objectFrom(row, ["recalculado"]);
         var fourth = personal ? row.ganho_bruto_centavos : (replay ? real.payout_centavos : row.comissoes_centavos);
@@ -3228,12 +3892,12 @@
       }).join("") + "</tbody></table></div>";
     }
     var alertMessages = {
-      projecao_futura_por_coortes_estatisticas: "Projeção futura calculada por coortes estatísticas.",
-      pool_global_sem_base_historica_estimado_como_indisponivel: "Pool global indisponível nesta estimativa por falta de base histórica.",
-      estrutura_parametrizada_e_deduplicacao_direta_prioritaria: "A projeção aplica a estrutura vigente e prioriza a comissão direta sem duplicidade.",
-      indicacao_pessoal_separada_do_posicionamento: "Indicação pessoal e posicionamento são calculados separadamente.",
-      spillover_futuro_estimado_por_capacidade: "O spillover futuro é estimado conforme a capacidade da estrutura.",
-      deduplicacao_apresentada_como_intervalo_sem_garantia: "A deduplicação futura é apresentada como intervalo estimado."
+      projecao_futura_por_coortes_estatisticas: legendaMmn("legenda_mmn_projecao_futura_calculada_por_coortes_estatisticas"),
+      pool_global_sem_base_historica_estimado_como_indisponivel: legendaMmn("legenda_mmn_pool_global_indisponivel_nesta_estimativa_por_falta_de_base_historica"),
+      estrutura_parametrizada_e_deduplicacao_direta_prioritaria: legendaMmn("legenda_mmn_a_projecao_aplica_a_estrutura_vigente_e_prioriza_a_comissao_direta_sem_duplicidade"),
+      indicacao_pessoal_separada_do_posicionamento: legendaMmn("legenda_mmn_indicacao_pessoal_e_posicionamento_sao_calculados_separadamente"),
+      spillover_futuro_estimado_por_capacidade: legendaMmn("legenda_mmn_o_spillover_futuro_e_estimado_conforme_a_capacidade_da_estrutura"),
+      deduplicacao_apresentada_como_intervalo_sem_garantia: legendaMmn("legenda_mmn_a_deduplicacao_futura_e_apresentada_como_intervalo_estimado")
     };
     var alerts = listFrom(data, ["alertas"]).map(function (alert) {
       var key = cleanText(alert).toLowerCase();
@@ -3242,9 +3906,12 @@
       var message = String(alert).replace(/_/g, " ").trim();
       return message ? message.charAt(0).toUpperCase() + message.slice(1) + (/[.!?]$/.test(message) ? "" : ".") : "";
     }).filter(Boolean);
-    if (alerts.length) html += "<div class=\"mmn-simulation-alerts\"><strong>Avisos da simulação</strong>" + alerts.map(function (alert) { return "<span>" + escapeHtml(alert) + "</span>"; }).join("") + "</div>";
-    html += "<p class=\"mmn-disclaimer\">Simulação estimativa, sem promessa ou garantia de renda, pagamento ou resultado.</p>";
-    container.innerHTML = html || emptyHtml("O servidor não retornou resultados para esta simulação.");
+    if (alerts.length) html += ("<div class=\"mmn-simulation-alerts\"><strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_avisos_da_simulacao")) + "</strong>") + alerts.map(function (alert) { return "<span>" + escapeHtml(alert) + "</span>"; }).join("") + "</div>";
+    html += ("<p class=\"mmn-disclaimer\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_simulacao_estimativa_sem_promessa_ou_garantia_de_renda_pagamento_ou_resultado")) + "</p>");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    apresentarMmn(container,"innerHTML",function(){return construirHtmlLegendaMmn() || emptyHtml(legendaMmn("legenda_mmn_o_servidor_nao_retornou_resultados_para_esta_simulacao"));});
   }
 
   async function loadUserTab(tab, append) {
@@ -3395,9 +4062,9 @@
     var adminDepth = configuredNetworkDepth(data);
     levels = levels.filter(function (row) { return integerValue(row.nivel) >= 1 && integerValue(row.nivel) <= adminDepth; });
     var max = Math.max.apply(null, levels.map(function (row) { return numberValue(row.percentual); }).concat([1]));
-    qs("adminLevelBars").innerHTML = levels.length ? levels.map(function (row) {
-      return "<div class=\"mmn-level-bar\"><strong>Nível " + escapeHtml(row.nivel) + "</strong><span class=\"mmn-level-bar-track\"><span style=\"width:" + Math.max(0, Math.min(100, numberValue(row.percentual) / max * 100)) + "%\"></span></span><span>" + escapeHtml(formatPercent(row.percentual)) + "</span></div>";
-    }).join("") : emptyHtml("A versão vigente ainda não retornou os níveis.");
+    apresentarMmn(qs("adminLevelBars"),"innerHTML",function(){return levels.length ? levels.map(function (row) {
+      return ("<div class=\"mmn-level-bar\"><strong>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_nivel"))) + escapeHtml(row.nivel) + "</strong><span class=\"mmn-level-bar-track\"><span style=\"width:" + Math.max(0, Math.min(100, numberValue(row.percentual) / max * 100)) + "%\"></span></span><span>" + escapeHtml(formatPercent(row.percentual)) + "</span></div>";
+    }).join("") : emptyHtml(legendaMmn("legenda_mmn_a_versao_vigente_ainda_nao_retornou_os_niveis"));});
     var health = listFrom(data, ["saude", "pendencias_resumo"]);
     if (!health.length && data.alertas && typeof data.alertas === "object") {
       health = Object.keys(data.alertas).map(function (key) {
@@ -3406,51 +4073,59 @@
         if (key === "pagamento_real_bloqueado") status = booleanValue(value, true) ? "pendente" : "ok";
         else if (key === "fiscal_homologado") status = booleanValue(value, false) ? "ok" : "pendente";
         else status = typeof value === "boolean" ? (value ? "ok" : "pendente") : (numberValue(value) > 0 ? "pendente" : "ok");
-        return { nome: key.replace(/_/g, " "), status: status, valor_formatado: typeof value === "boolean" ? (value ? "Sim" : "Não") : value };
+        return { nome: key.replace(/_/g, " "), status: status, valor_formatado: typeof value === "boolean" ? (value ? legendaMmn("legenda_mmn_rotulo_sim") : legendaMmn("legenda_mmn_nao")) : value };
       });
     }
-    qs("adminHealthList").innerHTML = health.length ? health.map(function (item) {
-      return "<div class=\"mmn-health-item\"><span>" + escapeHtml(item.nome || item.titulo || item.tipo || "Verificação") + "</span>" + pillHtml(item.status || (item.ok ? "ok" : "pendente"), item.valor_formatado || item.status_texto || item.status || "") + "</div>";
-    }).join("") : emptyHtml("Nenhuma pendência operacional informada.");
+    apresentarMmn(qs("adminHealthList"),"innerHTML",function(){return health.length ? health.map(function (item) {
+      return "<div class=\"mmn-health-item\"><span>" + escapeHtml(item.nome || item.titulo || item.tipo || legendaMmn("legenda_mmn_verificacao")) + "</span>" + pillHtml(item.status || (item.ok ? "ok" : "pendente"), item.valor_formatado || item.status_texto || item.status || "") + "</div>";
+    }).join("") : emptyHtml(legendaMmn("legenda_mmn_nenhuma_pendencia_operacional_informada"));});
   }
 
   function renderAdminPeriods(data, append) {
     var rows = listFrom(data, ["competencias", "periodos", "itens"]);
-    var html = rows.map(function (row) {
+    function construirHtmlLegendaMmn() {
+      var html = rows.map(function (row) {
       var id = row.cod_mmn_competencia || row.cod_mmn_periodo || row.id;
       var actions = [];
-      if (["aberto", "reaberto"].indexOf(row.status) >= 0) actions.push(["apurar", "Apurar"]);
-      if (row.status === "revisao") actions.push(["fechar", "Fechar"]);
-      if (["fechado", "liberado"].indexOf(row.status) >= 0) actions.push(["reabrir", "Reabrir"]);
+      if (["aberto", "reaberto"].indexOf(row.status) >= 0) actions.push(["apurar", legendaMmn("legenda_mmn_rotulo_apurar")]);
+      if (row.status === "revisao") actions.push(["fechar", legendaMmn("legenda_mmn_rotulo_fechar")]);
+      if (["fechado", "liberado"].indexOf(row.status) >= 0) actions.push(["reabrir", legendaMmn("legenda_mmn_rotulo_reabrir")]);
       var periodRevenue = centsFrom(row, ["total_receita_centavos", "receita_centavos", "mrr_centavos"]);
       var periodAllocated = numberValue(row.total_comissao_base_centavos) + numberValue(row.total_bonus_rank_centavos) + numberValue(row.total_pool_centavos);
       var periodPayout = numberValue(periodRevenue) > 0 ? periodAllocated * 100 / numberValue(periodRevenue) : null;
       return "<tr><td><strong>" + escapeHtml(row.competencia || row.periodo || "") + "</strong></td><td>Config. #" + escapeHtml(row.id_config || row.versao_nome || row.configuracao_versao || "—") + "</td><td>" + escapeHtml(formatMoneyCents(periodRevenue)) + "</td><td>" + escapeHtml(formatPercent(firstDefined([row.payout_percentual, periodPayout], null))) + "</td><td>" + pillHtml(row.status) + "</td><td><div class=\"btn-row\">" + actions.map(function (action) { return "<button class=\"btn btn-ghost btn-small\" type=\"button\" data-period-action=\"" + action[0] + "\" data-period-value=\"" + escapeHtml(row.competencia || row.periodo || "") + "\" data-period-id=\"" + escapeHtml(id) + "\">" + action[1] + "</button>"; }).join("") + "</div></td></tr>";
     }).join("");
-    if (append) qs("adminPeriodsBody").insertAdjacentHTML("beforeend", html);
-    else qs("adminPeriodsBody").innerHTML = html || emptyTableHtml(6, "Nenhuma competência encontrada.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    if (append) acrescentarHtmlMmn(qs("adminPeriodsBody"), html, construirHtmlLegendaMmn);
+    else apresentarMmn(qs("adminPeriodsBody"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyTableHtml(6, legendaMmn("legenda_mmn_nenhuma_competencia_encontrada"));});
     state.admin.cursors.periods = data.proximo_cursor || null;
     qs("adminPeriodsMore").hidden = !state.admin.cursors.periods;
   }
 
   function renderAdminParticipants(data, append) {
     var rows = listFrom(data, ["participantes", "usuarios", "itens"]);
-    var html = rows.map(function (row) {
+    function construirHtmlLegendaMmn() {
+      var html = rows.map(function (row) {
       var id = row.usuario_id || row.id_usuario || row.cod_usuario;
       var eligibility = objectFrom(row, ["elegibilidade"]);
       var placement = objectFrom(row, ["posicionamento", "posicao"]);
       var placementParent = firstDefined([placement.pai_posicionamento_id, row.pai_posicionamento_id], null);
       var placementSlot = firstDefined([placement.slot_posicionamento, placement.slot, row.slot_posicionamento], null);
-      var userLogin = cleanText(firstDefined([row.loginuser, row.usuario_loginuser, row.login, row.codinome], "Usuário"));
-      var sponsorLogin = cleanText(firstDefined([row.patrocinador_loginuser, row.patrocinador_login], row.patrocinador_id ? "Usuário" : "Raiz"));
-      var placementParentLogin = cleanText(firstDefined([placement.pai_posicionamento_loginuser, row.pai_posicionamento_loginuser], placementParent == null ? "Raiz estrutural" : "Usuário"));
+      var userLogin = cleanText(firstDefined([row.loginuser, row.usuario_loginuser, row.login, row.codinome], legendaMmn("legenda_mmn_usuario")));
+      var sponsorLogin = cleanText(firstDefined([row.patrocinador_loginuser, row.patrocinador_login], row.patrocinador_id ? legendaMmn("legenda_mmn_usuario") : legendaMmn("legenda_mmn_rotulo_raiz")));
+      var placementParentLogin = cleanText(firstDefined([placement.pai_posicionamento_loginuser, row.pai_posicionamento_loginuser], placementParent == null ? legendaMmn("legenda_mmn_raiz_estrutural") : legendaMmn("legenda_mmn_usuario")));
       var placementText = placementParentLogin + (placementSlot == null ? "" : " · #" + placementSlot);
       var spillover = booleanValue(firstDefined([placement.spillover, placement.foi_spillover, row.foi_spillover], false), false);
       var permanent = row.status === "inelegivel_permanente" || booleanValue(row.inelegibilidade_permanente, false);
-      return "<tr><td><strong>" + escapeHtml(userLogin) + "</strong><br><small>" + escapeHtml(row.nome || "") + "</small></td><td>" + escapeHtml(sponsorLogin) + "<br><small>Indicação direta</small></td><td>" + escapeHtml(placementText) + "<br><small>" + escapeHtml(spillover ? "Spillover" : "Posição direta") + "</small></td><td>" + escapeHtml(row.grupo || row.grupo_chave || "—") + "</td><td>" + pillHtml(eligibility.premium_vigente ? "ativo" : "pendente", eligibility.premium_vigente ? "Em dia" : "Inativo") + "</td><td>" + pillHtml(permanent ? "permanente" : (eligibility.elegivel_receber ? "ativo" : row.status), permanent ? "Permanente" : (eligibility.elegivel_receber ? "Elegível" : row.status)) + "</td><td>" + escapeHtml(row.rank_nome || row.rank || "—") + "</td><td><button class=\"btn btn-ghost btn-small\" type=\"button\" data-participant-edit=\"" + escapeHtml(id) + "\">Gerenciar</button></td></tr>";
+      return "<tr><td><strong>" + escapeHtml(userLogin) + "</strong><br><small>" + escapeHtml(row.nome || "") + "</small></td><td>" + escapeHtml(sponsorLogin) + ("<br><small>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_indicacao_direta")) + "</small></td><td>") + escapeHtml(placementText) + "<br><small>" + escapeHtml(spillover ? legendaMmn("legenda_mmn_rotulo_spillover") : legendaMmn("legenda_mmn_posicao_direta")) + "</small></td><td>" + escapeHtml(row.grupo || row.grupo_chave || "—") + "</td><td>" + pillHtml(eligibility.premium_vigente ? "ativo" : "pendente", eligibility.premium_vigente ? legendaMmn("legenda_mmn_em_dia") : legendaMmn("legenda_mmn_rotulo_inativo")) + "</td><td>" + pillHtml(permanent ? "permanente" : (eligibility.elegivel_receber ? "ativo" : row.status), permanent ? legendaMmn("legenda_mmn_rotulo_permanente") : (eligibility.elegivel_receber ? legendaMmn("legenda_mmn_elegivel") : row.status)) + "</td><td>" + escapeHtml(row.rank_nome || row.rank || "—") + "</td><td><button class=\"btn btn-ghost btn-small\" type=\"button\" data-participant-edit=\"" + escapeHtml(id) + ("\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_gerenciar")) + "</button></td></tr>");
     }).join("");
-    if (append) qs("adminParticipantsBody").insertAdjacentHTML("beforeend", html);
-    else qs("adminParticipantsBody").innerHTML = html || emptyTableHtml(8, "Nenhum participante encontrado.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    if (append) acrescentarHtmlMmn(qs("adminParticipantsBody"), html, construirHtmlLegendaMmn);
+    else apresentarMmn(qs("adminParticipantsBody"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyTableHtml(8, legendaMmn("legenda_mmn_nenhum_participante_encontrado"));});
     state.admin.participants = append ? (state.admin.participants || []).concat(rows) : rows;
     state.admin.cursors.participants = data.next_cursor || data.proximo_cursor || null;
     qs("adminParticipantsMore").hidden = data.has_more === false || !state.admin.cursors.participants;
@@ -3458,14 +4133,18 @@
 
   function renderAdminWaitlist(data, append) {
     var rows = listFrom(data, ["lista_espera", "cadastros", "itens"]);
-    var html = rows.map(function (row) {
+    function construirHtmlLegendaMmn() {
+      var html = rows.map(function (row) {
       var id = row.cod_mmn_espera_vinculo || row.id;
-      var actions = row.status === "prazo_expirado" ? [["reativar", "Reativar prazo"], ["aprovar", "Aprovar"], ["cancelar", "Cancelar"]] :
-        (row.status === "convertido" || row.status === "cancelado" ? [] : [["aprovar", "Aprovar"], ["revisao", "Revisar"], ["cancelar", "Cancelar"]]);
-      return "<tr><td><strong>#" + escapeHtml(row.codigo_convite || row.codigo || "") + "</strong></td><td>#" + escapeHtml(row.id_lead || "—") + "</td><td>" + escapeHtml(row.id_usuario_convertido ? "#" + row.id_usuario_convertido : "Aguardando cadastro") + "</td><td>#" + escapeHtml(row.id_lead_patrocinador || "—") + "</td><td>" + escapeHtml(formatDate(row.prazo_vinculacao_ate || row.prazo_ate || row.expira_em, false)) + "</td><td>" + pillHtml(row.status) + "</td><td><div class=\"btn-row\">" + (actions.map(function (action) { return "<button class=\"btn btn-ghost btn-small\" type=\"button\" data-waitlist-action=\"" + action[0] + "\" data-waitlist-id=\"" + escapeHtml(id) + "\">" + action[1] + "</button>"; }).join("") || "—") + "</div></td></tr>";
+      var actions = row.status === "prazo_expirado" ? [["reativar", legendaMmn("legenda_mmn_reativar_prazo")], ["aprovar", legendaMmn("legenda_mmn_rotulo_aprovar")], ["cancelar", legendaMmn("legenda_mmn_rotulo_cancelar")]] :
+        (row.status === "convertido" || row.status === "cancelado" ? [] : [["aprovar", legendaMmn("legenda_mmn_rotulo_aprovar")], ["revisao", legendaMmn("legenda_mmn_rotulo_revisar")], ["cancelar", legendaMmn("legenda_mmn_rotulo_cancelar")]]);
+      return "<tr><td><strong>#" + escapeHtml(row.codigo_convite || row.codigo || "") + "</strong></td><td>#" + escapeHtml(row.id_lead || "—") + "</td><td>" + escapeHtml(row.id_usuario_convertido ? "#" + row.id_usuario_convertido : legendaMmn("legenda_mmn_aguardando_cadastro")) + "</td><td>#" + escapeHtml(row.id_lead_patrocinador || "—") + "</td><td>" + escapeHtml(formatDate(row.prazo_vinculacao_ate || row.prazo_ate || row.expira_em, false)) + "</td><td>" + pillHtml(row.status) + "</td><td><div class=\"btn-row\">" + (actions.map(function (action) { return "<button class=\"btn btn-ghost btn-small\" type=\"button\" data-waitlist-action=\"" + action[0] + "\" data-waitlist-id=\"" + escapeHtml(id) + "\">" + action[1] + "</button>"; }).join("") || "—") + "</div></td></tr>";
     }).join("");
-    if (append) qs("adminWaitlistBody").insertAdjacentHTML("beforeend", html);
-    else qs("adminWaitlistBody").innerHTML = html || emptyTableHtml(7, "Nenhum cadastro na lista de espera.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    if (append) acrescentarHtmlMmn(qs("adminWaitlistBody"), html, construirHtmlLegendaMmn);
+    else apresentarMmn(qs("adminWaitlistBody"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyTableHtml(7, legendaMmn("legenda_mmn_nenhum_cadastro_na_lista_de_espera"));});
     state.admin.cursors.waitlist = data.next_cursor || data.proximo_cursor || null;
     qs("adminWaitlistMore").hidden = data.has_more === false || !state.admin.cursors.waitlist;
   }
@@ -3482,30 +4161,38 @@
     var directs = listFrom(network, ["diretos"]);
     if (!directs.length) directs = listFrom(sponsorship, ["diretos", "filhos"]);
     var positioned = listFrom(placement, ["filhos", "posicoes", "participantes"]);
-    var html = "";
+    function construirHtmlLegendaMmn() {
+      var html = "";
     if (base.id || base.cod_usuario || base.id_usuario) {
-      var baseLogin = cleanText(firstDefined([base.loginuser, base.usuario_loginuser, base.login, base.codinome], "Usuário"));
-      var adminSponsorLogin = cleanText(firstDefined([participant.patrocinador_loginuser, data.patrocinador_loginuser], participant.id_patrocinador || participant.patrocinador_id ? "Usuário" : "Raiz"));
-      var adminParentLogin = cleanText(firstDefined([placement.pai_posicionamento_loginuser, participant.pai_posicionamento_loginuser], placement.pai_posicionamento_id || participant.pai_posicionamento_id ? "Usuário" : "Raiz estrutural"));
+      var baseLogin = cleanText(firstDefined([base.loginuser, base.usuario_loginuser, base.login, base.codinome], legendaMmn("legenda_mmn_usuario")));
+      var adminSponsorLogin = cleanText(firstDefined([participant.patrocinador_loginuser, data.patrocinador_loginuser], participant.id_patrocinador || participant.patrocinador_id ? legendaMmn("legenda_mmn_usuario") : legendaMmn("legenda_mmn_rotulo_raiz")));
+      var adminParentLogin = cleanText(firstDefined([placement.pai_posicionamento_loginuser, participant.pai_posicionamento_loginuser], placement.pai_posicionamento_id || participant.pai_posicionamento_id ? legendaMmn("legenda_mmn_usuario") : legendaMmn("legenda_mmn_raiz_estrutural")));
       var adminSlot = firstDefined([placement.slot_posicionamento, participant.slot_posicionamento], null);
-      html += "<article class=\"mmn-feature-panel\"><div class=\"mmn-panel-title\"><div><h3>" + escapeHtml(baseLogin) + "</h3><p>" + escapeHtml(base.nome || "") + "</p></div>" + pillHtml(participant.status || (base.mmn_ativo ? "ativo" : "suspenso")) + "</div><div class=\"mmn-genealogy-summary\"><div><span>Patrocínio</span><strong>" + escapeHtml(relationPersonLabel(objectFrom(sponsorship, ["patrocinador", "pai"]), adminSponsorLogin)) + "</strong><small>Origem da comissão direta.</small></div><div><span>Pai de posicionamento</span><strong>" + escapeHtml(relationPersonLabel(objectFrom(placement, ["pai", "pai_posicionamento"]), adminParentLogin)) + "</strong><small>Origem dos níveis residuais.</small></div><div><span>Vaga</span><strong>" + escapeHtml(adminSlot == null ? "—" : "#" + adminSlot) + "</strong><small>Slot estrutural registrado.</small></div><div><span>Regra</span><strong>" + escapeHtml(width === 0 ? "Largura ilimitada" : (width + " vagas por nó")) + "</strong><small>Profundidade remunerada: " + escapeHtml(depth) + " nível(is).</small></div></div></article>";
+      html += "<article class=\"mmn-feature-panel\"><div class=\"mmn-panel-title\"><div><h3>" + escapeHtml(baseLogin) + "</h3><p>" + escapeHtml(base.nome || "") + "</p></div>" + pillHtml(participant.status || (base.mmn_ativo ? "ativo" : "suspenso")) + ("</div><div class=\"mmn-genealogy-summary\"><div><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_patrocinio")) + "</span><strong>") + escapeHtml(relationPersonLabel(objectFrom(sponsorship, ["patrocinador", "pai"]), adminSponsorLogin)) + ("</strong><small>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_origem_da_comissao_direta")) + "</small></div><div><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_pai_de_posicionamento")) + "</span><strong>") + escapeHtml(relationPersonLabel(objectFrom(placement, ["pai", "pai_posicionamento"]), adminParentLogin)) + ("</strong><small>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_origem_dos_niveis_residuais")) + "</small></div><div><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_vaga")) + "</span><strong>") + escapeHtml(adminSlot == null ? "—" : "#" + adminSlot) + ("</strong><small>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_slot_estrutural_registrado")) + "</small></div><div><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_regra")) + "</span><strong>") + escapeHtml(width === 0 ? legendaMmn("legenda_mmn_largura_ilimitada") : (width + legendaMmn("legenda_mmn_vagas_por_no"))) + ("</strong><small>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_profundidade"))) + escapeHtml(depth) + (escapeHtml(legendaMmn("legenda_fechamento_mmn_niveis_sufixo")) + "</small></div></div></article>");
     }
-    html += "<div class=\"mmn-tree-explanation\"><strong>Duas genealogias independentes</strong><span>Patrocínio preserva quem convidou. Posicionamento organiza as vagas e o spillover. A comissão direta prevalece e o mesmo beneficiário não recebe duas vezes sobre a mesma assinatura.</span></div>";
+    html += ("<div class=\"mmn-tree-explanation\"><strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_duas_genealogias_independentes")) + "</strong><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_patrocinio_preserva_quem_convidou_posicionamento_organiza_as_vagas_e_o_spillover_a_comissao")) + "</span></div>");
     html += levels.map(function (level) {
-      return "<div class=\"mmn-tree-level\"><strong>Nível " + escapeHtml(level.nivel) + "</strong><div class=\"mmn-tree-people\"><div class=\"mmn-tree-person\"><strong>" + escapeHtml(formatInteger(level.ativos)) + " ativos</strong><span>de " + escapeHtml(formatInteger(level.total)) + " participantes</span></div></div></div>";
+      return ("<div class=\"mmn-tree-level\"><strong>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_nivel"))) + escapeHtml(level.nivel) + "</strong><div class=\"mmn-tree-people\"><div class=\"mmn-tree-person\"><strong>" + escapeHtml(formatInteger(level.ativos)) + (escapeHtml(legendaMmn("legenda_fechamento_mmn_ativos")) + "</strong><span>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_de"))) + escapeHtml(formatInteger(level.total)) + (escapeHtml(legendaMmn("legenda_fechamento_mmn_participantes")) + "</span></div></div></div>");
     }).join("");
-    if (directs.length) html += "<div class=\"mmn-tree-level\"><strong>Patrocínio · indicados diretos</strong><div class=\"mmn-tree-people\">" + directs.map(function (person) { return "<div class=\"mmn-tree-person\"><strong>" + escapeHtml(firstDefined([person.loginuser, person.usuario_loginuser, person.login, person.codinome, person.nome], "Usuário")) + "</strong><span>Vínculo permanente de indicação</span>" + pillHtml(person.status || (person.ativo ? "ativo" : "suspenso")) + "</div>"; }).join("") + "</div></div>";
-    if (positioned.length) html += "<div class=\"mmn-tree-level\"><strong>Posicionamento · vagas abaixo</strong><div class=\"mmn-tree-people\">" + positioned.map(function (person) { return "<div class=\"mmn-tree-person\"><strong>" + escapeHtml(firstDefined([person.loginuser, person.usuario_loginuser, person.login, person.codinome, person.nome], "Usuário")) + "</strong><span>#" + escapeHtml(firstDefined([person.slot_posicionamento, person.slot], "—")) + (booleanValue(firstDefined([person.spillover, person.foi_spillover], false), false) ? " · spillover" : " · posição direta") + "</span>" + pillHtml(person.status || (person.ativo ? "ativo" : "suspenso")) + "</div>"; }).join("") + "</div></div>";
-    qs("adminNetworkTree").innerHTML = html || emptyHtml("Nenhuma genealogia encontrada para esse usuário.");
+    if (directs.length) html += ("<div class=\"mmn-tree-level\"><strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_patrocinio_indicados_diretos")) + "</strong><div class=\"mmn-tree-people\">") + directs.map(function (person) { return "<div class=\"mmn-tree-person\"><strong>" + escapeHtml(firstDefined([person.loginuser, person.usuario_loginuser, person.login, person.codinome, person.nome], legendaMmn("legenda_mmn_usuario"))) + ("</strong><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_vinculo_permanente_de_indicacao")) + "</span>") + pillHtml(person.status || (person.ativo ? "ativo" : "suspenso")) + "</div>"; }).join("") + "</div></div>";
+    if (positioned.length) html += ("<div class=\"mmn-tree-level\"><strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_posicionamento_vagas_abaixo")) + "</strong><div class=\"mmn-tree-people\">") + positioned.map(function (person) { return "<div class=\"mmn-tree-person\"><strong>" + escapeHtml(firstDefined([person.loginuser, person.usuario_loginuser, person.login, person.codinome, person.nome], legendaMmn("legenda_mmn_usuario"))) + "</strong><span>#" + escapeHtml(firstDefined([person.slot_posicionamento, person.slot], "—")) + (booleanValue(firstDefined([person.spillover, person.foi_spillover], false), false) ? legendaMmn("legenda_mmn_complemento_spillover") : legendaMmn("legenda_mmn_posicao_direta_mensagem")) + "</span>" + pillHtml(person.status || (person.ativo ? "ativo" : "suspenso")) + "</div>"; }).join("") + "</div></div>";
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    apresentarMmn(qs("adminNetworkTree"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyHtml(legendaMmn("legenda_mmn_nenhuma_genealogia_encontrada_para_esse_usuario"));});
   }
 
   function renderAdminRevenue(data, append) {
     var rows = listFrom(data, ["lancamentos", "receitas", "alocacoes", "itens"]);
-    var html = rows.map(function (row) {
-      return "<tr><td>" + escapeHtml(formatDate(row.ingerido_em || row.criado_em || row.data_evento, true)) + "</td><td><strong>" + escapeHtml(firstDefined([row.loginuser, row.origem_loginuser, row.usuario_loginuser, row.nome, row.origem_nome], "Usuário")) + "</strong><br><small>" + escapeHtml(row.nome || row.origem_nome || "") + "</small></td><td>#" + escapeHtml(row.id_pagamento || "—") + "<br><small>" + escapeHtml(row.gateway_payment_id || "") + "</small></td><td>" + escapeHtml(row.gateway || "—") + "</td><td><strong>" + escapeHtml(formatMoneyCents(centsFrom(row, ["valor_pago_centavos"]))) + "</strong></td><td>" + (row.valor_confirmado ? escapeHtml(formatDate(row.confirmado_em, true)) : "Aguardando") + "</td><td>" + pillHtml(row.gera_comissao ? "ativo" : "bloqueado", row.gera_comissao ? "Gera" : (row.motivo_nao_geracao || "Não gera")) + "</td><td>" + pillHtml(row.status) + "</td></tr>";
+    function construirHtmlLegendaMmn() {
+      var html = rows.map(function (row) {
+      return "<tr><td>" + escapeHtml(formatDate(row.ingerido_em || row.criado_em || row.data_evento, true)) + "</td><td><strong>" + escapeHtml(firstDefined([row.loginuser, row.origem_loginuser, row.usuario_loginuser, row.nome, row.origem_nome], legendaMmn("legenda_mmn_usuario"))) + "</strong><br><small>" + escapeHtml(row.nome || row.origem_nome || "") + "</small></td><td>#" + escapeHtml(row.id_pagamento || "—") + "<br><small>" + escapeHtml(row.gateway_payment_id || "") + "</small></td><td>" + escapeHtml(row.gateway || "—") + "</td><td><strong>" + escapeHtml(formatMoneyCents(centsFrom(row, ["valor_pago_centavos"]))) + "</strong></td><td>" + (row.valor_confirmado ? escapeHtml(formatDate(row.confirmado_em, true)) : legendaMmn("legenda_mmn_rotulo_aguardando")) + "</td><td>" + pillHtml(row.gera_comissao ? "ativo" : "bloqueado", row.gera_comissao ? legendaMmn("legenda_mmn_rotulo_gera") : (row.motivo_nao_geracao || legendaMmn("legenda_mmn_nao_gera"))) + "</td><td>" + pillHtml(row.status) + "</td></tr>";
     }).join("");
-    if (append) qs("adminRevenueBody").insertAdjacentHTML("beforeend", html);
-    else qs("adminRevenueBody").innerHTML = html || emptyTableHtml(8, "Nenhum lançamento encontrado.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    if (append) acrescentarHtmlMmn(qs("adminRevenueBody"), html, construirHtmlLegendaMmn);
+    else apresentarMmn(qs("adminRevenueBody"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyTableHtml(8, legendaMmn("legenda_mmn_nenhum_lancamento_encontrado"));});
     state.admin.cursors.revenue = data.next_cursor || data.proximo_cursor || null;
     qs("adminRevenueMore").hidden = data.has_more === false || !state.admin.cursors.revenue;
   }
@@ -3556,8 +4243,8 @@
   }
 
   function formatCapacity(value) {
-    if (value == null) return "Ilimitada";
-    if (!Number.isFinite(value) || value > Number.MAX_SAFE_INTEGER) return "Acima do limite numérico de exibição";
+    if (value == null) return legendaMmn("legenda_mmn_rotulo_ilimitada");
+    if (!Number.isFinite(value) || value > Number.MAX_SAFE_INTEGER) return legendaMmn("legenda_mmn_acima_do_limite_numerico_de_exibicao");
     return formatInteger(value);
   }
 
@@ -3574,12 +4261,12 @@
     var summary = qs("adminNetworkCapacity");
     if (summary) {
       if (width === 0) {
-        summary.innerHTML = "<strong>Largura ilimitada</strong><span>Não há limite estrutural horizontal. A profundidade remunerada permanece em " + escapeHtml(depth) + " nível(is).</span>";
+        apresentarMmn(summary,"innerHTML",function(){return ("<strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_largura_ilimitada")) + ("</strong><span>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_sem_limite")))) + escapeHtml(depth) + (escapeHtml(legendaMmn("legenda_fechamento_mmn_niveis_sufixo")) + "</span>");});
       } else if (width >= 2) {
         var levelSummary = capacity.levels.map(function (value, index) { return "N" + (index + 1) + ": " + formatCapacity(value); }).join(" · ");
-        summary.innerHTML = "<strong>Capacidade teórica da matriz</strong><span>Por nível (W<sup>d</sup>): " + escapeHtml(levelSummary) + "</span><span>Rede até o nível " + escapeHtml(depth) + ": " + escapeHtml(formatCapacity(capacity.total)) + " posições</span><span>Capacidade por perna: " + escapeHtml(formatCapacity(capacity.perLeg)) + " posições</span>";
+        apresentarMmn(summary,"innerHTML",function(){return ("<strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_capacidade_teorica_da_matriz")) + "</strong><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_por_nivel_w")) + "<sup>d</sup>): ") + escapeHtml(levelSummary) + ("</span><span>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_rede_ate"))) + escapeHtml(depth) + ": " + escapeHtml(formatCapacity(capacity.total)) + (escapeHtml(legendaMmn("legenda_fechamento_mmn_posicoes")) + "</span><span>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_capacidade_perna"))) + escapeHtml(formatCapacity(capacity.perLeg)) + (escapeHtml(legendaMmn("legenda_fechamento_mmn_posicoes")) + "</span>");});
       } else {
-        summary.innerHTML = "<strong>Configuração inválida</strong><span>Use 0 para ilimitada ou um inteiro a partir de 2.</span>";
+        apresentarMmn(summary,"innerHTML",function(){return "<strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_configuracao_invalida")) + "</strong><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_use_0_para_ilimitada_ou_um_inteiro_a_partir_de_2")) + "</span>";});
       }
     }
   }
@@ -3597,8 +4284,8 @@
       invalidField = field;
       if (field && typeof field.setCustomValidity === "function") field.setCustomValidity(text);
     }
-    if (!Number.isInteger(depthValue) || depthValue < 1 || depthValue > 10) invalidate(qs("adminConfigLevelCount"), "A quantidade de níveis deve ser um inteiro de 1 a 10.");
-    if (!Number.isInteger(widthValue) || widthValue < 0 || widthValue === 1 || widthValue > 2147483647) invalidate(qs("adminConfigPlacementWidth"), "A largura deve ser 0 para ilimitada ou um inteiro de 2 a 2.147.483.647.");
+    if (!Number.isInteger(depthValue) || depthValue < 1 || depthValue > 10) invalidate(qs("adminConfigLevelCount"), legendaMmn("legenda_mmn_a_quantidade_de_niveis_deve_ser_um_inteiro_de_1_a_10"));
+    if (!Number.isInteger(widthValue) || widthValue < 0 || widthValue === 1 || widthValue > 2147483647) invalidate(qs("adminConfigPlacementWidth"), legendaMmn("legenda_mmn_a_largura_deve_ser_0_para_ilimitada_ou_um_inteiro_de_2_a"));
     var depth = Number.isInteger(depthValue) ? depthValue : 6;
     var width = Number.isInteger(widthValue) ? widthValue : 0;
     var capacity = calculateNetworkCapacity(width, depth);
@@ -3611,10 +4298,10 @@
         var directs = row.querySelector("[data-level-field=\"min_diretos_ativos\"]");
         var legs = row.querySelector("[data-level-field=\"min_pernas_qualificadas\"]");
         var perLeg = row.querySelector("[data-level-field=\"min_ativos_por_perna\"]");
-        if (numberValue(directs.value) > width) invalidate(directs, "No nível " + level + ", diretos ativos mínimos não pode superar a largura atual de " + width + ".");
-        else if (numberValue(legs.value) > width) invalidate(legs, "No nível " + level + ", pernas qualificadas não pode superar a largura atual de " + width + ".");
-        else if (Number.isFinite(capacity.perLeg) && numberValue(perLeg.value) > capacity.perLeg) invalidate(perLeg, "No nível " + level + ", ativos mínimos por perna supera a capacidade teórica de " + formatCapacity(capacity.perLeg) + ".");
-        else if (Number.isFinite(capacity.total) && numberValue(legs.value) * numberValue(perLeg.value) > capacity.total) invalidate(perLeg, "No nível " + level + ", a combinação de pernas e ativos por perna supera a capacidade total de " + formatCapacity(capacity.total) + ".");
+        if (numberValue(directs.value) > width) invalidate(directs, legendaMmn("legenda_mmn_no_nivel") + level + legendaMmn("legenda_mmn_diretos_ativos_minimos_nao_pode_superar_a_largura_atual_de") + width + ".");
+        else if (numberValue(legs.value) > width) invalidate(legs, legendaMmn("legenda_mmn_no_nivel") + level + legendaMmn("legenda_mmn_pernas_qualificadas_nao_pode_superar_a_largura_atual_de") + width + ".");
+        else if (Number.isFinite(capacity.perLeg) && numberValue(perLeg.value) > capacity.perLeg) invalidate(perLeg, legendaMmn("legenda_mmn_no_nivel") + level + legendaMmn("legenda_mmn_ativos_minimos_por_perna_supera_a_capacidade_teorica_de") + formatCapacity(capacity.perLeg) + ".");
+        else if (Number.isFinite(capacity.total) && numberValue(legs.value) * numberValue(perLeg.value) > capacity.total) invalidate(perLeg, legendaMmn("legenda_mmn_no_nivel") + level + legendaMmn("legenda_mmn_a_combinacao_de_pernas_e_ativos_por_perna_supera_a_capacidade_total_de") + formatCapacity(capacity.total) + ".");
         return !!message;
       });
       if (!message) qsa("[data-rank-row]").some(function (row) {
@@ -3624,9 +4311,9 @@
         var directs = row.querySelector("[data-rank-field=\"min_diretos_ativos\"]");
         var network = row.querySelector("[data-rank-field=\"min_rede_ativa\"]");
         var concentration = row.querySelector("[data-rank-field=\"max_percentual_maior_perna\"]");
-        if (numberValue(directs.value) > width) invalidate(directs, "No rank " + name + ", diretos ativos mínimos não pode superar a largura atual de " + width + ".");
-        else if (Number.isFinite(capacity.total) && numberValue(network.value) > capacity.total) invalidate(network, "No rank " + name + ", a rede ativa mínima supera a capacidade teórica de " + formatCapacity(capacity.total) + ".");
-        else if (numberValue(network.value) > 0 && numberValue(concentration.value) < 100 / width) invalidate(concentration, "No rank " + name + ", a maior perna não pode ter limite inferior ao mínimo teórico de " + formatPercent(100 / width) + " para largura " + width + ".");
+        if (numberValue(directs.value) > width) invalidate(directs, legendaMmn("legenda_mmn_no_rank") + name + legendaMmn("legenda_mmn_diretos_ativos_minimos_nao_pode_superar_a_largura_atual_de") + width + ".");
+        else if (Number.isFinite(capacity.total) && numberValue(network.value) > capacity.total) invalidate(network, legendaMmn("legenda_mmn_no_rank") + name + legendaMmn("legenda_mmn_a_rede_ativa_minima_supera_a_capacidade_teorica_de") + formatCapacity(capacity.total) + ".");
+        else if (numberValue(network.value) > 0 && numberValue(concentration.value) < 100 / width) invalidate(concentration, legendaMmn("legenda_mmn_no_rank") + name + legendaMmn("legenda_mmn_a_maior_perna_nao_pode_ter_limite_inferior_ao_minimo_teorico_de") + formatPercent(100 / width) + legendaMmn("legenda_mmn_complemento_para_largura") + width + ".");
         return !!message;
       });
     }
@@ -3642,37 +4329,37 @@
       var existing = existingLevels.find(function (row) { return integerValue(row.nivel) === level; });
       levels.push(Object.assign({ nivel: level, percentual: 0, min_diretos_ativos: 0, min_pernas_qualificadas: 0, min_ativos_por_perna: 0, ativo: level <= depth }, existing || {}));
     }
-    qs("adminLevelConfig").innerHTML = levels.map(function (row) {
-      return "<div class=\"mmn-config-row\" data-level-row data-level-number=\"" + escapeHtml(row.nivel) + "\"><strong>Nível " + escapeHtml(row.nivel) + "</strong><label class=\"field\"><span>Percentual (%)</span><input type=\"number\" min=\"0\" max=\"100\" step=\"0.001\" data-level-field=\"percentual\" value=\"" + escapeHtml(firstDefined([row.percentual], 0)) + "\"></label><label class=\"field\"><span>Diretos ativos mínimos</span><input type=\"number\" min=\"0\" data-level-field=\"min_diretos_ativos\" value=\"" + escapeHtml(firstDefined([row.min_diretos_ativos], 0)) + "\"></label><label class=\"field\"><span>Pernas qualificadas mínimas</span><input type=\"number\" min=\"0\" data-level-field=\"min_pernas_qualificadas\" value=\"" + escapeHtml(firstDefined([row.min_pernas_qualificadas], 0)) + "\"></label><label class=\"field\"><span>Ativos mínimos por perna</span><input type=\"number\" min=\"0\" data-level-field=\"min_ativos_por_perna\" value=\"" + escapeHtml(firstDefined([row.min_ativos_por_perna], 0)) + "\"></label><label class=\"field\"><span>Ativo</span><select data-level-field=\"ativo\"><option value=\"true\" " + (booleanValue(row.ativo, true) ? "selected" : "") + ">Sim</option><option value=\"false\" " + (!booleanValue(row.ativo, true) ? "selected" : "") + ">Não</option></select></label></div>";
-    }).join("");
+    apresentarMmn(qs("adminLevelConfig"),"innerHTML",function(){return levels.map(function (row) {
+      return "<div class=\"mmn-config-row\" data-level-row data-level-number=\"" + escapeHtml(row.nivel) + ("\"><strong>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_nivel"))) + escapeHtml(row.nivel) + ("</strong><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_percentual")) + "</span><input type=\"number\" min=\"0\" max=\"100\" step=\"0.001\" data-level-field=\"percentual\" value=\"") + escapeHtml(firstDefined([row.percentual], 0)) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_diretos_ativos_minimos")) + "</span><input type=\"number\" min=\"0\" data-level-field=\"min_diretos_ativos\" value=\"") + escapeHtml(firstDefined([row.min_diretos_ativos], 0)) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_pernas_qualificadas_minimas")) + "</span><input type=\"number\" min=\"0\" data-level-field=\"min_pernas_qualificadas\" value=\"") + escapeHtml(firstDefined([row.min_pernas_qualificadas], 0)) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_ativos_minimos_por_perna")) + "</span><input type=\"number\" min=\"0\" data-level-field=\"min_ativos_por_perna\" value=\"") + escapeHtml(firstDefined([row.min_ativos_por_perna], 0)) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_ativo")) + "</span><select data-level-field=\"ativo\"><option value=\"true\" ") + (booleanValue(row.ativo, true) ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_sim")) + "</option><option value=\"false\" ") + (!booleanValue(row.ativo, true) ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_nao")) + "</option></select></label></div>");
+    }).join("");});
     var ranks = listFrom(config, ["ranks"]);
-    qs("adminRankConfig").innerHTML = ranks.map(rankRowHtml).join("") || emptyHtml("Nenhum rank configurado.");
+    apresentarMmn(qs("adminRankConfig"),"innerHTML",function(){return ranks.map(rankRowHtml).join("") || emptyHtml(legendaMmn("legenda_mmn_nenhum_rank_configurado"));});
     var groups = listFrom(config, ["grupos_isentos", "grupos"]);
-    qs("adminGroupConfig").innerHTML = groups.map(groupRowHtml).join("") || emptyHtml("Nenhum grupo isento configurado.");
+    apresentarMmn(qs("adminGroupConfig"),"innerHTML",function(){return groups.map(groupRowHtml).join("") || emptyHtml(legendaMmn("legenda_mmn_nenhum_grupo_isento_configurado"));});
     var taxes = listFrom(config, ["retencoes", "taxas"]);
-    qs("adminTaxConfig").innerHTML = taxes.map(taxRowHtml).join("") || emptyHtml("Nenhuma retenção configurada.");
+    apresentarMmn(qs("adminTaxConfig"),"innerHTML",function(){return taxes.map(taxRowHtml).join("") || emptyHtml(legendaMmn("legenda_mmn_nenhuma_retencao_configurada"));});
     var approvers = listFrom(config, ["aprovadores"]);
-    var actionNames = { publicacao: "Publicação", fechamento: "Fechamento", pagamento: "Pagamento", reabertura: "Reabertura" };
-    qs("adminApproverList").innerHTML = approvers.length ? approvers.map(function (row) {
-      var identity = row.uid_admin ? ("UID " + row.uid_admin) : ("Perfil " + (row.perfil_chave || "—"));
-      return "<div class=\"mmn-config-row\"><div class=\"mmn-row-main\"><strong>" + escapeHtml(identity) + "</strong><small>" + escapeHtml(actionNames[row.acao] || row.acao || "Pagamento") + "</small></div>" + pillHtml(row.ativo ? "ativo" : "bloqueado", row.ativo ? "Ativo" : "Inativo") + "</div>";
-    }).join("") : emptyHtml("Nenhum aprovador adicional configurado.");
+    var actionNames = { publicacao: legendaMmn("legenda_mmn_publicacao"), fechamento: legendaMmn("legenda_mmn_rotulo_fechamento"), pagamento: legendaMmn("legenda_mmn_rotulo_pagamento"), reabertura: legendaMmn("legenda_mmn_rotulo_reabertura") };
+    apresentarMmn(qs("adminApproverList"),"innerHTML",function(){return approvers.length ? approvers.map(function (row) {
+      var identity = row.uid_admin ? (legendaMmn("legenda_mmn_rotulo_uid") + row.uid_admin) : (legendaMmn("legenda_mmn_rotulo_perfil") + (row.perfil_chave || "—"));
+      return "<div class=\"mmn-config-row\"><div class=\"mmn-row-main\"><strong>" + escapeHtml(identity) + "</strong><small>" + escapeHtml(actionNames[row.acao] || row.acao || legendaMmn("legenda_mmn_rotulo_pagamento")) + "</small></div>" + pillHtml(row.ativo ? "ativo" : "bloqueado", row.ativo ? legendaMmn("legenda_mmn_rotulo_ativo") : legendaMmn("legenda_mmn_rotulo_inativo")) + "</div>";
+    }).join("") : emptyHtml(legendaMmn("legenda_mmn_nenhum_aprovador_adicional_configurado"));});
     updateConfigNetworkStructure();
     validateConfigNetworkStructure(false);
   }
 
   function rankRowHtml(row) {
-    return "<div class=\"mmn-config-row\" data-rank-row data-rank-id=\"" + escapeHtml(row.cod_mmn_config_rank || row.id || "") + "\"><label class=\"field\"><span>Chave</span><input data-rank-field=\"chave\" value=\"" + escapeHtml(row.chave || "") + "\"></label><label class=\"field\"><span>Nome</span><input data-rank-field=\"nome\" value=\"" + escapeHtml(row.nome || "") + "\"></label><label class=\"field\"><span>Rede ativa mínima</span><input type=\"number\" min=\"0\" data-rank-field=\"min_rede_ativa\" value=\"" + escapeHtml(row.min_rede_ativa || 0) + "\"></label><label class=\"field\"><span>Diretos ativos mínimos</span><input type=\"number\" min=\"0\" data-rank-field=\"min_diretos_ativos\" value=\"" + escapeHtml(row.min_diretos_ativos || 0) + "\"></label><label class=\"field\"><span>Máximo da maior perna (%)</span><input type=\"number\" min=\"0\" max=\"100\" step=\"0.001\" data-rank-field=\"max_percentual_maior_perna\" value=\"" + escapeHtml(firstDefined([row.max_percentual_maior_perna], 60)) + "\"></label><label class=\"field\"><span>Bônus de liderança (%)</span><input type=\"number\" min=\"0\" max=\"100\" step=\"0.001\" data-rank-field=\"bonus_percentual\" value=\"" + escapeHtml(row.bonus_percentual || 0) + "\"></label><label class=\"field\"><span>Coeficiente pool</span><input type=\"number\" min=\"0\" step=\"0.001\" data-rank-field=\"pool_coeficiente\" value=\"" + escapeHtml(row.pool_coeficiente || 0) + "\"></label><label class=\"field\"><span>Ativo</span><select data-rank-field=\"ativo\"><option value=\"true\" " + (booleanValue(row.ativo, true) ? "selected" : "") + ">Sim</option><option value=\"false\" " + (!booleanValue(row.ativo, true) ? "selected" : "") + ">Não</option></select></label><button class=\"btn btn-ghost\" type=\"button\" data-remove-row>Remover</button></div>";
+    return "<div class=\"mmn-config-row\" data-rank-row data-rank-id=\"" + escapeHtml(row.cod_mmn_config_rank || row.id || "") + ("\"><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_chave")) + "</span><input data-rank-field=\"chave\" value=\"") + escapeHtml(row.chave || "") + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_nome")) + "</span><input data-rank-field=\"nome\" value=\"") + escapeHtml(row.nome || "") + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_rede_ativa_minima")) + "</span><input type=\"number\" min=\"0\" data-rank-field=\"min_rede_ativa\" value=\"") + escapeHtml(row.min_rede_ativa || 0) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_diretos_ativos_minimos")) + "</span><input type=\"number\" min=\"0\" data-rank-field=\"min_diretos_ativos\" value=\"") + escapeHtml(row.min_diretos_ativos || 0) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_maximo_da_maior_perna")) + "</span><input type=\"number\" min=\"0\" max=\"100\" step=\"0.001\" data-rank-field=\"max_percentual_maior_perna\" value=\"") + escapeHtml(firstDefined([row.max_percentual_maior_perna], 60)) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_bonus_de_lideranca")) + "</span><input type=\"number\" min=\"0\" max=\"100\" step=\"0.001\" data-rank-field=\"bonus_percentual\" value=\"") + escapeHtml(row.bonus_percentual || 0) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_coeficiente_pool")) + "</span><input type=\"number\" min=\"0\" step=\"0.001\" data-rank-field=\"pool_coeficiente\" value=\"") + escapeHtml(row.pool_coeficiente || 0) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_ativo")) + "</span><select data-rank-field=\"ativo\"><option value=\"true\" ") + (booleanValue(row.ativo, true) ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_sim")) + "</option><option value=\"false\" ") + (!booleanValue(row.ativo, true) ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_nao")) + "</option></select></label><button class=\"btn btn-ghost\" type=\"button\" data-remove-row>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_remover")) + "</button></div>");
   }
 
   function groupRowHtml(row) {
-    return "<div class=\"mmn-config-row\" data-group-row data-group-id=\"" + escapeHtml(row.cod_mmn_config_grupo || row.id || "") + "\"><label class=\"field\"><span>Grupo</span><input data-group-field=\"grupo_chave\" value=\"" + escapeHtml(row.grupo_chave || row.chave || "") + "\"></label><label class=\"field\"><span>Dispensa Premium</span><select data-group-field=\"dispensa_premium\"><option value=\"true\" " + (booleanValue(firstDefined([row.dispensa_premium, row.isento_premium], true), true) ? "selected" : "") + ">Sim</option><option value=\"false\" " + (!booleanValue(firstDefined([row.dispensa_premium, row.isento_premium], true), true) ? "selected" : "") + ">Não</option></select></label><label class=\"field\"><span>Ativo</span><select data-group-field=\"ativo\"><option value=\"true\" " + (booleanValue(row.ativo, true) ? "selected" : "") + ">Sim</option><option value=\"false\" " + (!booleanValue(row.ativo, true) ? "selected" : "") + ">Não</option></select></label><button class=\"btn btn-ghost\" type=\"button\" data-remove-row>Remover</button></div>";
+    return "<div class=\"mmn-config-row\" data-group-row data-group-id=\"" + escapeHtml(row.cod_mmn_config_grupo || row.id || "") + ("\"><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_grupo")) + "</span><input data-group-field=\"grupo_chave\" value=\"") + escapeHtml(row.grupo_chave || row.chave || "") + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_dispensa_premium")) + "</span><select data-group-field=\"dispensa_premium\"><option value=\"true\" ") + (booleanValue(firstDefined([row.dispensa_premium, row.isento_premium], true), true) ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_sim")) + "</option><option value=\"false\" ") + (!booleanValue(firstDefined([row.dispensa_premium, row.isento_premium], true), true) ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_nao")) + "</option></select></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_ativo")) + "</span><select data-group-field=\"ativo\"><option value=\"true\" ") + (booleanValue(row.ativo, true) ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_sim")) + "</option><option value=\"false\" ") + (!booleanValue(row.ativo, true) ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_nao")) + "</option></select></label><button class=\"btn btn-ghost\" type=\"button\" data-remove-row>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_remover")) + "</button></div>");
   }
 
   function taxRowHtml(row) {
     var type = row.tipo || "percentual";
     var parameters = JSON.stringify(row.parametros && typeof row.parametros === "object" ? row.parametros : {}, null, 2);
-    return "<div class=\"mmn-tax-row\" data-tax-row data-tax-id=\"" + escapeHtml(row.cod_mmn_config_retencao || row.id || "") + "\"><label class=\"field\"><span>Chave</span><input data-tax-field=\"chave\" value=\"" + escapeHtml(row.chave || "") + "\"></label><label class=\"field\"><span>Nome</span><input data-tax-field=\"nome\" value=\"" + escapeHtml(row.nome || "") + "\"></label><label class=\"field\"><span>Tipo</span><select data-tax-field=\"tipo\"><option value=\"percentual\" " + (type === "percentual" ? "selected" : "") + ">Percentual</option><option value=\"valor_fixo\" " + (type === "valor_fixo" ? "selected" : "") + ">Valor fixo</option><option value=\"faixas\" " + (type === "faixas" ? "selected" : "") + ">Faixas</option></select></label><label class=\"field\"><span>Reter</span><select data-tax-field=\"reter\"><option value=\"true\" " + (booleanValue(row.reter, false) ? "selected" : "") + ">Sim</option><option value=\"false\" " + (!booleanValue(row.reter, false) ? "selected" : "") + ">Não</option></select></label><label class=\"field\"><span>Alíquota (%)</span><input type=\"number\" min=\"0\" max=\"100\" step=\"0.001\" data-tax-field=\"aliquota\" value=\"" + escapeHtml(row.aliquota || 0) + "\"></label><label class=\"field\"><span>Base mínima (R$)</span><input type=\"number\" min=\"0\" step=\"0.01\" data-tax-field=\"base_minima_reais\" value=\"" + escapeHtml(numberValue(row.base_minima_centavos) / 100) + "\"></label><label class=\"field\"><span>Teto (R$)</span><input type=\"number\" min=\"0\" step=\"0.01\" data-tax-field=\"teto_reais\" value=\"" + escapeHtml(row.teto_centavos == null ? "" : numberValue(row.teto_centavos) / 100) + "\"></label><label class=\"field\"><span>Município</span><input data-tax-field=\"municipio\" value=\"" + escapeHtml(row.municipio || "") + "\"></label><label class=\"field\"><span>Estado</span><input data-tax-field=\"estado\" maxlength=\"2\" value=\"" + escapeHtml(row.estado || "") + "\"></label><label class=\"field wide\"><span>Parâmetros por faixa (JSON)</span><textarea rows=\"5\" data-json-field=\"parametros\">" + escapeHtml(parameters) + "</textarea><small>Use JSON válido para faixas, limites e regras adicionais.</small></label><button class=\"btn btn-ghost\" type=\"button\" data-remove-row>Remover</button></div>";
+    return "<div class=\"mmn-tax-row\" data-tax-row data-tax-id=\"" + escapeHtml(row.cod_mmn_config_retencao || row.id || "") + ("\"><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_chave")) + "</span><input data-tax-field=\"chave\" value=\"") + escapeHtml(row.chave || "") + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_nome")) + "</span><input data-tax-field=\"nome\" value=\"") + escapeHtml(row.nome || "") + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_tipo")) + "</span><select data-tax-field=\"tipo\"><option value=\"percentual\" ") + (type === "percentual" ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_percentual_mensagem")) + "</option><option value=\"valor_fixo\" ") + (type === "valor_fixo" ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_valor_fixo")) + "</option><option value=\"faixas\" ") + (type === "faixas" ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_faixas")) + "</option></select></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_reter")) + "</span><select data-tax-field=\"reter\"><option value=\"true\" ") + (booleanValue(row.reter, false) ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_sim")) + "</option><option value=\"false\" ") + (!booleanValue(row.reter, false) ? "selected" : "") + (">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_nao")) + "</option></select></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_aliquota")) + "</span><input type=\"number\" min=\"0\" max=\"100\" step=\"0.001\" data-tax-field=\"aliquota\" value=\"") + escapeHtml(row.aliquota || 0) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_base_minima_r")) + "</span><input type=\"number\" min=\"0\" step=\"0.01\" data-tax-field=\"base_minima_reais\" value=\"") + escapeHtml(numberValue(row.base_minima_centavos) / 100) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_teto_r")) + "</span><input type=\"number\" min=\"0\" step=\"0.01\" data-tax-field=\"teto_reais\" value=\"") + escapeHtml(row.teto_centavos == null ? "" : numberValue(row.teto_centavos) / 100) + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_municipio")) + "</span><input data-tax-field=\"municipio\" value=\"") + escapeHtml(row.municipio || "") + ("\"></label><label class=\"field\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_estado")) + "</span><input data-tax-field=\"estado\" maxlength=\"2\" value=\"") + escapeHtml(row.estado || "") + ("\"></label><label class=\"field wide\"><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_parametros_por_faixa_json")) + "</span><textarea rows=\"5\" data-json-field=\"parametros\">") + escapeHtml(parameters) + ("</textarea><small>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_use_json_valido_para_faixas_limites_e_regras_adicionais")) + "</small></label><button class=\"btn btn-ghost\" type=\"button\" data-remove-row>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_remover")) + "</button></div>");
   }
 
   function renderAdminRegulationMetadata(regulation) {
@@ -3681,11 +4368,11 @@
     if (!container) return;
     var version = regulation.versao || regulation.documento_versao || "";
     if (!version && !(regulation.cod_mmn_documento || regulation.id)) {
-      container.innerHTML = emptyHtml("Nenhum regulamento foi gerado para esta versão.");
+      apresentarMmn(container,"innerHTML",function(){return emptyHtml(legendaMmn("legenda_mmn_nenhum_regulamento_foi_gerado_para_esta_versao"));});
       return;
     }
     var publicUrl = "../../regulamento-mmn.html" + (version ? "?versao=" + encodeURIComponent(version) : "");
-    container.innerHTML = "<div><span>Versão</span><strong>" + escapeHtml(version || "—") + "</strong></div><div><span>Status</span><strong>" + escapeHtml(regulation.status || "rascunho") + "</strong></div><div><span>Atualização</span><strong>" + escapeHtml(formatDate(regulation.atualizado_em || regulation.criado_em, true)) + "</strong></div><div><span>Publicação</span><strong>" + escapeHtml(formatDate(regulation.publicado_em, true)) + "</strong></div><div><span>Vigência</span><strong>" + escapeHtml(formatDate(regulation.vigencia_inicio || regulation.vigente_desde, false)) + "</strong></div><a class=\"btn btn-ghost btn-small\" href=\"" + escapeHtml(publicUrl) + "\" target=\"_blank\" rel=\"noopener\">Abrir versão/histórico</a>";
+    apresentarMmn(container,"innerHTML",function(){return ("<div><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_versao")) + "</span><strong>") + escapeHtml(version || "—") + ("</strong></div><div><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_status")) + "</span><strong>") + escapeHtml(regulation.status || "rascunho") + ("</strong></div><div><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_atualizacao")) + "</span><strong>") + escapeHtml(formatDate(regulation.atualizado_em || regulation.criado_em, true)) + ("</strong></div><div><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_publicacao")) + "</span><strong>") + escapeHtml(formatDate(regulation.publicado_em, true)) + ("</strong></div><div><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_vigencia")) + "</span><strong>") + escapeHtml(formatDate(regulation.vigencia_inicio || regulation.vigente_desde, false)) + "</strong></div><a class=\"btn btn-ghost btn-small\" href=\"" + escapeHtml(publicUrl) + ("\" target=\"_blank\" rel=\"noopener\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_abrir_versao_historico")) + "</a>");});
   }
 
   function renderAdminRegulationPreview(data) {
@@ -3702,7 +4389,8 @@
       var iframe = document.createElement("iframe");
       iframe.className = "mmn-regulation-frame";
       iframe.setAttribute("sandbox", "");
-      iframe.setAttribute("title", "Pré-visualização do regulamento");
+      iframe.setAttribute("title", legendaMmn("legenda_mmn_complemento_pre_visualizacao_do_regulamento"));
+      iframe.setAttribute("data-legenda-atributos",JSON.stringify({title:"legenda_mmn_complemento_pre_visualizacao_do_regulamento"}));
       iframe.srcdoc = String(htmlDocument);
       container.appendChild(iframe);
       return;
@@ -3719,8 +4407,8 @@
     var ranks = listFrom(snapshot, ["ranks"]);
     var depth = Math.max(1, Math.min(10, integerValue(firstDefined([parameters.quantidade_niveis], 6), 6)));
     levels = levels.filter(function (row) { return integerValue(row.nivel) <= depth; });
-    var title = documentRow.titulo || source.titulo || "Regulamento de Indicações e Benefícios";
-    container.innerHTML = "<article><h4>" + escapeHtml(title) + "</h4><p>Versão " + escapeHtml(documentRow.versao || source.versao || "—") + " · modelo jurídico Regulamento MMN v1.</p><div class=\"mmn-regulation-preview-grid\"><span><strong>" + escapeHtml(depth) + "</strong> níveis</span><span><strong>" + escapeHtml(integerValue(parameters.largura_maxima_posicionamento, 0) === 0 ? "Ilimitada" : formatInteger(parameters.largura_maxima_posicionamento)) + "</strong> largura</span><span><strong>" + escapeHtml(formatPercent(parameters.payout_teto_percentual)) + "</strong> teto</span><span><strong>" + escapeHtml(formatMoneyCents(parameters.pagamento_minimo_centavos)) + "</strong> mínimo</span></div>" + (levels.length ? "<div class=\"table-wrap\"><table><thead><tr><th>Nível</th><th>Percentual</th><th>Diretos</th><th>Pernas</th><th>Ativos/perna</th></tr></thead><tbody>" + levels.map(function (row) { return "<tr><td>" + escapeHtml(row.nivel) + "</td><td>" + escapeHtml(formatPercent(row.percentual)) + "</td><td>" + escapeHtml(formatInteger(row.min_diretos_ativos)) + "</td><td>" + escapeHtml(formatInteger(row.min_pernas_qualificadas)) + "</td><td>" + escapeHtml(formatInteger(row.min_ativos_por_perna)) + "</td></tr>"; }).join("") + "</tbody></table></div>" : "") + (ranks.length ? "<p><strong>Ranks:</strong> " + ranks.map(function (rank) { return escapeHtml(rank.nome || rank.chave); }).join(" · ") + "</p>" : "") + "</article>";
+    function tituloRegulamentoLegenda(){return documentRow.titulo || source.titulo || legendaMmn("legenda_mmn_regulamento_de_indicacoes_e_beneficios");}
+    apresentarMmn(container,"innerHTML",function(){return "<article><h4>" + escapeHtml(tituloRegulamentoLegenda()) + ("</h4><p>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_versao"))) + escapeHtml(documentRow.versao || source.versao || "—") + (escapeHtml(legendaMmn("legenda_fechamento_mmn_modelo_juridico")) + "</p><div class=\"mmn-regulation-preview-grid\"><span><strong>") + escapeHtml(depth) + ("</strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_niveis")) + "</span><span><strong>") + escapeHtml(integerValue(parameters.largura_maxima_posicionamento, 0) === 0 ? legendaMmn("legenda_mmn_rotulo_ilimitada") : formatInteger(parameters.largura_maxima_posicionamento)) + ("</strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_largura")) + "</span><span><strong>") + escapeHtml(formatPercent(parameters.payout_teto_percentual)) + ("</strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_teto")) + "</span><span><strong>") + escapeHtml(formatMoneyCents(parameters.pagamento_minimo_centavos)) + ("</strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_minimo")) + "</span></div>") + (levels.length ? ("<div class=\"table-wrap\"><table><thead><tr><th>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_nivel")) + "</th><th>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_percentual_mensagem")) + "</th><th>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_diretos")) + "</th><th>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_pernas")) + "</th><th>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_ativos_perna")) + "</th></tr></thead><tbody>") + levels.map(function (row) { return "<tr><td>" + escapeHtml(row.nivel) + "</td><td>" + escapeHtml(formatPercent(row.percentual)) + "</td><td>" + escapeHtml(formatInteger(row.min_diretos_ativos)) + "</td><td>" + escapeHtml(formatInteger(row.min_pernas_qualificadas)) + "</td><td>" + escapeHtml(formatInteger(row.min_ativos_por_perna)) + "</td></tr>"; }).join("") + "</tbody></table></div>" : "") + (ranks.length ? ("<p><strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_ranks")) + "</strong> ") + ranks.map(function (rank) { return escapeHtml(rank.nome || rank.chave); }).join(" · ") + "</p>" : "") + "</article>";});
   }
 
   function fillConfigForm(config) {
@@ -3778,7 +4466,7 @@
     };
     Object.keys(regulationValues).forEach(function (id) { if (qs(id)) qs(id).value = regulationValues[id]; });
     renderAdminRegulationMetadata(regulation);
-    qs("adminRegulationPreview").innerHTML = emptyHtml(regulation.cod_mmn_documento || regulation.id ? "Use Pré-visualizar para conferir o snapshot desta versão." : "Gere o regulamento depois de salvar as regras.");
+    apresentarMmn(qs("adminRegulationPreview"),"innerHTML",function(){return emptyHtml(regulation.cod_mmn_documento || regulation.id ? legendaMmn("legenda_mmn_use_pre_visualizar_para_conferir_o_snapshot_desta_versao") : legendaMmn("legenda_mmn_gere_o_regulamento_depois_de_salvar_as_regras"));});
     renderConfigRows(config);
     qsa(".mmn-version-button").forEach(function (button) { button.classList.toggle("is-active", String(button.dataset.configId) === String(values.adminConfigVersionId)); });
     loadPublicationProgress(integerValue(values.adminConfigVersionId));
@@ -3787,25 +4475,25 @@
   function renderAdminConfig(data) {
     state.admin.config = data;
     var versions = configVersions(data);
-    qs("adminConfigVersions").innerHTML = versions.length ? versions.map(function (version) {
-      return "<button class=\"mmn-version-button " + (version.status === "vigente" ? "is-active" : "") + "\" type=\"button\" data-config-id=\"" + escapeHtml(version.cod_mmn_config || version.cod_mmn_configuracao || version.id) + "\"><strong>" + escapeHtml(version.nome || ("Versão " + (version.versao || ""))) + "</strong><small>" + escapeHtml(formatDate(version.vigencia_inicio || version.vigencia, false)) + " · " + escapeHtml(version.status || "rascunho") + "</small></button>";
-    }).join("") : emptyHtml("Nenhuma versão de configuração.");
+    apresentarMmn(qs("adminConfigVersions"),"innerHTML",function(){return versions.length ? versions.map(function (version) {
+      return "<button class=\"mmn-version-button " + (version.status === "vigente" ? "is-active" : "") + "\" type=\"button\" data-config-id=\"" + escapeHtml(version.cod_mmn_config || version.cod_mmn_configuracao || version.id) + "\"><strong>" + escapeHtml(version.nome || (legendaMmn("legenda_mmn_versao") + (version.versao || ""))) + "</strong><small>" + escapeHtml(formatDate(version.vigencia_inicio || version.vigencia, false)) + " · " + escapeHtml(version.status || "rascunho") + "</small></button>";
+    }).join("") : emptyHtml(legendaMmn("legenda_mmn_nenhuma_versao_de_configuracao"));});
     var selected = normalizeConfigResponse(data);
     if (!selected.cod_mmn_config) selected = normalizeConfigResponse(versions.find(function (version) { return version.status === "vigente"; }) || versions[0] || {});
     fillConfigForm(selected);
     var groups = listFrom(selected || {}, ["grupos_isentos", "grupos"]);
-    qs("adminParticipantGroup").innerHTML = "<option value=\"\">Nenhum</option>" + groups.map(function (group) { return "<option value=\"" + escapeHtml(group.grupo_chave || group.chave || group.id) + "\">" + escapeHtml(group.grupo_chave || group.nome || group.chave) + "</option>"; }).join("");
+    apresentarMmn(qs("adminParticipantGroup"),"innerHTML",function(){return ("<option value=\"\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_nenhum")) + "</option>") + groups.map(function (group) { return "<option value=\"" + escapeHtml(group.grupo_chave || group.chave || group.id) + "\">" + escapeHtml(group.grupo_chave || group.nome || group.chave) + "</option>"; }).join("");});
     var versionOptions = versions.map(function (version) { return "<option value=\"" + escapeHtml(version.cod_mmn_config || version.cod_mmn_configuracao || version.id) + "\">" + escapeHtml(version.nome || version.versao) + "</option>"; }).join("");
     qs("adminSimVersion").innerHTML = versionOptions;
     qs("adminReplayVersion").innerHTML = versionOptions;
-    qs("adminSimulationHistoryVersion").innerHTML = "<option value=\"\">Todas</option>" + versionOptions;
+    apresentarMmn(qs("adminSimulationHistoryVersion"),"innerHTML",function(){return ("<option value=\"\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_todas")) + "</option>") + versionOptions;});
   }
 
   function renderPublicationProgress(data) {
     var container = qs("adminPublicationProgress");
     if (!container) return;
     if (!data || !data.config_id) {
-      container.innerHTML = emptyHtml("Salve o rascunho para consultar o progresso.");
+      apresentarMmn(container,"innerHTML",function(){return emptyHtml(legendaMmn("legenda_mmn_salve_o_rascunho_para_consultar_o_progresso"));});
       if (qs("adminConfigActivate")) qs("adminConfigActivate").disabled = true;
       return;
     }
@@ -3813,14 +4501,14 @@
     var simulationReady = !!data.simulacao_id && data.simulacao_hash === data.config_hash;
     var approvalsReady = numberValue(data.aprovacoes_recebidas) >= numberValue(data.aprovacoes_necessarias, 1);
     var steps = [
-      { label: "Rascunho salvo", detail: "Configuração #" + data.config_id, ready: true },
-      { label: "Regulamento gerado", detail: documentReady ? (objectFrom(data, ["documento_regulamento"]).titulo || "Snapshot #" + data.documento_regulamento_id) : "Gere o snapshot no servidor", ready: documentReady },
-      { label: "Simulação V2 válida", detail: simulationReady ? "Simulação #" + data.simulacao_id + " no hash atual" : "Execute novamente após qualquer alteração", ready: simulationReady },
-      { label: "Quórum de publicação", detail: formatInteger(data.aprovacoes_recebidas) + " de " + formatInteger(data.aprovacoes_necessarias), ready: approvalsReady }
+      { label: legendaMmn("legenda_mmn_rascunho_salvo"), detail: legendaMmn("legenda_mmn_configuracao") + data.config_id, ready: true },
+      { label: legendaMmn("legenda_mmn_regulamento_gerado"), detail: documentReady ? (objectFrom(data, ["documento_regulamento"]).titulo || legendaMmn("legenda_mmn_snapshot") + data.documento_regulamento_id) : legendaMmn("legenda_mmn_gere_o_snapshot_no_servidor"), ready: documentReady },
+      { label: legendaMmn("legenda_mmn_simulacao_v2_valida"), detail: simulationReady ? legendaMmn("legenda_mmn_simulacao") + data.simulacao_id + legendaMmn("legenda_mmn_complemento_no_hash_atual") : legendaMmn("legenda_mmn_execute_novamente_apos_qualquer_alteracao"), ready: simulationReady },
+      { label: legendaMmn("legenda_mmn_quorum_de_publicacao"), detail: formatInteger(data.aprovacoes_recebidas) + legendaMmn("legenda_mmn_complemento_de") + formatInteger(data.aprovacoes_necessarias), ready: approvalsReady }
     ];
-    container.innerHTML = steps.map(function (step, index) {
+    apresentarMmn(container,"innerHTML",function(){return steps.map(function (step, index) {
       return "<article class=\"mmn-governance-step " + (step.ready ? "is-complete" : "") + "\"><span>" + (step.ready ? "✓" : index + 1) + "</span><div><strong>" + escapeHtml(step.label) + "</strong><small>" + escapeHtml(step.detail) + "</small></div></article>";
-    }).join("") + (listFrom(data, ["aprovacoes"]).length ? "<div class=\"mmn-governance-approvals\"><strong>Aprovações registradas</strong>" + listFrom(data, ["aprovacoes"]).map(function (row) { return "<span>" + escapeHtml(formatDate(row.criado_em, true)) + " · " + escapeHtml(row.uid_admin || "Administrador") + "</span>"; }).join("") + "</div>" : "");
+    }).join("") + (listFrom(data, ["aprovacoes"]).length ? ("<div class=\"mmn-governance-approvals\"><strong>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_aprovacoes_registradas")) + "</strong>") + listFrom(data, ["aprovacoes"]).map(function (row) { return "<span>" + escapeHtml(formatDate(row.criado_em, true)) + " · " + escapeHtml(row.uid_admin || legendaMmn("legenda_mmn_rotulo_administrador")) + "</span>"; }).join("") + "</div>" : "");});
     if (qs("adminConfigActivate")) qs("adminConfigActivate").disabled = data.status !== "rascunho" || !documentReady || !simulationReady || !booleanValue(data.pode_aprovar, false);
   }
 
@@ -3845,14 +4533,18 @@
     var rows = listFrom(data, ["lotes", "pagamentos", "itens"]);
     var requestedStatus = qs("adminPaymentStatus") ? qs("adminPaymentStatus").value : "";
     if (requestedStatus) rows = rows.filter(function (row) { return row.status === requestedStatus; });
-    var html = rows.map(function (row) {
+    function construirHtmlLegendaMmn() {
+      var html = rows.map(function (row) {
       var id = row.cod_mmn_lote || row.cod_mmn_pagamento || row.id;
       var action = hasCapability("pagar") && (row.status === "calculado" || row.status === "revisao") ? "aprovar" : (hasCapability("pagar") && row.status === "aprovado" && row.modo === "manual" ? "pago" : "");
-      var actionHtml = action ? "<button class=\"btn btn-ghost btn-small\" type=\"button\" data-payment-action=\"" + action + "\" data-payment-id=\"" + escapeHtml(id) + "\">" + escapeHtml(action === "pago" ? "Registrar pago" : "Aprovar") + "</button>" : "—";
+      var actionHtml = action ? "<button class=\"btn btn-ghost btn-small\" type=\"button\" data-payment-action=\"" + action + "\" data-payment-id=\"" + escapeHtml(id) + "\">" + escapeHtml(action === "pago" ? legendaMmn("legenda_mmn_registrar_pago") : legendaMmn("legenda_mmn_rotulo_aprovar")) + "</button>" : "—";
       return "<tr><td><strong>Lote #" + escapeHtml(id) + "</strong><br><small>" + escapeHtml(row.competencia || "") + " · " + escapeHtml(row.modo || "manual") + "</small></td><td>" + escapeHtml(formatMoneyCents(centsFrom(row, ["total_bruto_centavos", "bruto_centavos", "valor_bruto_centavos"]))) + "</td><td>" + escapeHtml(formatMoneyCents(centsFrom(row, ["total_retencoes_centavos", "retencoes_centavos", "valor_retencoes_centavos"]))) + "</td><td><strong>" + escapeHtml(formatMoneyCents(centsFrom(row, ["total_liquido_centavos", "liquido_centavos", "valor_liquido_centavos", "total_centavos"]))) + "</strong></td><td>" + escapeHtml(formatInteger(row.aprovacoes_recebidas)) + "/" + escapeHtml(formatInteger(row.aprovacoes_necessarias)) + "</td><td>" + pillHtml(row.rpa_status || (row.simulacao ? "simulacao" : "pendente")) + "</td><td>" + pillHtml(row.status) + "</td><td>" + actionHtml + "</td></tr>";
     }).join("");
-    if (append) qs("adminPaymentsBody").insertAdjacentHTML("beforeend", html);
-    else qs("adminPaymentsBody").innerHTML = html || emptyTableHtml(8, "Nenhum pagamento encontrado.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    if (append) acrescentarHtmlMmn(qs("adminPaymentsBody"), html, construirHtmlLegendaMmn);
+    else apresentarMmn(qs("adminPaymentsBody"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyTableHtml(8, legendaMmn("legenda_mmn_nenhum_pagamento_encontrado"));});
     state.admin.cursors.payments = data.next_cursor || data.proximo_cursor || null;
     qs("adminPaymentsMore").hidden = !state.admin.cursors.payments;
   }
@@ -3860,20 +4552,24 @@
   function renderAdminRpas(data, append) {
     var rows = listFrom(data, ["itens"]);
     var summary = objectFrom(data, ["resumo"]);
-    qs("adminRpaSummary").innerHTML = [
-      ["Beneficiários", summary.beneficiarios],
-      ["Aguardando RPA", summary.aguardando_rpa],
-      ["Rascunhos", summary.rpas_rascunho],
-      ["Emitidos", summary.rpas_emitidos],
-      ["Pagos", summary.rpas_pagos]
-    ].map(function (item) { return "<article class=\"mmn-payment-card\"><span>" + escapeHtml(item[0]) + "</span><strong>" + escapeHtml(formatInteger(item[1])) + "</strong></article>"; }).join("");
-    var html = rows.map(function (row) {
+    apresentarMmn(qs("adminRpaSummary"),"innerHTML",function(){return [
+      [legendaMmn("legenda_mmn_beneficiarios"), summary.beneficiarios],
+      [legendaMmn("legenda_mmn_aguardando_rpa"), summary.aguardando_rpa],
+      [legendaMmn("legenda_mmn_rotulo_rascunhos"), summary.rpas_rascunho],
+      [legendaMmn("legenda_mmn_rotulo_emitidos"), summary.rpas_emitidos],
+      [legendaMmn("legenda_mmn_rotulo_pagos"), summary.rpas_pagos]
+    ].map(function (item) { return "<article class=\"mmn-payment-card\"><span>" + escapeHtml(item[0]) + "</span><strong>" + escapeHtml(formatInteger(item[1])) + "</strong></article>"; }).join("");});
+    function construirHtmlLegendaMmn() {
+      var html = rows.map(function (row) {
       var documentStatus = row.rpa_status || (row.rpa_id ? "rascunho" : "pendente");
       var transferStatus = row.pagamento_saida_status || (row.beneficiario_status === "pago" ? "confirmado" : "aguardando_rpa");
-      return "<tr><td><strong>" + escapeHtml(firstDefined([row.loginuser, row.usuario_loginuser, row.login, row.nome], "Usuário")) + "</strong><br><small>" + escapeHtml(row.cpf_mascarado || "") + " · PIX " + escapeHtml(row.pix_mascarado || "—") + "</small></td><td>" + escapeHtml(String(row.competencia || "").slice(0, 7)) + "<br><small>Lote #" + escapeHtml(row.id_lote) + " · " + escapeHtml(row.modo || "") + "</small></td><td><strong>" + escapeHtml(formatMoneyCents(row.valor_liquido_centavos)) + "</strong><br><small>Bruto " + escapeHtml(formatMoneyCents(row.valor_bruto_centavos)) + " · retenções " + escapeHtml(formatMoneyCents(row.retencoes_centavos)) + "</small></td><td>" + pillHtml(documentStatus) + "<br><small>" + escapeHtml(row.rpa_numero || "Sem número") + "</small></td><td>" + pillHtml(transferStatus) + "<br><small>" + escapeHtml(row.provedor_chave || "manual") + "</small></td><td><button class=\"btn btn-ghost btn-small\" type=\"button\" data-rpa-detail=\"" + escapeHtml(row.cod_mmn_lote_beneficiario) + "\">Detalhes</button></td></tr>";
+      return "<tr><td><strong>" + escapeHtml(firstDefined([row.loginuser, row.usuario_loginuser, row.login, row.nome], legendaMmn("legenda_mmn_usuario"))) + "</strong><br><small>" + escapeHtml(row.cpf_mascarado || "") + " · PIX " + escapeHtml(row.pix_mascarado || "—") + "</small></td><td>" + escapeHtml(String(row.competencia || "").slice(0, 7)) + "<br><small>Lote #" + escapeHtml(row.id_lote) + " · " + escapeHtml(row.modo || "") + "</small></td><td><strong>" + escapeHtml(formatMoneyCents(row.valor_liquido_centavos)) + "</strong><br><small>Bruto " + escapeHtml(formatMoneyCents(row.valor_bruto_centavos)) + legendaMmn("legenda_mmn_retencoes_prefixo") + escapeHtml(formatMoneyCents(row.retencoes_centavos)) + "</small></td><td>" + pillHtml(documentStatus) + "<br><small>" + escapeHtml(row.rpa_numero || legendaMmn("legenda_mmn_sem_numero")) + "</small></td><td>" + pillHtml(transferStatus) + "<br><small>" + escapeHtml(row.provedor_chave || "manual") + "</small></td><td><button class=\"btn btn-ghost btn-small\" type=\"button\" data-rpa-detail=\"" + escapeHtml(row.cod_mmn_lote_beneficiario) + ("\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_detalhes")) + "</button></td></tr>");
     }).join("");
-    if (append) qs("adminRpaBody").insertAdjacentHTML("beforeend", html);
-    else qs("adminRpaBody").innerHTML = html || emptyTableHtml(6, "Nenhum beneficiário encontrado na fila fiscal.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    if (append) acrescentarHtmlMmn(qs("adminRpaBody"), html, construirHtmlLegendaMmn);
+    else apresentarMmn(qs("adminRpaBody"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyTableHtml(6, legendaMmn("legenda_mmn_nenhum_beneficiario_encontrado_na_fila_fiscal"));});
     state.admin.cursors.rpas = data.next_cursor || null;
     qs("adminRpaMore").hidden = data.has_more === false || !state.admin.cursors.rpas;
   }
@@ -3884,19 +4580,19 @@
     var output = objectFrom(data, ["pagamento_saida"]);
     state.admin.selectedRpa = data;
     qs("adminRpaBeneficiaryId").value = beneficiary.id || "";
-    setText("adminRpaEditorTitle", (beneficiary.nome || "Beneficiário") + " · " + String(beneficiary.competencia || "").slice(0, 7));
+    apresentarTextoMmn("adminRpaEditorTitle",function(){return (beneficiary.nome || legendaMmn("legenda_mmn_beneficiario")) + " · " + String(beneficiary.competencia || "").slice(0, 7);});
     qs("adminRpaNumber").value = rpa.numero || "";
     qs("adminRpaDocumentRef").value = rpa.documento_ref || "";
     qs("adminRpaDocumentHash").value = rpa.documento_hash || "";
     qs("adminRpaReason").value = "";
-    qs("adminRpaDetail").innerHTML = [
-      ["Titular", (beneficiary.nome || "—") + " · " + (beneficiary.cpf_mascarado || "")],
+    apresentarMmn(qs("adminRpaDetail"),"innerHTML",function(){return [
+      [legendaMmn("legenda_mmn_rotulo_titular"), (beneficiary.nome || "—") + " · " + (beneficiary.cpf_mascarado || "")],
       ["PIX", (beneficiary.pix_tipo || "") + " · " + (beneficiary.pix_mascarado || "—")],
-      ["Valores", "Bruto " + formatMoneyCents(beneficiary.bruto_centavos) + " · retenções " + formatMoneyCents(beneficiary.retencoes_centavos) + " · líquido " + formatMoneyCents(beneficiary.liquido_centavos)],
-      ["RPA", (rpa.numero || "Ainda não registrado") + " · " + (rpa.status || "pendente")],
-      ["Transferência", output.status || beneficiary.status || "pendente"],
-      ["Comprovante", beneficiary.comprovante_ref || "Ainda não confirmado"]
-    ].map(function (item) { return "<div><span>" + escapeHtml(item[0]) + "</span><strong>" + escapeHtml(item[1]) + "</strong></div>"; }).join("");
+      [legendaMmn("legenda_mmn_rotulo_valores"), legendaMmn("legenda_mmn_rotulo_bruto") + formatMoneyCents(beneficiary.bruto_centavos) + legendaMmn("legenda_mmn_retencoes_prefixo") + formatMoneyCents(beneficiary.retencoes_centavos) + legendaMmn("legenda_mmn_liquido") + formatMoneyCents(beneficiary.liquido_centavos)],
+      ["RPA", (rpa.numero || legendaMmn("legenda_mmn_ainda_nao_registrado")) + " · " + (rpa.status || "pendente")],
+      [legendaMmn("legenda_mmn_transferencia"), output.status || beneficiary.status || "pendente"],
+      [legendaMmn("legenda_mmn_rotulo_comprovante"), beneficiary.comprovante_ref || legendaMmn("legenda_mmn_ainda_nao_confirmado")]
+    ].map(function (item) { return "<div><span>" + escapeHtml(item[0]) + "</span><strong>" + escapeHtml(item[1]) + "</strong></div>"; }).join("");});
     var canOperate = hasCapability("financeiro") || hasCapability("pagar");
     qs("adminRpaRegister").hidden = !canOperate || ["pago", "cancelado", "emitido"].indexOf(rpa.status) >= 0;
     qs("adminRpaEmit").hidden = !canOperate || !rpa.cod_mmn_rpa || ["pago", "cancelado"].indexOf(rpa.status) >= 0;
@@ -3906,22 +4602,30 @@
 
   function renderAdminSupport(data, append) {
     var rows = listFrom(data, ["ocorrencias", "tickets", "itens"]);
-    var html = rows.map(function (row) {
-      return "<article class=\"mmn-ticket\"><div class=\"mmn-row-main\"><strong>" + escapeHtml(row.assunto || row.tipo || "Ocorrência") + "</strong><small>#" + escapeHtml(row.cod_mmn_ocorrencia || row.id || "") + " · " + escapeHtml(row.usuario_nome || row.usuario_codinome || row.usuario || "") + "</small></div><span>" + escapeHtml(row.prioridade || "normal") + "</span>" + pillHtml(row.status) + "<button class=\"btn btn-ghost btn-small\" type=\"button\" data-support-action=\"em_analise\" data-support-id=\"" + escapeHtml(row.cod_mmn_ocorrencia || row.id) + "\">Analisar</button></article>";
+    function construirHtmlLegendaMmn() {
+      var html = rows.map(function (row) {
+      return "<article class=\"mmn-ticket\"><div class=\"mmn-row-main\"><strong>" + escapeHtml(row.assunto || row.tipo || legendaMmn("legenda_mmn_ocorrencia")) + "</strong><small>#" + escapeHtml(row.cod_mmn_ocorrencia || row.id || "") + " · " + escapeHtml(row.usuario_nome || row.usuario_codinome || row.usuario || "") + "</small></div><span>" + escapeHtml(row.prioridade || "normal") + "</span>" + pillHtml(row.status) + "<button class=\"btn btn-ghost btn-small\" type=\"button\" data-support-action=\"em_analise\" data-support-id=\"" + escapeHtml(row.cod_mmn_ocorrencia || row.id) + ("\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_analisar")) + "</button></article>");
     }).join("");
-    if (append) qs("adminSupportList").insertAdjacentHTML("beforeend", html);
-    else qs("adminSupportList").innerHTML = html || emptyHtml("Nenhuma ocorrência encontrada.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    if (append) acrescentarHtmlMmn(qs("adminSupportList"), html, construirHtmlLegendaMmn);
+    else apresentarMmn(qs("adminSupportList"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyHtml(legendaMmn("legenda_mmn_nenhuma_ocorrencia_encontrada"));});
     state.admin.cursors.support = data.next_cursor || data.proximo_cursor || null;
     qs("adminSupportMore").hidden = data.has_more === false || !state.admin.cursors.support;
   }
 
   function renderAdminAudit(data, append) {
     var rows = listFrom(data, ["auditoria", "eventos", "itens"]);
-    var html = rows.map(function (row) {
-      return "<article class=\"mmn-audit-row\"><span>" + escapeHtml(formatDate(row.criado_em, true)) + "</span><div class=\"mmn-row-main\"><strong>" + escapeHtml(row.acao || "Alteração") + "</strong><small>" + escapeHtml(row.alvo_tipo || "") + " " + escapeHtml(row.alvo_id || "") + "</small></div><span>" + escapeHtml(row.motivo || row.resumo || row.justificativa || "—") + "</span><span>" + escapeHtml(row.uid_ator || row.id_usuario_ator || row.admin_nome || row.autor || "Sistema") + "</span></article>";
+    function construirHtmlLegendaMmn() {
+      var html = rows.map(function (row) {
+      return "<article class=\"mmn-audit-row\"><span>" + escapeHtml(formatDate(row.criado_em, true)) + "</span><div class=\"mmn-row-main\"><strong>" + escapeHtml(row.acao || legendaMmn("legenda_mmn_alteracao")) + "</strong><small>" + escapeHtml(row.alvo_tipo || "") + " " + escapeHtml(row.alvo_id || "") + "</small></div><span>" + escapeHtml(row.motivo || row.resumo || row.justificativa || "—") + "</span><span>" + escapeHtml(row.uid_ator || row.id_usuario_ator || row.admin_nome || row.autor || legendaMmn("legenda_mmn_rotulo_sistema")) + "</span></article>";
     }).join("");
-    if (append) qs("adminAuditList").insertAdjacentHTML("beforeend", html);
-    else qs("adminAuditList").innerHTML = html || emptyHtml("Nenhum evento de auditoria encontrado.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    if (append) acrescentarHtmlMmn(qs("adminAuditList"), html, construirHtmlLegendaMmn);
+    else apresentarMmn(qs("adminAuditList"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyHtml(legendaMmn("legenda_mmn_nenhum_evento_de_auditoria_encontrado"));});
     state.admin.cursors.audit = data.next_cursor || data.proximo_cursor || null;
     qs("adminAuditMore").hidden = data.has_more === false || !state.admin.cursors.audit;
   }
@@ -4076,7 +4780,7 @@
         try {
           result[key] = value ? JSON.parse(value) : {};
         } catch (error) {
-          throw new Error("JSON inválido na retenção " + (result.nome || result.chave || "sem nome") + ".");
+          throw new Error(legendaMmn("legenda_mmn_json_invalido_na_retencao") + (result.nome || result.chave || legendaMmn("legenda_mmn_complemento_sem_nome")) + ".");
         }
       });
       return result;
@@ -4257,7 +4961,7 @@
       showLoading(false);
       qs("adminLoginPanel").hidden = false;
       qs("adminApp").hidden = true;
-      setStatus("pageStatus", "Entre com uma conta autorizada", null);
+      apresentarStatusMmn("pageStatus",function(){return legendaMmn("legenda_mmn_entre_com_uma_conta_autorizada");},null);
       return;
     }
     await refreshSessionIfNeeded();
@@ -4277,7 +4981,7 @@
     qs("adminApp").hidden = false;
     qs("userApp").hidden = true;
     renderAdminOverview(data);
-    setStatus("pageStatus", "Online · acesso conforme suas permissões", "ok");
+    apresentarStatusMmn("pageStatus",function(){return legendaMmn("legenda_mmn_online_acesso_conforme_suas_permissoes");},"ok");
   }
 
   async function refreshAdminDashboard() {
@@ -4291,7 +4995,7 @@
     var sequence = ++state.bootSequence;
     setGlobalError(null);
     showLoading(true);
-    setStatus("pageStatus", "Carregando...", null);
+    apresentarStatusMmn("pageStatus",function(){return legendaMmn("legenda_mmn_rotulo_carregando");},null);
     try {
       configureMode();
       if (state.mode === "user") await bootUser(sequence);
@@ -4317,8 +5021,8 @@
   function setupAuthEvents() {
     on("adminLoginForm", "submit", async function (event) {
       event.preventDefault();
-      setBusy("loginButton", true, "Entrando...");
-      setStatus("loginStatus", "Validando acesso...", null);
+      setBusy("loginButton", true, legendaMmn("legenda_mmn_rotulo_entrando"));
+      apresentarStatusMmn("loginStatus",function(){return legendaMmn("legenda_mmn_validando_acesso");},null);
       try {
         saveAdminSession(await adminLogin(qs("loginEmail").value.trim(), qs("loginPassword").value));
         await boot();
@@ -4333,7 +5037,7 @@
       clearAdminSession();
       qs("adminApp").hidden = true;
       qs("adminLoginPanel").hidden = false;
-      setStatus("pageStatus", "Sessão encerrada", null);
+      apresentarStatusMmn("pageStatus",function(){return legendaMmn("legenda_mmn_sessao_encerrada");},null);
     });
     on("reloadButton", "click", boot);
     on("retryButton", "click", boot);
@@ -4346,7 +5050,7 @@
         return;
       } catch (error) {}
     }
-    if (state.user.inviteUrl && navigator.share) navigator.share({ title: "Convite Turbo Tiger", url: state.user.inviteUrl }).catch(function () {});
+    if (state.user.inviteUrl && navigator.share) navigator.share({ title: legendaMmn("legenda_mmn_convite_turbo_tiger"), url: state.user.inviteUrl }).catch(function () {});
   }
 
   function showInviteCopyToast() {
@@ -4407,14 +5111,14 @@
     on("userShareButton", "click", shareInvite);
     on("userCopyInviteButton", "click", async function () {
       if (!state.user.inviteUrl) {
-        setGlobalError(new Error("O link de convite ainda não está disponível."));
+        setGlobalError(new Error(legendaMmn("legenda_mmn_o_link_de_convite_ainda_nao_esta_disponivel")));
         return;
       }
       try {
         await navigator.clipboard.writeText(state.user.inviteUrl);
         showInviteCopyToast();
       } catch (error) {
-        setGlobalError(new Error("Não foi possível copiar o link neste dispositivo."));
+        setGlobalError(new Error(legendaMmn("legenda_mmn_nao_foi_possivel_copiar_o_link_neste_dispositivo")));
       }
     });
     var enrollmentForm = qs("enrollmentForm");
@@ -4440,7 +5144,7 @@
         updatePixActions("enrollment");
         return;
       }
-      setBusy("enrollmentSubmit", true, "Salvando adesão...");
+      setBusy("enrollmentSubmit", true, legendaMmn("legenda_mmn_salvando_adesao"));
       setStatus("enrollmentStatus", "", null);
       try {
         validateAddressForSubmission("enrollment", true);
@@ -4459,7 +5163,7 @@
         if (isReentry) {
           await rpc(CONFIG.rpcs.userProgramReenter, { p_confirmacao: true });
         }
-        setStatus("enrollmentStatus", isReentry ? "Reentrada concluída com segurança." : "Adesão concluída com segurança.", "ok");
+        apresentarStatusMmn("enrollmentStatus",function(){return isReentry ? legendaMmn("legenda_mmn_reentrada_concluida_com_seguranca") : legendaMmn("legenda_mmn_adesao_concluida_com_seguranca");},"ok");
         await boot();
       } catch (error) {
         showPixFormError("enrollment", "enrollmentStatus", error);
@@ -4472,11 +5176,11 @@
       event.preventDefault();
       var pixChangeRequested = profilePixChangeRequested();
       if (!(await ensurePixReadyForSubmission("profile"))) {
-        setStatus("profileStatus", "Verifique, confira e confirme a chave Pix antes de salvar.", "error");
+        apresentarStatusMmn("profileStatus",function(){return legendaMmn("legenda_mmn_verifique_confira_e_confirme_a_chave_pix_antes_de_salvar");},"error");
         updatePixActions("profile");
         return;
       }
-      setBusy("profileSubmit", true, "Salvando...");
+      setBusy("profileSubmit", true, legendaMmn("legenda_mmn_rotulo_salvando"));
       try {
         validateAddressForSubmission("profile", true);
         var profile = collectProfile("profile");
@@ -4492,7 +5196,7 @@
           result.pix_validado,
           pixChangeRequested ? true : profilePixFlow.storedConfirmed
         ], false), false);
-        if (pixChangeRequested && !confirmedAfterSave) throw new Error("A confirmação da nova chave Pix não foi preservada. Verifique novamente.");
+        if (pixChangeRequested && !confirmedAfterSave) throw new Error(legendaMmn("legenda_mmn_a_confirmacao_da_nova_chave_pix_nao_foi_preservada_verifique_novamente"));
         var savedType = normalizePixType(firstDefined([result.pix_tipo, profile.pix_tipo, profilePixFlow.storedType], "cpf"));
         var savedMasked = cleanText(firstDefined([
           result.pix_mascarado,
@@ -4501,14 +5205,14 @@
         ], ""));
         qs("profilePixKey").value = "";
         qs("profilePixType").value = savedType || "cpf";
-        setText("profilePixMasked", savedMasked ? "Chave atual: " + savedMasked : "Nenhuma chave cadastrada.");
+        apresentarTextoMmn("profilePixMasked",function(){return savedMasked ? legendaMmn("legenda_mmn_chave_atual") + savedMasked : legendaMmn("legenda_mmn_nenhuma_chave_cadastrada");});
         initializePixValidation("profile", {
           cadastrado: !!savedMasked,
           pix_tipo: savedType,
           pix_mascarado: savedMasked,
           pix_validado: confirmedAfterSave
         });
-        setStatus("profileStatus", "Dados atualizados.", "ok");
+        apresentarStatusMmn("profileStatus",function(){return legendaMmn("legenda_mmn_dados_atualizados");},"ok");
       } catch (error) {
         showPixFormError("profile", "profileStatus", error);
       } finally {
@@ -4518,7 +5222,7 @@
     });
     on("userSimulatorForm", "submit", async function (event) {
       event.preventDefault();
-      setBusy("userSimulatorSubmit", true, "Simulando...");
+      setBusy("userSimulatorSubmit", true, legendaMmn("legenda_mmn_rotulo_simulando"));
       try {
         var data = await rpc(CONFIG.rpcs.userSimulator, { p_parametros: {
           novos_diretos_mes: integerValue(qs("userSimDirects").value),
@@ -4550,11 +5254,11 @@
       }
       var button = event.target.closest("[data-user-dispute-id]");
       if (!button) return;
-      var subject = window.prompt("Assunto da contestação:", "Revisão de lançamento");
+      var subject = window.prompt(legendaMmn("legenda_mmn_assunto_da_contestacao"), legendaMmn("legenda_mmn_revisao_de_lancamento"));
       if (subject === null) return;
-      var description = window.prompt("Descreva o motivo da contestação:", "");
+      var description = window.prompt(legendaMmn("legenda_mmn_descreva_o_motivo_da_contestacao"), "");
       if (description === null) return;
-      if (!subject.trim() || !description.trim()) return setGlobalError(new Error("Informe o assunto e a descrição da contestação."));
+      if (!subject.trim() || !description.trim()) return setGlobalError(new Error(legendaMmn("legenda_mmn_informe_o_assunto_e_a_descricao_da_contestacao")));
       try {
         await rpc(CONFIG.rpcs.userDispute, {
           p_alvo_tipo: button.dataset.userDisputeType,
@@ -4562,7 +5266,7 @@
           p_assunto: subject.trim(),
           p_descricao: description.trim()
         });
-        setStatus("pageStatus", "Contestação registrada para análise.", "ok");
+        apresentarStatusMmn("pageStatus",function(){return legendaMmn("legenda_mmn_contestacao_registrada_para_analise");},"ok");
         button.disabled = true;
       } catch (error) { setGlobalError(error); }
     });
@@ -4609,14 +5313,14 @@
     }
     on("networkDiagramPrint", "click", function () {
       document.body.classList.add("mmn-network-printing");
-      setNetworkDiagramPrintStatus("Preparando o diagrama para gerar o PDF...", null);
+      setNetworkDiagramPrintStatus(legendaMmn("legenda_mmn_preparando_o_diagrama_para_gerar_o_pdf"), null);
       if (hasNativeBridge()) {
         try {
           window.TurboTigerHistoricoBridge.post("TURBO_MMN_EXPORT_NETWORK_PDF");
           return;
         } catch (error) {
           document.body.classList.remove("mmn-network-printing");
-          setNetworkDiagramPrintStatus("Não foi possível abrir a geração do PDF no aplicativo.", "error");
+          setNetworkDiagramPrintStatus(legendaMmn("legenda_mmn_nao_foi_possivel_abrir_a_geracao_do_pdf_no_aplicativo"), "error");
           return;
         }
       }
@@ -4624,7 +5328,7 @@
     });
     window.addEventListener("TURBO_MMN_PDF_STATUS", function (event) {
       var detail = event.detail || {};
-      setNetworkDiagramPrintStatus(detail.message || (detail.ok ? "Escolha Salvar como PDF na tela aberta pelo dispositivo." : "Não foi possível gerar o PDF."), detail.ok ? "success" : "error");
+      setNetworkDiagramPrintStatus(detail.message || (detail.ok ? legendaMmn("legenda_mmn_escolha_salvar_como_pdf_na_tela_aberta_pelo_dispositivo") : legendaMmn("legenda_mmn_nao_foi_possivel_gerar_o_pdf")), detail.ok ? "success" : "error");
       if (!detail.ok) document.body.classList.remove("mmn-network-printing");
     });
     window.addEventListener("afterprint", function () {
@@ -4697,8 +5401,8 @@
       state.programExitBusy = true;
       qs("programExitCancel").disabled = true;
       qs("programExitClose").disabled = true;
-      setBusy("programExitConfirm", true, "Saindo...");
-      setStatus("programExitDialogStatus", "Processando sua solicitação...", null);
+      setBusy("programExitConfirm", true, legendaMmn("legenda_mmn_rotulo_saindo"));
+      apresentarStatusMmn("programExitDialogStatus",function(){return legendaMmn("legenda_mmn_processando_sua_solicitacao");},null);
 
       var exitCompleted = false;
       try {
@@ -4720,11 +5424,11 @@
       if (!exitCompleted) return;
 
       closeProgramExitDialog();
-      setStatus("programExitStatus", "Saída concluída. Atualizando seu painel...", "ok");
+      apresentarStatusMmn("programExitStatus",function(){return legendaMmn("legenda_mmn_saida_concluida_atualizando_seu_painel");},"ok");
       await boot();
-      setStatus("pageStatus", "Você saiu do programa de indicações.", "ok");
+      apresentarStatusMmn("pageStatus",function(){return legendaMmn("legenda_mmn_voce_saiu_do_programa_de_indicacoes");},"ok");
       if (!qs("userEnrollment").hidden) {
-        setStatus("enrollmentStatus", "Sua saída foi concluída. Para participar novamente, faça uma nova adesão ao regulamento vigente.", "ok");
+        apresentarStatusMmn("enrollmentStatus",function(){return legendaMmn("legenda_mmn_sua_saida_foi_concluida_para_participar_novamente_faca_uma_nova_adesao_ao_regulamento");},"ok");
         qs("userEnrollment").scrollIntoView({ behavior: "smooth", block: "start" });
       }
     });
@@ -4760,7 +5464,7 @@
       try {
         var action = button.dataset.periodAction;
         var rpcName = action === "apurar" ? CONFIG.rpcs.adminPeriodCalculate : (action === "fechar" ? CONFIG.rpcs.adminPeriodClose : CONFIG.rpcs.adminPeriodReopen);
-        await performAdminAction(rpcName, { p_competencia: monthDate(String(button.dataset.periodValue).slice(0, 7)) }, "Confirmar ação na competência", "A ação respeitará a versão vinculada e manterá a trilha de auditoria.");
+        await performAdminAction(rpcName, { p_competencia: monthDate(String(button.dataset.periodValue).slice(0, 7)) }, legendaMmn("legenda_mmn_confirmar_acao_na_competencia"), legendaMmn("legenda_mmn_a_acao_respeitara_a_versao_vinculada_e_mantera_a_trilha_de_auditoria"));
         await refreshAdminDashboard();
         await loadAdminTab("competencias", false);
       } catch (error) { setGlobalError(error); }
@@ -4784,7 +5488,7 @@
         return;
       }
       qs("adminParticipantId").value = row.usuario_id || row.id_usuario || row.cod_usuario || row.id;
-      setText("adminParticipantEditorTitle", "Gerenciar " + (row.loginuser || row.usuario_loginuser || row.login || row.codinome || row.nome || "participante"));
+      apresentarTextoMmn("adminParticipantEditorTitle",function(){return legendaMmn("legenda_mmn_rotulo_gerenciar_prefixo") + (row.loginuser || row.usuario_loginuser || row.login || row.codinome || row.nome || "participante");});
       qs("adminParticipantActive").value = String(booleanValue(row.mmn_ativo, false));
       qs("adminParticipantIneligibility").value = row.status === "inelegivel_permanente" || row.inelegibilidade_permanente ? "permanente" : (row.status === "suspenso" ? "temporaria" : "nenhuma");
       qs("adminParticipantTechnical").value = String(booleanValue(row.conta_tecnica, false));
@@ -4800,16 +5504,16 @@
     async function validateParticipantPix(approved) {
       try {
         var userId = integerValue(qs("adminParticipantId").value);
-        if (!userId) throw new Error("Selecione um participante.");
-        await performAdminAction(CONFIG.rpcs.adminPixValidate, { p_usuario_id: userId, p_aprovado: approved }, approved ? "Validar PIX" : "Rejeitar PIX", approved ? "Confirme que a chave pertence ao mesmo titular cadastrado no app." : "O PIX ficará pendente até uma nova validação administrativa.");
-        setStatus("adminParticipantStatus", approved ? "PIX validado." : "PIX rejeitado.", "ok");
+        if (!userId) throw new Error(legendaMmn("legenda_mmn_selecione_um_participante"));
+        await performAdminAction(CONFIG.rpcs.adminPixValidate, { p_usuario_id: userId, p_aprovado: approved }, approved ? legendaMmn("legenda_mmn_validar_pix") : legendaMmn("legenda_mmn_rejeitar_pix"), approved ? legendaMmn("legenda_mmn_confirme_que_a_chave_pertence_ao_mesmo_titular_cadastrado_no_app") : legendaMmn("legenda_mmn_o_pix_ficara_pendente_ate_uma_nova_validacao_administrativa"));
+        apresentarStatusMmn("adminParticipantStatus",function(){return approved ? legendaMmn("legenda_mmn_pix_validado") : legendaMmn("legenda_mmn_pix_rejeitado");},"ok");
       } catch (error) { setStatus("adminParticipantStatus", error.message || error, "error"); }
     }
     on("adminParticipantPixApprove", "click", function () { validateParticipantPix(true); });
     on("adminParticipantPixReject", "click", function () { validateParticipantPix(false); });
     on("adminParticipantEditor", "submit", async function (event) {
       event.preventDefault();
-      setBusy("adminParticipantSave", true, "Salvando...");
+      setBusy("adminParticipantSave", true, legendaMmn("legenda_mmn_rotulo_salvando"));
       try {
         var userId = integerValue(qs("adminParticipantId").value);
         var ineligibility = qs("adminParticipantIneligibility").value;
@@ -4841,7 +5545,7 @@
             p_motivo: reason
           });
         }
-        setStatus("adminParticipantStatus", "Alteração registrada e auditada.", "ok");
+        apresentarStatusMmn("adminParticipantStatus",function(){return legendaMmn("legenda_mmn_alteracao_registrada_e_auditada");},"ok");
         await refreshAdminDashboard();
         await loadAdminTab("participantes", false);
       } catch (error) { setStatus("adminParticipantStatus", error.message || error, "error"); }
@@ -4853,16 +5557,16 @@
       try {
         var sponsorId = null;
         if (button.dataset.waitlistAction === "aprovar") {
-          var informed = window.prompt("Informe o ID do usuário patrocinador (deixe vazio para raiz):", "");
+          var informed = window.prompt(legendaMmn("legenda_mmn_informe_o_id_do_usuario_patrocinador_deixe_vazio_para_raiz"), "");
           if (informed === null) return;
           sponsorId = informed.trim() ? integerValue(informed) : null;
-          if (informed.trim() && sponsorId <= 0) throw new Error("Informe um usuário patrocinador válido.");
+          if (informed.trim() && sponsorId <= 0) throw new Error(legendaMmn("legenda_mmn_informe_um_usuario_patrocinador_valido"));
         }
         await performAdminAction(CONFIG.rpcs.adminWaitlistDecide, {
           p_vinculo_id: integerValue(button.dataset.waitlistId),
           p_decisao: button.dataset.waitlistAction,
           p_patrocinador_usuario_id: sponsorId
-        }, "Decidir vínculo da lista de espera", "A genealogia será preservada sem reservar ou alterar o cod_usuario normal.");
+        }, legendaMmn("legenda_mmn_decidir_vinculo_da_lista_de_espera"), legendaMmn("legenda_mmn_complemento_a_genealogia_sera_preservada_sem_reservar_ou_alterar_o_cod_usuario_normal"));
         await loadAdminTab("espera", false);
       } catch (error) { setGlobalError(error); }
     });
@@ -4874,13 +5578,13 @@
         var paymentPayload = { p_lote_id: integerValue(button.dataset.paymentId) };
         var paymentRpc = CONFIG.rpcs.adminBatchApprove;
         if (paymentAction === "pago") {
-          var proof = window.prompt("Informe a referência do comprovante de pagamento:", "");
+          var proof = window.prompt(legendaMmn("legenda_mmn_informe_a_referencia_do_comprovante_de_pagamento"), "");
           if (proof === null) return;
-          if (!proof.trim()) throw new Error("Informe a referência do comprovante.");
+          if (!proof.trim()) throw new Error(legendaMmn("legenda_mmn_informe_a_referencia_do_comprovante"));
           paymentPayload.p_comprovante_ref = proof.trim();
           paymentRpc = CONFIG.rpcs.adminBatchMarkPaid;
         }
-        await performAdminAction(paymentRpc, paymentPayload, "Confirmar ação financeira", "A ação será validada pelas aprovações, bloqueios fiscais e estado atual do lote.");
+        await performAdminAction(paymentRpc, paymentPayload, legendaMmn("legenda_mmn_confirmar_acao_financeira"), legendaMmn("legenda_mmn_a_acao_sera_validada_pelas_aprovacoes_bloqueios_fiscais_e_estado_atual_do_lote"));
         await refreshAdminDashboard();
         await loadAdminTab("pagamentos", false);
       } catch (error) { setGlobalError(error); }
@@ -4888,10 +5592,10 @@
     on("adminRpaBody", "click", async function (event) {
       var button = event.target.closest("[data-rpa-detail]");
       if (!button) return;
-      setBusy(button, true, "Abrindo...");
+      setBusy(button, true, legendaMmn("legenda_mmn_rotulo_abrindo"));
       try {
         var beneficiaryId = integerValue(button.dataset.rpaDetail);
-        if (!beneficiaryId) throw new Error("Beneficiário do lote inválido.");
+        if (!beneficiaryId) throw new Error(legendaMmn("legenda_mmn_beneficiario_do_lote_invalido"));
         renderAdminRpaDetail(await rpc(CONFIG.rpcs.adminRpaGet, {
           p_lote_beneficiario_id: beneficiaryId
         }));
@@ -4902,11 +5606,11 @@
       if (!(hasCapability("financeiro") || hasCapability("pagar"))) return setGlobalError(new Error("acesso_financeiro_negado"));
       var beneficiaryId = integerValue(qs("adminRpaBeneficiaryId").value);
       var reason = qs("adminRpaReason").value.trim();
-      if (!beneficiaryId) return setStatus("adminRpaStatusText", "Selecione um beneficiário.", "error");
-      if (!reason) return setStatus("adminRpaStatusText", "Informe o motivo do registro.", "error");
-      var confirmation = await confirmAction("Registrar rascunho do RPA", "Os dados fiscais e os valores do beneficiário serão validados pelo servidor.", false);
+      if (!beneficiaryId) return apresentarStatusMmn("adminRpaStatusText",function(){return legendaMmn("legenda_mmn_selecione_um_beneficiario");},"error");
+      if (!reason) return apresentarStatusMmn("adminRpaStatusText",function(){return legendaMmn("legenda_mmn_informe_o_motivo_do_registro");},"error");
+      var confirmation = await confirmAction(legendaMmn("legenda_mmn_registrar_rascunho_do_rpa"), legendaMmn("legenda_mmn_os_dados_fiscais_e_os_valores_do_beneficiario_serao_validados_pelo_servidor"), false);
       if (confirmation === null) return;
-      setBusy("adminRpaRegister", true, "Registrando...");
+      setBusy("adminRpaRegister", true, legendaMmn("legenda_mmn_rotulo_registrando"));
       try {
         await rpc(CONFIG.rpcs.adminRpaRegister, {
           p_lote_beneficiario_id: beneficiaryId,
@@ -4917,7 +5621,7 @@
         renderAdminRpaDetail(await rpc(CONFIG.rpcs.adminRpaGet, {
           p_lote_beneficiario_id: beneficiaryId
         }));
-        setStatus("adminRpaStatusText", "Rascunho do RPA registrado.", "ok");
+        apresentarStatusMmn("adminRpaStatusText",function(){return legendaMmn("legenda_mmn_rascunho_do_rpa_registrado");},"ok");
       } catch (error) { setStatus("adminRpaStatusText", error.message || error, "error"); }
       finally { setBusy("adminRpaRegister", false); }
     });
@@ -4927,13 +5631,13 @@
       var documentRef = qs("adminRpaDocumentRef").value.trim();
       var documentHash = qs("adminRpaDocumentHash").value.trim();
       var reason = qs("adminRpaReason").value.trim();
-      if (!beneficiaryId) return setStatus("adminRpaStatusText", "Selecione um beneficiário.", "error");
-      if (!documentRef) return setStatus("adminRpaStatusText", "Informe a referência do documento fiscal.", "error");
-      if (documentHash && !/^[0-9a-f]{64}$/i.test(documentHash)) return setStatus("adminRpaStatusText", "Informe um hash SHA-256 válido com 64 caracteres hexadecimais.", "error");
-      if (!reason) return setStatus("adminRpaStatusText", "Informe o motivo da emissão.", "error");
-      var confirmation = await confirmAction("Emitir RPA", "A emissão será auditada e poderá liberar a próxima etapa do pagamento.", false);
+      if (!beneficiaryId) return apresentarStatusMmn("adminRpaStatusText",function(){return legendaMmn("legenda_mmn_selecione_um_beneficiario");},"error");
+      if (!documentRef) return apresentarStatusMmn("adminRpaStatusText",function(){return legendaMmn("legenda_mmn_informe_a_referencia_do_documento_fiscal");},"error");
+      if (documentHash && !/^[0-9a-f]{64}$/i.test(documentHash)) return apresentarStatusMmn("adminRpaStatusText",function(){return legendaMmn("legenda_mmn_informe_um_hash_sha_256_valido_com_64_caracteres_hexadecimais");},"error");
+      if (!reason) return apresentarStatusMmn("adminRpaStatusText",function(){return legendaMmn("legenda_mmn_informe_o_motivo_da_emissao");},"error");
+      var confirmation = await confirmAction(legendaMmn("legenda_mmn_emitir_rpa"), legendaMmn("legenda_mmn_a_emissao_sera_auditada_e_podera_liberar_a_proxima_etapa_do_pagamento"), false);
       if (confirmation === null) return;
-      setBusy("adminRpaEmit", true, "Emitindo...");
+      setBusy("adminRpaEmit", true, legendaMmn("legenda_mmn_rotulo_emitindo"));
       try {
         await rpc(CONFIG.rpcs.adminRpaIssue, {
           p_lote_beneficiario_id: beneficiaryId,
@@ -4945,7 +5649,7 @@
         renderAdminRpaDetail(await rpc(CONFIG.rpcs.adminRpaGet, {
           p_lote_beneficiario_id: beneficiaryId
         }));
-        setStatus("adminRpaStatusText", "RPA emitido com sucesso.", "ok");
+        apresentarStatusMmn("adminRpaStatusText",function(){return legendaMmn("legenda_mmn_rpa_emitido_com_sucesso");},"ok");
       } catch (error) { setStatus("adminRpaStatusText", error.message || error, "error"); }
       finally { setBusy("adminRpaEmit", false); }
     });
@@ -4953,7 +5657,7 @@
       var button = event.target.closest("[data-support-action]");
       if (!button) return;
       try {
-        var response = await confirmAction("Atualizar ocorrência", "Registre a orientação inicial. Depois, o status poderá ser atualizado conforme a decisão administrativa.", true);
+        var response = await confirmAction(legendaMmn("legenda_mmn_atualizar_ocorrencia"), legendaMmn("legenda_mmn_registre_a_orientacao_inicial_depois_o_status_podera_ser_atualizado_conforme_a_decisao"), true);
         if (response === null) return;
         await rpc(CONFIG.rpcs.adminOccurrenceUpdate, { p_ocorrencia_id: integerValue(button.dataset.supportId), p_status: button.dataset.supportAction, p_resposta: response });
         await refreshAdminDashboard();
@@ -4983,16 +5687,16 @@
     });
     on("adminNewConfigVersion", "click", async function () {
       var baseId = integerValue((state.admin.selectedConfig || {}).cod_mmn_config || qs("adminConfigVersionId").value);
-      if (!baseId) return setGlobalError(new Error("Selecione uma versão base para duplicar."));
-      var name = window.prompt("Nome da nova versão em rascunho:", "Nova versão");
+      if (!baseId) return setGlobalError(new Error(legendaMmn("legenda_mmn_selecione_uma_versao_base_para_duplicar")));
+      var name = window.prompt(legendaMmn("legenda_mmn_nome_da_nova_versao_em_rascunho"), "Nova versão");
       if (name === null) return;
-      if (!name.trim()) return setGlobalError(new Error("Informe o nome da nova versão."));
-      setBusy("adminNewConfigVersion", true, "Criando...");
+      if (!name.trim()) return setGlobalError(new Error(legendaMmn("legenda_mmn_informe_o_nome_da_nova_versao")));
+      setBusy("adminNewConfigVersion", true, legendaMmn("legenda_mmn_rotulo_criando"));
       try {
         var result = await rpc(CONFIG.rpcs.adminConfigDuplicate, { p_config_id: baseId, p_nome: name.trim() });
         state.admin.config = result;
         renderAdminConfig(result);
-        setStatus("adminConfigStatus", "Nova versão criada como rascunho auditável.", "ok");
+        apresentarStatusMmn("adminConfigStatus",function(){return legendaMmn("legenda_mmn_nova_versao_criada_como_rascunho_auditavel");},"ok");
         qs("adminConfigName").focus();
       } catch (error) { setGlobalError(error); }
       finally { setBusy("adminNewConfigVersion", false); }
@@ -5003,10 +5707,10 @@
       var uid = qs("adminApproverUid").value.trim();
       var profile = qs("adminApproverProfile").value.trim().toLowerCase();
       var reason = qs("adminApproverReason").value.trim();
-      if (!configId) return setStatus("adminApproverStatus", "Selecione uma versão de configuração.", "error");
-      if ((!uid && !profile) || (uid && profile)) return setStatus("adminApproverStatus", "Informe somente o UID do administrador ou somente o perfil.", "error");
-      if (!reason) return setStatus("adminApproverStatus", "Informe o motivo da alteração.", "error");
-      setBusy("adminApproverSave", true, "Salvando...");
+      if (!configId) return apresentarStatusMmn("adminApproverStatus",function(){return legendaMmn("legenda_mmn_selecione_uma_versao_de_configuracao");},"error");
+      if ((!uid && !profile) || (uid && profile)) return apresentarStatusMmn("adminApproverStatus",function(){return legendaMmn("legenda_mmn_informe_somente_o_uid_do_administrador_ou_somente_o_perfil");},"error");
+      if (!reason) return apresentarStatusMmn("adminApproverStatus",function(){return legendaMmn("legenda_mmn_informe_o_motivo_da_alteracao");},"error");
+      setBusy("adminApproverSave", true, legendaMmn("legenda_mmn_rotulo_salvando"));
       try {
         await rpc(CONFIG.rpcs.adminConfigApproverSave, {
           p_config_id: configId,
@@ -5023,19 +5727,19 @@
         qs("adminApproverUid").value = "";
         qs("adminApproverProfile").value = "";
         qs("adminApproverReason").value = "";
-        setStatus("adminApproverStatus", "Aprovador salvo e auditado.", "ok");
+        apresentarStatusMmn("adminApproverStatus",function(){return legendaMmn("legenda_mmn_aprovador_salvo_e_auditado");},"ok");
       } catch (error) { setStatus("adminApproverStatus", error.message || error, "error"); }
       finally { setBusy("adminApproverSave", false); }
     });
     on("adminRegulationSaveLink", "click", async function () {
-      if (!hasCapability("superadmin")) return setStatus("adminRegulationStatus", "Somente o superadmin pode gerar o regulamento.", "error");
+      if (!hasCapability("superadmin")) return apresentarStatusMmn("adminRegulationStatus",function(){return legendaMmn("legenda_mmn_somente_o_superadmin_pode_gerar_o_regulamento");},"error");
       var configId = integerValue(qs("adminConfigVersionId").value);
       var version = qs("adminRegulationVersion").value.trim();
       var title = qs("adminRegulationTitle").value.trim();
       var reason = qs("adminRegulationReason").value.trim();
-      if (!configId) return setStatus("adminRegulationStatus", "Salve primeiro a versão em rascunho.", "error");
-      if (!version || !title || !reason) return setStatus("adminRegulationStatus", "Informe versão, título e motivo da geração.", "error");
-      setBusy("adminRegulationSaveLink", true, "Gerando...");
+      if (!configId) return apresentarStatusMmn("adminRegulationStatus",function(){return legendaMmn("legenda_mmn_salve_primeiro_a_versao_em_rascunho");},"error");
+      if (!version || !title || !reason) return apresentarStatusMmn("adminRegulationStatus",function(){return legendaMmn("legenda_mmn_informe_versao_titulo_e_motivo_da_geracao");},"error");
+      setBusy("adminRegulationSaveLink", true, legendaMmn("legenda_mmn_rotulo_gerando"));
       try {
         var saved = await rpc(CONFIG.rpcs.adminRegulationDraftSave, {
           p_config_id: configId,
@@ -5049,7 +5753,7 @@
         if (!Object.keys(documentRow).length) documentRow = Object.assign({}, objectFrom(objectFrom(saved, ["snapshot"]), ["documento"]), { id: saved.documento_id, versao: saved.versao });
         qs("adminRegulationId").value = documentRow.cod_mmn_documento || documentRow.id || saved.documento_id || "";
         renderAdminRegulationMetadata(documentRow);
-        setStatus("adminRegulationStatus", "Snapshot do regulamento gerado e vinculado à configuração atual.", "ok");
+        apresentarStatusMmn("adminRegulationStatus",function(){return legendaMmn("legenda_mmn_snapshot_do_regulamento_gerado_e_vinculado_a_configuracao_atual");},"ok");
         var detail = await rpc(CONFIG.rpcs.adminConfigGet, { p_config_id: configId });
         detail.versoes = configVersions(state.admin.config || {});
         renderAdminConfig(detail);
@@ -5060,15 +5764,15 @@
     });
     on("adminRegulationPreviewButton", "click", async function () {
       var configId = integerValue(qs("adminConfigVersionId").value);
-      if (!configId) return setStatus("adminRegulationStatus", "Salve primeiro a versão em rascunho.", "error");
-      setBusy("adminRegulationPreviewButton", true, "Carregando...");
+      if (!configId) return apresentarStatusMmn("adminRegulationStatus",function(){return legendaMmn("legenda_mmn_salve_primeiro_a_versao_em_rascunho");},"error");
+      setBusy("adminRegulationPreviewButton", true, legendaMmn("legenda_mmn_rotulo_carregando"));
       try {
         var preview = await rpc(CONFIG.rpcs.adminRegulationPreview, { p_config_id: configId });
         renderAdminRegulationPreview(preview);
         var previewDocument = objectFrom(preview, ["documento", "regulamento"]);
         if (!Object.keys(previewDocument).length) previewDocument = objectFrom(objectFrom(preview, ["snapshot"]), ["documento"]);
         renderAdminRegulationMetadata(previewDocument);
-        setStatus("adminRegulationStatus", "Pré-visualização carregada a partir do snapshot do servidor.", "ok");
+        apresentarStatusMmn("adminRegulationStatus",function(){return legendaMmn("legenda_mmn_pre_visualizacao_carregada_a_partir_do_snapshot_do_servidor");},"ok");
       } catch (error) { setStatus("adminRegulationStatus", error.message || error, "error"); }
       finally { setBusy("adminRegulationPreviewButton", false); }
     });
@@ -5086,7 +5790,7 @@
     on("adminConfigForm", "click", function (event) { var button = event.target.closest("[data-remove-row]"); if (button) button.closest("[data-rank-row],[data-group-row],[data-tax-row]").remove(); });
     on("adminConfigForm", "submit", async function (event) {
       event.preventDefault();
-      setBusy("adminConfigSave", true, "Salvando...");
+      setBusy("adminConfigSave", true, legendaMmn("legenda_mmn_rotulo_salvando"));
       try {
         var structuralValidation = validateConfigNetworkStructure(true);
         if (!structuralValidation.valid) {
@@ -5095,7 +5799,7 @@
         }
         var config = collectConfig();
         var result = await rpc(CONFIG.rpcs.adminConfigSave, configSavePayload(config));
-        setStatus("adminConfigStatus", "Rascunho salvo. Gere novamente o regulamento e valide a simulação para estas regras.", "ok");
+        apresentarStatusMmn("adminConfigStatus",function(){return legendaMmn("legenda_mmn_rascunho_salvo_gere_novamente_o_regulamento_e_valide_a_simulacao_para_estas_regras");},"ok");
         state.admin.loaded.configuracoes = false;
         await loadAdminTab("configuracoes", false);
         return result;
@@ -5111,13 +5815,13 @@
           throw new Error(structuralValidation.message);
         }
         var config = collectConfig();
-        if (!config.cod_mmn_config) throw new Error("Salve primeiro a versão em rascunho.");
+        if (!config.cod_mmn_config) throw new Error(legendaMmn("legenda_mmn_salve_primeiro_a_versao_em_rascunho"));
         var progress = await loadPublicationProgress(config.cod_mmn_config);
-        if (!progress || !progress.documento_regulamento_id || !progress.simulacao_id || progress.simulacao_hash !== progress.config_hash) throw new Error("Gere o regulamento no servidor e execute uma simulação V2 válida para as regras atuais antes de publicar.");
-        var reason = await confirmAction("Aprovar publicação", "Sua aprovação será registrada no quórum desta versão. Ao completar o quórum, ela será agendada para a vigência informada sem recalcular competências fechadas.", true);
+        if (!progress || !progress.documento_regulamento_id || !progress.simulacao_id || progress.simulacao_hash !== progress.config_hash) throw new Error(legendaMmn("legenda_mmn_gere_o_regulamento_no_servidor_e_execute_uma_simulacao_v2_valida_para_as"));
+        var reason = await confirmAction(legendaMmn("legenda_mmn_aprovar_publicacao"), legendaMmn("legenda_mmn_sua_aprovacao_sera_registrada_no_quorum_desta_versao_ao_completar_o_quorum_ela"), true);
         if (reason === null) return;
         var publication = await rpc(CONFIG.rpcs.adminConfigPublish, { p_config_id: config.cod_mmn_config, p_vigencia_inicio: config.vigencia_inicio, p_motivo: reason });
-        setStatus("adminConfigStatus", publication.aguardando_aprovacoes ? "Aprovação registrada; aguardando o restante do quórum." : "Versão publicada e agendada.", "ok");
+        apresentarStatusMmn("adminConfigStatus",function(){return publication.aguardando_aprovacoes ? legendaMmn("legenda_mmn_aprovacao_registrada_aguardando_o_restante_do_quorum") : legendaMmn("legenda_mmn_versao_publicada_e_agendada");},"ok");
         state.admin.loaded.configuracoes = false;
         await loadAdminTab("configuracoes", false);
       } catch (error) { setGlobalError(error); }
@@ -5125,9 +5829,9 @@
     on("adminFiscalApprove", "click", async function () {
       try {
         var config = collectConfig();
-        if (!config.cod_mmn_config) throw new Error("Salve a versão antes da homologação fiscal.");
-        var homologate = window.confirm("Confirmar que os parâmetros fiscais desta versão foram homologados com a contabilidade?");
-        var reason = await confirmAction("Homologação fiscal", homologate ? "A versão será marcada como homologada. Defina se os pagamentos permanecem bloqueados no campo da configuração." : "A homologação será removida e os pagamentos permanecerão bloqueados.", true);
+        if (!config.cod_mmn_config) throw new Error(legendaMmn("legenda_mmn_salve_a_versao_antes_da_homologacao_fiscal"));
+        var homologate = window.confirm(legendaMmn("legenda_mmn_confirmar_que_os_parametros_fiscais_desta_versao_foram_homologados_com_a_contabilidade"));
+        var reason = await confirmAction(legendaMmn("legenda_mmn_homologacao_fiscal"), homologate ? legendaMmn("legenda_mmn_a_versao_sera_marcada_como_homologada_defina_se_os_pagamentos_permanecem_bloqueados_no") : legendaMmn("legenda_mmn_a_homologacao_sera_removida_e_os_pagamentos_permanecerao_bloqueados"), true);
         if (reason === null) return;
         await rpc(CONFIG.rpcs.adminFiscalApprove, {
           p_config_id: integerValue(config.cod_mmn_config),
@@ -5135,7 +5839,7 @@
           p_bloquear_pagamento_real: !config.pagamentos_reais_liberados,
           p_motivo: reason
         });
-        setStatus("adminConfigStatus", homologate ? "Configuração fiscal homologada." : "Homologação fiscal removida.", "ok");
+        apresentarStatusMmn("adminConfigStatus",function(){return homologate ? legendaMmn("legenda_mmn_configuracao_fiscal_homologada") : legendaMmn("legenda_mmn_homologacao_fiscal_removida");},"ok");
         state.admin.loaded.configuracoes = false;
         await loadAdminTab("configuracoes", false);
       } catch (error) { setGlobalError(error); }
@@ -5169,7 +5873,7 @@
       };
     });
     var total = rows.reduce(function (sum, row) { return sum + numberValue(row.participacao_percentual); }, 0);
-    if (Math.abs(total - 100) > 0.001) throw new Error("As participações do mix de planos devem somar exatamente 100%.");
+    if (Math.abs(total - 100) > 0.001) throw new Error(legendaMmn("legenda_mmn_as_participacoes_do_mix_de_planos_devem_somar_exatamente_100"));
     return rows;
   }
 
@@ -5207,20 +5911,24 @@
 
   function simulationSummaryText(row) {
     var summary = objectFrom(row, ["resumo"]);
-    if (row.tipo === "admin_historica") return "Real " + formatMoneyCents(summary.payout_real_total_centavos) + " · recalculado " + formatMoneyCents(summary.payout_recalculado_total_centavos);
-    if (row.tipo === "usuario") return "Líquido estimado " + formatMoneyCents(summary.liquido_total_centavos);
-    return "Receita " + formatMoneyCents(summary.receita_reconhecida_total_centavos) + " · payout " + formatMoneyCents(summary.payout_total_estimado_centavos);
+    if (row.tipo === "admin_historica") return legendaMmn("legenda_mmn_rotulo_real") + formatMoneyCents(summary.payout_real_total_centavos) + legendaMmn("legenda_mmn_complemento_recalculado") + formatMoneyCents(summary.payout_recalculado_total_centavos);
+    if (row.tipo === "usuario") return legendaMmn("legenda_mmn_liquido_estimado_prefixo") + formatMoneyCents(summary.liquido_total_centavos);
+    return legendaMmn("legenda_mmn_rotulo_receita_prefixo") + formatMoneyCents(summary.receita_reconhecida_total_centavos) + legendaMmn("legenda_mmn_complemento_payout") + formatMoneyCents(summary.payout_total_estimado_centavos);
   }
 
   function renderSimulationHistory(data, append) {
     var rows = listFrom(data, ["itens"]);
     state.admin.simulations = append ? state.admin.simulations.concat(rows) : rows;
-    var html = rows.map(function (row) {
+    function construirHtmlLegendaMmn() {
+      var html = rows.map(function (row) {
       var id = row.id_simulacao || row.simulacao_id;
-      return "<article class=\"mmn-simulation-history-row\"><label class=\"mmn-check\"><input type=\"checkbox\" data-simulation-select=\"" + escapeHtml(id) + "\"><span></span></label><div class=\"mmn-row-main\"><strong>" + escapeHtml(row.nome || (row.tipo === "admin_historica" ? "Replay histórico" : "Simulação " + (row.cenario || ""))) + "</strong><small>#" + escapeHtml(id) + " · Config. #" + escapeHtml(row.config_id) + " · " + escapeHtml(formatDate(row.criado_em, true)) + "</small><span>" + escapeHtml(simulationSummaryText(row)) + "</span></div>" + pillHtml(row.apta_publicacao ? "ok" : "pendente", row.apta_publicacao ? "Apta" : row.tipo) + "<div class=\"btn-row\"><button class=\"btn btn-ghost btn-small\" type=\"button\" data-simulation-detail=\"" + escapeHtml(id) + "\">Ver detalhes</button><select class=\"mmn-export-select\" data-simulation-export-section=\"" + escapeHtml(id) + "\"><option value=\"mensal\">Mensal</option><option value=\"niveis\">Níveis</option><option value=\"ranks\">Ranks</option><option value=\"resumo\">Resumo</option><option value=\"completo\">Completo</option></select><button class=\"btn btn-ghost btn-small\" type=\"button\" data-simulation-export=\"" + escapeHtml(id) + "\">Exportar JSON</button></div></article>";
+      return "<article class=\"mmn-simulation-history-row\"><label class=\"mmn-check\"><input type=\"checkbox\" data-simulation-select=\"" + escapeHtml(id) + "\"><span></span></label><div class=\"mmn-row-main\"><strong>" + escapeHtml(row.nome || (row.tipo === "admin_historica" ? legendaMmn("legenda_mmn_replay_historico") : legendaMmn("legenda_mmn_simulacao_prefixo") + (row.cenario || ""))) + "</strong><small>#" + escapeHtml(id) + legendaMmn("legenda_mmn_complemento_config") + escapeHtml(row.config_id) + " · " + escapeHtml(formatDate(row.criado_em, true)) + "</small><span>" + escapeHtml(simulationSummaryText(row)) + "</span></div>" + pillHtml(row.apta_publicacao ? "ok" : "pendente", row.apta_publicacao ? legendaMmn("legenda_mmn_rotulo_apta") : row.tipo) + "<div class=\"btn-row\"><button class=\"btn btn-ghost btn-small\" type=\"button\" data-simulation-detail=\"" + escapeHtml(id) + ("\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_ver_detalhes")) + "</button><select class=\"mmn-export-select\" data-simulation-export-section=\"") + escapeHtml(id) + ("\"><option value=\"mensal\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_mensal")) + "</option><option value=\"niveis\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_niveis_mensagem")) + "</option><option value=\"ranks\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_ranks_mensagem")) + "</option><option value=\"resumo\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_resumo")) + "</option><option value=\"completo\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_completo")) + "</option></select><button class=\"btn btn-ghost btn-small\" type=\"button\" data-simulation-export=\"") + escapeHtml(id) + ("\">" + escapeHtml(legendaMmn("legenda_mmn_rotulo_exportar_json")) + "</button></div></article>");
     }).join("");
-    if (append) qs("adminSimulationHistory").insertAdjacentHTML("beforeend", html);
-    else qs("adminSimulationHistory").innerHTML = html || emptyHtml("Nenhuma simulação registrada com esses filtros.");
+          return html;
+    }
+    var html = construirHtmlLegendaMmn();
+    if (append) acrescentarHtmlMmn(qs("adminSimulationHistory"), html, construirHtmlLegendaMmn);
+    else apresentarMmn(qs("adminSimulationHistory"),"innerHTML",function(){return construirHtmlLegendaMmn() || emptyHtml(legendaMmn("legenda_mmn_nenhuma_simulacao_registrada_com_esses_filtros"));});
     state.admin.cursors.simulations = data.proximo_cursor || null;
     qs("adminSimulationHistoryMore").hidden = data.has_more === false || !state.admin.cursors.simulations;
   }
@@ -5245,10 +5953,10 @@
     var rows = series.map(function (month) {
       return "<tr><td>" + escapeHtml(month.mes) + "</td>" + listFrom(month, ["valores"]).map(function (value) {
         var metrics = objectFrom(value, ["metricas"]);
-        return "<td><strong>" + escapeHtml(formatMoneyCents(metrics.payout_centavos)) + "</strong><br><small>Receita " + escapeHtml(formatMoneyCents(metrics.receita_centavos)) + " · margem " + escapeHtml(formatMoneyCents(metrics.margem_centavos)) + "</small><br><small>Δ payout " + escapeHtml(formatMoneyCents(value.diferenca_payout_centavos)) + "</small></td>";
+        return "<td><strong>" + escapeHtml(formatMoneyCents(metrics.payout_centavos)) + "</strong><br><small>Receita " + escapeHtml(formatMoneyCents(metrics.receita_centavos)) + legendaMmn("legenda_mmn_complemento_margem") + escapeHtml(formatMoneyCents(metrics.margem_centavos)) + "</small><br><small>Δ payout " + escapeHtml(formatMoneyCents(value.diferenca_payout_centavos)) + "</small></td>";
       }).join("") + "</tr>";
     }).join("");
-    qs("adminSimulationCompareResults").innerHTML = "<div class=\"mmn-simulation-meta\"><strong>Comparação com baseline #" + escapeHtml(data.baseline_id) + "</strong><span>2 a 4 execuções registradas, sem alterar dados reais.</span></div><div class=\"table-wrap mmn-simulation-table\"><table><thead><tr><th>Mês</th>" + header + "</tr></thead><tbody>" + rows + "</tbody></table></div>";
+    apresentarMmn(qs("adminSimulationCompareResults"),"innerHTML",function(){return ("<div class=\"mmn-simulation-meta\"><strong>" + escapeHtml(legendaMmn("legenda_fechamento_mmn_comparacao_base"))) + escapeHtml(data.baseline_id) + ("</strong><span>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_2_a_4_execucoes_registradas_sem_alterar_dados_reais")) + "</span></div><div class=\"table-wrap mmn-simulation-table\"><table><thead><tr><th>" + escapeHtml(legendaMmn("legenda_mmn_rotulo_mes")) + "</th>") + header + "</tr></thead><tbody>" + rows + "</tbody></table></div>";});
   }
 
   async function exportSimulation(simulationId, section) {
@@ -5267,7 +5975,7 @@
   function setupSimulatorAndExport() {
     on("adminSimulatorForm", "submit", async function (event) {
       event.preventDefault();
-      setBusy("adminSimulatorSubmit", true, "Simulando...");
+      setBusy("adminSimulatorSubmit", true, legendaMmn("legenda_mmn_rotulo_simulando"));
       try {
         var simulationParameters = collectAdminSimulationParameters();
         var data = await rpc(CONFIG.rpcs.adminSimulator, { p_config_id: integerValue(qs("adminSimVersion").value) || null, p_parametros: simulationParameters });
@@ -5280,7 +5988,7 @@
     });
     on("adminReplayForm", "submit", async function (event) {
       event.preventDefault();
-      setBusy("adminReplaySubmit", true, "Executando...");
+      setBusy("adminReplaySubmit", true, legendaMmn("legenda_mmn_rotulo_executando"));
       try {
         var data = await rpc(CONFIG.rpcs.adminSimulatorReplay, {
           p_config_id: integerValue(qs("adminReplayVersion").value) || null,
@@ -5309,7 +6017,7 @@
         } else if (exportButton) {
           var id = integerValue(exportButton.dataset.simulationExport);
           var select = qs("adminSimulationHistory").querySelector("[data-simulation-export-section=\"" + id + "\"]");
-          setBusy(exportButton, true, "Gerando...");
+          setBusy(exportButton, true, legendaMmn("legenda_mmn_rotulo_gerando"));
           try { await exportSimulation(id, select ? select.value : "mensal"); }
           finally { setBusy(exportButton, false); }
         }
@@ -5317,8 +6025,8 @@
     });
     on("adminSimulationCompare", "click", async function () {
       var ids = qsa("[data-simulation-select]:checked", qs("adminSimulationHistory")).map(function (input) { return integerValue(input.dataset.simulationSelect); });
-      if (ids.length < 2 || ids.length > 4) return setGlobalError(new Error("Selecione de 2 a 4 simulações distintas."));
-      setBusy("adminSimulationCompare", true, "Comparando...");
+      if (ids.length < 2 || ids.length > 4) return setGlobalError(new Error(legendaMmn("legenda_mmn_selecione_de_2_a_4_simulacoes_distintas")));
+      setBusy("adminSimulationCompare", true, legendaMmn("legenda_mmn_rotulo_comparando"));
       try {
         var data = await rpc(CONFIG.rpcs.adminSimulationsCompare, { p_simulacao_ids: ids });
         renderSimulationComparison(data);
@@ -5328,7 +6036,7 @@
     });
     on("adminPaymentExport", "click", async function () {
       try {
-        var reason = await confirmAction("Criar lote manual", "Será criado um lote real para a competência selecionada. Bloqueios fiscais e valor mínimo serão validados pelo servidor.", true);
+        var reason = await confirmAction(legendaMmn("legenda_mmn_criar_lote_manual"), legendaMmn("legenda_mmn_sera_criado_um_lote_real_para_a_competencia_selecionada_bloqueios_fiscais_e_valor"), true);
         if (reason === null) return;
         await rpc(CONFIG.rpcs.adminBatchCreate, { p_competencia: monthDate(qs("adminPaymentPeriod").value), p_simulacao: false, p_motivo: reason });
         await refreshAdminDashboard();

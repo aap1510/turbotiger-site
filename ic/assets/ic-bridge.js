@@ -5,6 +5,22 @@
   root.TurboTigerIC.Bridge = api;
 }(typeof window !== "undefined" ? window : globalThis, function (root) {
   "use strict";
+  var LEGENDAS_VALIDACAO={
+  "legenda_ic_validacao_sessao_nativa_invalida": "Sessão nativa inválida.",
+  "legenda_ic_validacao_token_de_sessao_invalido": "Token de sessão inválido.",
+  "legenda_ic_validacao_uuid_nativo_invalido": "UUID nativo inválido.",
+  "legenda_ic_validacao_contexto_nativo_invalido": "Contexto nativo inválido.",
+  "legenda_ic_validacao_periodo_nativo_invalido": "Período nativo inválido.",
+  "legenda_ic_validacao_destino_nativo_invalido": "Destino nativo inválido.",
+  "legenda_ic_validacao_escopo_estatistico_invalido": "Escopo estatístico inválido.",
+  "legenda_ic_validacao_direcao_historica_invalida": "Direção histórica inválida.",
+  "legenda_ic_validacao_fonte_efetiva_invalida": "Fonte efetiva inválida.",
+  "legenda_ic_validacao_fonte_fora_do_escopo_escolhido": "Fonte fora do escopo escolhido.",
+  "legenda_ic_validacao_janela_da_ocorrencia_invalida": "Janela da ocorrência inválida.",
+  "legenda_ic_validacao_versao_da_regra_invalida": "Versão da regra inválida."
+};
+  if(root.TurboTigerLegendas)root.TurboTigerLegendas.registrar(LEGENDAS_VALIDACAO);
+  function legendaValidacao(chave){return root.TurboTigerLegendas?root.TurboTigerLegendas.texto(chave):LEGENDAS_VALIDACAO[chave];}
   var bridgeName = "TurboTigerICBridge";
   var canonicalHost = "turbotiger.com.br";
   var schemePrefix = "turbotiger-ic://bridge?payload=";
@@ -55,7 +71,7 @@
   }
 
   function decodeBase64Json(encoded) {
-    if (typeof encoded !== "string" || encoded.length < 4 || encoded.length > 131072) throw new Error("Sessão nativa inválida.");
+    if (typeof encoded !== "string" || encoded.length < 4 || encoded.length > 131072) throw new Error(legendaValidacao("legenda_ic_validacao_sessao_nativa_invalida"));
     var binary = root.atob(encoded);
     var bytes = new Uint8Array(binary.length);
     for (var index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
@@ -66,7 +82,7 @@
   function normalizeSession(encoded) {
     var value = decodeBase64Json(encoded);
     var token = value && (value.access_token || value.accessToken);
-    if (typeof token !== "string" || token.length < 20 || token.length > 8192) throw new Error("Token de sessão inválido.");
+    if (typeof token !== "string" || token.length < 20 || token.length > 8192) throw new Error(legendaValidacao("legenda_ic_validacao_token_de_sessao_invalido"));
     return {
       accessToken: token,
       expiresAt: value.expires_at || value.expiresAt || null,
@@ -77,38 +93,38 @@
   function safeNativeUuid(value, required) {
     var text = String(value || "").trim().toLowerCase();
     if (!text && !required) return null;
-    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(text)) throw new Error("UUID nativo inválido.");
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(text)) throw new Error(legendaValidacao("legenda_ic_validacao_uuid_nativo_invalido"));
     return text;
   }
 
   function safeNativeText(value, maximum, required) {
     var text = String(value || "").trim();
-    if ((!text && required) || text.length > maximum || /[\u0000-\u001f]/.test(text)) throw new Error("Contexto nativo inválido.");
+    if ((!text && required) || text.length > maximum || /[\u0000-\u001f]/.test(text)) throw new Error(legendaValidacao("legenda_ic_validacao_contexto_nativo_invalido"));
     return text || null;
   }
 
   function safeNativeDate(value, required) {
     var text = safeNativeText(value, 64, required);
     if (!text) return null;
-    if (Number.isNaN(new Date(text).getTime())) throw new Error("Período nativo inválido.");
+    if (Number.isNaN(new Date(text).getTime())) throw new Error(legendaValidacao("legenda_ic_validacao_periodo_nativo_invalido"));
     return text;
   }
 
   function normalizeOpenSection(encoded) {
     var value = decodeBase64Json(encoded);
-    if (!value || value.section !== "estatisticas") throw new Error("Destino nativo inválido.");
+    if (!value || value.section !== "estatisticas") throw new Error(legendaValidacao("legenda_ic_validacao_destino_nativo_invalido"));
     var scope = safeNativeText(value.escopo_estatistico, 48, true);
     var direction = safeNativeText(value.direcao_historica, 80, true);
     var source = safeNativeText(value.fonte_efetiva, 24, true);
-    if (["pessoal", "comunidade", "ambos"].indexOf(scope) < 0) throw new Error("Escopo estatístico inválido.");
-    if (["melhor_historico", "pior_historico"].indexOf(direction) < 0) throw new Error("Direção histórica inválida.");
-    if (["pessoal", "comunidade", "ambos"].indexOf(source) < 0) throw new Error("Fonte efetiva inválida.");
-    if ((scope === "pessoal" && source !== "pessoal") || (scope === "comunidade" && source !== "comunidade")) throw new Error("Fonte fora do escopo escolhido.");
+    if (["pessoal", "comunidade", "ambos"].indexOf(scope) < 0) throw new Error(legendaValidacao("legenda_ic_validacao_escopo_estatistico_invalido"));
+    if (["melhor_historico", "pior_historico"].indexOf(direction) < 0) throw new Error(legendaValidacao("legenda_ic_validacao_direcao_historica_invalida"));
+    if (["pessoal", "comunidade", "ambos"].indexOf(source) < 0) throw new Error(legendaValidacao("legenda_ic_validacao_fonte_efetiva_invalida"));
+    if ((scope === "pessoal" && source !== "pessoal") || (scope === "comunidade" && source !== "comunidade")) throw new Error(legendaValidacao("legenda_ic_validacao_fonte_fora_do_escopo_escolhido"));
     var occurrenceStart = safeNativeDate(value.ocorrencia_inicio, true);
     var occurrenceEnd = safeNativeDate(value.ocorrencia_fim, true);
-    if (new Date(occurrenceEnd).getTime() <= new Date(occurrenceStart).getTime()) throw new Error("Janela da ocorrência inválida.");
+    if (new Date(occurrenceEnd).getTime() <= new Date(occurrenceStart).getTime()) throw new Error(legendaValidacao("legenda_ic_validacao_janela_da_ocorrencia_invalida"));
     var ruleVersion = safeNativeText(value.versao_regra, 16, true);
-    if (!/^[1-9][0-9]{0,8}$/.test(ruleVersion)) throw new Error("Versão da regra inválida.");
+    if (!/^[1-9][0-9]{0,8}$/.test(ruleVersion)) throw new Error(legendaValidacao("legenda_ic_validacao_versao_da_regra_invalida"));
     return {
       section: "estatisticas",
       id_assinatura_estatistica: safeNativeUuid(value.id_assinatura_estatistica, true),

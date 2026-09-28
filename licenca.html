@@ -119,8 +119,8 @@
 </style>
 <link rel="stylesheet" href="assets/turbotiger-site-ui.css?v=20260722-02" />
 <link rel="stylesheet" href="assets/turbotiger-legendas.css?v=20260926-01">
-<script src="assets/turbotiger-legendas.js?v=20260926-i18n-01"></script>
-<script src="assets/legendas/pt-BR.js?v=20260926-i18n-01"></script>
+<script src="assets/turbotiger-legendas.js?v=20260928-i18n-03"></script>
+<script src="assets/legendas/pt-BR.js?v=20260928-i18n-03"></script>
 </head>
 <body data-tt-background="fundo_geral" style="--tt-site-background-url:url('assets/bg-900x900.webp')">
 <header class="top">
@@ -350,6 +350,9 @@
 
 <script>
 const LEGENDAS_PAGAMENTO = {
+  "legenda_fechamento_pagamento_erro_conectar": "Não foi possível conectar ao gateway de pagamento: ",
+  "legenda_fechamento_pagamento_erro_processar": "Não foi possível processar o pagamento: ",
+
   "legenda_pagamento_id": "ID",
   "legenda_pagamento_codigo_postal": "Código postal",
   "legenda_pagamento_nome_completo": "Nome completo",
@@ -485,14 +488,14 @@ if (window.TurboTigerLegendas) window.TurboTigerLegendas.registrar(LEGENDAS_PAGA
 // Vinculos de apresentacao: nao executam validacao, consulta ou pagamento ao trocar idioma.
 const vinculosPagamento = new Map();
 let legendaBotaoBase = 'legenda_pagamento_validando_acesso';
-function mostrarLegendaPagamento(elemento, chave, valores) {
-  const texto = legendaPagamento(chave, valores);
+function mostrarLegendaPagamento(elemento, chave, valores, sufixo) {
+  const texto = legendaPagamento(chave, valores) + (sufixo || "");
   elemento.textContent = texto;
-  vinculosPagamento.set(elemento, {chave:chave, valores:valores, ultimo:texto});
+  vinculosPagamento.set(elemento, {chave:chave, valores:valores, sufixo:sufixo || "", ultimo:texto});
 }
-function setStatusLegenda(chave, kind) {
-  setStatus(legendaPagamento(chave), kind);
-  mostrarLegendaPagamento(statusBox, chave);
+function setStatusLegenda(chave, kind, sufixo) {
+  setStatus(legendaPagamento(chave) + (sufixo || ""), kind);
+  mostrarLegendaPagamento(statusBox, chave, undefined, sufixo);
 }
 function setButtonLegenda(enabled, chave) {
   setButton(enabled, legendaPagamento(chave));
@@ -501,7 +504,7 @@ function setButtonLegenda(enabled, chave) {
 function atualizarVinculosPagamento() {
   vinculosPagamento.forEach(function(vinculo, elemento) {
     if (!elemento.isConnected || elemento.textContent !== vinculo.ultimo) { vinculosPagamento.delete(elemento); return; }
-    vinculo.ultimo = legendaPagamento(vinculo.chave, vinculo.valores);
+    vinculo.ultimo = legendaPagamento(vinculo.chave, vinculo.valores) + (vinculo.sufixo || "");
     elemento.textContent = vinculo.ultimo;
   });
   if (legendaBotaoBase) {
@@ -1581,10 +1584,7 @@ checkoutBtn.addEventListener('click', async function(){
     data = await gatewayCheckout(checkoutPayload);
   } catch(e) {
     const detalheErro = String(e && e.message || '').trim();
-    setStatus(detalheErro
-      ? 'Não foi possível conectar ao gateway de pagamento: ' + detalheErro
-      : legendaPagamento("legenda_pagamento_nao_foi_possivel_conectar_ao_gateway_de_pagamento_verifique_sua_internet_e_tente_novamente"),
-      'error');
+    setStatusLegenda(detalheErro ? "legenda_fechamento_pagamento_erro_conectar" : "legenda_pagamento_nao_foi_possivel_conectar_ao_gateway_de_pagamento_verifique_sua_internet_e_tente_novamente", "error", detalheErro);
     paymentProcessing = false;
     setButtonLegenda(true, (selectedPay === 'cartao' ? "legenda_pagamento_tentar_novamente" : "legenda_pagamento_gerar_pix_novamente"));
     return;
@@ -1592,12 +1592,10 @@ checkoutBtn.addEventListener('click', async function(){
 
   if (!data.ok) {
     const detalheErro = String(data.mensagem || data.message || data.error || '').trim();
-    const message = data.error === 'cartao_recusado'
-      ? legendaPagamento("legenda_pagamento_cartao_recusado_confira_os_dados_ou_tente_outro_cartao")
-      : (detalheErro
-        ? 'N\u00e3o foi poss\u00edvel processar o pagamento: ' + detalheErro
-        : legendaPagamento("legenda_pagamento_nao_foi_possivel_processar_o_pagamento_tente_novamente"));
-    setStatus(message, 'error');
+    const chaveErro = data.error === "cartao_recusado"
+      ? "legenda_pagamento_cartao_recusado_confira_os_dados_ou_tente_outro_cartao"
+      : (detalheErro ? "legenda_fechamento_pagamento_erro_processar" : "legenda_pagamento_nao_foi_possivel_processar_o_pagamento_tente_novamente");
+    setStatusLegenda(chaveErro, "error", data.error === "cartao_recusado" ? "" : detalheErro);
     paymentProcessing = false;
     setButtonLegenda(true, (selectedPay === 'cartao' ? "legenda_pagamento_tentar_novamente" : "legenda_pagamento_gerar_pix_novamente"));
     return;

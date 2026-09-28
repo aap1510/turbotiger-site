@@ -431,8 +431,8 @@
   }
 </style>
 <link rel="stylesheet" href="../assets/turbotiger-site-ui.css?v=20260722-02" />
-<script src="../assets/turbotiger-legendas.js?v=20260926-i18n-01"></script>
-<script src="../assets/legendas/pt-BR.js?v=20260926-i18n-01"></script>
+<script src="../assets/turbotiger-legendas.js?v=20260928-i18n-03"></script>
+<script src="../assets/legendas/pt-BR.js?v=20260928-i18n-03"></script>
 </head>
 <body data-tt-background="fundo_geral" style="--tt-site-background-url:url('../assets/bg-900x900.webp')">
 <header class="wrap topbar">
@@ -608,6 +608,19 @@
   "use strict";
 
   const fontesLegendasEspera = {
+  "legenda_fechamento_espera_estado_vazio": "Nenhum estado encontrado",
+
+"legenda_espera_complemento_regra_indicacao":"O amigo precisa completar o cadastro na lista para a indicação contar.",
+"legenda_espera_complemento_aviso_maioridade":"Conteúdo e cadastro permitidos somente para maiores de 18 anos.",
+"legenda_espera_complemento_sem_promessa":"O Turbo Tiger é uma ferramenta de organização e acompanhamento. Não promete ganhos, lucro ou resultado em apostas.",
+"legenda_espera_complemento_lancamento_titulo":"Liberação do Turbo Tiger",
+"legenda_espera_complemento_lancamento_dias":"Faltam {dias} dias para liberação do Turbo Tiger",
+"legenda_espera_complemento_lancamento_iniciado":"A liberação do Turbo Tiger já começou",
+"legenda_espera_complemento_previsao_data":"Previsão: {data}",
+"legenda_espera_complemento_acesso_enviado_agora":" Enviamos agora o acesso para o e-mail já cadastrado.",
+"legenda_espera_complemento_acesso_enviado_recentemente":" O acesso já foi enviado recentemente para o e-mail cadastrado.",
+"legenda_espera_complemento_quantidade_pontos":"{quantidade} pontos",
+"legenda_espera_complemento_quantidade_indicacoes_confirmadas":"{quantidade} indicações confirmadas",
   "legenda_espera_entrei_na_lista_de_espera_do_turbo_tiger_cadastre_se_pelo_meu_link_para_ganhar_acesso_antecipado_comigo": "Entrei na lista de espera do Turbo Tiger. Cadastre-se pelo meu link para ganhar acesso antecipado comigo:",
   "legenda_espera_entre_na_lista_de_espera_do_turbo_tiger": "Entre na lista de espera do Turbo Tiger",
   "legenda_espera_organize_suas_bets_acompanhe_seus_resultados_e_receba_acesso_antecipado": "Organize suas bets, acompanhe seus resultados e receba acesso antecipado.",
@@ -774,6 +787,12 @@
     }
   };
 
+
+  function legendaConfiguradaEspera(chave, valor){return valor === fontesLegendasEspera[chave] ? legendaEspera(chave) : valor;}
+  const vinculosTextoEspera = new Map();
+  function apresentarTextoEspera(elemento, obter){if(!elemento)return;const texto=obter();elemento.textContent=texto;vinculosTextoEspera.set(elemento,{obter,ultimo:elemento.textContent});}
+  window.addEventListener("turbotiger:idioma",()=>{vinculosTextoEspera.forEach((v,el)=>{if(!el.isConnected||el.textContent!==v.ultimo){vinculosTextoEspera.delete(el);return;}el.textContent=v.obter();v.ultimo=el.textContent;});});
+
   function normalize(value){
     return value === null || value === undefined ? "" : String(value).trim();
   }
@@ -923,9 +942,9 @@
         : (cfg.contador_chamada || defaults.release.contador_chamada).replace("{dias}", days.toLocaleString("pt-BR"));
 
       $("launchDays").textContent = days.toLocaleString("pt-BR");
-      $("launchTitle").textContent = cfg.contador_titulo || defaults.release.contador_titulo;
-      $("launchText").textContent = text;
-      $("launchDateText").textContent = formatLaunchDate(date, cfg) ? "Previsão: " + formatLaunchDate(date, cfg) : "";
+      apresentarTextoEspera($("launchTitle"),()=>(legendaConfiguradaEspera("legenda_espera_complemento_lancamento_titulo",cfg.contador_titulo || defaults.release.contador_titulo)));
+      apresentarTextoEspera($("launchText"),()=>(diff <= 0 ? legendaConfiguradaEspera("legenda_espera_complemento_lancamento_iniciado",cfg.contador_encerrado || defaults.release.contador_encerrado) : legendaConfiguradaEspera("legenda_espera_complemento_lancamento_dias",cfg.contador_chamada || defaults.release.contador_chamada).replace("{dias}",days.toLocaleString("pt-BR"))));
+      apresentarTextoEspera($("launchDateText"),()=>(formatLaunchDate(date, cfg) ? legendaEspera("legenda_espera_complemento_previsao_data",{data:formatLaunchDate(date,cfg)}) : ""));
       box.classList.add("is-visible");
     };
 
@@ -1051,15 +1070,15 @@
     const legal = Object.assign({}, defaults.legal, promo.legal || {});
     const release = Object.assign({}, defaults.release, promo.release || {});
 
-    $("heroTitle").textContent = promo.titulo || legendaEspera("legenda_espera_entre_na_lista_de_espera_do_turbo_tiger");
-    $("heroSubtitle").textContent = promo.subtitulo || legendaEspera("legenda_espera_organize_suas_bets_acompanhe_seus_resultados_e_receba_acesso_antecipado");
-    $("benefitText").textContent = promo.beneficio || legendaEspera("legenda_espera_sua_posicao_fica_registrada_e_seu_link_pessoal_sera_criado_ao_finalizar");
-    $("statusPublico").textContent = promo.status_publico === "lista_aberta" ? legendaEspera("legenda_espera_lista_aberta") : legendaEspera("legenda_espera_acesso_antecipado");
+    apresentarTextoEspera($("heroTitle"),()=>(legendaConfiguradaEspera("legenda_espera_entre_na_lista_de_espera_do_turbo_tiger",promo.titulo || fontesLegendasEspera["legenda_espera_entre_na_lista_de_espera_do_turbo_tiger"])));
+    apresentarTextoEspera($("heroSubtitle"),()=>(legendaConfiguradaEspera("legenda_espera_organize_suas_bets_acompanhe_seus_resultados_e_receba_acesso_antecipado",promo.subtitulo || fontesLegendasEspera["legenda_espera_organize_suas_bets_acompanhe_seus_resultados_e_receba_acesso_antecipado"])));
+    apresentarTextoEspera($("benefitText"),()=>(legendaConfiguradaEspera("legenda_espera_sua_posicao_fica_registrada_e_seu_link_pessoal_sera_criado_ao_finalizar",promo.beneficio || fontesLegendasEspera["legenda_espera_sua_posicao_fica_registrada_e_seu_link_pessoal_sera_criado_ao_finalizar"])));
+    apresentarTextoEspera($("statusPublico"),()=>(promo.status_publico === "lista_aberta" ? legendaEspera("legenda_espera_lista_aberta") : legendaEspera("legenda_espera_acesso_antecipado")));
     $("totalLista").textContent = Number(promo.total_lista || 0).toLocaleString("pt-BR");
     $("pontosIndicacao").textContent = "+" + Number(indicacao.pontos_por_cadastro_confirmado || 0);
-    $("refRule").textContent = indicacao.regra_publica || defaults.indicacao.regra_publica;
-    $("legalNote").textContent = legal.sem_promessa || defaults.legal.sem_promessa;
-    $("legalAds").textContent = [legal.aviso_18, legal.sem_promessa, legal.jogo_responsavel].filter(Boolean).join(" ");
+    apresentarTextoEspera($("refRule"),()=>(legendaConfiguradaEspera("legenda_espera_complemento_regra_indicacao",indicacao.regra_publica || defaults.indicacao.regra_publica)));
+    apresentarTextoEspera($("legalNote"),()=>(legendaConfiguradaEspera("legenda_espera_complemento_sem_promessa",legal.sem_promessa || defaults.legal.sem_promessa)));
+    apresentarTextoEspera($("legalAds"),()=>([legendaConfiguradaEspera("legenda_espera_complemento_aviso_maioridade",legal.aviso_18), legendaConfiguradaEspera("legenda_espera_complemento_sem_promessa",legal.sem_promessa), legal.jogo_responsavel].filter(Boolean).join(" ")));
     $("termsLink").href = legal.politica_url || "/politicaetermos.html";
     $("termsPrivacyLink").href = legal.politica_url || "/politicaetermos.html";
     $("termsUseLink").href = legal.politica_url || "/politicaetermos.html";
@@ -1168,9 +1187,10 @@
   function setFieldHint(id, message, kind){
     const el = $(id);
     if (!el) return;
-    const text = normalize(message);
+    const text = normalize(typeof message === "function" ? message() : message);
     el.className = "field-hint" + (kind ? " " + kind : "");
-    el.textContent = text;
+    if (typeof message === "function") apresentarTextoEspera(el,()=>normalize(message()));
+    else { vinculosTextoEspera.delete(el); el.textContent = text; }
   }
 
   function contactHintKind(status){
@@ -1197,15 +1217,15 @@
     const whatsapp = data.whatsapp || {};
 
     if (kind === "email") {
-      setFieldHint("emailHelp", contactHintMessage("email", email), contactHintKind(email.status));
+      setFieldHint("emailHelp", ()=>contactHintMessage("email", email), contactHintKind(email.status));
     }
     if (kind === "whatsapp") {
-      setFieldHint("whatsappHelp", contactHintMessage("whatsapp", whatsapp), contactHintKind(whatsapp.status));
+      setFieldHint("whatsappHelp", ()=>contactHintMessage("whatsapp", whatsapp), contactHintKind(whatsapp.status));
     }
 
     if (data.conflito_lista) {
-      setFieldHint("emailHelp", friendlyError("email_whatsapp_em_cadastros_diferentes"), "");
-      setFieldHint("whatsappHelp", friendlyError("email_whatsapp_em_cadastros_diferentes"), "");
+      setFieldHint("emailHelp", ()=>friendlyError("email_whatsapp_em_cadastros_diferentes"), "");
+      setFieldHint("whatsappHelp", ()=>friendlyError("email_whatsapp_em_cadastros_diferentes"), "");
     }
   }
 
@@ -1220,8 +1240,8 @@
     if (!checkEmail && !checkWhatsApp) return;
 
     const seq = ++state.contactSeq;
-    if (checkEmail) setFieldHint("emailHelp", legendaEspera("legenda_espera_verificando_e_mail"), "warn");
-    if (checkWhatsApp) setFieldHint("whatsappHelp", legendaEspera("legenda_espera_verificando_whatsapp"), "warn");
+    if (checkEmail) setFieldHint("emailHelp", ()=>legendaEspera("legenda_espera_verificando_e_mail"), "warn");
+    if (checkWhatsApp) setFieldHint("whatsappHelp", ()=>legendaEspera("legenda_espera_verificando_whatsapp"), "warn");
 
     try {
       const data = await rpc("espera_contato_verificar_rpc", {
@@ -1234,8 +1254,8 @@
       applyContactResult(kind, data);
     } catch(e) {
       if (seq !== state.contactSeq) return;
-      if (checkEmail) setFieldHint("emailHelp", legendaEspera("legenda_espera_nao_foi_possivel_verificar_o_e_mail_agora"), "");
-      if (checkWhatsApp) setFieldHint("whatsappHelp", legendaEspera("legenda_espera_nao_foi_possivel_verificar_o_whatsapp_agora"), "");
+      if (checkEmail) setFieldHint("emailHelp", ()=>legendaEspera("legenda_espera_nao_foi_possivel_verificar_o_e_mail_agora"), "");
+      if (checkWhatsApp) setFieldHint("whatsappHelp", ()=>legendaEspera("legenda_espera_nao_foi_possivel_verificar_o_whatsapp_agora"), "");
     }
   }
 
@@ -1251,7 +1271,7 @@
       return;
     }
     if (!isValidEmail(value)) {
-      setFieldHint("emailHelp", showInvalid ? legendaEspera("legenda_espera_confira_o_e_mail_informado") : "");
+      setFieldHint("emailHelp", ()=>showInvalid ? legendaEspera("legenda_espera_confira_o_e_mail_informado") : "");
       return;
     }
     scheduleContactCheck("email", immediate);
@@ -1264,7 +1284,7 @@
       return;
     }
     if (!isValidWhatsApp(value)) {
-      setFieldHint("whatsappHelp", showInvalid ? legendaEspera("legenda_espera_confira_o_whatsapp_informado") : "");
+      setFieldHint("whatsappHelp", ()=>showInvalid ? legendaEspera("legenda_espera_confira_o_whatsapp_informado") : "");
       return;
     }
     scheduleContactCheck("whatsapp", immediate);
@@ -1311,7 +1331,8 @@
     const states = matchingStates($("uf").value);
 
     if (!states.length) {
-      list.innerHTML = '<div class="city-option" role="option">Nenhum estado encontrado</div>';
+      list.innerHTML = ("<div class=\"city-option\" role=\"option\">" + escapeHtml(legendaEspera("legenda_fechamento_espera_estado_vazio")) + "</div>");
+      apresentarTextoEspera(list.firstElementChild,()=>legendaEspera("legenda_fechamento_espera_estado_vazio"));
       list.hidden = false;
       return;
     }
@@ -1421,14 +1442,14 @@
         .filter((city) => city.nome && city.uf === uf && cityPayloadValue(city));
       renderCityList(state.cities);
       if (normalize(search) && !state.cities.length) {
-        $("cityHelp").textContent = legendaEspera("legenda_espera_nenhuma_cidade_encontrada_para_este_estado");
+        apresentarTextoEspera($("cityHelp"),()=>(legendaEspera("legenda_espera_nenhuma_cidade_encontrada_para_este_estado")));
       } else if (!state.selectedCity) {
         $("cityHelp").textContent = "";
       }
     } catch(e) {
       state.cities = [];
       renderCityList([]);
-      $("cityHelp").textContent = legendaEspera("legenda_espera_nao_foi_possivel_carregar_as_cidades_agora");
+      apresentarTextoEspera($("cityHelp"),()=>(legendaEspera("legenda_espera_nao_foi_possivel_carregar_as_cidades_agora")));
     }
     updateFormState();
   }
@@ -1452,11 +1473,11 @@
       return true;
     }
     if (!state.selectedUf) {
-      if (showMessage) $("cityHelp").textContent = legendaEspera("legenda_espera_selecione_o_estado_primeiro");
+      if (showMessage) apresentarTextoEspera($("cityHelp"),()=>(legendaEspera("legenda_espera_selecione_o_estado_primeiro")));
       return false;
     }
     if (!cityText) {
-      if (showMessage) $("cityHelp").textContent = legendaEspera("legenda_espera_selecione_sua_cidade");
+      if (showMessage) apresentarTextoEspera($("cityHelp"),()=>(legendaEspera("legenda_espera_selecione_sua_cidade")));
       return false;
     }
     if (
@@ -1467,7 +1488,7 @@
     ) {
       return true;
     }
-    if (showMessage) $("cityHelp").textContent = legendaEspera("legenda_espera_escolha_uma_cidade_da_lista");
+    if (showMessage) apresentarTextoEspera($("cityHelp"),()=>(legendaEspera("legenda_espera_escolha_uma_cidade_da_lista")));
     return false;
   }
 
@@ -1501,8 +1522,9 @@
     const alertId = checkAlertId(inputId);
     const box = alertId ? $(alertId) : null;
     if (!box) return;
-    const text = normalize(message);
-    box.textContent = text;
+    const text = normalize(typeof message === "function" ? message() : message);
+    if (typeof message === "function") apresentarTextoEspera(box,()=>normalize(message()));
+    else { vinculosTextoEspera.delete(box); box.textContent = text; }
     box.hidden = !text;
   }
 
@@ -1526,7 +1548,7 @@
     });
 
     if (showMessage && firstMissing) {
-      setCheckAlert(firstMissing, checkRequiredMessage(firstMissing));
+      setCheckAlert(firstMissing, ()=>checkRequiredMessage(firstMissing));
     }
 
     return { ok, message: firstMessage };
@@ -1688,10 +1710,10 @@
     const base = waitlistExistingMessage(data);
     const emailStatus = normalize(data && data.email_notificacao_status);
     if (emailStatus === "enfileirada") {
-      return base + " Enviamos agora o acesso para o e-mail já cadastrado.";
+      return base + legendaEspera("legenda_espera_complemento_acesso_enviado_agora");
     }
     if (emailStatus === "ja_enfileirada_recentemente") {
-      return base + " O acesso já foi enviado recentemente para o e-mail cadastrado.";
+      return base + legendaEspera("legenda_espera_complemento_acesso_enviado_recentemente");
     }
     return base;
   }
@@ -1702,11 +1724,11 @@
     $("waitlistForm").hidden = true;
     $("resultPanel").hidden = false;
     $("resultPosition").textContent = "#" + (data.posicao || "--");
-    $("resultText").textContent = data.ja_cadastrado
+    apresentarTextoEspera($("resultText"),()=>(data.ja_cadastrado
       ? waitlistExistingMessage(data)
-      : legendaEspera("legenda_espera_seu_cadastro_foi_recebido_compartilhe_seu_link_para_subir_na_lista_quando_seus_amigos_tambem_se_cadastrarem");
-    $("resultPoints").textContent = (data.pontos || 0) + " pontos";
-    $("resultRefs").textContent = (data.indicacoes_confirmadas || 0) + " indicações confirmadas";
+      : legendaEspera("legenda_espera_seu_cadastro_foi_recebido_compartilhe_seu_link_para_subir_na_lista_quando_seus_amigos_tambem_se_cadastrarem")));
+    apresentarTextoEspera($("resultPoints"),()=>(legendaEspera("legenda_espera_complemento_quantidade_pontos",{quantidade:data.pontos || 0})));
+    apresentarTextoEspera($("resultRefs"),()=>(legendaEspera("legenda_espera_complemento_quantidade_indicacoes_confirmadas",{quantidade:data.indicacoes_confirmadas || 0})));
     $("shareLink").textContent = state.shareLink;
     if (data.total_lista !== undefined && data.total_lista !== null) {
       $("totalLista").textContent = Number(data.total_lista || 0).toLocaleString("pt-BR");
@@ -1720,10 +1742,10 @@
     }
     if (data.email_notificacao_status === "enfileirada") {
       $("resultVerify").hidden = false;
-      $("resultVerify").textContent = legendaEspera("legenda_espera_link_enviado_para_a_fila_de_e_mail");
+      apresentarTextoEspera($("resultVerify"),()=>(legendaEspera("legenda_espera_link_enviado_para_a_fila_de_e_mail")));
     } else if (data.email_notificacao_status === "ja_enfileirada_recentemente") {
       $("resultVerify").hidden = false;
-      $("resultVerify").textContent = legendaEspera("legenda_espera_link_ja_solicitado_por_e_mail");
+      apresentarTextoEspera($("resultVerify"),()=>(legendaEspera("legenda_espera_link_ja_solicitado_por_e_mail")));
     }
 
     try {
@@ -1736,7 +1758,7 @@
     track("complete_registration", { codigo:data.codigo, posicao:data.posicao });
 
     if (state.panelLink) {
-      $("panelBtn").textContent = legendaEspera("legenda_espera_abrindo_meu_painel");
+      apresentarTextoEspera($("panelBtn"),()=>(legendaEspera("legenda_espera_abrindo_meu_painel")));
       window.setTimeout(() => {
         window.location.assign(state.panelLink);
       }, data.ja_cadastrado ? 2500 : 450);
@@ -1770,7 +1792,7 @@
     $("signupPanel").classList.add("loading");
     $("submitBtn").disabled = true;
     status.className = "status";
-    status.textContent = legendaEspera("legenda_espera_reservando_sua_posicao");
+    apresentarTextoEspera(status,()=>(legendaEspera("legenda_espera_reservando_sua_posicao")));
 
     try {
       const data = await rpc("espera_lead_cadastrar_rpc", { p_payload: buildPayload() });
@@ -1783,7 +1805,7 @@
       showResult(data);
     } catch(e) {
       status.className = "status error";
-      status.textContent = legendaEspera("legenda_espera_falha_de_conexao_tente_novamente");
+      apresentarTextoEspera(status,()=>(legendaEspera("legenda_espera_falha_de_conexao_tente_novamente")));
     } finally {
       state.submitting = false;
       $("signupPanel").classList.remove("loading");
@@ -1795,8 +1817,8 @@
     if (!state.shareLink) return;
     try {
       await navigator.clipboard.writeText(state.shareLink);
-      $("copyBtn").textContent = legendaEspera("legenda_espera_link_copiado");
-      setTimeout(() => { $("copyBtn").textContent = legendaEspera("legenda_espera_copiar_link"); }, 1800);
+      apresentarTextoEspera($("copyBtn"),()=>(legendaEspera("legenda_espera_link_copiado")));
+      setTimeout(() => { apresentarTextoEspera($("copyBtn"),()=>(legendaEspera("legenda_espera_copiar_link"))); }, 1800);
     } catch(e) {
       window.prompt(legendaEspera("legenda_espera_copie_seu_link"), state.shareLink);
     }
