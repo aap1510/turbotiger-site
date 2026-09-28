@@ -2784,8 +2784,400 @@
     }).join("") : emptyState(legendaCentral("legenda_ie_central_nenhum_esporte_disponivel"), legendaCentral("legenda_ie_central_o_catalogo_esportivo_ainda_nao_foi_disponibilizado"), false));
   }
 
+  var opcoesSelecaoCentral = {
+  "countrySelect/18": {
+    "fonte": "Escócia",
+    "chave": "legenda_selecao_escocia"
+  },
+  "countrySelect/40": {
+    "fonte": "Cazaquistão",
+    "chave": "legenda_selecao_cazaquistao"
+  },
+  "countrySelect/1": {
+    "fonte": "Brasil",
+    "chave": "legenda_selecao_pais_br"
+  },
+  "countrySelect/2": {
+    "fonte": "Estados Unidos",
+    "chave": "legenda_selecao_pais_us"
+  },
+  "countrySelect/3": {
+    "fonte": "Canadá",
+    "chave": "legenda_selecao_pais_ca"
+  },
+  "countrySelect/4": {
+    "fonte": "México",
+    "chave": "legenda_selecao_pais_mx"
+  },
+  "countrySelect/5": {
+    "fonte": "Argentina",
+    "chave": "legenda_selecao_pais_ar"
+  },
+  "countrySelect/6": {
+    "fonte": "Uruguai",
+    "chave": "legenda_selecao_pais_uy"
+  },
+  "countrySelect/7": {
+    "fonte": "Chile",
+    "chave": "legenda_selecao_pais_cl"
+  },
+  "countrySelect/8": {
+    "fonte": "Colômbia",
+    "chave": "legenda_selecao_pais_co"
+  },
+  "countrySelect/70": {
+    "fonte": "Irã",
+    "chave": "legenda_selecao_pais_ir"
+  },
+  "countrySelect/71": {
+    "fonte": "Noruega",
+    "chave": "legenda_selecao_pais_no"
+  },
+  "countrySelect/72": {
+    "fonte": "Cabo Verde",
+    "chave": "legenda_selecao_pais_cv"
+  },
+  "countrySelect/73": {
+    "fonte": "Arábia Saudita",
+    "chave": "legenda_selecao_pais_sa"
+  },
+  "countrySelect/9": {
+    "fonte": "Paraguai",
+    "chave": "legenda_selecao_pais_py"
+  },
+  "countrySelect/10": {
+    "fonte": "Inglaterra",
+    "chave": "legenda_selecao_inglaterra"
+  },
+  "countrySelect/11": {
+    "fonte": "Espanha",
+    "chave": "legenda_selecao_pais_es"
+  },
+  "countrySelect/12": {
+    "fonte": "Itália",
+    "chave": "legenda_selecao_pais_it"
+  },
+  "countrySelect/13": {
+    "fonte": "Alemanha",
+    "chave": "legenda_selecao_pais_de"
+  },
+  "countrySelect/14": {
+    "fonte": "Portugal",
+    "chave": "legenda_selecao_pais_pt"
+  },
+  "countrySelect/15": {
+    "fonte": "França",
+    "chave": "legenda_selecao_pais_fr"
+  },
+  "countrySelect/16": {
+    "fonte": "Países Baixos",
+    "chave": "legenda_selecao_pais_nl"
+  },
+  "countrySelect/17": {
+    "fonte": "Bélgica",
+    "chave": "legenda_selecao_pais_be"
+  },
+  "countrySelect/31": {
+    "fonte": "Austrália",
+    "chave": "legenda_selecao_pais_au"
+  },
+  "countrySelect/32": {
+    "fonte": "Japão",
+    "chave": "legenda_selecao_pais_jp"
+  },
+  "countrySelect/33": {
+    "fonte": "Coreia do Sul",
+    "chave": "legenda_selecao_pais_kr"
+  },
+  "countrySelect/34": {
+    "fonte": "Taiwan",
+    "chave": "legenda_selecao_pais_tw"
+  },
+  "countrySelect/35": {
+    "fonte": "Filipinas",
+    "chave": "legenda_selecao_pais_ph"
+  },
+  "countrySelect/36": {
+    "fonte": "Dinamarca",
+    "chave": "legenda_selecao_pais_dk"
+  },
+  "countrySelect/37": {
+    "fonte": "Hungria",
+    "chave": "legenda_selecao_pais_hu"
+  },
+  "countrySelect/38": {
+    "fonte": "Islândia",
+    "chave": "legenda_selecao_pais_is"
+  },
+  "countrySelect/39": {
+    "fonte": "Suécia",
+    "chave": "legenda_selecao_pais_se"
+  },
+  "countrySelect/41": {
+    "fonte": "Rússia",
+    "chave": "legenda_selecao_pais_ru"
+  },
+  "countrySelect/42": {
+    "fonte": "Nova Zelândia",
+    "chave": "legenda_selecao_pais_nz"
+  },
+  "countrySelect/74": {
+    "fonte": "República Democrática do Congo",
+    "chave": "legenda_selecao_republica_democratica_do_congo"
+  },
+  "countrySelect/75": {
+    "fonte": "Uzbequistão",
+    "chave": "legenda_selecao_pais_uz"
+  },
+  "countrySelect/76": {
+    "fonte": "Haiti",
+    "chave": "legenda_selecao_haiti"
+  },
+  "countrySelect/77": {
+    "fonte": "Peru",
+    "chave": "legenda_selecao_pais_pe"
+  },
+  "countrySelect/78": {
+    "fonte": "República Tcheca",
+    "chave": "legenda_selecao_republica_tcheca"
+  },
+  "countrySelect/79": {
+    "fonte": "Panamá",
+    "chave": "legenda_selecao_pais_pa"
+  },
+  "countrySelect/80": {
+    "fonte": "Jordânia",
+    "chave": "legenda_selecao_pais_jo"
+  },
+  "countrySelect/81": {
+    "fonte": "Croácia",
+    "chave": "legenda_selecao_pais_hr"
+  },
+  "countrySelect/82": {
+    "fonte": "Suíça",
+    "chave": "legenda_selecao_pais_ch"
+  },
+  "countrySelect/83": {
+    "fonte": "Catar",
+    "chave": "legenda_selecao_pais_qa"
+  },
+  "countrySelect/84": {
+    "fonte": "Bósnia e Herzegovina",
+    "chave": "legenda_selecao_pais_ba"
+  },
+  "countrySelect/85": {
+    "fonte": "Costa do Marfim",
+    "chave": "legenda_selecao_pais_ci"
+  },
+  "countrySelect/86": {
+    "fonte": "Egito",
+    "chave": "legenda_selecao_pais_eg"
+  },
+  "countrySelect/87": {
+    "fonte": "Gana",
+    "chave": "legenda_selecao_pais_gh"
+  },
+  "countrySelect/88": {
+    "fonte": "Senegal",
+    "chave": "legenda_selecao_pais_sn"
+  },
+  "countrySelect/89": {
+    "fonte": "Áustria",
+    "chave": "legenda_selecao_pais_at"
+  },
+  "countrySelect/90": {
+    "fonte": "Iraque",
+    "chave": "legenda_selecao_pais_iq"
+  },
+  "countrySelect/91": {
+    "fonte": "Tunísia",
+    "chave": "legenda_selecao_pais_tn"
+  },
+  "countrySelect/92": {
+    "fonte": "Argélia",
+    "chave": "legenda_selecao_pais_dz"
+  },
+  "countrySelect/93": {
+    "fonte": "Marrocos",
+    "chave": "legenda_selecao_pais_ma"
+  },
+  "countrySelect/94": {
+    "fonte": "Equador",
+    "chave": "legenda_selecao_pais_ec"
+  },
+  "countrySelect/95": {
+    "fonte": "Curaçao",
+    "chave": "legenda_selecao_curacao"
+  },
+  "countrySelect/96": {
+    "fonte": "África do Sul",
+    "chave": "legenda_selecao_pais_za"
+  },
+  "countrySelect/98": {
+    "fonte": "Bulgária",
+    "chave": "legenda_selecao_pais_bg"
+  },
+  "continentSelect/1": {
+    "fonte": "América do Sul",
+    "chave": "legenda_selecao_america_do_sul"
+  },
+  "continentSelect/2": {
+    "fonte": "América do Norte",
+    "chave": "legenda_selecao_america_do_norte"
+  },
+  "continentSelect/3": {
+    "fonte": "Europa",
+    "chave": "legenda_selecao_europa"
+  },
+  "continentSelect/4": {
+    "fonte": "África",
+    "chave": "legenda_selecao_africa"
+  },
+  "continentSelect/5": {
+    "fonte": "Ásia",
+    "chave": "legenda_selecao_asia"
+  },
+  "continentSelect/6": {
+    "fonte": "Oceania",
+    "chave": "legenda_selecao_oceania"
+  },
+  "continentSelect/7": {
+    "fonte": "Global",
+    "chave": "legenda_selecao_global"
+  },
+  "sportSelect/2": {
+    "fonte": "Futebol australiano",
+    "chave": "legenda_selecao_futebol_australiano"
+  },
+  "sportSelect/3": {
+    "fonte": "Beisebol",
+    "chave": "legenda_selecao_beisebol"
+  },
+  "sportSelect/4": {
+    "fonte": "Basquete",
+    "chave": "legenda_selecao_basquete"
+  },
+  "sportSelect/5": {
+    "fonte": "Fórmula 1",
+    "chave": "legenda_selecao_formula_1"
+  },
+  "sportSelect/6": {
+    "fonte": "Handebol",
+    "chave": "legenda_selecao_handebol"
+  },
+  "sportSelect/7": {
+    "fonte": "Hóquei",
+    "chave": "legenda_selecao_hoquei"
+  },
+  "sportSelect/8": {
+    "fonte": "MMA",
+    "chave": "legenda_selecao_mma"
+  },
+  "sportSelect/1": {
+    "fonte": "Futebol",
+    "chave": "legenda_selecao_futebol"
+  },
+  "sportSelect/9": {
+    "fonte": "Futebol americano",
+    "chave": "legenda_selecao_futebol_americano"
+  },
+  "sportSelect/10": {
+    "fonte": "Rugby",
+    "chave": "legenda_selecao_rugby"
+  },
+  "sportSelect/11": {
+    "fonte": "Vôlei",
+    "chave": "legenda_selecao_volei"
+  }
+};
+  var fontesSelecaoCentral = {
+  "legenda_selecao_escocia": "Escócia",
+  "legenda_selecao_cazaquistao": "Cazaquistão",
+  "legenda_selecao_pais_br": "Brasil",
+  "legenda_selecao_pais_us": "Estados Unidos",
+  "legenda_selecao_pais_ca": "Canadá",
+  "legenda_selecao_pais_mx": "México",
+  "legenda_selecao_pais_ar": "Argentina",
+  "legenda_selecao_pais_uy": "Uruguai",
+  "legenda_selecao_pais_cl": "Chile",
+  "legenda_selecao_pais_co": "Colômbia",
+  "legenda_selecao_pais_ir": "Irã",
+  "legenda_selecao_pais_no": "Noruega",
+  "legenda_selecao_pais_cv": "Cabo Verde",
+  "legenda_selecao_pais_sa": "Arábia Saudita",
+  "legenda_selecao_pais_py": "Paraguai",
+  "legenda_selecao_inglaterra": "Inglaterra",
+  "legenda_selecao_pais_es": "Espanha",
+  "legenda_selecao_pais_it": "Itália",
+  "legenda_selecao_pais_de": "Alemanha",
+  "legenda_selecao_pais_pt": "Portugal",
+  "legenda_selecao_pais_fr": "França",
+  "legenda_selecao_pais_nl": "Países Baixos",
+  "legenda_selecao_pais_be": "Bélgica",
+  "legenda_selecao_pais_au": "Austrália",
+  "legenda_selecao_pais_jp": "Japão",
+  "legenda_selecao_pais_kr": "Coreia do Sul",
+  "legenda_selecao_pais_tw": "Taiwan",
+  "legenda_selecao_pais_ph": "Filipinas",
+  "legenda_selecao_pais_dk": "Dinamarca",
+  "legenda_selecao_pais_hu": "Hungria",
+  "legenda_selecao_pais_is": "Islândia",
+  "legenda_selecao_pais_se": "Suécia",
+  "legenda_selecao_pais_ru": "Rússia",
+  "legenda_selecao_pais_nz": "Nova Zelândia",
+  "legenda_selecao_republica_democratica_do_congo": "República Democrática do Congo",
+  "legenda_selecao_pais_uz": "Uzbequistão",
+  "legenda_selecao_haiti": "Haiti",
+  "legenda_selecao_pais_pe": "Peru",
+  "legenda_selecao_republica_tcheca": "República Tcheca",
+  "legenda_selecao_pais_pa": "Panamá",
+  "legenda_selecao_pais_jo": "Jordânia",
+  "legenda_selecao_pais_hr": "Croácia",
+  "legenda_selecao_pais_ch": "Suíça",
+  "legenda_selecao_pais_qa": "Catar",
+  "legenda_selecao_pais_ba": "Bósnia e Herzegovina",
+  "legenda_selecao_pais_ci": "Costa do Marfim",
+  "legenda_selecao_pais_eg": "Egito",
+  "legenda_selecao_pais_gh": "Gana",
+  "legenda_selecao_pais_sn": "Senegal",
+  "legenda_selecao_pais_at": "Áustria",
+  "legenda_selecao_pais_iq": "Iraque",
+  "legenda_selecao_pais_tn": "Tunísia",
+  "legenda_selecao_pais_dz": "Argélia",
+  "legenda_selecao_pais_ma": "Marrocos",
+  "legenda_selecao_pais_ec": "Equador",
+  "legenda_selecao_curacao": "Curaçao",
+  "legenda_selecao_pais_za": "África do Sul",
+  "legenda_selecao_pais_bg": "Bulgária",
+  "legenda_selecao_america_do_sul": "América do Sul",
+  "legenda_selecao_america_do_norte": "América do Norte",
+  "legenda_selecao_europa": "Europa",
+  "legenda_selecao_africa": "África",
+  "legenda_selecao_asia": "Ásia",
+  "legenda_selecao_oceania": "Oceania",
+  "legenda_selecao_global": "Global",
+  "legenda_selecao_futebol_australiano": "Futebol australiano",
+  "legenda_selecao_beisebol": "Beisebol",
+  "legenda_selecao_basquete": "Basquete",
+  "legenda_selecao_formula_1": "Fórmula 1",
+  "legenda_selecao_handebol": "Handebol",
+  "legenda_selecao_hoquei": "Hóquei",
+  "legenda_selecao_mma": "MMA",
+  "legenda_selecao_futebol": "Futebol",
+  "legenda_selecao_futebol_americano": "Futebol americano",
+  "legenda_selecao_rugby": "Rugby",
+  "legenda_selecao_volei": "Vôlei"
+};
+  if (window.TurboTigerLegendas) window.TurboTigerLegendas.registrar(fontesSelecaoCentral);
+  function rotuloSelecaoCentral(select, item) {
+    var id = item.id || item.id_esporte || item.id_continente || item.id_pais;
+    var contrato = opcoesSelecaoCentral[select.id + "/" + id];
+    if (!contrato || contrato.fonte !== item.nome || !window.TurboTigerLegendas) return item.nome;
+    return window.TurboTigerLegendas.texto(contrato.chave);
+  }
+
   function fillSelect(select, items, placeholder, value) {
-    apresentarHTMLCentral(select, "<option value=\"\">" + escapeHtml(placeholder) + "</option>" + arrayOf(items).map(function (item) { return "<option value=\"" + escapeHtml(item.id || item.id_esporte || item.id_continente || item.id_pais) + "\">" + escapeHtml(item.nome) + "</option>"; }).join(""));
+    apresentarHTMLCentral(select, "<option value=\"\">" + escapeHtml(placeholder) + "</option>" + arrayOf(items).map(function (item) { return "<option value=\"" + escapeHtml(item.id || item.id_esporte || item.id_continente || item.id_pais) + "\">" + escapeHtml(rotuloSelecaoCentral(select, item)) + "</option>"; }).join(""));
     if (!reapresentandoIdiomaCentral) select.value = value == null ? "" : String(value);
   }
 

@@ -2515,10 +2515,10 @@
       context.postalCodeConsistent = false;
       updatePostalCodeSearchButton(prefix);
       var select = qs(prefix + "PostalCodeSelect");
-      select.innerHTML = ("<option value=\"\">" + escapeHtml(legendaMmn("legenda_fechamento_mmn_escolher_endereco"))) + rows.length + (escapeHtml(legendaMmn("legenda_fechamento_mmn_enderecos_encontrados")) + "</option>") + rows.map(function (row, index) {
+      apresentarMmn(select, "innerHTML", function () { return ("<option value=\"\">" + escapeHtml(legendaMmn("legenda_fechamento_mmn_escolher_endereco"))) + rows.length + (escapeHtml(legendaMmn("legenda_fechamento_mmn_enderecos_encontrados")) + "</option>") + rows.map(function (row, index) {
         var label = [formatPostalCode(row.cep), row.logradouro, row.bairro, row.cidade + "/" + row.uf].filter(Boolean).join(" - ");
         return "<option value=\"" + index + "\">" + escapeHtml(label) + "</option>";
-      }).join("");
+      }).join(""); });
       qs(prefix + "PostalCodeResults").hidden = false;
       setAddressStatus(prefix, legendaMmn("legenda_mmn_foram_encontrados_varios_ceps_selecione_o_endereco_correto_para_confirmar"), "warn");
     } catch (error) {

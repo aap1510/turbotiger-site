@@ -241,9 +241,110 @@
     return Object.keys(byCode).sort().filter(function (code) { return !conflicts[code]; }).map(function (code) { return byCode[code]; });
   }
 
+  var opcoesMoedasLegenda = {
+  "BRL": {
+    "fonte": "Real brasileiro (BRL)",
+    "chave": "legenda_selecao_moeda_brl"
+  },
+  "USD": {
+    "fonte": "Dolar dos Estados Unidos (USD)",
+    "chave": "legenda_selecao_moeda_usd"
+  },
+  "EUR": {
+    "fonte": "Euro (EUR)",
+    "chave": "legenda_selecao_moeda_eur"
+  },
+  "GBP": {
+    "fonte": "Libra esterlina (GBP)",
+    "chave": "legenda_selecao_moeda_gbp"
+  },
+  "ARS": {
+    "fonte": "Peso argentino (ARS)",
+    "chave": "legenda_selecao_moeda_ars"
+  },
+  "CLP": {
+    "fonte": "Peso chileno (CLP)",
+    "chave": "legenda_selecao_moeda_clp"
+  },
+  "COP": {
+    "fonte": "Peso colombiano (COP)",
+    "chave": "legenda_selecao_moeda_cop"
+  },
+  "MXN": {
+    "fonte": "Peso mexicano (MXN)",
+    "chave": "legenda_selecao_moeda_mxn"
+  },
+  "PEN": {
+    "fonte": "Sol peruano (PEN)",
+    "chave": "legenda_selecao_moeda_pen"
+  },
+  "UYU": {
+    "fonte": "Peso uruguaio (UYU)",
+    "chave": "legenda_selecao_moeda_uyu"
+  },
+  "CAD": {
+    "fonte": "Dolar canadense (CAD)",
+    "chave": "legenda_selecao_moeda_cad"
+  },
+  "AUD": {
+    "fonte": "Dolar australiano (AUD)",
+    "chave": "legenda_selecao_moeda_aud"
+  },
+  "JPY": {
+    "fonte": "Iene japones (JPY)",
+    "chave": "legenda_selecao_moeda_jpy"
+  },
+  "CHF": {
+    "fonte": "Franco suico (CHF)",
+    "chave": "legenda_selecao_moeda_chf"
+  },
+  "CNY": {
+    "fonte": "Yuan chines (CNY)",
+    "chave": "legenda_selecao_moeda_cny"
+  },
+  "INR": {
+    "fonte": "Rupia indiana (INR)",
+    "chave": "legenda_selecao_moeda_inr"
+  },
+  "BHD": {
+    "fonte": "Dinar bareinita (BHD)",
+    "chave": "legenda_selecao_moeda_bhd"
+  },
+  "KWD": {
+    "fonte": "Dinar kuwaitiano (KWD)",
+    "chave": "legenda_selecao_moeda_kwd"
+  }
+};
+  var fontesMoedasLegenda = {
+  "legenda_selecao_moeda_brl": "Real brasileiro (BRL)",
+  "legenda_selecao_moeda_usd": "Dolar dos Estados Unidos (USD)",
+  "legenda_selecao_moeda_eur": "Euro (EUR)",
+  "legenda_selecao_moeda_gbp": "Libra esterlina (GBP)",
+  "legenda_selecao_moeda_ars": "Peso argentino (ARS)",
+  "legenda_selecao_moeda_clp": "Peso chileno (CLP)",
+  "legenda_selecao_moeda_cop": "Peso colombiano (COP)",
+  "legenda_selecao_moeda_mxn": "Peso mexicano (MXN)",
+  "legenda_selecao_moeda_pen": "Sol peruano (PEN)",
+  "legenda_selecao_moeda_uyu": "Peso uruguaio (UYU)",
+  "legenda_selecao_moeda_cad": "Dolar canadense (CAD)",
+  "legenda_selecao_moeda_aud": "Dolar australiano (AUD)",
+  "legenda_selecao_moeda_jpy": "Iene japones (JPY)",
+  "legenda_selecao_moeda_chf": "Franco suico (CHF)",
+  "legenda_selecao_moeda_cny": "Yuan chines (CNY)",
+  "legenda_selecao_moeda_inr": "Rupia indiana (INR)",
+  "legenda_selecao_moeda_bhd": "Dinar bareinita (BHD)",
+  "legenda_selecao_moeda_kwd": "Dinar kuwaitiano (KWD)"
+};
+  if (root.TurboTigerLegendas) root.TurboTigerLegendas.registrar(fontesMoedasLegenda);
+  function rotuloMoedaLegenda(currency) {
+    var contrato = opcoesMoedasLegenda[currency.code];
+    if (!contrato || contrato.fonte !== currency.label || !root.TurboTigerLegendas) return currency.label;
+    return root.TurboTigerLegendas.texto(contrato.chave);
+  }
+
   function currencyOptions(context, selectedCode, emptyLabel) {
     return '<option value="">' + escapeHtml(emptyLabel || legendaBase("legenda_ic_base_selecione_moeda")) + '</option>' + currencyCatalog(context).map(function (currency) {
-      return '<option value="' + currency.code + '"' + (currency.code === selectedCode ? " selected" : "") + '>' + escapeHtml(currency.label) + '</option>';
+      return '<option value="' + currency.code + '"' + (currency.code === selectedCode ? " selected" : "") + '>' + escapeHtml(rotuloMoedaLegenda(currency)) + '</option>';
     }).join("");
   }
 

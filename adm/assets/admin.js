@@ -351,13 +351,326 @@
     return contexto;
   }
 
-  function fillSelect(select, rows, valueKey, labelKey) {
+  var OPCOES_ADMIN = {
+  "categoria/alertas_importantes": {
+    "fonte": "Alertas importantes",
+    "chave": "legenda_java_canal_alertas_importantes"
+  },
+  "categoria/avisos_diversos": {
+    "fonte": "Avisos diversos",
+    "chave": "legenda_java_canal_avisos_diversos"
+  },
+  "categoria/promocoes": {
+    "fonte": "Promocoes",
+    "chave": "legenda_selecao_admin_promocoes"
+  },
+  "categoria/melhores_momentos": {
+    "fonte": "Melhores momentos",
+    "chave": "legenda_java_canal_melhores_momentos"
+  },
+  "categoria/inteligencia_esportiva": {
+    "fonte": "Inteligência esportiva",
+    "chave": "legenda_java_canal_inteligencia_esportiva"
+  },
+  "tipo/inteligencia_esportiva/padrao": {
+    "fonte": "Padrao",
+    "chave": "legenda_admin_padrao"
+  },
+  "tipo/inteligencia_esportiva/inicio_partida": {
+    "fonte": "Inicio de partida",
+    "chave": "legenda_selecao_admin_inicio_de_partida"
+  },
+  "tipo/inteligencia_esportiva/inicio_partida_aviso_1": {
+    "fonte": "Inicio de partida - aviso 1",
+    "chave": "legenda_selecao_admin_inicio_de_partida_aviso_1"
+  },
+  "tipo/inteligencia_esportiva/inicio_partida_aviso_2": {
+    "fonte": "Inicio de partida - aviso 2",
+    "chave": "legenda_selecao_admin_inicio_de_partida_aviso_2"
+  },
+  "tipo/inteligencia_esportiva/prorrogacao": {
+    "fonte": "Prorrogacao",
+    "chave": "legenda_servidor_push_config_inteligencia_esportiva_prorrogacao_titulo"
+  },
+  "tipo/inteligencia_esportiva/penaltis": {
+    "fonte": "Penaltis",
+    "chave": "legenda_servidor_push_config_inteligencia_esportiva_penaltis_titulo"
+  },
+  "tipo/inteligencia_esportiva/resultado": {
+    "fonte": "Resultado final",
+    "chave": "legenda_servidor_push_config_inteligencia_esportiva_resultado_titulo"
+  },
+  "tipo/inteligencia_esportiva/alerta_admin_inicio_partida_divergente": {
+    "fonte": "Alerta admin - inicio divergente",
+    "chave": "legenda_selecao_admin_alerta_admin_inicio_divergente"
+  },
+  "tipo/melhores_momentos/padrao": {
+    "fonte": "Padrao",
+    "chave": "legenda_admin_padrao"
+  },
+  "tipo/melhores_momentos/melhor_momento": {
+    "fonte": "Melhor momento",
+    "chave": "legenda_servidor_push_config_melhores_momentos_melhor_momento_titulo"
+  },
+  "tipo/melhores_momentos/melhor_dia": {
+    "fonte": "Melhor dia",
+    "chave": "legenda_selecao_admin_melhor_dia"
+  },
+  "tipo/melhores_momentos/melhor_horario": {
+    "fonte": "Melhor horario",
+    "chave": "legenda_selecao_admin_melhor_horario"
+  },
+  "tipo/melhores_momentos/janela_oportunidade": {
+    "fonte": "Janela de oportunidade",
+    "chave": "legenda_selecao_admin_janela_de_oportunidade"
+  },
+  "tipo/melhores_momentos/sequencia_positiva": {
+    "fonte": "Sequencia positiva",
+    "chave": "legenda_servidor_push_config_melhores_momentos_sequencia_positiva_titulo"
+  },
+  "tipo/alertas_importantes/padrao": {
+    "fonte": "Padrao",
+    "chave": "legenda_admin_padrao"
+  },
+  "tipo/alertas_importantes/seguranca": {
+    "fonte": "Seguranca",
+    "chave": "legenda_selecao_admin_seguranca"
+  },
+  "tipo/alertas_importantes/manutencao": {
+    "fonte": "Manutencao",
+    "chave": "legenda_selecao_admin_manutencao"
+  },
+  "tipo/alertas_importantes/conta": {
+    "fonte": "Conta",
+    "chave": "legenda_ic_ao_vivo_conta"
+  },
+  "tipo/alertas_importantes/pagamento": {
+    "fonte": "Pagamento",
+    "chave": "legenda_mmn_rotulo_pagamento"
+  },
+  "tipo/avisos_diversos/padrao": {
+    "fonte": "Padrao",
+    "chave": "legenda_admin_padrao"
+  },
+  "tipo/avisos_diversos/manual": {
+    "fonte": "Manual",
+    "chave": "legenda_admin_manual"
+  },
+  "tipo/avisos_diversos/novidade": {
+    "fonte": "Novidade",
+    "chave": "legenda_selecao_admin_novidade"
+  },
+  "tipo/avisos_diversos/comunicado": {
+    "fonte": "Comunicado",
+    "chave": "legenda_servidor_push_config_avisos_diversos_comunicado_titulo"
+  },
+  "tipo/avisos_diversos/lembrete": {
+    "fonte": "Lembrete",
+    "chave": "legenda_servidor_push_config_avisos_diversos_lembrete_titulo"
+  },
+  "tipo/promocoes/padrao": {
+    "fonte": "Padrao",
+    "chave": "legenda_admin_padrao"
+  },
+  "tipo/promocoes/promocao": {
+    "fonte": "Promocao",
+    "chave": "legenda_selecao_admin_promocao"
+  },
+  "tipo/promocoes/oferta": {
+    "fonte": "Oferta",
+    "chave": "legenda_selecao_admin_oferta"
+  },
+  "tipo/promocoes/cupom": {
+    "fonte": "Cupom",
+    "chave": "legenda_selecao_admin_cupom"
+  },
+  "tipo/promocoes/renovacao": {
+    "fonte": "Renovacao",
+    "chave": "legenda_servidor_push_config_promocoes_renovacao_titulo"
+  },
+  "tipo/melhores_momentos/jogabilidade": {
+    "fonte": "Jogabilidade",
+    "chave": "legenda_selecao_admin_jogabilidade"
+  },
+  "tipo/inteligencia_esportiva/pre_inicio": {
+    "fonte": "Antes do início",
+    "chave": "legenda_ie_central_antes_do_inicio"
+  },
+  "tipo/inteligencia_esportiva/inicio_evento": {
+    "fonte": "Partida iniciada",
+    "chave": "legenda_servidor_push_config_inteligencia_esportiva_inicio_evento_titulo"
+  },
+  "tipo/inteligencia_esportiva/escalacao_disponivel": {
+    "fonte": "Escalação disponível",
+    "chave": "legenda_servidor_push_config_inteligencia_esportiva_escalacao_disponivel_titulo"
+  },
+  "tipo/inteligencia_esportiva/gol": {
+    "fonte": "Gol",
+    "chave": "legenda_servidor_push_config_inteligencia_esportiva_gol_titulo"
+  },
+  "tipo/inteligencia_esportiva/cartao_vermelho": {
+    "fonte": "Cartão vermelho",
+    "chave": "legenda_servidor_push_config_inteligencia_esportiva_cartao_vermelho_titulo"
+  },
+  "tipo/inteligencia_esportiva/intervalo": {
+    "fonte": "Intervalo",
+    "chave": "legenda_servidor_push_config_inteligencia_esportiva_intervalo_titulo"
+  },
+  "tipo/inteligencia_esportiva/encerramento": {
+    "fonte": "Partida encerrada",
+    "chave": "legenda_servidor_push_config_inteligencia_esportiva_encerramento_titulo"
+  },
+  "tipo/inteligencia_esportiva/mudanca_horario": {
+    "fonte": "Horário atualizado",
+    "chave": "legenda_servidor_push_config_inteligencia_esportiva_mudanca_horario_titulo"
+  },
+  "tipo/inteligencia_esportiva/reinicio_evento": {
+    "fonte": "Reinício do evento",
+    "chave": "legenda_selecao_admin_reinicio_do_evento"
+  },
+  "tipo/inteligencia_esportiva/simulacao_margem_alterada": {
+    "fonte": "Impacto da simulacao alterado",
+    "chave": "legenda_selecao_admin_impacto_da_simulacao_alterado"
+  },
+  "tipo/inteligencia_esportiva/simulacao_indisponivel": {
+    "fonte": "Simulacao indisponivel",
+    "chave": "legenda_servidor_push_config_inteligencia_esportiva_simulacao_indisponivel_titulo"
+  },
+  "tipo/inteligencia_esportiva/placar_corrigido": {
+    "fonte": "Placar corrigido",
+    "chave": "legenda_servidor_ie_placar_corrigido_titulo"
+  },
+  "perfil/sobolao_operador": {
+    "fonte": "Operador So Bolao",
+    "chave": "legenda_selecao_admin_operador_so_bolao"
+  },
+  "perfil/sobolao_suporte": {
+    "fonte": "Suporte So Bolao",
+    "chave": "legenda_selecao_admin_suporte_so_bolao"
+  },
+  "perfil/push_operador": {
+    "fonte": "Operador de notificacoes",
+    "chave": "legenda_selecao_admin_operador_de_notificacoes"
+  },
+  "perfil/mmn_financeiro": {
+    "fonte": "Financeiro MMN",
+    "chave": "legenda_selecao_admin_financeiro_mmn"
+  },
+  "perfil/mmn_auditor": {
+    "fonte": "Auditoria MMN",
+    "chave": "legenda_selecao_admin_auditoria_mmn"
+  },
+  "perfil/mmn_suporte": {
+    "fonte": "Suporte MMN",
+    "chave": "legenda_selecao_admin_suporte_mmn"
+  },
+  "perfil/super_admin": {
+    "fonte": "Super administrador",
+    "chave": "legenda_selecao_admin_super_administrador"
+  },
+  "destino/todos_dispositivos": {
+    "fonte": "Todos os aparelhos",
+    "chave": "legenda_selecao_admin_todos_os_aparelhos"
+  },
+  "destino/dispositivos_vinculados": {
+    "fonte": "Aparelhos vinculados a usuarios",
+    "chave": "legenda_selecao_admin_aparelhos_vinculados_a_usuarios"
+  },
+  "destino/app_aberto": {
+    "fonte": "Aparelhos com app aberto agora",
+    "chave": "legenda_selecao_admin_aparelhos_com_app_aberto_agora"
+  },
+  "destino/usuarios_logados": {
+    "fonte": "Usuarios logados agora",
+    "chave": "legenda_selecao_admin_usuarios_logados_agora"
+  },
+  "destino/usuarios": {
+    "fonte": "Usuarios selecionados",
+    "chave": "legenda_selecao_admin_usuarios_selecionados"
+  },
+  "destino/licenca": {
+    "fonte": "Por licenca",
+    "chave": "legenda_selecao_admin_por_licenca"
+  },
+  "destino/grupo": {
+    "fonte": "Por grupo",
+    "chave": "legenda_selecao_admin_por_grupo"
+  }
+};
+  var FONTES_OPCOES_ADMIN = {
+  "legenda_java_canal_alertas_importantes": "Alertas importantes",
+  "legenda_java_canal_avisos_diversos": "Avisos diversos",
+  "legenda_selecao_admin_promocoes": "Promocoes",
+  "legenda_java_canal_melhores_momentos": "Melhores momentos",
+  "legenda_java_canal_inteligencia_esportiva": "Inteligência esportiva",
+  "legenda_admin_padrao": "Padrao",
+  "legenda_selecao_admin_inicio_de_partida": "Inicio de partida",
+  "legenda_selecao_admin_inicio_de_partida_aviso_1": "Inicio de partida - aviso 1",
+  "legenda_selecao_admin_inicio_de_partida_aviso_2": "Inicio de partida - aviso 2",
+  "legenda_servidor_push_config_inteligencia_esportiva_prorrogacao_titulo": "Prorrogacao",
+  "legenda_servidor_push_config_inteligencia_esportiva_penaltis_titulo": "Penaltis",
+  "legenda_servidor_push_config_inteligencia_esportiva_resultado_titulo": "Resultado final",
+  "legenda_selecao_admin_alerta_admin_inicio_divergente": "Alerta admin - inicio divergente",
+  "legenda_servidor_push_config_melhores_momentos_melhor_momento_titulo": "Melhor momento",
+  "legenda_selecao_admin_melhor_dia": "Melhor dia",
+  "legenda_selecao_admin_melhor_horario": "Melhor horario",
+  "legenda_selecao_admin_janela_de_oportunidade": "Janela de oportunidade",
+  "legenda_servidor_push_config_melhores_momentos_sequencia_positiva_titulo": "Sequencia positiva",
+  "legenda_selecao_admin_seguranca": "Seguranca",
+  "legenda_selecao_admin_manutencao": "Manutencao",
+  "legenda_ic_ao_vivo_conta": "Conta",
+  "legenda_mmn_rotulo_pagamento": "Pagamento",
+  "legenda_admin_manual": "Manual",
+  "legenda_selecao_admin_novidade": "Novidade",
+  "legenda_servidor_push_config_avisos_diversos_comunicado_titulo": "Comunicado",
+  "legenda_servidor_push_config_avisos_diversos_lembrete_titulo": "Lembrete",
+  "legenda_selecao_admin_promocao": "Promocao",
+  "legenda_selecao_admin_oferta": "Oferta",
+  "legenda_selecao_admin_cupom": "Cupom",
+  "legenda_servidor_push_config_promocoes_renovacao_titulo": "Renovacao",
+  "legenda_selecao_admin_jogabilidade": "Jogabilidade",
+  "legenda_ie_central_antes_do_inicio": "Antes do início",
+  "legenda_servidor_push_config_inteligencia_esportiva_inicio_evento_titulo": "Partida iniciada",
+  "legenda_servidor_push_config_inteligencia_esportiva_escalacao_disponivel_titulo": "Escalação disponível",
+  "legenda_servidor_push_config_inteligencia_esportiva_gol_titulo": "Gol",
+  "legenda_servidor_push_config_inteligencia_esportiva_cartao_vermelho_titulo": "Cartão vermelho",
+  "legenda_servidor_push_config_inteligencia_esportiva_intervalo_titulo": "Intervalo",
+  "legenda_servidor_push_config_inteligencia_esportiva_encerramento_titulo": "Partida encerrada",
+  "legenda_servidor_push_config_inteligencia_esportiva_mudanca_horario_titulo": "Horário atualizado",
+  "legenda_selecao_admin_reinicio_do_evento": "Reinício do evento",
+  "legenda_selecao_admin_impacto_da_simulacao_alterado": "Impacto da simulacao alterado",
+  "legenda_servidor_push_config_inteligencia_esportiva_simulacao_indisponivel_titulo": "Simulacao indisponivel",
+  "legenda_servidor_ie_placar_corrigido_titulo": "Placar corrigido",
+  "legenda_selecao_admin_operador_so_bolao": "Operador So Bolao",
+  "legenda_selecao_admin_suporte_so_bolao": "Suporte So Bolao",
+  "legenda_selecao_admin_operador_de_notificacoes": "Operador de notificacoes",
+  "legenda_selecao_admin_financeiro_mmn": "Financeiro MMN",
+  "legenda_selecao_admin_auditoria_mmn": "Auditoria MMN",
+  "legenda_selecao_admin_suporte_mmn": "Suporte MMN",
+  "legenda_selecao_admin_super_administrador": "Super administrador",
+  "legenda_selecao_admin_todos_os_aparelhos": "Todos os aparelhos",
+  "legenda_selecao_admin_aparelhos_vinculados_a_usuarios": "Aparelhos vinculados a usuarios",
+  "legenda_selecao_admin_aparelhos_com_app_aberto_agora": "Aparelhos com app aberto agora",
+  "legenda_selecao_admin_usuarios_logados_agora": "Usuarios logados agora",
+  "legenda_selecao_admin_usuarios_selecionados": "Usuarios selecionados",
+  "legenda_selecao_admin_por_licenca": "Por licenca",
+  "legenda_selecao_admin_por_grupo": "Por grupo"
+};
+  if (window.TurboTigerLegendas) window.TurboTigerLegendas.registrar(FONTES_OPCOES_ADMIN);
+  function rotuloOpcaoAdmin(grupo, codigo, original) {
+    var contrato = OPCOES_ADMIN[grupo + "/" + codigo];
+    if (!contrato || contrato.fonte !== original || !window.TurboTigerLegendas) return original;
+    return window.TurboTigerLegendas.texto(contrato.chave);
+  }
+
+  function fillSelect(select, rows, valueKey, labelKey, grupoLegenda) {
     if (!select) return;
     select.innerHTML = "";
     (rows || []).forEach(function (row) {
       var option = document.createElement("option");
       option.value = row[valueKey];
-      option.textContent = row[labelKey] || row[valueKey];
+      var original = row[labelKey] || row[valueKey];
+      apresentarTextoAdmin(option, function () { return rotuloOpcaoAdmin(grupoLegenda, row[valueKey], original); });
       select.appendChild(option);
     });
   }
@@ -482,7 +795,7 @@
     modelTypeOptions(categoria).forEach(function (item) {
       var option = document.createElement("option");
       option.value = item.tipo;
-      option.textContent = item.nome + " (" + item.tipo + ")";
+      apresentarTextoAdmin(option, function () { return rotuloOpcaoAdmin("tipo", categoria + "/" + item.tipo, item.nome) + " (" + item.tipo + ")"; });
       select.appendChild(option);
     });
     restoreSelectValue(select, current);
@@ -498,7 +811,7 @@
     options.forEach(function (item) {
       var option = document.createElement("option");
       option.value = item.tipo;
-      option.textContent = item.nome + " (" + item.tipo + ")";
+      apresentarTextoAdmin(option, function () { return rotuloOpcaoAdmin("tipo", categoria + "/" + item.tipo, item.nome) + " (" + item.tipo + ")"; });
       select.appendChild(option);
     });
     restoreSelectValue(select, current);
@@ -893,7 +1206,7 @@
   }
 
   function fillAdminProfileSelect() {
-    fillSelect(qs("admUserPerfil"), activeProfiles(), "chave", "nome");
+    fillSelect(qs("admUserPerfil"), activeProfiles(), "chave", "nome", "perfil");
   }
 
   function renderAdminUsers() {
@@ -1136,9 +1449,9 @@
       throw new Error((state.catalogo && state.catalogo.error) || "catalogo_indisponivel");
     }
     var categorias = state.catalogo.categorias || [];
-    fillSelect(qs("sendCategoria"), categorias, "chave", "nome");
-    fillSelect(qs("modelCategoria"), categorias, "chave", "nome");
-    fillSelect(qs("sendDestinoTipo"), state.catalogo.destinos || [], "tipo", "nome");
+    fillSelect(qs("sendCategoria"), categorias, "chave", "nome", "categoria");
+    fillSelect(qs("modelCategoria"), categorias, "chave", "nome", "categoria");
+    fillSelect(qs("sendDestinoTipo"), state.catalogo.destinos || [], "tipo", "nome", "destino");
     restoreSelectValue(qs("sendCategoria"), sendCategoria);
     restoreSelectValue(qs("sendDestinoTipo"), sendDestinoTipo);
     restoreSelectValue(qs("modelCategoria"), modelCategoria);
